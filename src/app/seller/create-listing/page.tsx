@@ -2,17 +2,33 @@
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { ArrowLeft, CheckCircle2, ShieldCheck, Trophy, Upload, Zap, AlertCircle } from "lucide-react";
+import {
+  ArrowLeft,
+  CheckCircle2,
+  ShieldCheck,
+  Trophy,
+  Upload,
+  UploadCloud,
+  Zap,
+  AlertCircle,
+  Image as ImageIcon,
+  Trash2,
+  RefreshCw,
+  Link as LinkIcon,
+  Loader2,
+} from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useRef, useState } from "react";
 
 export default function CreateListingPage() {
   const router = useRouter();
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Form State
+  // Basic Information (All initialized empty - placeholders serve as guidance hints only)
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -20,29 +36,122 @@ export default function CreateListingPage() {
   const [gameVersion, setGameVersion] = useState("v4.0.0");
   const [region, setRegion] = useState("Global");
 
-  const [accountLevel, setAccountLevel] = useState("45");
-  const [overallStrength, setOverallStrength] = useState("3120");
-  const [gpBalance, setGpBalance] = useState("1500000");
-  const [coinBalance, setCoinBalance] = useState("850");
-  const [efootballPoints, setEfootballPoints] = useState("12000");
-  const [contractTickets, setContractTickets] = useState("10");
+  // Account Strength & Balances
+  const [accountLevel, setAccountLevel] = useState("");
+  const [overallStrength, setOverallStrength] = useState("");
+  const [gpBalance, setGpBalance] = useState("");
+  const [coinBalance, setCoinBalance] = useState("");
+  const [efootballPoints, setEfootballPoints] = useState("");
+  const [contractTickets, setContractTickets] = useState("");
 
-  const [epicCount, setEpicCount] = useState("8");
-  const [bigTimeCount, setBigTimeCount] = useState("4");
-  const [highlightCount, setHighlightCount] = useState("15");
-  const [featuredCount, setFeaturedCount] = useState("20");
-  const [legendCount, setLegendCount] = useState("10");
-  const [keyPlayers, setKeyPlayers] = useState("Messi 105 Big Time, Vieira Booster, Rummenigge Epic, Ronaldinho 102");
+  // Special Player Cards & Tactics
+  const [epicCount, setEpicCount] = useState("");
+  const [bigTimeCount, setBigTimeCount] = useState("");
+  const [highlightCount, setHighlightCount] = useState("");
+  const [featuredCount, setFeaturedCount] = useState("");
+  const [legendCount, setLegendCount] = useState("");
+  const [keyPlayers, setKeyPlayers] = useState("");
 
-  const [managerName, setManagerName] = useState("G. Caputto");
-  const [formation, setFormation] = useState("4-2-2-2");
+  const [managerName, setManagerName] = useState("");
+  const [formation, setFormation] = useState("");
   const [primaryPlaystyle, setPrimaryPlaystyle] = useState("quick_counter");
-  const [currentDivision, setCurrentDivision] = useState("1");
-  const [highestDivision, setHighestDivision] = useState("1");
+  const [currentDivision, setCurrentDivision] = useState("");
+  const [highestDivision, setHighestDivision] = useState("");
 
+  // Security & Konami ID Status
   const [konamiIdStatus, setKonamiIdStatus] = useState("linked_changeable");
   const [linkedEmailStatus, setLinkedEmailStatus] = useState("transferable_full_access");
-  const [imageUrl, setImageUrl] = useState("https://images.unsplash.com/photo-1511512578047-dfb367046420?w=1200&auto=format&fit=crop&q=80");
+
+  // Squad Image Upload State
+  const [imageUrl, setImageUrl] = useState("");
+  const [imageFileName, setImageFileName] = useState("");
+  const [imageFileSize, setImageFileSize] = useState<number | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [isDragOver, setIsDragOver] = useState(false);
+  const [showManualUrl, setShowManualUrl] = useState(false);
+
+  // Handle Image File Selection & Direct Upload
+  const handleImageUpload = async (file: File) => {
+    if (!file) return;
+    setUploadError("");
+
+    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+    if (!validTypes.includes(file.type.toLowerCase())) {
+      setUploadError("Invalid file type. Please upload a PNG, JPG, or WebP screenshot.");
+      return;
+    }
+
+    // 10MB limit check
+    if (file.size > 10 * 1024 * 1024) {
+      setUploadError(
+        `File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed is 10MB.`
+      );
+      return;
+    }
+
+    setUploadingImage(true);
+
+    try {
+      const formData = new FormData();
+      formData.append("file", file);
+
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+
+      const data = await res.json();
+
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to upload squad image.");
+      }
+
+      setImageUrl(data.url);
+      setImageFileName(file.name);
+      setImageFileSize(file.size);
+    } catch (err: any) {
+      setUploadError(err.message || "Failed to upload image. Please try again.");
+    } finally {
+      setUploadingImage(false);
+    }
+  };
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    const file = e.dataTransfer.files?.[0];
+    if (file) {
+      handleImageUpload(file);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleRemoveImage = () => {
+    setImageUrl("");
+    setImageFileName("");
+    setImageFileSize(null);
+    setUploadError("");
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -50,38 +159,54 @@ export default function CreateListingPage() {
     setError("");
 
     try {
+      if (!title.trim()) {
+        throw new Error("Please enter a descriptive listing title.");
+      }
+
+      if (!price || Number(price) <= 0) {
+        throw new Error("Please specify a valid listing price in KES.");
+      }
+
+      if (!overallStrength || Number(overallStrength) < 2000) {
+        throw new Error("Overall Team Strength (OVR) is required and must be at least 2000.");
+      }
+
+      if (!imageUrl.trim()) {
+        throw new Error("Please upload a squad screenshot image before submitting your listing.");
+      }
+
       const playersList = keyPlayers
         .split(",")
         .map((p) => p.trim())
         .filter(Boolean);
 
       const payload = {
-        title,
-        description,
+        title: title.trim(),
+        description: description.trim(),
         price: Number(price),
         platform,
         game_version: gameVersion,
         region,
-        account_level: Number(accountLevel),
+        account_level: accountLevel ? Number(accountLevel) : 1,
         overall_team_strength: Number(overallStrength),
-        gp_balance: Number(gpBalance),
-        coin_balance: Number(coinBalance),
-        efootball_points: Number(efootballPoints),
-        contract_renewal_tickets: Number(contractTickets),
-        epic_players_count: Number(epicCount),
-        big_time_players_count: Number(bigTimeCount),
-        highlight_players_count: Number(highlightCount),
-        featured_players_count: Number(featuredCount),
-        legend_players_count: Number(legendCount),
+        gp_balance: gpBalance ? Number(gpBalance) : 0,
+        coin_balance: coinBalance ? Number(coinBalance) : 0,
+        efootball_points: efootballPoints ? Number(efootballPoints) : 0,
+        contract_renewal_tickets: contractTickets ? Number(contractTickets) : 0,
+        epic_players_count: epicCount ? Number(epicCount) : 0,
+        big_time_players_count: bigTimeCount ? Number(bigTimeCount) : 0,
+        highlight_players_count: highlightCount ? Number(highlightCount) : 0,
+        featured_players_count: featuredCount ? Number(featuredCount) : 0,
+        legend_players_count: legendCount ? Number(legendCount) : 0,
         key_players_list: playersList,
-        manager_name: managerName,
-        formation: formation,
+        manager_name: managerName.trim() || undefined,
+        formation: formation.trim() || undefined,
         primary_playstyle: primaryPlaystyle,
-        current_division: Number(currentDivision),
-        highest_division: Number(highestDivision),
+        current_division: currentDivision ? Number(currentDivision) : 10,
+        highest_division: highestDivision ? Number(highestDivision) : 10,
         konami_id_status: konamiIdStatus,
         linked_email_status: linkedEmailStatus,
-        image_urls: [imageUrl],
+        image_urls: [imageUrl.trim()],
       };
 
       const res = await fetch("/api/listings", {
@@ -122,7 +247,7 @@ export default function CreateListingPage() {
           Create eFootball Account Listing
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Specify exact account metrics and screenshots. Real database verification applies to all published listings.
+          Specify exact account metrics and upload real squad screenshots. Every field starts blank so you can enter your exact squad details without pre-filled sample text.
         </p>
       </div>
 
@@ -136,8 +261,9 @@ export default function CreateListingPage() {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Section 1: Basic Information */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3">
-            1. Basic Listing Information
+          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
+            <span>1. Basic Listing Information</span>
+            <span className="text-xs font-normal text-slate-400">Placeholders indicate suggested formats</span>
           </h2>
 
           <Input
@@ -146,6 +272,7 @@ export default function CreateListingPage() {
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             required
+            helperText="Include key highlights like total team strength, marquee epics, or coin balances"
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -156,6 +283,7 @@ export default function CreateListingPage() {
               value={price}
               onChange={(e) => setPrice(e.target.value)}
               required
+              helperText="Set your desired payout in Kenyan Shillings"
             />
 
             <div>
@@ -197,7 +325,7 @@ export default function CreateListingPage() {
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Describe your account achievements, standout players, training progress, and login guidelines..."
+              placeholder="Describe your account achievements, standout players, training progress, skill allocations, and handover guidelines..."
               className="w-full rounded-lg bg-pitch-card border border-pitch-border p-3 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
               required
             />
@@ -206,8 +334,9 @@ export default function CreateListingPage() {
 
         {/* Section 2: Team Strength & In-Game Resources */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3">
-            2. Team Strength & Balances
+          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
+            <span>2. Team Strength & Balances</span>
+            <span className="text-xs font-normal text-slate-400">Enter your live account numbers</span>
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -218,6 +347,7 @@ export default function CreateListingPage() {
               value={overallStrength}
               onChange={(e) => setOverallStrength(e.target.value)}
               required
+              helperText="Min. 2000 OVR"
             />
 
             <Input
@@ -226,7 +356,7 @@ export default function CreateListingPage() {
               placeholder="e.g. 1500000"
               value={gpBalance}
               onChange={(e) => setGpBalance(e.target.value)}
-              required
+              helperText="In-game GP currency"
             />
 
             <Input
@@ -235,7 +365,7 @@ export default function CreateListingPage() {
               placeholder="e.g. 850"
               value={coinBalance}
               onChange={(e) => setCoinBalance(e.target.value)}
-              required
+              helperText="Purchased / earned coins"
             />
 
             <Input
@@ -244,7 +374,7 @@ export default function CreateListingPage() {
               placeholder="e.g. 12000"
               value={efootballPoints}
               onChange={(e) => setEfootballPoints(e.target.value)}
-              required
+              helperText="Redeemable point balance"
             />
           </div>
 
@@ -254,70 +384,80 @@ export default function CreateListingPage() {
               type="number"
               min={1}
               max={10}
+              placeholder="e.g. 1"
               value={currentDivision}
               onChange={(e) => setCurrentDivision(e.target.value)}
-              required
+              helperText="1 (Highest) to 10"
             />
             <Input
               label="Highest Division Ever"
               type="number"
               min={1}
               max={10}
+              placeholder="e.g. 1"
               value={highestDivision}
               onChange={(e) => setHighestDivision(e.target.value)}
-              required
+              helperText="Career best division"
             />
             <Input
               label="Contract Renewal Tickets"
               type="number"
+              placeholder="e.g. 10"
               value={contractTickets}
               onChange={(e) => setContractTickets(e.target.value)}
-              required
+              helperText="Available renewal tickets"
             />
             <Input
               label="Account Level"
               type="number"
+              placeholder="e.g. 45"
               value={accountLevel}
               onChange={(e) => setAccountLevel(e.target.value)}
-              required
+              helperText="User profile level"
             />
           </div>
         </div>
 
         {/* Section 3: Squad Composition & Tactics */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3">
-            3. Special Player Cards & Tactics
+          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
+            <span>3. Special Player Cards & Tactics</span>
+            <span className="text-xs font-normal text-slate-400">Card breakdown for buyers</span>
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
             <Input
               label="Epic Cards"
               type="number"
+              placeholder="e.g. 8"
               value={epicCount}
               onChange={(e) => setEpicCount(e.target.value)}
             />
             <Input
               label="Big Time Cards"
               type="number"
+              placeholder="e.g. 4"
               value={bigTimeCount}
               onChange={(e) => setBigTimeCount(e.target.value)}
             />
             <Input
               label="Highlight Cards"
               type="number"
+              placeholder="e.g. 15"
               value={highlightCount}
               onChange={(e) => setHighlightCount(e.target.value)}
             />
             <Input
               label="Featured Cards"
               type="number"
+              placeholder="e.g. 20"
               value={featuredCount}
               onChange={(e) => setFeaturedCount(e.target.value)}
             />
             <Input
               label="Legend Cards"
               type="number"
+              placeholder="e.g. 10"
               value={legendCount}
               onChange={(e) => setLegendCount(e.target.value)}
             />
@@ -325,23 +465,23 @@ export default function CreateListingPage() {
 
           <Input
             label="Key Featured Player Names (Comma separated)"
-            placeholder="e.g. Messi 105 Big Time, Vieira Booster, Rummenigge Epic"
+            placeholder="e.g. Messi 105 Big Time, Vieira Booster, Rummenigge Epic, Ronaldinho 102"
             value={keyPlayers}
             onChange={(e) => setKeyPlayers(e.target.value)}
-            helperText="Separate multiple card names with commas"
+            helperText="Separate multiple player card names with commas"
           />
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             <Input
               label="Head Coach / Manager"
-              placeholder="e.g. G. Caputto or Pep Guardiola"
+              placeholder="e.g. Pep Guardiola, G. Caputto, or L. Scaloni"
               value={managerName}
               onChange={(e) => setManagerName(e.target.value)}
             />
 
             <Input
               label="Formation"
-              placeholder="e.g. 4-2-2-2 or 4-3-3"
+              placeholder="e.g. 4-2-2-2, 4-3-3, or 4-1-2-3"
               value={formation}
               onChange={(e) => setFormation(e.target.value)}
             />
@@ -363,10 +503,11 @@ export default function CreateListingPage() {
           </div>
         </div>
 
-        {/* Section 4: Security & Konami ID Status */}
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
-          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3">
-            4. Konami ID Linking & Transfer Safety
+        {/* Section 4: Security, Konami ID & Squad Image Upload */}
+        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-6">
+          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
+            <span>4. Konami ID Linking & Squad Screenshot</span>
+            <span className="text-xs font-normal text-slate-400">Authentic proof for buyer trust</span>
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -390,20 +531,169 @@ export default function CreateListingPage() {
                 onChange={(e) => setLinkedEmailStatus(e.target.value)}
                 className="w-full bg-pitch-card border border-pitch-border rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
               >
-                <option value="transferable_full_access">Full Access (Primary Email Given to Buyer)</option>
-                <option value="buyer_email_bindable">Buyer Email Bindable (Assisted Transfer)</option>
+                <option value="transferable_full_access">Full Access (Primary Email Handed to Buyer)</option>
+                <option value="buyer_email_bindable">Buyer Email Bindable (Assisted Handover)</option>
               </select>
             </div>
           </div>
 
-          <Input
-            label="Squad Screenshot Image URL"
-            placeholder="https://images.unsplash.com/..."
-            value={imageUrl}
-            onChange={(e) => setImageUrl(e.target.value)}
-            helperText="High-resolution image showing the starting XI squad and substitutes"
-            required
-          />
+          {/* Squad Screenshot Upload Area */}
+          <div className="space-y-3">
+            <div className="flex items-center justify-between">
+              <label className="block text-xs font-medium text-slate-200">
+                Squad Screenshot Image <span className="text-brand-400">*</span>
+              </label>
+              <button
+                type="button"
+                onClick={() => setShowManualUrl(!showManualUrl)}
+                className="text-[11px] text-slate-400 hover:text-brand-400 transition-colors flex items-center gap-1"
+              >
+                <LinkIcon className="w-3 h-3" />
+                <span>{showManualUrl ? "Upload image file instead" : "Or enter image URL"}</span>
+              </button>
+            </div>
+
+            {uploadError && (
+              <div className="p-3 rounded-lg bg-rose-950/50 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
+                <AlertCircle className="w-4 h-4 shrink-0" />
+                <span>{uploadError}</span>
+              </div>
+            )}
+
+            {/* Hidden File Input */}
+            <input
+              type="file"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              accept="image/png, image/jpeg, image/webp"
+              className="hidden"
+            />
+
+            {!imageUrl ? (
+              /* Drag & Drop Upload Zone */
+              <div
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()}
+                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                  isDragOver
+                    ? "border-brand-400 bg-brand-500/10 shadow-lg"
+                    : "border-pitch-border hover:border-slate-500 bg-pitch-card/60 hover:bg-pitch-card"
+                }`}
+              >
+                {uploadingImage ? (
+                  <div className="flex flex-col items-center justify-center py-4 space-y-3">
+                    <Loader2 className="w-10 h-10 text-brand-400 animate-spin" />
+                    <p className="text-sm font-medium text-slate-200">
+                      Uploading squad screenshot to secure storage...
+                    </p>
+                    <p className="text-xs text-slate-400">
+                      Please wait while your image is verified and stored.
+                    </p>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center justify-center space-y-3">
+                    <div className="w-14 h-14 rounded-full bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400">
+                      <UploadCloud className="w-7 h-7" />
+                    </div>
+                    <div>
+                      <p className="text-sm font-semibold text-slate-100">
+                        Click to upload squad screenshot or drag & drop
+                      </p>
+                      <p className="text-xs text-slate-400 mt-1">
+                        PNG, JPG, or WebP up to 10MB. Clear view of Starting XI & bench recommended.
+                      </p>
+                    </div>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        fileInputRef.current?.click();
+                      }}
+                      className="mt-2"
+                    >
+                      <Upload className="w-3.5 h-3.5 mr-1.5" />
+                      Browse Files
+                    </Button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              /* Image Uploaded Preview Card */
+              <div className="bg-pitch-card border border-pitch-border rounded-xl p-4 space-y-4">
+                <div className="flex flex-col sm:flex-row items-center gap-4">
+                  <div className="relative w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-pitch-border bg-pitch-surface shrink-0 flex items-center justify-center">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={imageUrl}
+                      alt="Squad Screenshot Preview"
+                      className="w-full h-full object-cover"
+                    />
+                  </div>
+
+                  <div className="flex-1 w-full space-y-2">
+                    <div className="flex items-center gap-2">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                      <span className="text-xs font-semibold text-emerald-300">
+                        Squad Screenshot Successfully Attached
+                      </span>
+                    </div>
+
+                    <p className="text-xs text-slate-300 truncate">
+                      {imageFileName || "Squad Screenshot"}
+                    </p>
+
+                    {imageFileSize && (
+                      <p className="text-[11px] text-slate-400">
+                        Size: {(imageFileSize / (1024 * 1024)).toFixed(2)} MB
+                      </p>
+                    )}
+
+                    <div className="flex items-center gap-2 pt-1">
+                      <Button
+                        type="button"
+                        variant="secondary"
+                        size="sm"
+                        onClick={() => fileInputRef.current?.click()}
+                        disabled={uploadingImage}
+                        className="text-xs"
+                      >
+                        <RefreshCw className="w-3 h-3 mr-1" />
+                        Replace Image
+                      </Button>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={handleRemoveImage}
+                        disabled={uploadingImage}
+                        className="text-xs text-rose-400 hover:text-rose-300 hover:border-rose-700"
+                      >
+                        <Trash2 className="w-3 h-3 mr-1" />
+                        Remove
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
+
+            {/* Optional Manual URL Fallback Input */}
+            {showManualUrl && (
+              <div className="pt-2">
+                <Input
+                  label="Or enter direct image URL"
+                  placeholder="https://images.example.com/squad-photo.jpg"
+                  value={imageUrl}
+                  onChange={(e) => setImageUrl(e.target.value)}
+                  helperText="Direct HTTPS link to public screenshot"
+                />
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Submit Button */}
@@ -411,7 +701,7 @@ export default function CreateListingPage() {
           type="submit"
           variant="gold"
           size="lg"
-          className="w-full font-bold text-base shadow-2xl"
+          className="w-full font-bold text-base shadow-2xl py-3.5"
           isLoading={loading}
         >
           Publish Account to Escrow Marketplace

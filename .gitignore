@@ -37,5 +37,8 @@ yarn-error.log*
 
 # OS generated files
 .DS_Store
-Thumbs.db
 *.tsbuildinfo
+
+# Uploaded listing media
+public/uploads/*
+!public/uploads/.gitkeep
