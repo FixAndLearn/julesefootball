@@ -1,4 +1,4 @@
-import { Shield, Lock, CreditCard, HelpCircle } from "lucide-react";
+import { Shield, Lock, CreditCard, HelpCircle, Code2, Heart } from "lucide-react";
 import Link from "next/link";
 
 export function Footer() {
@@ -61,7 +61,7 @@ export function Footer() {
               <li><Link href="/seller/create-listing" className="hover:text-white transition-colors">Create Listing</Link></li>
               <li><Link href="/seller/verification" className="hover:text-white transition-colors">Seller Verification (KYC)</Link></li>
               <li><Link href="/seller/earnings" className="hover:text-white transition-colors">Earnings & Withdrawals</Link></li>
-              <li><Link href="/seller/guidelines" className="hover:text-white transition-colors">Seller Policy</Link></li>
+              <li><Link href="/seller/guidelines" className="hover:text-white transition-colors">Seller Policy & Standards</Link></li>
             </ul>
           </div>
 
@@ -81,15 +81,30 @@ export function Footer() {
             <p className="text-xs text-slate-400 mb-3">
               Official M-Pesa automated Lipa Na M-Pesa STK Push integration.
             </p>
-            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 text-xs font-semibold">
+            <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 text-xs font-semibold mb-4">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               M-PESA STK Verified
+            </div>
+
+            {/* Creator Badge */}
+            <div className="pt-2 border-t border-pitch-border/60">
+              <span className="text-[11px] text-slate-400 block mb-1">Architecture & Engineering:</span>
+              <a
+                href="https://github.com/FixAndLearn/julesefootball"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-xs font-medium text-slate-200 hover:text-white hover:border-brand-500 transition-colors"
+              >
+                <Code2 className="w-3.5 h-3.5 text-brand-400" />
+                <span>Created by Brian (FixAndLearn)</span>
+              </a>
             </div>
           </div>
         </div>
 
+        {/* Bottom Attribution */}
         <div className="border-t border-pitch-border/60 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} eFootballMarket. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} eFootballMarket. Created & Architected by Brian (@FixAndLearn / Jules). All rights reserved.</p>
           <p className="mt-2 sm:mt-0 text-[11px] text-slate-400">
             eFootball™ is a trademark of Konami Digital Entertainment. eFootballMarket is an independent marketplace.
           </p>
