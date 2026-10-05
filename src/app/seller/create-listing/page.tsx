@@ -22,9 +22,11 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
+import { useAuth } from "@/hooks/useAuth";
 
 export default function CreateListingPage() {
   const router = useRouter();
+  const { isAuthenticated, loading: authLoading } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(false);
@@ -174,6 +176,11 @@ export default function CreateListingPage() {
     setError("");
 
     try {
+      if (!isAuthenticated && !authLoading) {
+        router.push("/login?redirect=/seller/create-listing");
+        return;
+      }
+
       if (!title.trim()) {
         throw new Error("Please enter a listing title for your eFootball squad.");
       }
@@ -265,6 +272,37 @@ export default function CreateListingPage() {
           Enter your squad information below. All suggestions remain permanently visible to guide you and can be clicked to quickly populate your fields without being stuck in the text inputs.
         </p>
       </div>
+
+      {/* Contextual Auth Guidance for Guests */}
+      {!isAuthenticated && !authLoading && (
+        <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+              <ShieldCheck className="w-5 h-5" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-amber-200">
+                Seller Account Required to Publish & Receive M-Pesa Payouts
+              </h3>
+              <p className="text-xs text-slate-300 mt-0.5">
+                You can draft your listing metrics below, but to publish it to buyers and link it to your M-Pesa phone number for instant escrow release, please log in or create an account.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <Link href="/login?redirect=/seller/create-listing">
+              <Button variant="secondary" size="sm">
+                Log In
+              </Button>
+            </Link>
+            <Link href="/register?redirect=/seller/create-listing">
+              <Button variant="gold" size="sm" className="font-semibold shadow-md">
+                Create Account
+              </Button>
+            </Link>
+          </div>
+        </div>
+      )}
 
       {error && (
         <div className="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-sm flex items-center gap-2">
@@ -996,7 +1034,9 @@ export default function CreateListingPage() {
           className="w-full font-bold text-base shadow-2xl py-3.5"
           isLoading={loading}
         >
-          Publish Account to Escrow Marketplace
+          {isAuthenticated
+            ? "Publish Account to Escrow Marketplace"
+            : "Log In or Create Account to Publish"}
         </Button>
       </form>
     </div>
