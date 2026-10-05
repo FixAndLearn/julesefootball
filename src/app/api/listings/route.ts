@@ -4,9 +4,9 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
 const listingCreateSchema = z.object({
-  title: z.string().min(5).max(255),
-  description: z.string().min(20),
-  price: z.number().min(100),
+  title: z.string().min(3, "Title must be at least 3 characters").max(255),
+  description: z.string().default("Verified eFootball account with confirmed squad strength and player assets."),
+  price: z.coerce.number().min(100, "Listing price must be at least 100 KES"),
   currency: z.string().default("KES"),
   platform: z.enum([
     "android",
@@ -16,53 +16,71 @@ const listingCreateSchema = z.object({
     "playstation_5",
     "xbox_one",
     "xbox_series_x",
-  ]),
+  ]).default("android"),
   game_version: z.string().default("v4.0.0"),
   region: z.string().default("Global"),
-  account_level: z.number().min(1),
-  overall_team_strength: z.number().min(2000),
-  gp_balance: z.number().min(0).default(0),
-  coin_balance: z.number().min(0).default(0),
-  efootball_points: z.number().min(0).default(0),
-  contract_renewal_tickets: z.number().min(0).default(0),
-  booster_tokens: z.number().min(0).default(0),
-  training_programs: z.number().min(0).default(0),
-  player_slots: z.number().min(100).default(500),
-  legend_players_count: z.number().min(0).default(0),
-  epic_players_count: z.number().min(0).default(0),
-  big_time_players_count: z.number().min(0).default(0),
-  highlight_players_count: z.number().min(0).default(0),
-  featured_players_count: z.number().min(0).default(0),
+  account_level: z.coerce.number().min(1).default(1),
+  overall_team_strength: z.coerce
+    .number()
+    .min(2000, "Overall team strength must be at least 2000 OVR")
+    .default(3000),
+  gp_balance: z.coerce.number().min(0).default(0),
+  coin_balance: z.coerce.number().min(0).default(0),
+  efootball_points: z.coerce.number().min(0).default(0),
+  contract_renewal_tickets: z.coerce.number().min(0).default(0),
+  booster_tokens: z.coerce.number().min(0).default(0),
+  training_programs: z.coerce.number().min(0).default(0),
+  player_slots: z.coerce.number().min(100).default(500),
+  legend_players_count: z.coerce.number().min(0).default(0),
+  epic_players_count: z.coerce.number().min(0).default(0),
+  big_time_players_count: z.coerce.number().min(0).default(0),
+  highlight_players_count: z.coerce.number().min(0).default(0),
+  featured_players_count: z.coerce.number().min(0).default(0),
   key_players_list: z.array(z.string()).default([]),
-  manager_name: z.string().nullable().optional(),
-  formation: z.string().nullable().optional(),
+  manager_name: z
+    .string()
+    .nullish()
+    .transform((val) => val?.trim() || null),
+  formation: z
+    .string()
+    .nullish()
+    .transform((val) => val?.trim() || null),
   primary_playstyle: z.enum([
     "possession",
     "quick_counter",
     "long_ball_counter",
     "out_wide",
     "long_ball",
-  ]),
-  possession_rating: z.number().min(0).max(100).default(70),
-  quick_counter_rating: z.number().min(0).max(100).default(70),
-  long_ball_counter_rating: z.number().min(0).max(100).default(70),
-  out_wide_rating: z.number().min(0).max(100).default(70),
-  long_ball_rating: z.number().min(0).max(100).default(70),
-  current_division: z.number().min(1).max(10).default(10),
-  highest_division: z.number().min(1).max(10).default(10),
-  dream_team_name: z.string().nullable().optional(),
-  matches_played: z.number().min(0).default(0),
-  wins: z.number().min(0).default(0),
-  draws: z.number().min(0).default(0),
-  losses: z.number().min(0).default(0),
-  goals_scored: z.number().min(0).default(0),
-  goals_conceded: z.number().min(0).default(0),
-  account_age_months: z.number().min(0).default(0),
-  konami_id_status: z.enum(["linked_changeable", "unlinked", "linked_immutable"]),
-  linked_email_status: z.enum(["transferable_full_access", "buyer_email_bindable"]),
+  ]).default("quick_counter"),
+  possession_rating: z.coerce.number().min(0).max(100).default(70),
+  quick_counter_rating: z.coerce.number().min(0).max(100).default(70),
+  long_ball_counter_rating: z.coerce.number().min(0).max(100).default(70),
+  out_wide_rating: z.coerce.number().min(0).max(100).default(70),
+  long_ball_rating: z.coerce.number().min(0).max(100).default(70),
+  current_division: z.coerce
+    .number()
+    .transform((val) => Math.min(10, Math.max(1, val || 10)))
+    .default(10),
+  highest_division: z.coerce
+    .number()
+    .transform((val) => Math.min(10, Math.max(1, val || 10)))
+    .default(10),
+  dream_team_name: z
+    .string()
+    .nullish()
+    .transform((val) => val?.trim() || null),
+  matches_played: z.coerce.number().min(0).default(0),
+  wins: z.coerce.number().min(0).default(0),
+  draws: z.coerce.number().min(0).default(0),
+  losses: z.coerce.number().min(0).default(0),
+  goals_scored: z.coerce.number().min(0).default(0),
+  goals_conceded: z.coerce.number().min(0).default(0),
+  account_age_months: z.coerce.number().min(0).default(0),
+  konami_id_status: z.enum(["linked_changeable", "unlinked", "linked_immutable"]).default("linked_changeable"),
+  linked_email_status: z.enum(["transferable_full_access", "buyer_email_bindable"]).default("transferable_full_access"),
   status: z.enum(["draft", "pending_review", "published"]).default("published"),
   is_featured: z.boolean().default(false),
-  image_urls: z.array(z.string()).min(1, "At least one screenshot is required"),
+  image_urls: z.array(z.string()).min(1, "Please upload at least one squad screenshot"),
 });
 
 export async function GET(req: NextRequest) {
@@ -113,17 +131,52 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized. Authentication required." }, { status: 401 });
+      return NextResponse.json(
+        { error: "Unauthorized. Please log in or create an account to publish a listing." },
+        { status: 401 }
+      );
     }
 
     const json = await req.json();
     const parsed = listingCreateSchema.safeParse(json);
 
     if (!parsed.success) {
+      const issueDetails = parsed.error.issues
+        .map((issue) => {
+          const field = issue.path.join(".") || "field";
+          return `${field.replace(/_/g, " ")}: ${issue.message}`;
+        })
+        .join("; ");
+
       return NextResponse.json(
-        { error: "Invalid listing submission", details: parsed.error.format() },
+        {
+          error: `Please correct the following: ${issueDetails}`,
+          details: parsed.error.format(),
+        },
         { status: 400 }
       );
+    }
+
+    // Ensure the seller's profile record exists in profiles table
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("id")
+      .eq("id", user.id)
+      .maybeSingle();
+
+    if (!profile) {
+      const fallbackUsername =
+        user.email?.split("@")[0] || `trader_${user.id.slice(0, 6)}`;
+      await supabase.from("profiles").upsert({
+        id: user.id,
+        username: user.user_metadata?.username || fallbackUsername,
+        first_name: user.user_metadata?.first_name || fallbackUsername,
+        last_name: user.user_metadata?.last_name || "",
+        country: "KEN",
+        is_verified_seller: false,
+        available_balance: 0.0,
+        escrow_balance: 0.0,
+      });
     }
 
     const { image_urls, ...listingData } = parsed.data;
@@ -139,6 +192,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, listing }, { status: 201 });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error("Listing creation API error:", error);
+    return NextResponse.json({ error: error.message || "Failed to create listing" }, { status: 500 });
   }
 }

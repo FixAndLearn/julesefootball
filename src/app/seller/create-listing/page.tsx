@@ -185,16 +185,16 @@ export default function CreateListingPage() {
         throw new Error("Please enter a listing title for your eFootball squad.");
       }
 
-      if (!price || Number(price) <= 0) {
-        throw new Error("Please enter a valid listing price in KES.");
+      if (!price || Number(price) < 100) {
+        throw new Error("Listing price must be at least 100 KES.");
       }
 
       if (!overallStrength || Number(overallStrength) < 2000) {
-        throw new Error("Overall Team Strength (OVR) is required and must be at least 2000.");
+        throw new Error("Overall Team Strength (OVR) is required and must be at least 2000 (e.g. 3120).");
       }
 
       if (!imageUrl.trim()) {
-        throw new Error("Please upload a real screenshot of your squad before publishing your listing. Image links are not permitted.");
+        throw new Error("Please upload a real screenshot of your squad before publishing your listing.");
       }
 
       const playersList = keyPlayers
@@ -202,14 +202,24 @@ export default function CreateListingPage() {
         .map((p) => p.trim())
         .filter(Boolean);
 
+      const finalDescription = description.trim()
+        ? description.trim()
+        : `${title.trim()} - eFootball account with ${overallStrength} OVR team strength. Includes marquee cards: ${keyPlayers.trim() || "elite squad players"}. Verified for instant escrow transfer.`;
+
+      const parseDiv = (v: string) => {
+        const n = Number(v);
+        if (isNaN(n) || n < 1 || n > 10) return 10;
+        return n;
+      };
+
       const payload = {
         title: title.trim(),
-        description: description.trim(),
+        description: finalDescription,
         price: Number(price),
         platform,
         game_version: gameVersion,
         region,
-        account_level: accountLevel ? Number(accountLevel) : 1,
+        account_level: accountLevel ? Math.max(1, Number(accountLevel)) : 1,
         overall_team_strength: Number(overallStrength),
         gp_balance: gpBalance ? Number(gpBalance) : 0,
         coin_balance: coinBalance ? Number(coinBalance) : 0,
@@ -224,8 +234,8 @@ export default function CreateListingPage() {
         manager_name: managerName.trim() || undefined,
         formation: formation.trim() || undefined,
         primary_playstyle: primaryPlaystyle,
-        current_division: currentDivision ? Number(currentDivision) : 10,
-        highest_division: highestDivision ? Number(highestDivision) : 10,
+        current_division: parseDiv(currentDivision),
+        highest_division: parseDiv(highestDivision),
         konami_id_status: konamiIdStatus,
         linked_email_status: linkedEmailStatus,
         image_urls: [imageUrl.trim()],
@@ -244,7 +254,7 @@ export default function CreateListingPage() {
           router.push("/login?redirect=/seller/create-listing");
           return;
         }
-        throw new Error(data.error || "Failed to create listing");
+        throw new Error(data.error || "Failed to create listing. Please check your entered values.");
       }
 
       router.push(`/listings/${data.listing.id}`);
