@@ -25,6 +25,7 @@ export function ListingCard({ listing }: ListingCardProps) {
             alt={listing.title}
             fill
             sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+            unoptimized={primaryImage?.startsWith("data:")}
             className="object-cover group-hover:scale-105 transition-transform duration-500"
           />
         ) : (

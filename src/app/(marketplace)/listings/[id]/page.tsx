@@ -70,6 +70,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                   alt={listing.title}
                   fill
                   priority
+                  unoptimized={primaryImage.startsWith("data:")}
                   className="object-cover"
                 />
               ) : (
@@ -95,7 +96,13 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               <div className="p-4 border-t border-pitch-border flex items-center gap-3 overflow-x-auto">
                 {otherImages.map((img) => (
                   <div key={img.id} className="relative w-24 h-16 rounded-lg overflow-hidden shrink-0 border border-slate-700">
-                    <Image src={img.image_url} alt="Screenshot" fill className="object-cover" />
+                    <Image
+                      src={img.image_url}
+                      alt="Screenshot"
+                      fill
+                      unoptimized={img.image_url.startsWith("data:")}
+                      className="object-cover"
+                    />
                   </div>
                 ))}
               </div>
