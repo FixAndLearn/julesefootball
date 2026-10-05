@@ -4,6 +4,7 @@ import { formatCompactNumber, formatCurrency, getKonamiIdStatusInfo, getPlatform
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ListingService } from "@/services/listingService";
 import { BuyNowButton } from "@/components/marketplace/BuyNowButton";
+import { ListingGallery } from "@/components/marketplace/ListingGallery";
 import {
   ArrowLeft,
   CheckCircle2,
@@ -41,8 +42,6 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
     notFound();
   }
 
-  const primaryImage = listing.images?.find((img) => img.is_primary)?.image_url || listing.images?.[0]?.image_url;
-  const otherImages = listing.images?.filter((img) => img.image_url !== primaryImage) || [];
   const konamiStatus = getKonamiIdStatusInfo(listing.konami_id_status);
 
   return (
@@ -61,53 +60,14 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Gallery & In-Depth Details (2 cols) */}
         <div className="lg:col-span-2 space-y-6">
-          {/* Main Visual Banner / Screenshots */}
-          <div className="bg-pitch-surface border border-pitch-border rounded-2xl overflow-hidden shadow-xl">
-            <div className="relative aspect-[16/9] w-full bg-slate-900">
-              {primaryImage ? (
-                <Image
-                  src={primaryImage}
-                  alt={listing.title}
-                  fill
-                  priority
-                  unoptimized={primaryImage.startsWith("data:")}
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex flex-col items-center justify-center text-slate-600">
-                  <Trophy className="w-16 h-16 stroke-[1.5] mb-2" />
-                  <span className="text-sm font-semibold">Account Squad Preview</span>
-                </div>
-              )}
+          {/* Main Visual Banner / Screenshots with HD Lossless Viewer & Lightbox */}
+          <ListingGallery
+            images={listing.images || []}
+            title={listing.title}
+            platform={listing.platform}
+            overallTeamStrength={listing.overall_team_strength}
+          />
 
-              <div className="absolute top-4 left-4 flex items-center gap-2">
-                <Badge variant="brand" size="md" className="font-bold">
-                  {getPlatformLabel(listing.platform)}
-                </Badge>
-                <div className="flex items-center gap-1 px-3 py-1 rounded-full bg-black/80 backdrop-blur-md border border-white/10 text-xs font-bold text-amber-300">
-                  <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                  <span>OVR {listing.overall_team_strength}</span>
-                </div>
-              </div>
-            </div>
-
-            {/* Thumbnail gallery */}
-            {otherImages.length > 0 && (
-              <div className="p-4 border-t border-pitch-border flex items-center gap-3 overflow-x-auto">
-                {otherImages.map((img) => (
-                  <div key={img.id} className="relative w-24 h-16 rounded-lg overflow-hidden shrink-0 border border-slate-700">
-                    <Image
-                      src={img.image_url}
-                      alt="Screenshot"
-                      fill
-                      unoptimized={img.image_url.startsWith("data:")}
-                      className="object-cover"
-                    />
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
 
           {/* Title & Key Attributes */}
           <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4">

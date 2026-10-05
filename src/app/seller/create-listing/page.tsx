@@ -1107,12 +1107,12 @@ export default function CreateListingPage() {
               /* Real Uploaded Image Preview & Verification Card */
               <div className="bg-pitch-card border border-pitch-border rounded-2xl p-5 space-y-4">
                 <div className="flex flex-col sm:flex-row items-center gap-5">
-                  <div className="relative w-full sm:w-56 h-36 rounded-xl overflow-hidden border border-pitch-border bg-pitch-surface shrink-0 shadow-md">
+                  <div className="relative w-full sm:w-56 h-36 rounded-xl overflow-hidden border border-pitch-border bg-slate-950 shrink-0 shadow-md flex items-center justify-center p-1">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imageUrl}
                       alt="Uploaded Real Squad Screenshot"
-                      className="w-full h-full object-cover"
+                      className="w-full h-full object-contain drop-shadow-md"
                     />
                   </div>
 
@@ -1132,7 +1132,7 @@ export default function CreateListingPage() {
                       </p>
                     )}
 
-                    <div className="flex items-center gap-2 pt-1">
+                    <div className="flex flex-wrap items-center gap-2 pt-1">
                       <Button
                         type="button"
                         variant="secondary"
@@ -1144,6 +1144,18 @@ export default function CreateListingPage() {
                         <RefreshCw className="w-3 h-3 mr-1" />
                         Upload Different Screenshot
                       </Button>
+
+                      <a
+                        href={imageUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-pitch-surface hover:bg-slate-800 text-slate-300 hover:text-white border border-pitch-border text-xs font-medium transition-all"
+                        title="Inspect original uncompressed image"
+                      >
+                        <ExternalLink className="w-3 h-3 text-brand-400" />
+                        <span>Inspect Full HD</span>
+                      </a>
+
                       <Button
                         type="button"
                         variant="outline"
