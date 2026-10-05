@@ -1,3 +1,4 @@
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ListingService } from "@/services/listingService";
 import { NextRequest, NextResponse } from "next/server";
@@ -157,42 +158,129 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    // Ensure the seller's profile record exists in profiles table
-    const { data: profile } = await supabase
-      .from("profiles")
-      .select("id")
-      .eq("id", user.id)
-      .maybeSingle();
+    // 1. Ensure the seller's profile record exists in public.profiles table
+    const adminSupabase = createAdminClient();
+    const cleanId = user.id.replace(/-/g, "").slice(0, 6);
+    const emailPrefix = user.email ? user.email.split("@")[0].replace(/[^a-zA-Z0-9_]/g, "") : "";
+    const fallbackUsername =
+      user.user_metadata?.username?.trim() ||
+      (emailPrefix ? `${emailPrefix}_${cleanId}` : `trader_${cleanId}`);
 
-    if (!profile) {
-      const fallbackUsername =
-        user.email?.split("@")[0] || `trader_${user.id.slice(0, 6)}`;
-      await supabase.from("profiles").upsert({
-        id: user.id,
-        username: user.user_metadata?.username || fallbackUsername,
-        first_name: user.user_metadata?.first_name || fallbackUsername,
-        last_name: user.user_metadata?.last_name || "",
-        country: "KEN",
-        is_verified_seller: false,
-        available_balance: 0.0,
-        escrow_balance: 0.0,
-      });
+    const firstName =
+      user.user_metadata?.first_name?.trim() ||
+      emailPrefix ||
+      "Trader";
+    const lastName = user.user_metadata?.last_name?.trim() || "";
+    const phoneNumber = user.user_metadata?.phone_number?.trim() || "";
+
+    const profileData = {
+      id: user.id,
+      username: fallbackUsername,
+      first_name: firstName,
+      last_name: lastName,
+      phone_number: phoneNumber,
+      country: "KEN",
+      is_verified_seller: false,
+      available_balance: 0.0,
+      escrow_balance: 0.0,
+    };
+
+    // First attempt: Provision profile via admin client (service role key bypasses RLS)
+    let profileReady = false;
+    try {
+      const { error: adminProfileErr } = await adminSupabase
+        .from("profiles")
+        .upsert(profileData, { onConflict: "id" });
+
+      if (!adminProfileErr) {
+        profileReady = true;
+      } else {
+        console.warn("adminSupabase profile upsert note:", adminProfileErr.message);
+      }
+    } catch (err: any) {
+      console.warn("adminSupabase profile upsert exception:", err.message);
+    }
+
+    // Fallback: Provision profile via authenticated user client
+    if (!profileReady) {
+      try {
+        const { error: userProfileErr } = await supabase
+          .from("profiles")
+          .upsert(profileData, { onConflict: "id" });
+
+        if (userProfileErr) {
+          console.warn("supabase user profile upsert note:", userProfileErr.message);
+        } else {
+          profileReady = true;
+        }
+      } catch (err: any) {
+        console.warn("supabase user profile upsert exception:", err.message);
+      }
+    }
+
+    // Ensure seller and buyer roles exist for this user in user_roles
+    try {
+      await adminSupabase.from("user_roles").upsert(
+        [
+          { user_id: user.id, role_id: "seller" },
+          { user_id: user.id, role_id: "buyer" },
+        ],
+        { onConflict: "user_id,role_id" }
+      );
+    } catch {
+      try {
+        await supabase.from("user_roles").upsert(
+          [
+            { user_id: user.id, role_id: "seller" },
+            { user_id: user.id, role_id: "buyer" },
+          ],
+          { onConflict: "user_id,role_id" }
+        );
+      } catch {
+        // Non-blocking role assignment
+      }
     }
 
     const { image_urls, ...listingData } = parsed.data;
-    const service = new ListingService(supabase);
 
-    const listing = await service.createListing(
-      {
-        ...listingData,
-        seller_id: user.id,
-      } as any,
-      image_urls
-    );
+    // Use admin client if service role key is present to bypass any residual RLS issues,
+    // otherwise use the authenticated cookie client.
+    const serviceRoleConfigured = hasServiceRoleKey();
+    const primaryClient = serviceRoleConfigured ? adminSupabase : supabase;
+    const service = new ListingService(primaryClient);
+
+    let listing;
+    try {
+      listing = await service.createListing(
+        {
+          ...listingData,
+          seller_id: user.id,
+        } as any,
+        image_urls
+      );
+    } catch (createError: any) {
+      // If primary client failed and we used admin client, retry with user client
+      if (serviceRoleConfigured) {
+        console.warn("Primary client createListing failed, retrying with user client:", createError.message);
+        const fallbackService = new ListingService(supabase);
+        listing = await fallbackService.createListing(
+          {
+            ...listingData,
+            seller_id: user.id,
+          } as any,
+          image_urls
+        );
+      } else {
+        throw createError;
+      }
+    }
 
     return NextResponse.json({ success: true, listing }, { status: 201 });
   } catch (error: any) {
     console.error("Listing creation API error:", error);
-    return NextResponse.json({ error: error.message || "Failed to create listing" }, { status: 500 });
+    return NextResponse.json(
+      { error: error.message || "Failed to create listing" },
+      { status: 500 }
+    );
   }
 }

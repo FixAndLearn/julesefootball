@@ -4,6 +4,11 @@ import { createClient } from "@supabase/supabase-js";
  * Service Role Supabase client for administrative tasks, storage, and secure ledger functions.
  * NEVER expose this client to browser components.
  */
+export function hasServiceRoleKey(): boolean {
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+  return Boolean(key && !key.includes("placeholder"));
+}
+
 export function createAdminClient() {
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://mock-efootball-market.supabase.co";
   const serviceRoleKey =

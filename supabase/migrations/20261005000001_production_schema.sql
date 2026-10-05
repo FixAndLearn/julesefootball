@@ -44,9 +44,9 @@ ON CONFLICT (id) DO NOTHING;
 CREATE TABLE IF NOT EXISTS profiles (
   id UUID PRIMARY KEY REFERENCES auth.users(id) ON DELETE RESTRICT,
   username CITEXT UNIQUE NOT NULL,
-  first_name VARCHAR(100) NOT NULL,
-  last_name VARCHAR(100) NOT NULL,
-  phone_number VARCHAR(20) NOT NULL,
+  first_name VARCHAR(100) NOT NULL DEFAULT '',
+  last_name VARCHAR(100) NOT NULL DEFAULT '',
+  phone_number VARCHAR(20) NOT NULL DEFAULT '',
   country VARCHAR(3) NOT NULL DEFAULT 'KEN',
   avatar_url TEXT,
   bio TEXT,
@@ -61,6 +61,12 @@ CREATE TABLE IF NOT EXISTS profiles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   deleted_at TIMESTAMPTZ
 );
+
+-- Ensure column defaults exist if table was already created
+ALTER TABLE profiles ALTER COLUMN first_name SET DEFAULT '';
+ALTER TABLE profiles ALTER COLUMN last_name SET DEFAULT '';
+ALTER TABLE profiles ALTER COLUMN phone_number SET DEFAULT '';
+
 
 CREATE TRIGGER trg_profiles_updated_at
   BEFORE UPDATE ON profiles
@@ -738,12 +744,28 @@ ALTER TABLE dispute_evidence ENABLE ROW LEVEL SECURITY;
 ALTER TABLE reviews ENABLE ROW LEVEL SECURITY;
 ALTER TABLE notifications ENABLE ROW LEVEL SECURITY;
 
--- Profiles: Public read, User can update own profile
+-- Profiles: Public read, User can insert and update own profile
+DROP POLICY IF EXISTS "Public profiles are readable" ON profiles;
 CREATE POLICY "Public profiles are readable" ON profiles
   FOR SELECT USING (deleted_at IS NULL);
 
+DROP POLICY IF EXISTS "Users can insert own profile" ON profiles;
+CREATE POLICY "Users can insert own profile" ON profiles
+  FOR INSERT WITH CHECK (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Users can update own profile" ON profiles;
 CREATE POLICY "Users can update own profile" ON profiles
   FOR UPDATE USING (auth.uid() = id);
+
+-- User Roles: Public read, User can insert own roles
+DROP POLICY IF EXISTS "Public user roles are viewable" ON user_roles;
+CREATE POLICY "Public user roles are viewable" ON user_roles
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can insert own roles" ON user_roles;
+CREATE POLICY "Users can insert own roles" ON user_roles
+  FOR INSERT WITH CHECK (auth.uid() = user_id);
+
 
 -- Listings: Published is public, Sellers manage own
 CREATE POLICY "Published listings are viewable by everyone" ON listings
@@ -825,3 +847,83 @@ CREATE POLICY "Reviews are viewable by everyone" ON reviews
 
 CREATE POLICY "Buyers can write reviews for completed orders" ON reviews
   FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
+
+-- ==============================================================================
+-- 14. AUTH USER LIFECYCLE TRIGGER & BACKFILL
+-- Automatically provisions public.profiles and user_roles when any user signs up
+-- ==============================================================================
+
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS TRIGGER AS $$
+DECLARE
+  v_username TEXT;
+  v_clean_id TEXT;
+BEGIN
+  v_clean_id := substr(replace(NEW.id::text, '-', ''), 1, 6);
+  v_username := COALESCE(
+    NEW.raw_user_meta_data->>'username',
+    CASE
+      WHEN NEW.email IS NOT NULL AND NEW.email != '' THEN split_part(NEW.email, '@', 1) || '_' || v_clean_id
+      ELSE 'trader_' || v_clean_id
+    END
+  );
+
+  INSERT INTO public.profiles (
+    id,
+    username,
+    first_name,
+    last_name,
+    phone_number,
+    country
+  )
+  VALUES (
+    NEW.id,
+    v_username,
+    COALESCE(NEW.raw_user_meta_data->>'first_name', split_part(NEW.email, '@', 1), 'Trader'),
+    COALESCE(NEW.raw_user_meta_data->>'last_name', ''),
+    COALESCE(NEW.raw_user_meta_data->>'phone_number', ''),
+    'KEN'
+  )
+  ON CONFLICT (id) DO NOTHING;
+
+  INSERT INTO public.user_roles (user_id, role_id)
+  VALUES (NEW.id, 'buyer')
+  ON CONFLICT (user_id, role_id) DO NOTHING;
+
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Immediate backfill for any existing auth.users lacking a profile
+INSERT INTO public.profiles (id, username, first_name, last_name, phone_number, country)
+SELECT
+  u.id,
+  COALESCE(
+    u.raw_user_meta_data->>'username',
+    CASE
+      WHEN u.email IS NOT NULL AND u.email != '' THEN split_part(u.email, '@', 1) || '_' || substr(replace(u.id::text, '-', ''), 1, 6)
+      ELSE 'trader_' || substr(replace(u.id::text, '-', ''), 1, 6)
+    END
+  ),
+  COALESCE(u.raw_user_meta_data->>'first_name', split_part(u.email, '@', 1), 'Trader'),
+  COALESCE(u.raw_user_meta_data->>'last_name', ''),
+  COALESCE(u.raw_user_meta_data->>'phone_number', ''),
+  'KEN'
+FROM auth.users u
+LEFT JOIN public.profiles p ON p.id = u.id
+WHERE p.id IS NULL
+ON CONFLICT (id) DO NOTHING;
+
+-- Immediate backfill for user_roles
+INSERT INTO public.user_roles (user_id, role_id)
+SELECT p.id, 'buyer'
+FROM public.profiles p
+LEFT JOIN public.user_roles ur ON ur.user_id = p.id AND ur.role_id = 'buyer'
+WHERE ur.user_id IS NULL
+ON CONFLICT (user_id, role_id) DO NOTHING;
+

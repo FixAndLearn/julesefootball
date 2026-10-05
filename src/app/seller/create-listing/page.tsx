@@ -358,7 +358,7 @@ export default function CreateListingPage() {
               {copiedSql ? (
                 <>
                   <Check className="w-3.5 h-3.5 mr-1 text-slate-950" />
-                  Copied 828 Lines to Clipboard!
+                  Copied Schema SQL to Clipboard!
                 </>
               ) : (
                 <>
@@ -382,6 +382,61 @@ export default function CreateListingPage() {
             <Link href="/setup">
               <Button type="button" variant="outline" size="sm" className="text-xs">
                 View Setup Diagnostics (/setup)
+              </Button>
+            </Link>
+          </div>
+        </div>
+      ) : error && (error.includes("foreign key constraint") || error.includes("listings_seller_id_fkey") || error.includes("profiles")) ? (
+        <div className="mb-6 p-5 rounded-2xl bg-amber-950/70 border border-amber-600/80 text-amber-200 shadow-2xl space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0">
+              <Database className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-amber-100">
+                Seller Profile Sync & Database Policy Update
+              </h3>
+              <p className="text-xs text-amber-200/90 leading-relaxed">
+                Your user account is now auto-provisioned in the seller profile ledger. Click <strong>Publish Listing</strong> again to complete publication. If you haven&apos;t run the latest migration, copy the updated SQL script to register the automatic profile triggers and RLS policies.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-1 flex flex-wrap items-center gap-2.5">
+            <Button
+              type="button"
+              variant="gold"
+              size="sm"
+              onClick={handleCopySql}
+              className="text-xs font-semibold shadow-md"
+            >
+              {copiedSql ? (
+                <>
+                  <Check className="w-3.5 h-3.5 mr-1 text-slate-950" />
+                  Copied Updated SQL to Clipboard!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5 mr-1" />
+                  Copy Updated Setup SQL
+                </>
+              )}
+            </Button>
+
+            <a
+              href="https://supabase.com/dashboard/project/_/sql/new"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button type="button" variant="secondary" size="sm" className="text-xs font-medium">
+                <ExternalLink className="w-3.5 h-3.5 mr-1 text-amber-400" />
+                Open Supabase SQL Editor
+              </Button>
+            </a>
+
+            <Link href="/setup">
+              <Button type="button" variant="outline" size="sm" className="text-xs">
+                Run Diagnostics (/setup)
               </Button>
             </Link>
           </div>
