@@ -18,6 +18,9 @@ import {
   Sparkles,
   Camera,
   Check,
+  Database,
+  Copy,
+  ExternalLink,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -31,6 +34,19 @@ export default function CreateListingPage() {
 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [copiedSql, setCopiedSql] = useState(false);
+
+  const handleCopySql = async () => {
+    try {
+      const res = await fetch("/api/setup-database/sql");
+      const sql = await res.text();
+      await navigator.clipboard.writeText(sql);
+      setCopiedSql(true);
+      setTimeout(() => setCopiedSql(false), 4000);
+    } catch {
+      // fallback
+    }
+  };
 
   // Basic Information (All initialized empty; suggestions remain visibly accessible below)
   const [title, setTitle] = useState("");
@@ -314,12 +330,68 @@ export default function CreateListingPage() {
         </div>
       )}
 
-      {error && (
+      {error && (error.includes("Could not find the table") || error.includes("schema cache") || error.includes("Database Tables Not Found")) ? (
+        <div className="mb-6 p-5 rounded-2xl bg-amber-950/70 border border-amber-600/80 text-amber-200 shadow-2xl space-y-3">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0">
+              <Database className="w-5 h-5" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-sm font-bold text-amber-100">
+                Supabase Database Tables Not Initialized Yet
+              </h3>
+              <p className="text-xs text-amber-200/90 leading-relaxed">
+                Your Supabase project is connected, but the <strong>&apos;public.listings&apos;</strong> table has not been created yet.
+                You just need to execute the migration script once in your Supabase SQL Editor.
+              </p>
+            </div>
+          </div>
+
+          <div className="pt-1 flex flex-wrap items-center gap-2.5">
+            <Button
+              type="button"
+              variant="gold"
+              size="sm"
+              onClick={handleCopySql}
+              className="text-xs font-semibold shadow-md"
+            >
+              {copiedSql ? (
+                <>
+                  <Check className="w-3.5 h-3.5 mr-1 text-slate-950" />
+                  Copied 828 Lines to Clipboard!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5 mr-1" />
+                  Copy Setup SQL to Clipboard
+                </>
+              )}
+            </Button>
+
+            <a
+              href="https://supabase.com/dashboard/project/_/sql/new"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button type="button" variant="secondary" size="sm" className="text-xs font-medium">
+                <ExternalLink className="w-3.5 h-3.5 mr-1 text-amber-400" />
+                Open Supabase SQL Editor
+              </Button>
+            </a>
+
+            <Link href="/setup">
+              <Button type="button" variant="outline" size="sm" className="text-xs">
+                View Setup Diagnostics (/setup)
+              </Button>
+            </Link>
+          </div>
+        </div>
+      ) : error ? (
         <div className="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-sm flex items-center gap-2">
           <AlertCircle className="w-5 h-5 shrink-0" />
           <span>{error}</span>
         </div>
-      )}
+      ) : null}
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Section 1: Basic Information */}
