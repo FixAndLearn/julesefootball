@@ -1,10 +1,10 @@
 import { Button } from "@/components/ui/Button";
-import { CheckCircle2, Clock, Lock, ShieldCheck, ShoppingCart, UserCheck, AlertTriangle } from "lucide-react";
+import { CheckCircle2, Clock, Lock, ShieldCheck, ShoppingCart, Building2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
 export default function EscrowGuaranteePage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-12">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-10">
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-semibold">
           <ShieldCheck className="w-4 h-4" />
@@ -15,6 +15,26 @@ export default function EscrowGuaranteePage() {
         </h1>
         <p className="text-sm text-slate-300 max-w-2xl mx-auto">
           Our financial architecture prevents gaming account fraud by removing direct peer-to-peer payments.
+        </p>
+      </div>
+
+      {/* Corporate Governance Notice */}
+      <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl space-y-3">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
+            <Building2 className="w-5 h-5" />
+          </div>
+          <div>
+            <h2 className="text-base font-bold text-slate-100 font-display">
+              Escrow Architecture Governed by Brian Okibo, CEO
+            </h2>
+            <p className="text-xs text-emerald-400 font-medium">
+              Institutional Zero-Custody Financial Ledger
+            </p>
+          </div>
+        </div>
+        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
+          The escrow engine of <strong>eFootballMarket Inc.</strong> was engineered under the executive direction of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>. Every shilling locked in escrow is bound to an automated PostgreSQL state machine, ensuring money is never disbursed until account access is verified by the buyer.
         </p>
       </div>
 

@@ -1,9 +1,9 @@
-import { CheckCircle2, Clock, ShieldCheck, Trophy, UserCheck, AlertTriangle, HelpCircle } from "lucide-react";
+import { CheckCircle2, Clock, ShieldCheck, Trophy, Building2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Seller Guidelines & Standards | eFootballMarket",
-  description: "Official seller code of conduct, delivery SLAs, and account verification rules on eFootballMarket.",
+  title: "Seller Standards & Code of Conduct | eFootballMarket",
+  description: "Merchant standards, delivery SLAs, and operational rules instituted by eFootballMarket Inc.",
 };
 
 export default function SellerGuidelinesPage() {
@@ -13,92 +13,74 @@ export default function SellerGuidelinesPage() {
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-konami-blue/20 border border-konami-blue/40 text-sky-400 text-xs font-semibold">
           <Trophy className="w-4 h-4" />
-          <span>Merchant Excellence & Trust Standards</span>
+          <span>Merchant Operational Excellence</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
-          Seller Guidelines & Policy
+          Seller Guidelines & Merchant Standards
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-          Requirements for listing eFootball accounts, honoring escrow delivery SLAs, and maintaining top seller ratings.
+          Operational code of conduct governing merchant inventory, delivery SLAs, and escrow compliance.
         </p>
       </div>
 
-      {/* Creator & Framework Notice */}
+      {/* Corporate Governance Notice */}
       <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl space-y-3">
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-xl bg-indigo-950/60 border border-indigo-800/60 flex items-center justify-center text-indigo-400">
-            <UserCheck className="w-5 h-5" />
+            <Building2 className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-100 font-display">
-              Seller Protocol Established by Brian (FixAndLearn / Jules)
+              Merchant Standards Instituted by Brian Okibo, CEO
             </h2>
-            <p className="text-xs text-slate-400">
-              Fair Trade Framework Protecting Honest Merchants
+            <p className="text-xs text-sky-400 font-medium">
+              Fair Trade Commercial Framework Protecting Legitimate Sellers
             </p>
           </div>
         </div>
         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          The seller standards were established by <strong>Brian (FixAndLearn / Jules)</strong> to reward transparent merchants with automated M-Pesa payouts, zero chargeback exposure, and verified trust badges while maintaining an uncompromising standard against deceptive inventory.
+          The merchant operational guidelines of <strong>eFootballMarket Inc.</strong> were established under the executive leadership of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>. The platform rewards transparent sellers with automated M-Pesa payouts, zero chargeback exposure, and verified badges while maintaining a zero-tolerance policy against misleading listings.
         </p>
       </div>
 
       <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-8 shadow-xl space-y-8 text-slate-300 text-sm leading-relaxed">
         {/* Rule 1 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-sky-400">1.</span> Accurate Account Representation
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-sky-400">1.</span> Accurate Account Inventory Representation
           </h2>
           <p>
-            Every listing published on eFootballMarket must represent a genuine account in your immediate possession:
+            Sellers are strictly accountable for the veracity of all account metrics published on the Platform:
           </p>
           <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
-            <li><strong>Actual Overall Team Strength:</strong> State the genuine OVR (e.g. 3120). Do not inflate ratings using temporary loan managers.</li>
-            <li><strong>Real Coin & GP Balances:</strong> State the exact number of coins and GP available at the moment of sale.</li>
-            <li><strong>Verified Screenshots:</strong> Provide clean, unaltered screenshots showing the Game Plan starting XI, substitute bench, and Konami ID status.</li>
+            <li><strong>Verified Overall Team Strength (OVR):</strong> The advertised rating must match actual squad strength without reliance on temporary loan items.</li>
+            <li><strong>Actual Resource Balances:</strong> Coin, GP, and contract ticket counts must be accurate at the time of purchase.</li>
+            <li><strong>Clean Screenshots:</strong> Clear, unaltered screenshots of the starting XI, reserves, and Konami ID connection status must be uploaded.</li>
           </ul>
         </section>
 
         {/* Rule 2 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-sky-400">2.</span> Delivery SLA & Credential Vault Requirements
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-sky-400">2.</span> Mandatory 12-Hour Credential Delivery SLA
           </h2>
           <p>
-            When a buyer locks payment into escrow via M-Pesa:
+            Upon notification that a buyer has secured payment in escrow via M-Pesa:
           </p>
           <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
-            <li>You must deliver working Konami ID credentials within <strong>twelve (12) hours</strong> via the order page.</li>
-            <li>If two-step verification is enabled, you must provide prompt assistance in the order chatbox or supply valid backup codes.</li>
-            <li>Failure to deliver credentials within the SLA window results in automated order cancellation and a penalty on your seller rating.</li>
+            <li>Sellers must submit working credentials through the encrypted vault within <strong>twelve (12) hours</strong>.</li>
+            <li>If 2-Step Verification is active, the seller must assist in the order chatbox or provide functional backup codes.</li>
+            <li>Failure to comply triggers automated order cancellation and a public strike against merchant standing.</li>
           </ul>
         </section>
 
         {/* Rule 3 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-sky-400">3.</span> Konami ID Unlinking & Full Email Surrender
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-sky-400">3.</span> Disconnection of Third-Party Accounts
           </h2>
           <p>
-            To guarantee buyer safety and protect your earnings against disputes:
-          </p>
-          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2">
-            <p>
-              • If the listing states <strong>&quot;Transferable Full Access&quot;</strong>, the seller must hand over the registered email account or assist the buyer in updating the registered email in My KONAMI settings.
-            </p>
-            <p>
-              • Sellers must unlink third-party accounts (Google Play, Game Center, Apple ID, PSN, or Steam) before delivering credentials to prevent conflicting logins.
-            </p>
-          </div>
-        </section>
-
-        {/* Rule 4 */}
-        <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-sky-400">4.</span> Seller KYC Verification & Ratings
-          </h2>
-          <p>
-            Sellers who complete KYC verification receive the verified seller badge, priority placement in search results, and instantaneous payout release once buyers confirm delivery.
+            Prior to credential delivery, sellers must unbind Google Play, Apple Game Center, Steam, or PlayStation Network logins from the Konami ID to ensure sole unencumbered access transfers to the buyer.
           </p>
         </section>
       </div>

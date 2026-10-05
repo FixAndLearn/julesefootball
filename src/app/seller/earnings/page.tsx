@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency } from "@/lib/utils";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { ArrowLeft, ArrowUpRight, CheckCircle2, Clock, Smartphone, UserCheck, Wallet } from "lucide-react";
+import { ArrowLeft, ArrowUpRight, CheckCircle2, Clock, Smartphone, Building2, Wallet } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -65,11 +65,11 @@ export default async function SellerEarningsPage() {
         </div>
       </div>
 
-      {/* Creator & Financial Framework Notice */}
+      {/* Corporate Governance Notice */}
       <div className="p-4 rounded-xl bg-pitch-surface border border-pitch-border flex items-center gap-3 text-xs text-slate-300">
-        <UserCheck className="w-5 h-5 text-brand-400 shrink-0" />
+        <Building2 className="w-5 h-5 text-brand-400 shrink-0" />
         <span>
-          Financial settlement engine architected by <strong>Brian (FixAndLearn / Jules)</strong> with automated ledger auditing and atomic balance deductions.
+          Financial settlement infrastructure operated under the executive oversight of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong> with automated ledger auditing and atomic balance deductions.
         </span>
       </div>
 

@@ -1,4 +1,4 @@
-import { Shield, Lock, CreditCard, HelpCircle, Code2, Heart } from "lucide-react";
+import { Shield, Lock, CreditCard, Building2 } from "lucide-react";
 import Link from "next/link";
 
 export function Footer() {
@@ -69,44 +69,39 @@ export function Footer() {
             <h4 className="text-xs uppercase font-semibold tracking-wider text-slate-200 mb-4">Trust & Security</h4>
             <ul className="space-y-2.5 text-xs">
               <li><Link href="/escrow-guarantee" className="hover:text-white transition-colors">Escrow Protection Rules</Link></li>
-              <li><Link href="/dispute-policy" className="hover:text-white transition-colors">Dispute Resolution</Link></li>
+              <li><Link href="/dispute-policy" className="hover:text-white transition-colors">Dispute Resolution Policy</Link></li>
               <li><Link href="/fraud-prevention" className="hover:text-white transition-colors">Anti-Fraud Systems</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
-              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link></li>
+              <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy & Data Policy</Link></li>
             </ul>
           </div>
 
           <div>
-            <h4 className="text-xs uppercase font-semibold tracking-wider text-slate-200 mb-4">Payment Methods</h4>
+            <h4 className="text-xs uppercase font-semibold tracking-wider text-slate-200 mb-4">Payment Methods & Governance</h4>
             <p className="text-xs text-slate-400 mb-3">
-              Official M-Pesa automated Lipa Na M-Pesa STK Push integration.
+              Automated Safaricom Lipa Na M-Pesa STK Push settlement.
             </p>
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 text-xs font-semibold mb-4">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               M-PESA STK Verified
             </div>
 
-            {/* Creator Badge */}
+            {/* Corporate Governance Badge */}
             <div className="pt-2 border-t border-pitch-border/60">
-              <span className="text-[11px] text-slate-400 block mb-1">Architecture & Engineering:</span>
-              <a
-                href="https://github.com/FixAndLearn/julesefootball"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-xs font-medium text-slate-200 hover:text-white hover:border-brand-500 transition-colors"
-              >
-                <Code2 className="w-3.5 h-3.5 text-brand-400" />
-                <span>Created by Brian (FixAndLearn)</span>
-              </a>
+              <span className="text-[11px] text-slate-400 block mb-1">Executive Leadership:</span>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-xs font-medium text-slate-200">
+                <Building2 className="w-3.5 h-3.5 text-brand-400" />
+                <span>Brian Okibo, Chief Executive Officer (CEO)</span>
+              </div>
             </div>
           </div>
         </div>
 
         {/* Bottom Attribution */}
         <div className="border-t border-pitch-border/60 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} eFootballMarket. Created & Architected by Brian (@FixAndLearn / Jules). All rights reserved.</p>
+          <p>© {new Date().getFullYear()} eFootballMarket Inc. Under Executive Leadership of Brian Okibo, CEO. All rights reserved.</p>
           <p className="mt-2 sm:mt-0 text-[11px] text-slate-400">
-            eFootball™ is a trademark of Konami Digital Entertainment. eFootballMarket is an independent marketplace.
+            eFootball™ is a trademark of Konami Digital Entertainment. eFootballMarket is an independent escrow intermediary.
           </p>
         </div>
       </div>

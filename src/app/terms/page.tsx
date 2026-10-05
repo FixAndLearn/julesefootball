@@ -1,9 +1,9 @@
-import { ShieldCheck, Scale, AlertTriangle, FileText, UserCheck, Lock } from "lucide-react";
+import { Scale, ShieldAlert, Building2, ShieldCheck, FileText, CheckCircle2 } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Terms of Service | eFootballMarket",
-  description: "Official legal terms of service, escrow agreements, and non-circumvention policies for eFootballMarket.",
+  title: "Terms of Service & Escrow Agreement | eFootballMarket",
+  description: "Official legal terms, user warranties, non-circumvention rules, and liability limitations of eFootballMarket Inc.",
 };
 
 export default function TermsOfServicePage() {
@@ -13,124 +13,166 @@ export default function TermsOfServicePage() {
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-950/80 border border-brand-800/80 text-brand-300 text-xs font-semibold">
           <Scale className="w-4 h-4 text-brand-400" />
-          <span>Legal Agreement & Escrow Protocol</span>
+          <span>Institutional Escrow & Legal Governance</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
-          Terms of Service
+          Terms of Service & Escrow Agreement
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-          Last revised: October 2026. Please read these terms carefully before utilizing the eFootballMarket platform.
+          Effective Date: October 2026. Legally binding agreement between Users and eFootballMarket Inc.
         </p>
       </div>
 
-      {/* Creator & Platform Origin Disclosure */}
-      <div className="p-6 rounded-2xl bg-brand-950/40 border border-brand-800/60 shadow-xl space-y-3">
+      {/* Corporate Governance Notice */}
+      <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl space-y-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-brand-600/30 border border-brand-500/40 flex items-center justify-center text-brand-400">
-            <UserCheck className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-brand-600/20 border border-brand-500/30 flex items-center justify-center text-brand-400">
+            <Building2 className="w-5 h-5" />
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-100 font-display">
-              Platform Architecture & Creator Attribution
+              Corporate Governance & Executive Administration
             </h2>
-            <p className="text-xs text-brand-300">
-              Founded & Architected by <strong className="text-white">Brian (@FixAndLearn / Jules)</strong>
+            <p className="text-xs text-brand-300 font-medium">
+              Executive Office of Brian Okibo, Chief Executive Officer (CEO)
             </p>
           </div>
         </div>
         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          <strong>eFootballMarket</strong> was conceived, designed, and engineered by <strong>Brian (FixAndLearn / Jules)</strong> as an institutional-grade, escrow-secured digital marketplace. All proprietary software algorithms, non-custodial escrow state engines, cryptographic credential vaults, and Daraja M-Pesa automated transaction pipelines are the exclusive intellectual property of the Creator and eFootballMarket.
+          <strong>eFootballMarket Inc.</strong> (&quot;the Company&quot;, &quot;we&quot;, &quot;our&quot;, or &quot;the Platform&quot;) operates under the executive leadership of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>. All proprietary escrow algorithms, state machines, automated M-Pesa verification engines, and cryptographic vaults are the sole intellectual and operational property of the organization.
         </p>
       </div>
 
       <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-8 shadow-xl space-y-8 text-slate-300 text-sm leading-relaxed">
         {/* Section 1 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-brand-400">1.</span> Nature of the Platform & Disclaimer
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-brand-400">1.</span> Nature of the Platform & Complete Game Publisher Disclaimer
           </h2>
           <p>
-            eFootballMarket operates strictly as a neutral technology provider, escrow software engine, and marketplace intermediary. The platform facilitates peer-to-peer digital gaming account exchanges by holding funds in escrow until transaction terms are verified.
+            eFootballMarket operates strictly as a neutral technology service provider and non-custodial software escrow intermediary. The Platform does not create, own, sell, purchase, or take physical custody of digital game accounts. All transactions are bilateral contracts entered into directly between independent Buyers and Sellers.
           </p>
-          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-400 space-y-1">
-            <strong className="text-slate-200 block">Konami Digital Entertainment Trademark Disclaimer:</strong>
+          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2">
+            <strong className="text-amber-400 block font-semibold uppercase tracking-wider">
+              Total Third-Party Publisher Disclaimers:
+            </strong>
             <p>
-              eFootball™ and PES™ are registered trademarks of Konami Digital Entertainment Inc. eFootballMarket, its founder Brian (FixAndLearn), and operating entities are independent third-party entities and are NOT affiliated, associated, authorized, endorsed by, or in any way officially connected with Konami Digital Entertainment or any of its subsidiaries.
+              • <strong>Konami Digital Entertainment:</strong> eFootball™, Pro Evolution Soccer, and PES are registered trademarks of Konami Digital Entertainment Inc. eFootballMarket Inc., Brian Okibo (CEO), its directors, and officers are completely independent entities and maintain NO affiliation, sponsorship, endorsement, authorization, or commercial relationship with Konami Digital Entertainment Inc.
+            </p>
+            <p>
+              • <strong>Console & Mobile Platform Providers:</strong> Google Play, Apple App Store, Sony PlayStation Network, Microsoft Xbox Live, and Valve Steam are trademarks of their respective owners. Neither eFootballMarket Inc. nor its CEO claims any association therewith.
+            </p>
+            <p>
+              • <strong>Publisher Sanctions & Terms of Service:</strong> Users acknowledge that trading game credentials may conflict with third-party game publisher End User License Agreements (EULAs). The Company and its CEO bear absolute zero liability for any account bans, game suspensions, card rollbacks, or service interruptions initiated by third-party game publishers.
             </p>
           </div>
         </section>
 
         {/* Section 2 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-brand-400">2.</span> Escrow Mechanics & Settlement
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-brand-400">2.</span> User Representations, Warranties & Legal Eligibility
           </h2>
           <p>
-            By placing an order on eFootballMarket, both Buyer and Seller irrevocably agree to the following financial mechanics:
+            By accessing or transacting on the Platform, you warrant and represent under penalty of law that:
           </p>
-          <ul className="list-disc list-inside space-y-2 text-xs sm:text-sm pl-2">
-            <li>
-              <strong>Non-Custodial Holding:</strong> All payments completed via Safaricom Lipa Na M-Pesa STK Push are locked immediately into the automated escrow ledger. Funds are NEVER paid directly to the seller prior to verification.
-            </li>
-            <li>
-              <strong>12-Hour Seller Delivery SLA:</strong> Sellers must submit verified Konami ID login credentials via the encrypted vault within twelve (12) hours of payment receipt. Failure to deliver allows the Buyer to initiate an automatic cancellation and refund.
-            </li>
-            <li>
-              <strong>24-Hour Inspection Window:</strong> Once credentials are submitted, the Buyer has a maximum of twenty-four (24) hours to log into the account, verify the squad composition (overall team strength, coin balance, and Epic/Big Time players), and bind their own security credentials.
-            </li>
-            <li>
-              <strong>Automated Final Settlement:</strong> If the Buyer verifies the account, or fails to file a formal dispute within the 24-hour inspection window, the escrow contract settles automatically, releasing the net payout to the Seller&apos;s available ledger balance.
-            </li>
+          <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
+            <li>You have reached the legal age of majority in your jurisdiction and possess full legal capacity to enter into binding agreements.</li>
+            <li>If acting as a Seller, you are the sole, lawful, and original creator or unencumbered owner of the listed account, and have the unreserved legal right to transfer all associated access credentials.</li>
+            <li>The account was not obtained through unauthorized access, phishing, exploitation, credential stuffing, fraud, or theft.</li>
+            <li>All listing data, overall team strength (OVR) ratings, coin balances, and screenshots provided are accurate, current, and non-deceptive.</li>
           </ul>
         </section>
 
         {/* Section 3 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-brand-400">3.</span> Non-Circumvention Policy
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-brand-400">3.</span> Absolute Hold Harmless & Indemnification Covenant
           </h2>
-          <p>
-            Users are strictly forbidden from taking communications, account deliveries, or payment settlements off-platform (such as via WhatsApp, Telegram, Discord, or direct M-Pesa send money). Any off-platform agreement voids all escrow protections, forfeits dispute eligibility, and leads to immediate permanent account suspension.
-          </p>
+          <div className="p-4 rounded-xl bg-amber-950/30 border border-amber-800/60 text-xs sm:text-sm text-amber-200 space-y-2">
+            <strong className="block text-amber-100 font-bold uppercase tracking-wider">
+              Comprehensive Defense and Hold-Harmless Obligation:
+            </strong>
+            <p>
+              You irrevocably agree to indemnify, defend, and hold completely harmless <strong>eFootballMarket Inc., Brian Okibo (Chief Executive Officer)</strong>, and all directors, shareholders, employees, agents, and infrastructure service providers from and against ANY AND ALL claims, demands, liabilities, suits, legal proceedings, judgments, regulatory fines, losses, penalties, damages, costs, and expenses (including attorney fees and forensic costs) arising directly or indirectly from:
+            </p>
+            <p>
+              (a) Your breach of any provision of these Terms;<br />
+              (b) Your violation of any third-party right, publisher EULA, or intellectual property;<br />
+              (c) Any dispute between you and any counterparty (Buyer or Seller);<br />
+              (d) Any unauthorized account recovery, credential misuse, or fraud committed by you;<br />
+              (e) Your tax liabilities or failure to report earnings to fiscal authorities.
+            </p>
+          </div>
         </section>
 
         {/* Section 4 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-brand-400">4.</span> Absolute Post-Sale Account Security & Fraud
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-brand-400">4.</span> Comprehensive Limitation of Liability & Liability Cap
           </h2>
           <p>
-            Sellers legally warrant that they are the legitimate owner of the listed account with full rights to transfer all access. Recovering, resetting, or retrieving an account after funds have been released from escrow constitutes <strong>theft and fraudulent conversion</strong> under applicable cybercrimes legislation. eFootballMarket reserves the right to report offender identity and KYC documentation to relevant law enforcement and mobile money authorities.
+            TO THE MAXIMUM EXTENT PERMITTED BY APPLICABLE LAW:
           </p>
+          <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
+            <li>
+              <strong>Exclusion of Consequential Damages:</strong> In no event shall eFootballMarket Inc., its CEO Brian Okibo, officers, or affiliates be liable for any indirect, special, incidental, consequential, punitive, or exemplary damages, including lost gaming assets, lost profits, reputational harm, account bans, or device inaccessibility, even if advised of the possibility of such damages.
+            </li>
+            <li>
+              <strong>Absolute Financial Liability Cap:</strong> Under all circumstances and regardless of the legal theory invoked (contract, tort, negligence, strict liability, or breach of statutory duty), the total collective liability of eFootballMarket Inc. and Brian Okibo, CEO, shall be strictly capped at and shall not exceed the lesser of: (i) the exact technology service fee retained by the Platform on the specific disputed transaction, or (ii) KES 1,000 (One Thousand Kenyan Shillings).
+            </li>
+          </ul>
         </section>
 
         {/* Section 5 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-brand-400">5.</span> Platform Fees & Withdrawal Thresholds
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-brand-400">5.</span> Strict Non-Circumvention Policy & Liquidated Damages
           </h2>
           <p>
-            eFootballMarket deducts a 5% technology and escrow maintenance fee from the gross order price upon successful completion. Sellers can withdraw their available balance to their registered M-Pesa line at any time, subject to a minimum withdrawal threshold of KES 200.
+            Users are strictly prohibited from soliciting, negotiating, or executing transactions outside of the official eFootballMarket platform (including via WhatsApp, Telegram, Discord, social media, or direct peer-to-peer bank/M-Pesa transfers).
+          </p>
+          <p className="text-xs text-slate-400">
+            Any attempt to circumvent the Platform voids all escrow protections, forfeits dispute eligibility, incurs immediate account termination, and subjects the violator to liquidated contractual damages of KES 50,000 per violation to cover investigative and enforcement costs.
           </p>
         </section>
 
         {/* Section 6 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-brand-400">6.</span> Limitation of Liability & Creator Protection
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-brand-400">6.</span> Criminality of Post-Settlement Account Retrieval
           </h2>
           <p>
-            To the maximum extent permitted by applicable law, neither eFootballMarket, its founder <strong>Brian (FixAndLearn / Jules)</strong>, officers, employees, nor agents shall be held liable for any indirect, punitive, consequential, or exemplary damages, including account bans initiated by third-party game publishers, server maintenance downtimes, or improper post-delivery password management by the buyer.
+            Any Seller who attempts to reclaim, recover, reset passwords on, or report as stolen an account after escrow funds have been disbursed commits <strong>criminal theft, unlawful computer access, and fraudulent conversion</strong> under applicable cybercrime legislation.
+          </p>
+          <p className="text-xs text-rose-300 font-medium">
+            eFootballMarket Inc. maintains an automated protocol to immediately forward the offender&apos;s full KYC identity, IP access records, M-Pesa transaction identifiers, and chat logs to national cybercrime investigation bureaus and mobile network fraud divisions for prosecution.
           </p>
         </section>
 
         {/* Section 7 */}
         <section className="space-y-3">
-          <h2 className="text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-brand-400">7.</span> Amendments & Acceptance
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-brand-400">7.</span> Mandatory Binding Arbitration & Class Action Waiver
           </h2>
           <p>
-            Continued usage of eFootballMarket constitutes unconditional acceptance of these terms. For legal inquiries or dispute arbitration, contact the platform administration at legal@efootballmarket.com.
+            All claims, disputes, or controversies arising out of or relating to these Terms or your use of the Platform shall be resolved exclusively through final and binding confidential arbitration.
+          </p>
+          <p className="text-xs text-slate-400">
+            <strong>Class Action Waiver:</strong> YOU AND THE COMPANY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY, AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING.
+          </p>
+        </section>
+
+        {/* Section 8 */}
+        <section className="space-y-3">
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-brand-400">8.</span> Severability, Governing Law & Executive Authority
+          </h2>
+          <p>
+            These Terms constitute the entire and sole agreement between the parties regarding the subject matter herein. If any provision is deemed unenforceable by a court of competent jurisdiction, the remaining provisions shall continue in full force and effect.
+          </p>
+          <p className="text-xs text-slate-400">
+            For official executive or legal correspondence, contact the Executive Office of the CEO at legal@efootballmarket.com.
           </p>
         </section>
       </div>
