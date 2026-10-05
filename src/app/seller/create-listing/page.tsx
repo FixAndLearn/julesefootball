@@ -14,8 +14,10 @@ import {
   Image as ImageIcon,
   Trash2,
   RefreshCw,
-  Link as LinkIcon,
   Loader2,
+  Sparkles,
+  Camera,
+  Check,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -28,7 +30,7 @@ export default function CreateListingPage() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
-  // Basic Information (All initialized empty - placeholders serve as guidance hints only)
+  // Basic Information (All initialized empty; suggestions remain visibly accessible below)
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -62,30 +64,43 @@ export default function CreateListingPage() {
   const [konamiIdStatus, setKonamiIdStatus] = useState("linked_changeable");
   const [linkedEmailStatus, setLinkedEmailStatus] = useState("transferable_full_access");
 
-  // Squad Image Upload State
+  // Real Squad Image File State (Strict real image upload - NO URL links permitted)
   const [imageUrl, setImageUrl] = useState("");
   const [imageFileName, setImageFileName] = useState("");
   const [imageFileSize, setImageFileSize] = useState<number | null>(null);
   const [uploadingImage, setUploadingImage] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
-  const [showManualUrl, setShowManualUrl] = useState(false);
 
-  // Handle Image File Selection & Direct Upload
+  // Helper function to append players to keyPlayers list without erasing existing entries
+  const handleAddPlayerSuggestion = (playerName: string) => {
+    if (!keyPlayers.trim()) {
+      setKeyPlayers(playerName);
+    } else {
+      const existing = keyPlayers
+        .split(",")
+        .map((p) => p.trim().toLowerCase());
+      if (!existing.includes(playerName.toLowerCase())) {
+        setKeyPlayers(`${keyPlayers.trim()}, ${playerName}`);
+      }
+    }
+  };
+
+  // Handle Real Image File Selection & Direct Upload
   const handleImageUpload = async (file: File) => {
     if (!file) return;
     setUploadError("");
 
     const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
     if (!validTypes.includes(file.type.toLowerCase())) {
-      setUploadError("Invalid file type. Please upload a PNG, JPG, or WebP screenshot.");
+      setUploadError("Invalid file type. Please upload a real PNG, JPG, or WebP screenshot file from your device.");
       return;
     }
 
     // 10MB limit check
     if (file.size > 10 * 1024 * 1024) {
       setUploadError(
-        `File is too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed is 10MB.`
+        `File size too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed size is 10MB.`
       );
       return;
     }
@@ -160,11 +175,11 @@ export default function CreateListingPage() {
 
     try {
       if (!title.trim()) {
-        throw new Error("Please enter a descriptive listing title.");
+        throw new Error("Please enter a listing title for your eFootball squad.");
       }
 
       if (!price || Number(price) <= 0) {
-        throw new Error("Please specify a valid listing price in KES.");
+        throw new Error("Please enter a valid listing price in KES.");
       }
 
       if (!overallStrength || Number(overallStrength) < 2000) {
@@ -172,7 +187,7 @@ export default function CreateListingPage() {
       }
 
       if (!imageUrl.trim()) {
-        throw new Error("Please upload a squad screenshot image before submitting your listing.");
+        throw new Error("Please upload a real screenshot of your squad before publishing your listing. Image links are not permitted.");
       }
 
       const playersList = keyPlayers
@@ -247,7 +262,7 @@ export default function CreateListingPage() {
           Create eFootball Account Listing
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Specify exact account metrics and upload real squad screenshots. Every field starts blank so you can enter your exact squad details without pre-filled sample text.
+          Enter your squad information below. All suggestions remain permanently visible to guide you and can be clicked to quickly populate your fields without being stuck in the text inputs.
         </p>
       </div>
 
@@ -260,31 +275,89 @@ export default function CreateListingPage() {
 
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Section 1: Basic Information */}
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
+        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
             <span>1. Basic Listing Information</span>
-            <span className="text-xs font-normal text-slate-400">Placeholders indicate suggested formats</span>
+            <span className="text-xs font-normal text-amber-400 flex items-center gap-1">
+              <Sparkles className="w-3 h-3" /> Visible suggestions below
+            </span>
           </h2>
 
-          <Input
-            label="Listing Title"
-            placeholder="e.g. 3120 OVR Quick Counter Squad | 105 Messi + Booster Vieira | 850 Coins"
-            value={title}
-            onChange={(e) => setTitle(e.target.value)}
-            required
-            helperText="Include key highlights like total team strength, marquee epics, or coin balances"
-          />
+          {/* Listing Title with Visible Suggested Formulas */}
+          <div className="space-y-2">
+            <Input
+              label="Listing Title"
+              placeholder="e.g. 3120 OVR Quick Counter Squad | 105 Messi + Booster Vieira | 850 Coins"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
+            />
+            
+            {/* Always Visible Title Suggestion Box */}
+            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-2">
+              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-300">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Suggested Listing Title Formula (High Click-Through):</span>
+              </div>
+              <p className="text-[11px] text-slate-300 font-mono bg-pitch-surface/80 px-2 py-1 rounded border border-pitch-border/50">
+                [Total OVR] + [Playstyle] | [Top 1-2 Boosters/Epics] | [Coins or Division]
+              </p>
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                <span className="text-[11px] text-slate-400">Click to use suggested template:</span>
+                <button
+                  type="button"
+                  onClick={() => setTitle("3120 OVR Quick Counter Squad | 105 Messi + Booster Vieira | 850 Coins")}
+                  className="text-[11px] px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-all cursor-pointer"
+                >
+                  ⚡ 3120 OVR Quick Counter | 105 Messi + Vieira | 850 Coins
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setTitle("3150 OVR Possession Game | Epic Rummenigge + Booster Gullit | Div 1")}
+                  className="text-[11px] px-2.5 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 hover:bg-brand-500/20 transition-all cursor-pointer"
+                >
+                  ⚡ 3150 OVR Possession | Epic Rummenigge + Gullit | Div 1
+                </button>
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Input
-              label="Listing Price (KES)"
-              type="number"
-              placeholder="e.g. 4500"
-              value={price}
-              onChange={(e) => setPrice(e.target.value)}
-              required
-              helperText="Set your desired payout in Kenyan Shillings"
-            />
+            {/* Price with Visible Price Benchmarks */}
+            <div className="space-y-1.5">
+              <Input
+                label="Listing Price (KES)"
+                type="number"
+                placeholder="e.g. 4500"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
+                required
+              />
+              <div className="pt-1">
+                <span className="block text-[11px] text-slate-400 mb-1">Suggested Price Tiers:</span>
+                <div className="flex flex-wrap gap-1">
+                  {[
+                    { label: "KES 2,500", val: "2500" },
+                    { label: "KES 4,500", val: "4500" },
+                    { label: "KES 8,000", val: "8000" },
+                    { label: "KES 15,000", val: "15000" },
+                  ].map((chip) => (
+                    <button
+                      key={chip.val}
+                      type="button"
+                      onClick={() => setPrice(chip.val)}
+                      className={`text-[10px] px-2 py-0.5 rounded border transition-all ${
+                        price === chip.val
+                          ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
+                          : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
+                      }`}
+                    >
+                      {chip.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">Gaming Platform</label>
@@ -301,6 +374,7 @@ export default function CreateListingPage() {
                 <option value="xbox_one">Xbox One</option>
                 <option value="xbox_series_x">Xbox Series X/S</option>
               </select>
+              <span className="block text-[10px] text-slate-400 mt-1">Platform where squad was created</span>
             </div>
 
             <div>
@@ -316,10 +390,12 @@ export default function CreateListingPage() {
                 <option value="North America">North America</option>
                 <option value="South America">South America</option>
               </select>
+              <span className="block text-[10px] text-slate-400 mt-1">Default matchmaking server region</span>
             </div>
           </div>
 
-          <div className="space-y-1.5">
+          {/* Description with Visible Quality Checklist */}
+          <div className="space-y-2">
             <label className="block text-xs font-medium text-slate-300">Account Description & Squad Details</label>
             <textarea
               rows={4}
@@ -329,100 +405,229 @@ export default function CreateListingPage() {
               className="w-full rounded-lg bg-pitch-card border border-pitch-border p-3 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
               required
             />
+
+            {/* Always Visible Description Guide */}
+            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-2">
+              <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
+                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                Suggested points to include (improves buyer confidence):
+              </span>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-slate-300">
+                <span className="flex items-center gap-1">✓ List 3-5 marquee Epic/Showtime players</span>
+                <span className="flex items-center gap-1">✓ Note player skill resets or extra skills added</span>
+                <span className="flex items-center gap-1">✓ Confirm clean account history (no bans/strikes)</span>
+                <span className="flex items-center gap-1">✓ State Konami ID transfer readiness</span>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  const outline = `• Squad Highlights: Top rated Booster & Epic players fully trained.\n• Resource Inventory: GP, eFootball Coins, and Contract Renewals ready.\n• Manager & Tactics: Main playstyle optimized with full team proficiency.\n• Transfer Handover: Konami ID credentials will be transferred safely via Escrow.`;
+                  setDescription((prev) => (prev ? `${prev}\n\n${outline}` : outline));
+                }}
+                className="text-[11px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors inline-flex items-center gap-1 cursor-pointer mt-1"
+              >
+                <span>+ Append suggested description outline</span>
+              </button>
+            </div>
           </div>
         </div>
 
         {/* Section 2: Team Strength & In-Game Resources */}
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
+        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
             <span>2. Team Strength & Balances</span>
-            <span className="text-xs font-normal text-slate-400">Enter your live account numbers</span>
+            <span className="text-xs font-normal text-amber-400">Click any suggestion badge to fill</span>
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <Input
-              label="Overall Team Strength (OVR)"
-              type="number"
-              placeholder="e.g. 3120"
-              value={overallStrength}
-              onChange={(e) => setOverallStrength(e.target.value)}
-              required
-              helperText="Min. 2000 OVR"
-            />
+            {/* OVR Team Strength */}
+            <div className="space-y-1.5">
+              <Input
+                label="Overall Team Strength (OVR)"
+                type="number"
+                placeholder="e.g. 3120"
+                value={overallStrength}
+                onChange={(e) => setOverallStrength(e.target.value)}
+                required
+              />
+              <div className="pt-0.5">
+                <span className="text-[10px] text-slate-400 block mb-1">Common OVRs:</span>
+                <div className="flex flex-wrap gap-1">
+                  {["3050", "3100", "3120", "3150", "3180"].map((ovr) => (
+                    <button
+                      key={ovr}
+                      type="button"
+                      onClick={() => setOverallStrength(ovr)}
+                      className={`text-[10px] px-1.5 py-0.5 rounded border transition-all ${
+                        overallStrength === ovr
+                          ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
+                          : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
+                      }`}
+                    >
+                      {ovr}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-            <Input
-              label="GP Balance"
-              type="number"
-              placeholder="e.g. 1500000"
-              value={gpBalance}
-              onChange={(e) => setGpBalance(e.target.value)}
-              helperText="In-game GP currency"
-            />
+            {/* GP Balance */}
+            <div className="space-y-1.5">
+              <Input
+                label="GP Balance"
+                type="number"
+                placeholder="e.g. 1500000"
+                value={gpBalance}
+                onChange={(e) => setGpBalance(e.target.value)}
+              />
+              <div className="pt-0.5">
+                <span className="text-[10px] text-slate-400 block mb-1">Quick GP:</span>
+                <div className="flex flex-wrap gap-1">
+                  {[
+                    { label: "500k", val: "500000" },
+                    { label: "1.5M", val: "1500000" },
+                    { label: "3M", val: "3000000" },
+                  ].map((gp) => (
+                    <button
+                      key={gp.val}
+                      type="button"
+                      onClick={() => setGpBalance(gp.val)}
+                      className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
+                    >
+                      {gp.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-            <Input
-              label="eFootball Coins"
-              type="number"
-              placeholder="e.g. 850"
-              value={coinBalance}
-              onChange={(e) => setCoinBalance(e.target.value)}
-              helperText="Purchased / earned coins"
-            />
+            {/* eFootball Coins */}
+            <div className="space-y-1.5">
+              <Input
+                label="eFootball Coins"
+                type="number"
+                placeholder="e.g. 850"
+                value={coinBalance}
+                onChange={(e) => setCoinBalance(e.target.value)}
+              />
+              <div className="pt-0.5">
+                <span className="text-[10px] text-slate-400 block mb-1">Quick Coins:</span>
+                <div className="flex flex-wrap gap-1">
+                  {["250", "850", "1500", "3200"].map((c) => (
+                    <button
+                      key={c}
+                      type="button"
+                      onClick={() => setCoinBalance(c)}
+                      className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
+                    >
+                      {c}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-            <Input
-              label="eFootball Points"
-              type="number"
-              placeholder="e.g. 12000"
-              value={efootballPoints}
-              onChange={(e) => setEfootballPoints(e.target.value)}
-              helperText="Redeemable point balance"
-            />
+            {/* eFootball Points */}
+            <div className="space-y-1.5">
+              <Input
+                label="eFootball Points"
+                type="number"
+                placeholder="e.g. 12000"
+                value={efootballPoints}
+                onChange={(e) => setEfootballPoints(e.target.value)}
+              />
+              <div className="pt-0.5">
+                <span className="text-[10px] text-slate-400 block mb-1">Quick Points:</span>
+                <div className="flex flex-wrap gap-1">
+                  {["5000", "12000", "25000"].map((pts) => (
+                    <button
+                      key={pts}
+                      type="button"
+                      onClick={() => setEfootballPoints(pts)}
+                      className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
+                    >
+                      {pts}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+            <div className="space-y-1.5">
+              <Input
+                label="Current Division"
+                type="number"
+                min={1}
+                max={10}
+                placeholder="e.g. 1"
+                value={currentDivision}
+                onChange={(e) => setCurrentDivision(e.target.value)}
+              />
+              <div className="flex gap-1 pt-0.5">
+                {["1", "2", "3", "4"].map((div) => (
+                  <button
+                    key={div}
+                    type="button"
+                    onClick={() => setCurrentDivision(div)}
+                    className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
+                  >
+                    Div {div}
+                  </button>
+                ))}
+              </div>
+            </div>
+
+            <div className="space-y-1.5">
+              <Input
+                label="Highest Division Ever"
+                type="number"
+                min={1}
+                max={10}
+                placeholder="e.g. 1"
+                value={highestDivision}
+                onChange={(e) => setHighestDivision(e.target.value)}
+              />
+              <div className="flex gap-1 pt-0.5">
+                {["1", "2", "3"].map((div) => (
+                  <button
+                    key={div}
+                    type="button"
+                    onClick={() => setHighestDivision(div)}
+                    className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
+                  >
+                    Div {div}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <Input
-              label="Current Division"
-              type="number"
-              min={1}
-              max={10}
-              placeholder="e.g. 1"
-              value={currentDivision}
-              onChange={(e) => setCurrentDivision(e.target.value)}
-              helperText="1 (Highest) to 10"
-            />
-            <Input
-              label="Highest Division Ever"
-              type="number"
-              min={1}
-              max={10}
-              placeholder="e.g. 1"
-              value={highestDivision}
-              onChange={(e) => setHighestDivision(e.target.value)}
-              helperText="Career best division"
-            />
-            <Input
-              label="Contract Renewal Tickets"
+              label="Contract Tickets"
               type="number"
               placeholder="e.g. 10"
               value={contractTickets}
               onChange={(e) => setContractTickets(e.target.value)}
-              helperText="Available renewal tickets"
+              helperText="Available 10-day/60-day tickets"
             />
+
             <Input
               label="Account Level"
               type="number"
               placeholder="e.g. 45"
               value={accountLevel}
               onChange={(e) => setAccountLevel(e.target.value)}
-              helperText="User profile level"
+              helperText="In-game profile level"
             />
           </div>
         </div>
 
         {/* Section 3: Squad Composition & Tactics */}
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
+        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
             <span>3. Special Player Cards & Tactics</span>
-            <span className="text-xs font-normal text-slate-400">Card breakdown for buyers</span>
+            <span className="text-xs font-normal text-amber-400">Tap cards to append to your list</span>
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -463,28 +668,119 @@ export default function CreateListingPage() {
             />
           </div>
 
-          <Input
-            label="Key Featured Player Names (Comma separated)"
-            placeholder="e.g. Messi 105 Big Time, Vieira Booster, Rummenigge Epic, Ronaldinho 102"
-            value={keyPlayers}
-            onChange={(e) => setKeyPlayers(e.target.value)}
-            helperText="Separate multiple player card names with commas"
-          />
+          {/* Key Featured Player Names with Permanently Visible Suggestion Badges */}
+          <div className="space-y-2">
+            <Input
+              label="Key Featured Player Names (Comma separated)"
+              placeholder="e.g. 105 Messi Big Time, Vieira Booster, Rummenigge Epic, Gullit Booster"
+              value={keyPlayers}
+              onChange={(e) => setKeyPlayers(e.target.value)}
+            />
+
+            {/* Always Visible Suggestion Badges that never disappear and never clutter input text */}
+            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
+                  <Sparkles className="w-3.5 h-3.5" />
+                  Suggested Marquee Players (Click any badge to add to your list):
+                </span>
+                <span className="text-[10px] text-slate-400">Keeps your existing text intact</span>
+              </div>
+              <div className="flex flex-wrap gap-1.5 pt-1">
+                {[
+                  "105 Big Time Messi",
+                  "Booster Vieira",
+                  "Epic Rummenigge",
+                  "Booster Gullit",
+                  "Epic Cruyff",
+                  "Big Time Ronaldinho",
+                  "Booster Maldini",
+                  "Showtime Bellingham",
+                  "Epic Cech",
+                  "Booster Shevchenko",
+                  "Booster Pirlo",
+                  "Big Time Neymar",
+                  "Epic Roberto Carlos",
+                  "Booster Seedorf",
+                  "Epic Puyol",
+                  "Booster Kaka",
+                ].map((player) => (
+                  <button
+                    key={player}
+                    type="button"
+                    onClick={() => handleAddPlayerSuggestion(player)}
+                    className="text-[11px] px-2.5 py-1 rounded-full bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/50 hover:bg-pitch-surface/80 transition-all flex items-center gap-1 cursor-pointer"
+                  >
+                    <span>+ {player}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <Input
-              label="Head Coach / Manager"
-              placeholder="e.g. Pep Guardiola, G. Caputto, or L. Scaloni"
-              value={managerName}
-              onChange={(e) => setManagerName(e.target.value)}
-            />
+            {/* Manager with Visible Meta Suggestions */}
+            <div className="space-y-1.5">
+              <Input
+                label="Head Coach / Manager"
+                placeholder="e.g. Pep Guardiola or G. Caputto"
+                value={managerName}
+                onChange={(e) => setManagerName(e.target.value)}
+              />
+              <div className="pt-0.5">
+                <span className="text-[10px] text-slate-400 block mb-1">Top Managers (Click to set):</span>
+                <div className="flex flex-wrap gap-1">
+                  {[
+                    "Pep Guardiola",
+                    "G. Caputto",
+                    "L. Scaloni",
+                    "D. Deschamps",
+                  ].map((m) => (
+                    <button
+                      key={m}
+                      type="button"
+                      onClick={() => setManagerName(m)}
+                      className={`text-[10px] px-1.5 py-0.5 rounded border transition-all ${
+                        managerName === m
+                          ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
+                          : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
+                      }`}
+                    >
+                      {m}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
-            <Input
-              label="Formation"
-              placeholder="e.g. 4-2-2-2, 4-3-3, or 4-1-2-3"
-              value={formation}
-              onChange={(e) => setFormation(e.target.value)}
-            />
+            {/* Formation with Visible Meta Suggestions */}
+            <div className="space-y-1.5">
+              <Input
+                label="Formation"
+                placeholder="e.g. 4-2-2-2 or 4-3-3"
+                value={formation}
+                onChange={(e) => setFormation(e.target.value)}
+              />
+              <div className="pt-0.5">
+                <span className="text-[10px] text-slate-400 block mb-1">Meta Formations (Click to set):</span>
+                <div className="flex flex-wrap gap-1">
+                  {["4-2-2-2", "4-3-3", "4-1-2-3", "4-2-1-3", "5-2-1-2"].map((f) => (
+                    <button
+                      key={f}
+                      type="button"
+                      onClick={() => setFormation(f)}
+                      className={`text-[10px] px-1.5 py-0.5 rounded border transition-all ${
+                        formation === f
+                          ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
+                          : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
+                      }`}
+                    >
+                      {f}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
 
             <div>
               <label className="block text-xs font-medium text-slate-300 mb-1.5">Primary Playstyle</label>
@@ -499,15 +795,18 @@ export default function CreateListingPage() {
                 <option value="out_wide">Out Wide</option>
                 <option value="long_ball">Long Ball</option>
               </select>
+              <span className="block text-[10px] text-slate-400 mt-1">Playstyle team rating 88+</span>
             </div>
           </div>
         </div>
 
-        {/* Section 4: Security, Konami ID & Squad Image Upload */}
+        {/* Section 4: Konami ID & REAL SQUAD SCREENSHOT IMAGE (DIRECT FILE UPLOAD ONLY - ZERO LINKS) */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-6">
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
-            <span>4. Konami ID Linking & Squad Screenshot</span>
-            <span className="text-xs font-normal text-slate-400">Authentic proof for buyer trust</span>
+            <span>4. Konami ID Security & Real Squad Screenshot</span>
+            <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
+              <ShieldCheck className="w-3.5 h-3.5" /> Real Photo Upload Only
+            </span>
           </h2>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -519,9 +818,12 @@ export default function CreateListingPage() {
                 className="w-full bg-pitch-card border border-pitch-border rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
               >
                 <option value="linked_changeable">Konami ID Linked (Email Changeable)</option>
-                <option value="unlinked">Konami ID Unlinked (Buyer Can Bind)</option>
-                <option value="linked_immutable">Konami ID Linked (Fixed Email)</option>
+                <option value="unlinked">Konami ID Unlinked (Buyer Can Bind Directly)</option>
+                <option value="linked_immutable">Konami ID Linked (Fixed Email Handover)</option>
               </select>
+              <span className="block text-[10px] text-slate-400 mt-1">
+                Changeable email accounts provide the fastest escrow release
+              </span>
             </div>
 
             <div>
@@ -531,36 +833,36 @@ export default function CreateListingPage() {
                 onChange={(e) => setLinkedEmailStatus(e.target.value)}
                 className="w-full bg-pitch-card border border-pitch-border rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
               >
-                <option value="transferable_full_access">Full Access (Primary Email Handed to Buyer)</option>
-                <option value="buyer_email_bindable">Buyer Email Bindable (Assisted Handover)</option>
+                <option value="transferable_full_access">Full Access (Primary Email Given to Buyer)</option>
+                <option value="buyer_email_bindable">Buyer Email Bindable (Assisted Transfer)</option>
               </select>
+              <span className="block text-[10px] text-slate-400 mt-1">
+                Ensures buyer gains permanent access upon release
+              </span>
             </div>
           </div>
 
-          {/* Squad Screenshot Upload Area */}
+          {/* Real Squad Screenshot Upload Component (No Link Allowed) */}
           <div className="space-y-3">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-medium text-slate-200">
-                Squad Screenshot Image <span className="text-brand-400">*</span>
+              <label className="block text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                <Camera className="w-4 h-4 text-amber-400" />
+                <span>Upload Real Squad Screenshot</span>
+                <span className="text-rose-400">*</span>
               </label>
-              <button
-                type="button"
-                onClick={() => setShowManualUrl(!showManualUrl)}
-                className="text-[11px] text-slate-400 hover:text-brand-400 transition-colors flex items-center gap-1"
-              >
-                <LinkIcon className="w-3 h-3" />
-                <span>{showManualUrl ? "Upload image file instead" : "Or enter image URL"}</span>
-              </button>
+              <span className="text-[11px] text-slate-400">
+                Direct image upload required • No external links
+              </span>
             </div>
 
             {uploadError && (
-              <div className="p-3 rounded-lg bg-rose-950/50 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{uploadError}</span>
               </div>
             )}
 
-            {/* Hidden File Input */}
+            {/* Hidden File Input for Device/Gallery/Camera Image Selection */}
             <input
               type="file"
               ref={fileInputRef}
@@ -570,85 +872,88 @@ export default function CreateListingPage() {
             />
 
             {!imageUrl ? (
-              /* Drag & Drop Upload Zone */
+              /* Drag & Drop Real Image Upload Box */
               <div
                 onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
                 onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all ${
+                className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
                   isDragOver
-                    ? "border-brand-400 bg-brand-500/10 shadow-lg"
-                    : "border-pitch-border hover:border-slate-500 bg-pitch-card/60 hover:bg-pitch-card"
+                    ? "border-amber-400 bg-amber-500/10 shadow-xl"
+                    : "border-pitch-border hover:border-amber-400/60 bg-pitch-card/60 hover:bg-pitch-card"
                 }`}
               >
                 {uploadingImage ? (
-                  <div className="flex flex-col items-center justify-center py-4 space-y-3">
-                    <Loader2 className="w-10 h-10 text-brand-400 animate-spin" />
-                    <p className="text-sm font-medium text-slate-200">
-                      Uploading squad screenshot to secure storage...
+                  <div className="flex flex-col items-center justify-center py-6 space-y-3">
+                    <Loader2 className="w-10 h-10 text-amber-400 animate-spin" />
+                    <p className="text-sm font-semibold text-slate-100">
+                      Uploading real screenshot to secure escrow storage...
                     </p>
                     <p className="text-xs text-slate-400">
-                      Please wait while your image is verified and stored.
+                      Processing high-resolution image file. Please wait...
                     </p>
                   </div>
                 ) : (
                   <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-14 h-14 rounded-full bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400">
-                      <UploadCloud className="w-7 h-7" />
+                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-inner">
+                      <UploadCloud className="w-8 h-8" />
                     </div>
                     <div>
-                      <p className="text-sm font-semibold text-slate-100">
-                        Click to upload squad screenshot or drag & drop
+                      <p className="text-sm font-bold text-slate-100">
+                        Tap or drag & drop to upload your real squad screenshot
                       </p>
-                      <p className="text-xs text-slate-400 mt-1">
-                        PNG, JPG, or WebP up to 10MB. Clear view of Starting XI & bench recommended.
+                      <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
+                        Upload a clear screenshot showing your Starting XI formation, player ratings, and reserves from your mobile gallery or PC.
                       </p>
+                    </div>
+                    <div className="flex items-center gap-2 pt-1">
+                      <span className="text-[11px] font-medium text-slate-400 px-2.5 py-1 rounded bg-pitch-surface border border-pitch-border">
+                        PNG, JPG, or WebP (Max 10MB)
+                      </span>
                     </div>
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="gold"
                       size="sm"
                       onClick={(e) => {
                         e.stopPropagation();
                         fileInputRef.current?.click();
                       }}
-                      className="mt-2"
+                      className="mt-2 font-semibold shadow-lg"
                     >
                       <Upload className="w-3.5 h-3.5 mr-1.5" />
-                      Browse Files
+                      Select Real Screenshot from Device
                     </Button>
                   </div>
                 )}
               </div>
             ) : (
-              /* Image Uploaded Preview Card */
-              <div className="bg-pitch-card border border-pitch-border rounded-xl p-4 space-y-4">
-                <div className="flex flex-col sm:flex-row items-center gap-4">
-                  <div className="relative w-full sm:w-48 h-32 rounded-lg overflow-hidden border border-pitch-border bg-pitch-surface shrink-0 flex items-center justify-center">
+              /* Real Uploaded Image Preview & Verification Card */
+              <div className="bg-pitch-card border border-pitch-border rounded-2xl p-5 space-y-4">
+                <div className="flex flex-col sm:flex-row items-center gap-5">
+                  <div className="relative w-full sm:w-56 h-36 rounded-xl overflow-hidden border border-pitch-border bg-pitch-surface shrink-0 shadow-md">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={imageUrl}
-                      alt="Squad Screenshot Preview"
+                      alt="Uploaded Real Squad Screenshot"
                       className="w-full h-full object-cover"
                     />
                   </div>
 
-                  <div className="flex-1 w-full space-y-2">
-                    <div className="flex items-center gap-2">
-                      <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
-                      <span className="text-xs font-semibold text-emerald-300">
-                        Squad Screenshot Successfully Attached
-                      </span>
+                  <div className="flex-1 w-full space-y-2.5">
+                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 text-xs font-semibold">
+                      <CheckCircle2 className="w-3.5 h-3.5" />
+                      <span>Real Image File Stored & Verified</span>
                     </div>
 
-                    <p className="text-xs text-slate-300 truncate">
-                      {imageFileName || "Squad Screenshot"}
+                    <p className="text-xs text-slate-200 font-medium truncate">
+                      {imageFileName || "Squad_Screenshot.png"}
                     </p>
 
                     {imageFileSize && (
                       <p className="text-[11px] text-slate-400">
-                        Size: {(imageFileSize / (1024 * 1024)).toFixed(2)} MB
+                        File Size: {(imageFileSize / (1024 * 1024)).toFixed(2)} MB • Stored in escrow media repository
                       </p>
                     )}
 
@@ -662,7 +967,7 @@ export default function CreateListingPage() {
                         className="text-xs"
                       >
                         <RefreshCw className="w-3 h-3 mr-1" />
-                        Replace Image
+                        Upload Different Screenshot
                       </Button>
                       <Button
                         type="button"
@@ -678,19 +983,6 @@ export default function CreateListingPage() {
                     </div>
                   </div>
                 </div>
-              </div>
-            )}
-
-            {/* Optional Manual URL Fallback Input */}
-            {showManualUrl && (
-              <div className="pt-2">
-                <Input
-                  label="Or enter direct image URL"
-                  placeholder="https://images.example.com/squad-photo.jpg"
-                  value={imageUrl}
-                  onChange={(e) => setImageUrl(e.target.value)}
-                  helperText="Direct HTTPS link to public screenshot"
-                />
               </div>
             )}
           </div>
