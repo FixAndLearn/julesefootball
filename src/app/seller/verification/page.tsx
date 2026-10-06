@@ -15,9 +15,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 
-export default function SellerVerificationPage() {
+function SellerVerificationContent() {
   const searchParams = useSearchParams();
   const [showPreview, setShowPreview] = useState(searchParams.get("preview") === "true");
 
@@ -131,5 +131,19 @@ export default function SellerVerificationPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function SellerVerificationPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-24 text-center text-xs text-slate-400">
+          Loading verification portal...
+        </div>
+      }
+    >
+      <SellerVerificationContent />
+    </Suspense>
   );
 }

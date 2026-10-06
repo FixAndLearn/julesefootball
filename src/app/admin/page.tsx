@@ -33,9 +33,9 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useEffect, useState, useCallback, Suspense } from "react";
 
-export default function AdminControlCenterPage() {
+function AdminControlCenterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
@@ -918,5 +918,19 @@ export default function AdminControlCenterPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function AdminControlCenterPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-24 text-center text-xs text-slate-400">
+          Loading Executive Admin Control Center...
+        </div>
+      }
+    >
+      <AdminControlCenterContent />
+    </Suspense>
   );
 }
