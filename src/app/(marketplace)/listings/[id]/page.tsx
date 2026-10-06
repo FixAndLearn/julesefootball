@@ -258,10 +258,16 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
-                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                    <span>{listing.seller?.seller_rating ? Number(listing.seller.seller_rating).toFixed(1) : "5.0"}</span>
-                    <span>•</span>
-                    <span>{listing.seller?.completed_sales_count || 0} completed orders</span>
+                    {(listing.seller?.completed_sales_count || 0) > 0 && listing.seller?.seller_rating ? (
+                      <>
+                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <span>{Number(listing.seller.seller_rating).toFixed(1)}</span>
+                        <span>•</span>
+                        <span>{listing.seller.completed_sales_count} completed orders</span>
+                      </>
+                    ) : (
+                      <span>New Seller • 0 completed orders</span>
+                    )}
                   </div>
                 </div>
               </div>

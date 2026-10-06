@@ -100,9 +100,15 @@ export function ListingCard({ listing }: ListingCardProps) {
                 )}
               </div>
               <div className="flex items-center gap-1 text-[10px] text-slate-400">
-                <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
-                <span>{listing.seller?.seller_rating ? Number(listing.seller.seller_rating).toFixed(1) : "5.0"}</span>
-                <span>({listing.seller?.completed_sales_count || 0} sales)</span>
+                {(listing.seller?.completed_sales_count || 0) > 0 && listing.seller?.seller_rating ? (
+                  <>
+                    <Star className="w-2.5 h-2.5 text-amber-400 fill-amber-400" />
+                    <span>{Number(listing.seller.seller_rating).toFixed(1)}</span>
+                    <span>({listing.seller.completed_sales_count} sales)</span>
+                  </>
+                ) : (
+                  <span>New Seller (0 sales)</span>
+                )}
               </div>
             </div>
           </div>

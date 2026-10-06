@@ -41,7 +41,7 @@ export default async function SellerDashboardPage() {
     available_balance: Number(profile?.available_balance || 0),
     escrow_balance: Number(profile?.escrow_balance || 0),
     completed_sales_count: profile?.completed_sales_count || 0,
-    seller_rating: Number(profile?.seller_rating || 5.0),
+    seller_rating: Number(profile?.seller_rating || 0),
     is_verified_seller: profile?.is_verified_seller || false,
   };
 

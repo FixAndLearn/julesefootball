@@ -84,9 +84,13 @@ export function SellerDashboardView({
           </span>
           <div className="flex items-center gap-2 mt-2">
             <span className="text-3xl font-bold text-white font-display">
-              {Number(sellerProfile.seller_rating || 5.0).toFixed(1)}
+              {sellerProfile.seller_rating > 0
+                ? Number(sellerProfile.seller_rating).toFixed(1)
+                : "New"}
             </span>
-            <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+            {sellerProfile.seller_rating > 0 && (
+              <Star className="w-5 h-5 text-amber-400 fill-amber-400" />
+            )}
           </div>
           <div className="flex items-center gap-1.5 mt-3 text-xs text-slate-300">
             {sellerProfile.is_verified_seller ? (

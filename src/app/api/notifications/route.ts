@@ -41,43 +41,6 @@ export async function GET(req: NextRequest) {
       return n;
     });
 
-    // If new user has no notifications yet, provision welcoming onboarding notifications
-    if (items.length === 0) {
-      const welcomeNotifications = [
-        {
-          recipient_id: user.id,
-          type: "escrow_welcome",
-          title: "Automated Escrow Protection Active",
-          message:
-            "Welcome to eFootballMarket! Every purchase and sale is safeguarded by our automated Safaricom M-Pesa escrow vault. Payouts are locked until the buyer inspects credentials.",
-          action_url: "/dashboard/buyer",
-          is_read: false,
-        },
-        {
-          recipient_id: user.id,
-          type: "account_setup",
-          title: "Start Trading eFootball Accounts",
-          message:
-            "Browse thousands of verified Konami ID accounts or list your own squad with instant team OVR checks and transparent seller ratings.",
-          action_url: "/browse",
-          is_read: false,
-        },
-      ];
-
-      try {
-        const { data: seeded } = await adminSupabase
-          .from("notifications")
-          .insert(welcomeNotifications)
-          .select();
-
-        if (seeded && seeded.length > 0) {
-          items = seeded;
-        }
-      } catch (seedErr) {
-        console.warn("Could not seed welcome notifications:", seedErr);
-      }
-    }
-
     const unreadCount = items.filter((n) => !n.is_read).length;
 
     return NextResponse.json({
