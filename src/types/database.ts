@@ -91,6 +91,7 @@ export interface Profile {
   country: string;
   avatar_url: string | null;
   bio: string | null;
+  role?: UserRole;
   is_verified_seller: boolean;
   seller_rating: number;
   total_reviews_count: number;
@@ -101,6 +102,30 @@ export interface Profile {
   created_at: string;
   updated_at: string;
   deleted_at: string | null;
+}
+
+export type NewsCategory =
+  | 'scammer_alert'
+  | 'efootball_news'
+  | 'escrow_guide'
+  | 'announcement'
+  | 'update';
+
+export interface NewsArticle {
+  id: string;
+  title: string;
+  slug: string;
+  category: NewsCategory;
+  content: string;
+  summary: string;
+  cover_image_url?: string | null;
+  author_id?: string | null;
+  author_name?: string;
+  is_pinned: boolean;
+  is_published: boolean;
+  views_count: number;
+  created_at: string;
+  updated_at: string;
 }
 
 export interface Listing {

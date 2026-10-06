@@ -23,6 +23,8 @@ import {
   ArrowRight,
   Shield,
   MessageSquare,
+  AlertTriangle,
+  Newspaper,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -50,6 +52,19 @@ function formatRelativeTime(dateString: string): string {
 
 function getNotificationBadge(type: string) {
   switch (type) {
+    case "scammer_alert":
+      return {
+        icon: <AlertTriangle className="w-5 h-5 text-rose-400" />,
+        color: "bg-rose-500/10 border-rose-500/30 text-rose-300",
+        label: "Security Alert",
+      };
+    case "news_broadcast":
+    case "news_alert":
+      return {
+        icon: <Newspaper className="w-5 h-5 text-amber-400" />,
+        color: "bg-amber-500/10 border-amber-500/30 text-amber-300",
+        label: "Official Bulletin",
+      };
     case "funds_released":
     case "escrow_welcome":
     case "escrow":

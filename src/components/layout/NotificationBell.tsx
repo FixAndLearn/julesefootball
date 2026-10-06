@@ -14,6 +14,8 @@ import {
   Sparkles,
   Trophy,
   MessageSquare,
+  AlertTriangle,
+  Newspaper,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -37,6 +39,11 @@ function formatRelativeTime(dateString: string): string {
 
 function getNotificationIcon(type: string) {
   switch (type) {
+    case "scammer_alert":
+      return <AlertTriangle className="w-4 h-4 text-rose-400" />;
+    case "news_broadcast":
+    case "news_alert":
+      return <Newspaper className="w-4 h-4 text-amber-400" />;
     case "funds_released":
     case "escrow_welcome":
     case "escrow":

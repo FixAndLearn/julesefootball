@@ -1,13 +1,17 @@
 "use client";
 
+import { Logo } from "@/components/brand/Logo";
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
+import { isUserAdmin } from "@/lib/security/adminAuth";
 import {
   Bell,
   CheckCircle2,
   ChevronDown,
+  Crown,
   LogOut,
   Menu,
+  Newspaper,
   PlusCircle,
   ShieldCheck,
   ShoppingCart,
@@ -23,6 +27,7 @@ import { useState, useRef, useEffect } from "react";
 export function Header() {
   const router = useRouter();
   const { user, profile, loading, signOut, isAuthenticated, displayName } = useAuth();
+  const isAdminUser = isUserAdmin(user?.email, profile?.role);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [dismissedBanner, setDismissedBanner] = useState(false);
@@ -99,19 +104,7 @@ export function Header() {
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
           <div className="flex items-center gap-8">
-            <Link href="/" className="flex items-center gap-2.5 group">
-              <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-brand-600 via-indigo-600 to-konami-blue flex items-center justify-center shadow-lg shadow-brand-600/30 group-hover:scale-105 transition-transform">
-                <ShieldCheck className="w-6 h-6 text-white" />
-              </div>
-              <div>
-                <span className="text-lg font-bold tracking-tight text-white font-display">
-                  eFootball<span className="text-brand-400">Market</span>
-                </span>
-                <span className="block text-[10px] uppercase tracking-wider text-slate-400 font-medium -mt-1">
-                  Escrow Protected
-                </span>
-              </div>
-            </Link>
+            <Logo clickable={true} size="md" />
 
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
               <Link href="/browse" className="hover:text-white transition-colors">
@@ -122,6 +115,13 @@ export function Header() {
               </Link>
               <Link href="/browse?minStrength=3100" className="hover:text-white transition-colors">
                 OVR 3100+
+              </Link>
+              <Link
+                href="/news"
+                className="hover:text-amber-300 flex items-center gap-1.5 transition-colors font-semibold text-amber-400/90"
+              >
+                <Newspaper className="w-3.5 h-3.5" />
+                <span>News & Alerts</span>
               </Link>
               <Link
                 href="/escrow-guarantee"
@@ -220,13 +220,24 @@ export function Header() {
                         <span>Create New Listing</span>
                       </Link>
 
+                      {isAdminUser && (
+                        <Link
+                          href="/admin"
+                          onClick={() => setDropdownOpen(false)}
+                          className="flex items-center gap-2 px-3 py-2 rounded-lg text-amber-300 bg-amber-500/10 border border-amber-500/30 hover:bg-amber-500/20 font-bold transition-colors my-1"
+                        >
+                          <Crown className="w-4 h-4 text-amber-400" />
+                          <span>Admin Control Center</span>
+                        </Link>
+                      )}
+
                       <Link
                         href="/seller/verification"
                         onClick={() => setDropdownOpen(false)}
                         className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-card transition-colors"
                       >
                         <CheckCircle2 className="w-4 h-4 text-sky-400" />
-                        <span>Seller KYC Verification</span>
+                        <span>Seller Verification (Coming Soon)</span>
                       </Link>
                     </div>
 
@@ -330,6 +341,17 @@ export function Header() {
           )}
 
           <nav className="space-y-1 text-sm font-medium text-slate-300">
+            {isAdminUser && (
+              <Link
+                href="/admin"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold"
+              >
+                <span>Admin Control Center</span>
+                <Crown className="w-4 h-4 text-amber-400" />
+              </Link>
+            )}
+
             <Link
               href="/notifications"
               onClick={() => setMobileMenuOpen(false)}
@@ -338,6 +360,16 @@ export function Header() {
               <span>Notifications</span>
               <Bell className="w-4 h-4 text-amber-400" />
             </Link>
+
+            <Link
+              href="/news"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-400 font-semibold"
+            >
+              <span>News & Scammer Alerts</span>
+              <Newspaper className="w-4 h-4 text-amber-400" />
+            </Link>
+
             <Link
               href="/browse"
               onClick={() => setMobileMenuOpen(false)}

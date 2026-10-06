@@ -59,7 +59,7 @@ export function Footer() {
             <h4 className="text-xs uppercase font-semibold tracking-wider text-slate-200 mb-4">Sellers</h4>
             <ul className="space-y-2.5 text-xs">
               <li><Link href="/seller/create-listing" className="hover:text-white transition-colors">Create Listing</Link></li>
-              <li><Link href="/seller/verification" className="hover:text-white transition-colors">Seller Verification (KYC)</Link></li>
+              <li><Link href="/seller/verification" className="hover:text-white transition-colors">Seller Verification (Coming Soon)</Link></li>
               <li><Link href="/seller/earnings" className="hover:text-white transition-colors">Earnings & Withdrawals</Link></li>
               <li><Link href="/seller/guidelines" className="hover:text-white transition-colors">Seller Policy & Standards</Link></li>
             </ul>
@@ -68,6 +68,7 @@ export function Footer() {
           <div>
             <h4 className="text-xs uppercase font-semibold tracking-wider text-slate-200 mb-4">Trust & Security</h4>
             <ul className="space-y-2.5 text-xs">
+              <li><Link href="/news" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">🚨 News & Scammer Alerts</Link></li>
               <li><Link href="/escrow-guarantee" className="hover:text-white transition-colors">Escrow Protection Rules</Link></li>
               <li><Link href="/dispute-policy" className="hover:text-white transition-colors">Dispute Resolution Policy</Link></li>
               <li><Link href="/fraud-prevention" className="hover:text-white transition-colors">Anti-Fraud Systems</Link></li>

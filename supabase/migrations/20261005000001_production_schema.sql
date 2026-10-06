@@ -1094,3 +1094,46 @@ LEFT JOIN public.user_roles ur ON ur.user_id = p.id AND ur.role_id = 'buyer'
 WHERE ur.user_id IS NULL
 ON CONFLICT (user_id, role_id) DO NOTHING;
 
+-- 13. USER ROLES & NEWS ARTICLES
+ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'user';
+
+-- Automatically set brianokibo@gmail.com as super_admin if profile exists
+UPDATE profiles
+SET role = 'super_admin'
+WHERE id IN (
+  SELECT id FROM auth.users WHERE lower(email) = 'brianokibo@gmail.com'
+);
+
+CREATE TABLE IF NOT EXISTS news_articles (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  title VARCHAR(300) NOT NULL,
+  slug VARCHAR(350) UNIQUE NOT NULL,
+  category VARCHAR(50) NOT NULL DEFAULT 'efootball_news',
+  summary TEXT NOT NULL,
+  content TEXT NOT NULL,
+  cover_image_url TEXT,
+  author_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
+  author_name VARCHAR(150) DEFAULT 'eFootballMarket Editorial',
+  is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
+  is_published BOOLEAN NOT NULL DEFAULT TRUE,
+  views_count INTEGER NOT NULL DEFAULT 0,
+  created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
+  updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
+);
+
+ALTER TABLE news_articles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view published news" ON news_articles;
+CREATE POLICY "Public can view published news" ON news_articles
+  FOR SELECT USING (is_published = true);
+
+DROP POLICY IF EXISTS "Admins can manage news" ON news_articles;
+CREATE POLICY "Admins can manage news" ON news_articles
+  FOR ALL USING (
+    EXISTS (
+      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND (profiles.role = 'admin' OR profiles.role = 'super_admin')
+    ) OR
+    EXISTS (
+      SELECT 1 FROM auth.users WHERE auth.users.id = auth.uid() AND lower(auth.users.email) = 'brianokibo@gmail.com'
+    )
+  );
