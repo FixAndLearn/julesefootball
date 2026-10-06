@@ -1,0 +1,148 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 630" width="1200" height="630">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#080c14" />
+      <stop offset="50%" stopColor="#0d1424" />
+      <stop offset="100%" stopColor="#05080f" />
+    </linearGradient>
+
+    <!-- Glowing Orbs -->
+    <radialGradient id="glow-brand" cx="30%" cy="40%" r="50%">
+      <stop offset="0%" stopColor="#2563eb" stopOpacity="0.35" />
+      <stop offset="100%" stopColor="#2563eb" stopOpacity="0" />
+    </radialGradient>
+
+    <radialGradient id="glow-gold" cx="80%" cy="70%" r="50%">
+      <stop offset="0%" stopColor="#d97706" stopOpacity="0.25" />
+      <stop offset="100%" stopColor="#d97706" stopOpacity="0" />
+    </radialGradient>
+
+    <radialGradient id="glow-emerald" cx="85%" cy="20%" r="40%">
+      <stop offset="0%" stopColor="#059669" stopOpacity="0.3" />
+      <stop offset="100%" stopColor="#059669" stopOpacity="0" />
+    </radialGradient>
+
+    <!-- Shield Gradients -->
+    <linearGradient id="shield-blue" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#1e3a8a" />
+      <stop offset="50%" stopColor="#2563eb" />
+      <stop offset="100%" stopColor="#0284c7" />
+    </linearGradient>
+
+    <linearGradient id="gold-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#f59e0b" />
+      <stop offset="50%" stopColor="#fbbf24" />
+      <stop offset="100%" stopColor="#d97706" />
+    </linearGradient>
+
+    <linearGradient id="emerald-accent" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stopColor="#10b981" />
+      <stop offset="100%" stopColor="#059669" />
+    </linearGradient>
+
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="12" stdDeviation="20" flood-color="#000" flood-opacity="0.6" />
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="url(#bg)" />
+  <rect width="1200" height="630" fill="url(#glow-brand)" />
+  <rect width="1200" height="630" fill="url(#glow-gold)" />
+  <rect width="1200" height="630" fill="url(#glow-emerald)" />
+
+  <!-- Grid overlay -->
+  <g opacity="0.06" stroke="#fff" stroke-width="1">
+    <line x1="100" y1="0" x2="100" y2="630" />
+    <line x1="250" y1="0" x2="250" y2="630" />
+    <line x1="400" y1="0" x2="400" y2="630" />
+    <line x1="550" y1="0" x2="550" y2="630" />
+    <line x1="700" y1="0" x2="700" y2="630" />
+    <line x1="850" y1="0" x2="850" y2="630" />
+    <line x1="1000" y1="0" x2="1000" y2="630" />
+    <line x1="0" y1="100" x2="1200" y2="100" />
+    <line x1="0" y1="250" x2="1200" y2="250" />
+    <line x1="0" y1="400" x2="1200" y2="400" />
+    <line x1="0" y1="550" x2="1200" y2="550" />
+  </g>
+
+  <!-- Pitch Circle in Corner -->
+  <circle cx="1050" cy="315" r="240" fill="none" stroke="#2563eb" stroke-width="2" opacity="0.15" />
+  <circle cx="1050" cy="315" r="6" fill="#2563eb" opacity="0.3" />
+
+  <!-- BRAND HEADER / LOGO -->
+  <g transform="translate(100, 90)">
+    <!-- Logo Shield Icon -->
+    <g transform="scale(1.8)" filter="url(#shadow)">
+      <path d="M24 4L7 11V23C7 33.5 14.3 43.1 24 46C33.7 43.1 41 33.5 41 23V11L24 4Z" fill="url(#shield-blue)" />
+      <path d="M24 6L9 12.2V23C9 32.3 15.5 40.8 24 43.5C32.5 40.8 39 32.3 39 23V12.2L24 6Z" fill="#090d16" opacity="0.9" />
+      <circle cx="24" cy="22" r="11" fill="none" stroke="url(#gold-accent)" stroke-width="2" />
+      <circle cx="24" cy="22" r="7" fill="url(#shield-blue)" />
+      <circle cx="24" cy="22" r="3" fill="#ffffff" />
+      <path d="M24 11V15M24 29V33M13 22H17M31 22H35" stroke="url(#gold-accent)" stroke-width="1.5" stroke-linecap="round" />
+      <circle cx="24" cy="40" r="2.5" fill="url(#emerald-accent)" />
+    </g>
+
+    <!-- Brand Typography -->
+    <text x="100" y="44" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="46" fill="#ffffff" letter-spacing="-1">
+      eFootball<tspan fill="#38bdf8">Market</tspan>
+    </text>
+    <text x="102" y="74" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="16" fill="#f59e0b" letter-spacing="4">
+      INSTITUTIONAL ESCROW EXCHANGE
+    </text>
+  </g>
+
+  <!-- MAIN HEADLINE -->
+  <g transform="translate(100, 240)">
+    <text x="0" y="55" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="56" fill="#ffffff" letter-spacing="-1.5">
+      Trade High-OVR eFootball Accounts
+    </text>
+    <text x="0" y="125" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="56" fill="#10b981" letter-spacing="-1.5">
+      With 100% Guaranteed M-Pesa Escrow.
+    </text>
+    <text x="0" y="175" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="500" font-size="24" fill="#94a3b8" letter-spacing="-0.5">
+      Zero Peer-to-Peer Scams. Instant Konami ID verification &amp; automated Daraja STK Push.
+    </text>
+  </g>
+
+  <!-- TRUST BADGES / PILLS -->
+  <g transform="translate(100, 480)">
+    <!-- Badge 1: Escrow -->
+    <g transform="translate(0, 0)">
+      <rect width="270" height="56" rx="28" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+      <circle cx="32" cy="28" r="14" fill="#10b981" fill-opacity="0.2" />
+      <path d="M27 28L30 31L37 24" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" />
+      <text x="56" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="17" fill="#f1f5f9">
+        100% Escrow Protected
+      </text>
+    </g>
+
+    <!-- Badge 2: M-Pesa -->
+    <g transform="translate(290, 0)">
+      <rect width="290" height="56" rx="28" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+      <circle cx="32" cy="28" r="14" fill="#059669" fill-opacity="0.2" />
+      <text x="26" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="900" font-size="15" fill="#10b981">KES</text>
+      <text x="56" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="17" fill="#f1f5f9">
+        Lipa Na M-Pesa STK Push
+      </text>
+    </g>
+
+    <!-- Badge 3: 24h Window -->
+    <g transform="translate(600, 0)">
+      <rect width="250" height="56" rx="28" fill="#1e293b" stroke="#334155" stroke-width="1.5" />
+      <circle cx="32" cy="28" r="14" fill="#f59e0b" fill-opacity="0.2" />
+      <path d="M32 20V28L36 30" stroke="#f59e0b" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" fill="none" />
+      <text x="56" y="34" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="700" font-size="17" fill="#f1f5f9">
+        24-Hr Inspection Window
+      </text>
+    </g>
+
+    <!-- URL on right -->
+    <g transform="translate(870, 16)">
+      <text x="0" y="22" font-family="-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif" font-weight="800" font-size="20" fill="#38bdf8">
+        efootballmarket.com →
+      </text>
+    </g>
+  </g>
+</svg>
