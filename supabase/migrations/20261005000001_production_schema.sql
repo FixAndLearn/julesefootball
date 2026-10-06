@@ -795,21 +795,131 @@ CREATE POLICY "Sellers can manage images for own listings" ON listing_images
 CREATE POLICY "Users can manage own favorites" ON favorites
   FOR ALL USING (auth.uid() = user_id);
 
--- Orders: Buyer and Seller can see their orders
+-- Orders: Buyer and Seller can see, create, and update their orders
+DROP POLICY IF EXISTS "Buyers and sellers can view their own orders" ON orders;
 CREATE POLICY "Buyers and sellers can view their own orders" ON orders
   FOR SELECT USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
 
--- Escrow Accounts: Accessible to buyer and seller of the order
+DROP POLICY IF EXISTS "Buyers can create orders" ON orders;
+CREATE POLICY "Buyers can create orders" ON orders
+  FOR INSERT WITH CHECK (auth.uid() = buyer_id);
+
+DROP POLICY IF EXISTS "Buyers and sellers can update their own orders" ON orders;
+CREATE POLICY "Buyers and sellers can update their own orders" ON orders
+  FOR UPDATE USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
+
+-- Escrow Accounts: Accessible to participants
+DROP POLICY IF EXISTS "Escrow visible to participants" ON escrow_accounts;
 CREATE POLICY "Escrow visible to participants" ON escrow_accounts
   FOR SELECT USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
 
+DROP POLICY IF EXISTS "Participants can create escrow accounts" ON escrow_accounts;
+CREATE POLICY "Participants can create escrow accounts" ON escrow_accounts
+  FOR INSERT WITH CHECK (auth.uid() = buyer_id OR auth.uid() = seller_id);
+
+DROP POLICY IF EXISTS "Participants can update escrow accounts" ON escrow_accounts;
+CREATE POLICY "Participants can update escrow accounts" ON escrow_accounts
+  FOR UPDATE USING (auth.uid() = buyer_id OR auth.uid() = seller_id);
+
+-- Escrow Transactions: Visible and auditable by participants
+DROP POLICY IF EXISTS "Escrow transactions visible to participants" ON escrow_transactions;
+CREATE POLICY "Escrow transactions visible to participants" ON escrow_transactions
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM escrow_accounts WHERE escrow_accounts.id = escrow_transactions.escrow_id AND (escrow_accounts.buyer_id = auth.uid() OR escrow_accounts.seller_id = auth.uid())
+    )
+  );
+
+DROP POLICY IF EXISTS "Participants can insert escrow transactions" ON escrow_transactions;
+CREATE POLICY "Participants can insert escrow transactions" ON escrow_transactions
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM escrow_accounts WHERE escrow_accounts.id = escrow_transactions.escrow_id AND (escrow_accounts.buyer_id = auth.uid() OR escrow_accounts.seller_id = auth.uid())
+    )
+  );
+
 -- Account Deliveries: Only buyer and seller of the order can access
+DROP POLICY IF EXISTS "Account credentials strictly visible to order parties" ON account_deliveries;
 CREATE POLICY "Account credentials strictly visible to order parties" ON account_deliveries
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM orders WHERE orders.id = account_deliveries.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
     )
   );
+
+DROP POLICY IF EXISTS "Sellers can deliver credentials" ON account_deliveries;
+CREATE POLICY "Sellers can deliver credentials" ON account_deliveries
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = account_deliveries.order_id AND orders.seller_id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Order parties can update deliveries" ON account_deliveries;
+CREATE POLICY "Order parties can update deliveries" ON account_deliveries
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = account_deliveries.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
+    )
+  );
+
+-- Payments: Accessible and creatable by order parties
+DROP POLICY IF EXISTS "Payments visible to order parties" ON payments;
+CREATE POLICY "Payments visible to order parties" ON payments
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = payments.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
+    )
+  );
+
+DROP POLICY IF EXISTS "Buyers can initiate payments" ON payments;
+CREATE POLICY "Buyers can initiate payments" ON payments
+  FOR INSERT WITH CHECK (
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = payments.order_id AND orders.buyer_id = auth.uid()
+    )
+  );
+
+DROP POLICY IF EXISTS "Order parties can update payments" ON payments;
+CREATE POLICY "Order parties can update payments" ON payments
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = payments.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
+    )
+  );
+
+-- Disputes: Visible and manageable by participants
+DROP POLICY IF EXISTS "Disputes visible to order parties" ON disputes;
+CREATE POLICY "Disputes visible to order parties" ON disputes
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = disputes.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
+    )
+  );
+
+DROP POLICY IF EXISTS "Order parties can open disputes" ON disputes;
+CREATE POLICY "Order parties can open disputes" ON disputes
+  FOR INSERT WITH CHECK (
+    auth.uid() = opened_by AND
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = disputes.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
+    )
+  );
+
+DROP POLICY IF EXISTS "Dispute evidence visible to order parties" ON dispute_evidence;
+CREATE POLICY "Dispute evidence visible to order parties" ON dispute_evidence
+  FOR SELECT USING (
+    EXISTS (
+      SELECT 1 FROM disputes
+      JOIN orders ON orders.id = disputes.order_id
+      WHERE disputes.id = dispute_evidence.dispute_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
+    )
+  );
+
+DROP POLICY IF EXISTS "Order parties can submit dispute evidence" ON dispute_evidence;
+CREATE POLICY "Order parties can submit dispute evidence" ON dispute_evidence
+  FOR INSERT WITH CHECK (auth.uid() = submitted_by);
+
 
 -- Conversations & Messages: Members only
 CREATE POLICY "Members can view conversations" ON conversations

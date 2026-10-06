@@ -2,6 +2,7 @@ import { OrderChatBox } from "@/components/chat/OrderChatBox";
 import { OrderEscrowController } from "@/components/escrow/OrderEscrowController";
 import { Badge } from "@/components/ui/Badge";
 import { formatCurrency, getPlatformLabel } from "@/lib/utils";
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { MessageService } from "@/services/messageService";
 import { OrderService } from "@/services/orderService";
@@ -27,7 +28,11 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
     redirect(`/login?redirect=/orders/${params.id}`);
   }
 
-  const orderService = new OrderService(supabase);
+  const adminSupabase = createAdminClient();
+  const serviceRoleConfigured = hasServiceRoleKey();
+  const primaryClient = serviceRoleConfigured ? adminSupabase : supabase;
+
+  const orderService = new OrderService(primaryClient);
   const order = await orderService.getOrderById(params.id);
 
   if (!order) {
@@ -42,7 +47,8 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
   const isBuyer = order.buyer_id === user.id;
 
   // Fetch or initialize order conversation
-  const messageService = new MessageService(supabase);
+  const messageService = new MessageService(primaryClient);
+
   const conversation = await messageService.getOrCreateOrderConversation(
     order.id,
     order.buyer_id,

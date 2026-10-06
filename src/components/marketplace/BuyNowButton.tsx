@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
-import { ShieldCheck, ShoppingCart, UserCheck, Sparkles } from "lucide-react";
+import { ShieldCheck, ShoppingCart, UserCheck, Sparkles, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -67,8 +67,12 @@ export function BuyNowButton({ listingId, priceFormatted }: BuyNowButtonProps) {
       </Button>
 
       {error && (
-        <p className="text-xs text-rose-400 text-center font-medium">{error}</p>
+        <div className="p-3 rounded-xl bg-rose-950/70 border border-rose-800 text-rose-300 text-xs flex items-start gap-2 shadow-md">
+          <AlertCircle className="w-4 h-4 shrink-0 text-rose-400 mt-0.5" />
+          <span className="leading-relaxed">{error}</span>
+        </div>
       )}
+
 
       {/* Guest guidance: tells visitor when & why to sign in or create an account */}
       {!isAuthenticated && !authLoading && (

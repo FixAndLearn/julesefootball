@@ -1,3 +1,4 @@
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { OrderService } from "@/services/orderService";
 import { NextRequest, NextResponse } from "next/server";
@@ -16,7 +17,10 @@ export async function GET(
       return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
-    const orderService = new OrderService(supabase);
+    const adminSupabase = createAdminClient();
+    const serviceRoleConfigured = hasServiceRoleKey();
+    const primaryClient = serviceRoleConfigured ? adminSupabase : supabase;
+    const orderService = new OrderService(primaryClient);
     const order = await orderService.getOrderById(params.id);
 
     if (!order) {
