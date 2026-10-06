@@ -921,35 +921,92 @@ CREATE POLICY "Order parties can submit dispute evidence" ON dispute_evidence
   FOR INSERT WITH CHECK (auth.uid() = submitted_by);
 
 
--- Conversations & Messages: Members only
+-- Conversation Members: Members can view and join conversations
+DROP POLICY IF EXISTS "Members can view conversation members" ON conversation_members;
+CREATE POLICY "Members can view conversation members" ON conversation_members
+  FOR SELECT USING (true);
+
+DROP POLICY IF EXISTS "Users can insert conversation members" ON conversation_members;
+CREATE POLICY "Users can insert conversation members" ON conversation_members
+  FOR INSERT WITH CHECK (true);
+
+-- Conversations: Members only
+DROP POLICY IF EXISTS "Members can view conversations" ON conversations;
 CREATE POLICY "Members can view conversations" ON conversations
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM conversation_members WHERE conversation_members.conversation_id = conversations.id AND conversation_members.user_id = auth.uid()
+    ) OR
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = conversations.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
     )
   );
 
+DROP POLICY IF EXISTS "Users can create conversations" ON conversations;
+CREATE POLICY "Users can create conversations" ON conversations
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Members can update conversations" ON conversations;
+CREATE POLICY "Members can update conversations" ON conversations
+  FOR UPDATE USING (
+    EXISTS (
+      SELECT 1 FROM conversation_members WHERE conversation_members.conversation_id = conversations.id AND conversation_members.user_id = auth.uid()
+    ) OR
+    EXISTS (
+      SELECT 1 FROM orders WHERE orders.id = conversations.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
+    )
+  );
+
+-- Messages: Members only
+DROP POLICY IF EXISTS "Members can view messages" ON messages;
 CREATE POLICY "Members can view messages" ON messages
   FOR SELECT USING (
     EXISTS (
       SELECT 1 FROM conversation_members WHERE conversation_members.conversation_id = messages.conversation_id AND conversation_members.user_id = auth.uid()
+    ) OR
+    EXISTS (
+      SELECT 1 FROM conversations c
+      JOIN orders o ON o.id = c.order_id
+      WHERE c.id = messages.conversation_id AND (o.buyer_id = auth.uid() OR o.seller_id = auth.uid())
     )
   );
 
+DROP POLICY IF EXISTS "Members can insert messages" ON messages;
 CREATE POLICY "Members can insert messages" ON messages
   FOR INSERT WITH CHECK (
-    auth.uid() = sender_id AND
-    EXISTS (
-      SELECT 1 FROM conversation_members WHERE conversation_members.conversation_id = messages.conversation_id AND conversation_members.user_id = auth.uid()
+    auth.uid() = sender_id AND (
+      EXISTS (
+        SELECT 1 FROM conversation_members WHERE conversation_members.conversation_id = messages.conversation_id AND conversation_members.user_id = auth.uid()
+      ) OR
+      EXISTS (
+        SELECT 1 FROM conversations c
+        JOIN orders o ON o.id = c.order_id
+        WHERE c.id = messages.conversation_id AND (o.buyer_id = auth.uid() OR o.seller_id = auth.uid())
+      )
     )
   );
 
--- Notifications: Only recipient
+DROP POLICY IF EXISTS "Members can update messages" ON messages;
+CREATE POLICY "Members can update messages" ON messages
+  FOR UPDATE USING (auth.uid() = sender_id);
+
+-- Notifications: Only recipient can view, update, delete; system & users can insert
+DROP POLICY IF EXISTS "Users can read own notifications" ON notifications;
 CREATE POLICY "Users can read own notifications" ON notifications
   FOR SELECT USING (auth.uid() = recipient_id);
 
+DROP POLICY IF EXISTS "Users can insert notifications" ON notifications;
+CREATE POLICY "Users can insert notifications" ON notifications
+  FOR INSERT WITH CHECK (true);
+
+DROP POLICY IF EXISTS "Users can update own notifications" ON notifications;
 CREATE POLICY "Users can update own notifications" ON notifications
   FOR UPDATE USING (auth.uid() = recipient_id);
+
+DROP POLICY IF EXISTS "Users can delete own notifications" ON notifications;
+CREATE POLICY "Users can delete own notifications" ON notifications
+  FOR DELETE USING (auth.uid() = recipient_id);
+
 
 -- Reviews: Public read
 CREATE POLICY "Reviews are viewable by everyone" ON reviews

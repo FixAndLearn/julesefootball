@@ -121,6 +121,12 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
             conversationId={conversation.id}
             currentUserId={user.id}
             initialMessages={messages}
+            orderId={order.id}
+            orderNumber={order.order_number}
+            orderStatus={order.status}
+            isBuyer={isBuyer}
+            totalAmount={order.total_amount}
+            currency={order.currency}
           />
 
           {/* Participant Card */}

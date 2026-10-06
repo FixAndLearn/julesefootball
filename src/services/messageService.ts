@@ -15,6 +15,28 @@ export class MessageService {
       .single();
 
     if (existing) {
+      // Ensure both buyer and seller are recorded in conversation_members
+      try {
+        const { data: members } = await this.supabase
+          .from("conversation_members")
+          .select("user_id")
+          .eq("conversation_id", existing.id);
+
+        const existingUserIds = new Set((members || []).map((m: any) => m.user_id));
+        const missing = [];
+        if (!existingUserIds.has(buyerId)) {
+          missing.push({ conversation_id: existing.id, user_id: buyerId });
+        }
+        if (!existingUserIds.has(sellerId)) {
+          missing.push({ conversation_id: existing.id, user_id: sellerId });
+        }
+        if (missing.length > 0) {
+          await this.supabase.from("conversation_members").insert(missing);
+        }
+      } catch {
+        // Non-blocking member sync
+      }
+
       return existing as Conversation;
     }
 

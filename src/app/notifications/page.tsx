@@ -22,6 +22,7 @@ import {
   Inbox,
   ArrowRight,
   Shield,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -76,6 +77,13 @@ function getNotificationBadge(type: string) {
         color: "bg-emerald-500/10 border-emerald-500/30 text-emerald-300",
         label: "M-Pesa Deposit",
       };
+    case "new_message":
+    case "message":
+      return {
+        icon: <MessageSquare className="w-5 h-5 text-sky-400" />,
+        color: "bg-sky-500/10 border-sky-500/30 text-sky-300",
+        label: "Direct Chat",
+      };
     default:
       return {
         icon: <Sparkles className="w-5 h-5 text-brand-400" />,
@@ -92,7 +100,7 @@ export default function NotificationsPage() {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState<"all" | "unread" | "escrow" | "orders">("all");
+  const [activeTab, setActiveTab] = useState<"all" | "unread" | "messages" | "escrow" | "orders">("all");
   const [actionLoading, setActionLoading] = useState(false);
 
   const fetchNotifications = useCallback(async () => {
@@ -185,6 +193,8 @@ export default function NotificationsPage() {
   // Filter list by selected tab
   const filteredNotifications = notifications.filter((item) => {
     if (activeTab === "unread") return !item.is_read;
+    if (activeTab === "messages")
+      return item.type.includes("message");
     if (activeTab === "escrow")
       return item.type.includes("escrow") || item.type.includes("funds");
     if (activeTab === "orders")
@@ -308,6 +318,17 @@ export default function NotificationsPage() {
                 {unreadCount}
               </span>
             )}
+          </button>
+          <button
+            type="button"
+            onClick={() => setActiveTab("messages")}
+            className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
+              activeTab === "messages"
+                ? "bg-brand-600 text-white shadow-md shadow-brand-900/50"
+                : "bg-pitch-surface text-slate-400 hover:text-slate-200 hover:bg-pitch-card"
+            }`}
+          >
+            Messages
           </button>
           <button
             type="button"

@@ -13,6 +13,7 @@ import {
   ShoppingCart,
   Sparkles,
   Trophy,
+  MessageSquare,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -47,6 +48,9 @@ function getNotificationIcon(type: string) {
       return <Trophy className="w-4 h-4 text-amber-400" />;
     case "mpesa_payment":
       return <Coins className="w-4 h-4 text-emerald-400" />;
+    case "new_message":
+    case "message":
+      return <MessageSquare className="w-4 h-4 text-sky-400" />;
     default:
       return <Sparkles className="w-4 h-4 text-brand-400" />;
   }
@@ -78,8 +82,8 @@ export function NotificationBell() {
   useEffect(() => {
     fetchNotifications();
 
-    // Auto-refresh notifications every 45 seconds
-    const interval = setInterval(fetchNotifications, 45000);
+    // Auto-refresh notifications every 12 seconds
+    const interval = setInterval(fetchNotifications, 12000);
     return () => clearInterval(interval);
   }, [fetchNotifications]);
 

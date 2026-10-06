@@ -33,7 +33,13 @@ export async function GET(req: NextRequest) {
       console.warn("Error querying notifications:", error.message);
     }
 
-    let items = notifications || [];
+    let items = (notifications || []).map((n) => {
+      // Heal legacy placeholder urls that point to rules instead of dashboard
+      if (n.action_url === "/escrow-guarantee") {
+        return { ...n, action_url: "/dashboard/buyer" };
+      }
+      return n;
+    });
 
     // If new user has no notifications yet, provision welcoming onboarding notifications
     if (items.length === 0) {
@@ -44,7 +50,7 @@ export async function GET(req: NextRequest) {
           title: "Automated Escrow Protection Active",
           message:
             "Welcome to eFootballMarket! Every purchase and sale is safeguarded by our automated Safaricom M-Pesa escrow vault. Payouts are locked until the buyer inspects credentials.",
-          action_url: "/escrow-guarantee",
+          action_url: "/dashboard/buyer",
           is_read: false,
         },
         {
