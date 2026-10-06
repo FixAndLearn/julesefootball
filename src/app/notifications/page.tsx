@@ -25,10 +25,12 @@ import {
   MessageSquare,
   AlertTriangle,
   Newspaper,
+  X,
+  ChevronRight,
 } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useCallback } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, useCallback, Suspense } from "react";
 
 function formatRelativeTime(dateString: string): string {
   try {
@@ -108,8 +110,29 @@ function getNotificationBadge(type: string) {
   }
 }
 
-export default function NotificationsPage() {
+function getActionLabel(item: Notification) {
+  if (item.type.includes("message")) {
+    return "Open Chat Conversation";
+  }
+  if (item.type === "scammer_alert" || item.type.includes("news")) {
+    return "Read Full News Bulletin";
+  }
+  if (item.type.includes("order") || item.type.includes("escrow") || item.type.includes("funds")) {
+    return "Go to Order & Escrow";
+  }
+  if (item.action_url?.includes("/browse")) {
+    return "Browse Verified Accounts";
+  }
+  if (item.action_url?.includes("/dashboard")) {
+    return "Open Dashboard";
+  }
+  return "View Destination";
+}
+
+function NotificationsContent() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const targetId = searchParams.get("id");
   const { isAuthenticated, loading: authLoading } = useAuth();
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -117,6 +140,27 @@ export default function NotificationsPage() {
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState<"all" | "unread" | "messages" | "escrow" | "orders">("all");
   const [actionLoading, setActionLoading] = useState(false);
+  const [readingNotification, setReadingNotification] = useState<Notification | null>(null);
+
+  const markNotificationRead = useCallback((id: string) => {
+    setNotifications((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+    );
+    setUnreadCount((prev) => Math.max(0, prev - 1));
+
+    fetch("/api/notifications", {
+      method: "PATCH",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id }),
+    }).catch(console.warn);
+  }, []);
+
+  const handleOpenNotification = useCallback((item: Notification) => {
+    setReadingNotification(item);
+    if (!item.is_read) {
+      markNotificationRead(item.id);
+    }
+  }, [markNotificationRead]);
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
@@ -127,38 +171,25 @@ export default function NotificationsPage() {
       if (data.notifications) {
         setNotifications(data.notifications);
         setUnreadCount(data.unreadCount || 0);
+
+        // Auto-open requested notification from URL query
+        if (targetId) {
+          const match = data.notifications.find((n: Notification) => n.id === targetId);
+          if (match) {
+            handleOpenNotification(match);
+          }
+        }
       }
     } catch (err) {
       console.warn("Failed to load notifications:", err);
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [targetId, handleOpenNotification]);
 
   useEffect(() => {
     fetchNotifications();
   }, [fetchNotifications]);
-
-  const handleMarkAsRead = async (id: string, actionUrl?: string | null) => {
-    try {
-      setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
-      );
-      setUnreadCount((prev) => Math.max(0, prev - 1));
-
-      await fetch("/api/notifications", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
-      });
-
-      if (actionUrl) {
-        router.push(actionUrl);
-      }
-    } catch (err) {
-      console.warn("Failed to mark as read:", err);
-    }
-  };
 
   const handleMarkAllRead = async () => {
     setActionLoading(true);
@@ -197,6 +228,9 @@ export default function NotificationsPage() {
     e.stopPropagation();
     try {
       setNotifications((prev) => prev.filter((n) => n.id !== id));
+      if (readingNotification?.id === id) {
+        setReadingNotification(null);
+      }
       await fetch(`/api/notifications?id=${id}`, {
         method: "DELETE",
       });
@@ -208,12 +242,9 @@ export default function NotificationsPage() {
   // Filter list by selected tab
   const filteredNotifications = notifications.filter((item) => {
     if (activeTab === "unread") return !item.is_read;
-    if (activeTab === "messages")
-      return item.type.includes("message");
-    if (activeTab === "escrow")
-      return item.type.includes("escrow") || item.type.includes("funds");
-    if (activeTab === "orders")
-      return item.type.includes("order") || item.type.includes("payment");
+    if (activeTab === "messages") return item.type.includes("message");
+    if (activeTab === "escrow") return item.type.includes("escrow") || item.type.includes("funds");
+    if (activeTab === "orders") return item.type.includes("order") || item.type.includes("payment");
     return true;
   });
 
@@ -228,7 +259,7 @@ export default function NotificationsPage() {
           </div>
           <h1 className="text-3xl font-bold text-white font-display">Notifications Center</h1>
           <p className="text-sm text-slate-400 mt-1">
-            Real-time alerts for M-Pesa escrow transfers, order deliveries, and account security.
+            Real-time alerts for M-Pesa escrow transfers, buyer/seller messages, and security bulletins.
           </p>
         </div>
 
@@ -389,7 +420,7 @@ export default function NotificationsPage() {
             return (
               <div
                 key={item.id}
-                onClick={() => handleMarkAsRead(item.id, item.action_url)}
+                onClick={() => handleOpenNotification(item)}
                 className={`p-4 sm:p-5 rounded-2xl border transition-all duration-200 cursor-pointer flex flex-col sm:flex-row items-start justify-between gap-4 ${
                   !item.is_read
                     ? "bg-pitch-surface border-amber-500/40 shadow-lg shadow-amber-950/20 hover:border-amber-400/80"
@@ -424,7 +455,7 @@ export default function NotificationsPage() {
                       {item.title}
                     </h3>
 
-                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line">
+                    <p className="text-xs text-slate-300 leading-relaxed whitespace-pre-line line-clamp-2">
                       {item.message}
                     </p>
                   </div>
@@ -432,21 +463,19 @@ export default function NotificationsPage() {
 
                 {/* Right Action Buttons */}
                 <div className="flex items-center gap-2 self-end sm:self-center shrink-0 pt-2 sm:pt-0">
-                  {item.action_url && (
-                    <Button
-                      type="button"
-                      variant="gold"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleMarkAsRead(item.id, item.action_url);
-                      }}
-                      className="text-xs font-semibold shadow-sm"
-                    >
-                      <span>View</span>
-                      <ArrowRight className="w-3 h-3 ml-1" />
-                    </Button>
-                  )}
+                  <Button
+                    type="button"
+                    variant="gold"
+                    size="sm"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleOpenNotification(item);
+                    }}
+                    className="text-xs font-semibold shadow-sm"
+                  >
+                    <span>Read</span>
+                    <ArrowRight className="w-3 h-3 ml-1" />
+                  </Button>
 
                   <button
                     type="button"
@@ -490,6 +519,100 @@ export default function NotificationsPage() {
           </div>
         </div>
       )}
+
+      {/* FULL NOTIFICATION READER MODAL */}
+      {readingNotification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="bg-pitch-surface border border-pitch-border rounded-3xl max-w-lg w-full p-6 sm:p-7 shadow-2xl space-y-5 animate-in zoom-in-95">
+            {/* Modal Header */}
+            <div className="flex items-start justify-between gap-4 border-b border-pitch-border/60 pb-4">
+              <div className="flex items-center gap-3">
+                <div className="w-11 h-11 rounded-2xl bg-pitch-card border border-pitch-border flex items-center justify-center shrink-0 shadow-inner">
+                  {getNotificationBadge(readingNotification.type).icon}
+                </div>
+                <div>
+                  <span
+                    className={`inline-block px-2 py-0.5 rounded-full border text-[10px] font-bold uppercase tracking-wider mb-1 ${
+                      getNotificationBadge(readingNotification.type).color
+                    }`}
+                  >
+                    {getNotificationBadge(readingNotification.type).label}
+                  </span>
+                  <div className="flex items-center gap-1.5 text-xs text-slate-400">
+                    <Clock className="w-3 h-3" />
+                    <span>{formatRelativeTime(readingNotification.created_at)}</span>
+                  </div>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => setReadingNotification(null)}
+                className="p-2 rounded-xl text-slate-400 hover:text-white hover:bg-pitch-card transition-colors"
+                aria-label="Close"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Notification Title & Full Body Message */}
+            <div className="space-y-3">
+              <h2 className="text-lg font-bold text-white font-display">
+                {readingNotification.title}
+              </h2>
+
+              <div className="p-4 rounded-2xl bg-pitch-card/70 border border-pitch-border/80 text-sm text-slate-200 leading-relaxed whitespace-pre-line font-sans">
+                {readingNotification.message}
+              </div>
+            </div>
+
+            {/* Modal Actions */}
+            <div className="pt-2 flex flex-col sm:flex-row items-center justify-end gap-3 border-t border-pitch-border/60">
+              <Button
+                type="button"
+                variant="secondary"
+                size="md"
+                onClick={() => setReadingNotification(null)}
+                className="w-full sm:w-auto text-xs"
+              >
+                Close
+              </Button>
+
+              {readingNotification.action_url ? (
+                <Button
+                  type="button"
+                  variant="gold"
+                  size="md"
+                  onClick={() => {
+                    const dest = readingNotification.action_url!;
+                    setReadingNotification(null);
+                    router.push(dest);
+                  }}
+                  className="w-full sm:w-auto text-xs font-bold shadow-lg flex items-center justify-center gap-1.5"
+                >
+                  <span>{getActionLabel(readingNotification)}</span>
+                  <ArrowRight className="w-4 h-4" />
+                </Button>
+              ) : null}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
+  );
+}
+
+export default function NotificationsPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="max-w-4xl mx-auto px-4 py-20 text-center space-y-3">
+          <Loader2 className="w-8 h-8 text-brand-400 animate-spin mx-auto" />
+          <p className="text-xs text-slate-400">Opening Notification Center...</p>
+        </div>
+      }
+    >
+      <NotificationsContent />
+    </Suspense>
   );
 }

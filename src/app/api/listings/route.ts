@@ -81,7 +81,10 @@ const listingCreateSchema = z.object({
   linked_email_status: z.enum(["transferable_full_access", "buyer_email_bindable"]).default("transferable_full_access"),
   status: z.enum(["draft", "pending_review", "published"]).default("published"),
   is_featured: z.boolean().default(false),
-  image_urls: z.array(z.string()).min(1, "Please upload at least one squad screenshot"),
+  image_urls: z
+    .array(z.string())
+    .min(1, "Please upload at least one squad screenshot")
+    .max(5, "You can upload a maximum of 5 squad screenshots"),
 });
 
 export async function GET(req: NextRequest) {

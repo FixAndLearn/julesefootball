@@ -54,11 +54,16 @@ export function ListingCard({ listing }: ListingCardProps) {
           </div>
         </div>
 
-        {/* Bottom Playstyle Chip on Image */}
-        <div className="absolute bottom-2 left-3 pointer-events-none">
+        {/* Bottom Playstyle Chip & Image Count on Image */}
+        <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between pointer-events-none">
           <span className="text-[11px] font-medium text-slate-200 bg-slate-900/80 backdrop-blur-md px-2 py-0.5 rounded-md border border-slate-700/60">
             {getPlaystyleLabel(listing.primary_playstyle)}
           </span>
+          {listing.images && listing.images.length > 1 && (
+            <span className="text-[10px] font-semibold text-slate-200 bg-black/70 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10 flex items-center gap-1">
+              📷 {listing.images.length} photos
+            </span>
+          )}
         </div>
       </div>
 

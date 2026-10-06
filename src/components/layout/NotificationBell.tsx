@@ -116,7 +116,7 @@ export function NotificationBell() {
     }
   };
 
-  const handleMarkAsRead = async (id: string, actionUrl?: string | null) => {
+  const handleNotificationClick = async (id: string) => {
     try {
       // Optimistic update
       setNotifications((prev) =>
@@ -124,18 +124,18 @@ export function NotificationBell() {
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
-      await fetch("/api/notifications", {
+      // Persist read status in Supabase so it does NOT pop up as new again
+      fetch("/api/notifications", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id }),
-      });
+      }).catch(console.warn);
 
-      if (actionUrl) {
-        setIsOpen(false);
-        router.push(actionUrl);
-      }
+      setIsOpen(false);
+      // Opens the notification center page directly to read this notification
+      router.push(`/notifications?id=${id}`);
     } catch (err) {
-      console.warn("Failed to mark notification as read:", err);
+      console.warn("Failed to process notification click:", err);
     }
   };
 
@@ -214,7 +214,7 @@ export function NotificationBell() {
               previewList.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => handleMarkAsRead(item.id, item.action_url)}
+                  onClick={() => handleNotificationClick(item.id)}
                   className={`p-3.5 hover:bg-pitch-card transition-colors cursor-pointer flex items-start gap-3 ${
                     !item.is_read ? "bg-amber-500/[0.04]" : ""
                   }`}

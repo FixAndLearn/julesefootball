@@ -21,11 +21,19 @@ import {
   Database,
   Copy,
   ExternalLink,
+  Plus,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+
+interface UploadedImage {
+  url: string;
+  fileName: string;
+  size: number;
+}
 
 export default function CreateListingPage() {
   const router = useRouter();
@@ -48,7 +56,7 @@ export default function CreateListingPage() {
     }
   };
 
-  // Basic Information (All initialized empty; suggestions remain visibly accessible below)
+  // Basic Information
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
@@ -82,87 +90,85 @@ export default function CreateListingPage() {
   const [konamiIdStatus, setKonamiIdStatus] = useState("linked_changeable");
   const [linkedEmailStatus, setLinkedEmailStatus] = useState("transferable_full_access");
 
-  // Real Squad Image File State (Strict real image upload - NO URL links permitted)
-  const [imageUrl, setImageUrl] = useState("");
-  const [imageFileName, setImageFileName] = useState("");
-  const [imageFileSize, setImageFileSize] = useState<number | null>(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
+  // Real Squad Images State (Supports up to 5 images in original quality)
+  const [images, setImages] = useState<UploadedImage[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
 
-  // Helper function to append players to keyPlayers list without erasing existing entries
-  const handleAddPlayerSuggestion = (playerName: string) => {
-    if (!keyPlayers.trim()) {
-      setKeyPlayers(playerName);
-    } else {
-      const existing = keyPlayers
-        .split(",")
-        .map((p) => p.trim().toLowerCase());
-      if (!existing.includes(playerName.toLowerCase())) {
-        setKeyPlayers(`${keyPlayers.trim()}, ${playerName}`);
-      }
-    }
-  };
-
-  // Handle Real Image File Selection & Direct Upload
-  const handleImageUpload = async (file: File) => {
-    if (!file) return;
+  // Upload handler for up to 5 images
+  const handleFilesUpload = async (fileList: FileList | File[]) => {
+    if (!fileList || fileList.length === 0) return;
     setUploadError("");
 
-    const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
-    if (!validTypes.includes(file.type.toLowerCase())) {
-      setUploadError("Invalid file type. Please upload a real PNG, JPG, or WebP screenshot file from your device.");
+    const remainingSlots = 5 - images.length;
+    if (remainingSlots <= 0) {
+      setUploadError("Maximum 5 squad images allowed. Please remove an existing image first to upload another.");
       return;
     }
 
-    // 10MB limit check
-    if (file.size > 10 * 1024 * 1024) {
-      setUploadError(
-        `File size too large (${(file.size / (1024 * 1024)).toFixed(1)}MB). Maximum allowed size is 10MB.`
-      );
-      return;
+    const filesToUpload = Array.from(fileList).slice(0, remainingSlots);
+    if (Array.from(fileList).length > remainingSlots) {
+      setUploadError(`Only ${remainingSlots} more image(s) could be added (maximum 5 images allowed).`);
     }
 
-    setUploadingImage(true);
+    setUploadingImages(true);
 
     try {
-      const formData = new FormData();
-      formData.append("file", file);
+      const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+      const newUploaded: UploadedImage[] = [];
 
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
+      for (const file of filesToUpload) {
+        if (!validTypes.includes(file.type.toLowerCase())) {
+          throw new Error(`"${file.name}" is not supported. Please upload a real PNG, JPG, or WebP screenshot.`);
+        }
 
-      const data = await res.json();
+        if (file.size > 10 * 1024 * 1024) {
+          throw new Error(`"${file.name}" exceeds 10MB limit.`);
+        }
 
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to upload squad image.");
+        const formData = new FormData();
+        formData.append("file", file);
+
+        const res = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || `Failed to upload ${file.name}`);
+        }
+
+        newUploaded.push({
+          url: data.url,
+          fileName: file.name,
+          size: file.size,
+        });
       }
 
-      setImageUrl(data.url);
-      setImageFileName(file.name);
-      setImageFileSize(file.size);
+      setImages((prev) => [...prev, ...newUploaded]);
     } catch (err: any) {
-      setUploadError(err.message || "Failed to upload image. Please try again.");
+      setUploadError(err.message || "Failed to upload image(s). Please try again.");
     } finally {
-      setUploadingImage(false);
+      setUploadingImages(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file) {
-      handleImageUpload(file);
+    if (e.target.files) {
+      handleFilesUpload(e.target.files);
     }
   };
 
   const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
     setIsDragOver(false);
-    const file = e.dataTransfer.files?.[0];
-    if (file) {
-      handleImageUpload(file);
+    if (e.dataTransfer.files) {
+      handleFilesUpload(e.dataTransfer.files);
     }
   };
 
@@ -176,14 +182,18 @@ export default function CreateListingPage() {
     setIsDragOver(false);
   };
 
-  const handleRemoveImage = () => {
-    setImageUrl("");
-    setImageFileName("");
-    setImageFileSize(null);
+  const handleRemoveImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
     setUploadError("");
-    if (fileInputRef.current) {
-      fileInputRef.current.value = "";
-    }
+  };
+
+  const handleSetPrimaryCover = (index: number) => {
+    if (index === 0) return;
+    setImages((prev) => {
+      const selected = prev[index];
+      const rest = prev.filter((_, i) => i !== index);
+      return [selected, ...rest];
+    });
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -209,8 +219,8 @@ export default function CreateListingPage() {
         throw new Error("Overall Team Strength (OVR) is required and must be at least 2000 (e.g. 3120).");
       }
 
-      if (!imageUrl.trim()) {
-        throw new Error("Please upload a real screenshot of your squad before publishing your listing.");
+      if (images.length === 0) {
+        throw new Error("Please upload at least one real squad screenshot (up to 5 images allowed) in real quality.");
       }
 
       const playersList = keyPlayers
@@ -254,7 +264,7 @@ export default function CreateListingPage() {
         highest_division: parseDiv(highestDivision),
         konami_id_status: konamiIdStatus,
         linked_email_status: linkedEmailStatus,
-        image_urls: [imageUrl.trim()],
+        image_urls: images.map((img) => img.url),
       };
 
       const res = await fetch("/api/listings", {
@@ -295,7 +305,7 @@ export default function CreateListingPage() {
           Create eFootball Account Listing
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Enter your squad information below. All suggestions remain permanently visible to guide you and can be clicked to quickly populate your fields without being stuck in the text inputs.
+          Post your squad with real screenshot quality (up to 5 photos). Simple 1 or 2 examples are provided below to guide how to fill each field.
         </p>
       </div>
 
@@ -378,67 +388,6 @@ export default function CreateListingPage() {
                 Open Supabase SQL Editor
               </Button>
             </a>
-
-            <Link href="/setup">
-              <Button type="button" variant="outline" size="sm" className="text-xs">
-                View Setup Diagnostics (/setup)
-              </Button>
-            </Link>
-          </div>
-        </div>
-      ) : error && (error.includes("foreign key constraint") || error.includes("listings_seller_id_fkey") || error.includes("profiles")) ? (
-        <div className="mb-6 p-5 rounded-2xl bg-amber-950/70 border border-amber-600/80 text-amber-200 shadow-2xl space-y-3">
-          <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-300 shrink-0">
-              <Database className="w-5 h-5" />
-            </div>
-            <div className="space-y-1">
-              <h3 className="text-sm font-bold text-amber-100">
-                Seller Profile Sync & Database Policy Update
-              </h3>
-              <p className="text-xs text-amber-200/90 leading-relaxed">
-                Your user account is now auto-provisioned in the seller profile ledger. Click <strong>Publish Listing</strong> again to complete publication. If you haven&apos;t run the latest migration, copy the updated SQL script to register the automatic profile triggers and RLS policies.
-              </p>
-            </div>
-          </div>
-
-          <div className="pt-1 flex flex-wrap items-center gap-2.5">
-            <Button
-              type="button"
-              variant="gold"
-              size="sm"
-              onClick={handleCopySql}
-              className="text-xs font-semibold shadow-md"
-            >
-              {copiedSql ? (
-                <>
-                  <Check className="w-3.5 h-3.5 mr-1 text-slate-950" />
-                  Copied Updated SQL to Clipboard!
-                </>
-              ) : (
-                <>
-                  <Copy className="w-3.5 h-3.5 mr-1" />
-                  Copy Updated Setup SQL
-                </>
-              )}
-            </Button>
-
-            <a
-              href="https://supabase.com/dashboard/project/_/sql/new"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <Button type="button" variant="secondary" size="sm" className="text-xs font-medium">
-                <ExternalLink className="w-3.5 h-3.5 mr-1 text-amber-400" />
-                Open Supabase SQL Editor
-              </Button>
-            </a>
-
-            <Link href="/setup">
-              <Button type="button" variant="outline" size="sm" className="text-xs">
-                Run Diagnostics (/setup)
-              </Button>
-            </Link>
           </div>
         </div>
       ) : error ? (
@@ -454,11 +403,11 @@ export default function CreateListingPage() {
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
             <span>1. Basic Listing Information</span>
             <span className="text-xs font-normal text-amber-400 flex items-center gap-1">
-              <Sparkles className="w-3 h-3" /> Visible suggestions below
+              <Sparkles className="w-3 h-3" /> 1-2 examples provided
             </span>
           </h2>
 
-          {/* Listing Title with Visible Suggested Formulas */}
+          {/* Listing Title with 2 Clean Examples */}
           <div className="space-y-2">
             <Input
               label="Listing Title"
@@ -467,38 +416,33 @@ export default function CreateListingPage() {
               onChange={(e) => setTitle(e.target.value)}
               required
             />
-            
-            {/* Always Visible Title Suggestion Box */}
-            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-2">
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-300">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Suggested Listing Title Formula (High Click-Through):</span>
-              </div>
-              <p className="text-[11px] text-slate-300 font-mono bg-pitch-surface/80 px-2 py-1 rounded border border-pitch-border/50">
-                [Total OVR] + [Playstyle] | [Top 1-2 Boosters/Epics] | [Coins or Division]
-              </p>
+
+            {/* Clean 2 Examples Box */}
+            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-1.5">
+              <span className="text-xs font-semibold text-amber-300 flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" /> Examples of how to write the title:
+              </span>
               <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                <span className="text-[11px] text-slate-400">Click to use suggested template:</span>
                 <button
                   type="button"
-                  onClick={() => setTitle("3120 OVR Quick Counter Squad | 105 Messi + Booster Vieira | 850 Coins")}
-                  className="text-[11px] px-2.5 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 hover:bg-amber-500/20 transition-all cursor-pointer"
+                  onClick={() => setTitle("3120 OVR Quick Counter | 105 Messi + Booster Vieira | 850 Coins")}
+                  className="text-xs px-3 py-1 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/60 transition-all text-left"
                 >
-                  ⚡ 3120 OVR Quick Counter | 105 Messi + Vieira | 850 Coins
+                  <strong>Example 1:</strong> 3120 OVR Quick Counter | 105 Messi + Booster Vieira | 850 Coins
                 </button>
                 <button
                   type="button"
-                  onClick={() => setTitle("3150 OVR Possession Game | Epic Rummenigge + Booster Gullit | Div 1")}
-                  className="text-[11px] px-2.5 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 hover:bg-brand-500/20 transition-all cursor-pointer"
+                  onClick={() => setTitle("3150 OVR Possession Game | Epic Rummenigge + Gullit | Div 1")}
+                  className="text-xs px-3 py-1 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/60 transition-all text-left"
                 >
-                  ⚡ 3150 OVR Possession | Epic Rummenigge + Gullit | Div 1
+                  <strong>Example 2:</strong> 3150 OVR Possession Game | Epic Rummenigge + Gullit | Div 1
                 </button>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Price with Visible Price Benchmarks */}
+            {/* Price with 2 Clean Examples */}
             <div className="space-y-1.5">
               <Input
                 label="Listing Price (KES)"
@@ -508,29 +452,30 @@ export default function CreateListingPage() {
                 onChange={(e) => setPrice(e.target.value)}
                 required
               />
-              <div className="pt-1">
-                <span className="block text-[11px] text-slate-400 mb-1">Suggested Price Tiers:</span>
-                <div className="flex flex-wrap gap-1">
-                  {[
-                    { label: "KES 2,500", val: "2500" },
-                    { label: "KES 4,500", val: "4500" },
-                    { label: "KES 8,000", val: "8000" },
-                    { label: "KES 15,000", val: "15000" },
-                  ].map((chip) => (
-                    <button
-                      key={chip.val}
-                      type="button"
-                      onClick={() => setPrice(chip.val)}
-                      className={`text-[10px] px-2 py-0.5 rounded border transition-all ${
-                        price === chip.val
-                          ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
-                          : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
-                      }`}
-                    >
-                      {chip.label}
-                    </button>
-                  ))}
-                </div>
+              <div className="pt-0.5 flex items-center gap-1.5">
+                <span className="text-[11px] text-slate-400">Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setPrice("2500")}
+                  className={`text-[10px] px-2 py-0.5 rounded border transition-all ${
+                    price === "2500"
+                      ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
+                      : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
+                  }`}
+                >
+                  KES 2,500
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrice("4500")}
+                  className={`text-[10px] px-2 py-0.5 rounded border transition-all ${
+                    price === "4500"
+                      ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
+                      : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
+                  }`}
+                >
+                  KES 4,500
+                </button>
               </div>
             </div>
 
@@ -565,11 +510,11 @@ export default function CreateListingPage() {
                 <option value="North America">North America</option>
                 <option value="South America">South America</option>
               </select>
-              <span className="block text-[10px] text-slate-400 mt-1">Default matchmaking server region</span>
+              <span className="block text-[10px] text-slate-400 mt-1">Matchmaking server region</span>
             </div>
           </div>
 
-          {/* Description with Visible Quality Checklist */}
+          {/* Description with Clean 1-Click Example Outline */}
           <div className="space-y-2">
             <label className="block text-xs font-medium text-slate-300">Account Description & Squad Details</label>
             <textarea
@@ -581,27 +526,19 @@ export default function CreateListingPage() {
               required
             />
 
-            {/* Always Visible Description Guide */}
-            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-2">
-              <span className="text-xs font-semibold text-slate-300 flex items-center gap-1.5">
-                <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
-                Suggested points to include (improves buyer confidence):
+            <div className="p-2.5 rounded-xl bg-pitch-card/70 border border-pitch-border/80 flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+              <span className="text-xs text-slate-300">
+                <strong>Example:</strong> Outline mentioning key epics, resources, and Konami ID transfer readiness.
               </span>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 text-[11px] text-slate-300">
-                <span className="flex items-center gap-1">✓ List 3-5 marquee Epic/Showtime players</span>
-                <span className="flex items-center gap-1">✓ Note player skill resets or extra skills added</span>
-                <span className="flex items-center gap-1">✓ Confirm clean account history (no bans/strikes)</span>
-                <span className="flex items-center gap-1">✓ State Konami ID transfer readiness</span>
-              </div>
               <button
                 type="button"
                 onClick={() => {
                   const outline = `• Squad Highlights: Top rated Booster & Epic players fully trained.\n• Resource Inventory: GP, eFootball Coins, and Contract Renewals ready.\n• Manager & Tactics: Main playstyle optimized with full team proficiency.\n• Transfer Handover: Konami ID credentials will be transferred safely via Escrow.`;
                   setDescription((prev) => (prev ? `${prev}\n\n${outline}` : outline));
                 }}
-                className="text-[11px] px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 transition-colors inline-flex items-center gap-1 cursor-pointer mt-1"
+                className="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-colors inline-flex items-center gap-1 cursor-pointer shrink-0"
               >
-                <span>+ Append suggested description outline</span>
+                <span>+ Use example description</span>
               </button>
             </div>
           </div>
@@ -611,12 +548,12 @@ export default function CreateListingPage() {
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
             <span>2. Team Strength & Balances</span>
-            <span className="text-xs font-normal text-amber-400">Click any suggestion badge to fill</span>
+            <span className="text-xs font-normal text-amber-400">1-2 examples per field</span>
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
             {/* OVR Team Strength */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Input
                 label="Overall Team Strength (OVR)"
                 type="number"
@@ -625,29 +562,27 @@ export default function CreateListingPage() {
                 onChange={(e) => setOverallStrength(e.target.value)}
                 required
               />
-              <div className="pt-0.5">
-                <span className="text-[10px] text-slate-400 block mb-1">Common OVRs:</span>
-                <div className="flex flex-wrap gap-1">
-                  {["3050", "3100", "3120", "3150", "3180"].map((ovr) => (
-                    <button
-                      key={ovr}
-                      type="button"
-                      onClick={() => setOverallStrength(ovr)}
-                      className={`text-[10px] px-1.5 py-0.5 rounded border transition-all ${
-                        overallStrength === ovr
-                          ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
-                          : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
-                      }`}
-                    >
-                      {ovr}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setOverallStrength("3120")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  3120
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOverallStrength("3150")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  3150
+                </button>
               </div>
             </div>
 
             {/* GP Balance */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Input
                 label="GP Balance"
                 type="number"
@@ -655,29 +590,27 @@ export default function CreateListingPage() {
                 value={gpBalance}
                 onChange={(e) => setGpBalance(e.target.value)}
               />
-              <div className="pt-0.5">
-                <span className="text-[10px] text-slate-400 block mb-1">Quick GP:</span>
-                <div className="flex flex-wrap gap-1">
-                  {[
-                    { label: "500k", val: "500000" },
-                    { label: "1.5M", val: "1500000" },
-                    { label: "3M", val: "3000000" },
-                  ].map((gp) => (
-                    <button
-                      key={gp.val}
-                      type="button"
-                      onClick={() => setGpBalance(gp.val)}
-                      className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
-                    >
-                      {gp.label}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setGpBalance("1500000")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  1.5M
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setGpBalance("3000000")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  3M
+                </button>
               </div>
             </div>
 
             {/* eFootball Coins */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Input
                 label="eFootball Coins"
                 type="number"
@@ -685,25 +618,27 @@ export default function CreateListingPage() {
                 value={coinBalance}
                 onChange={(e) => setCoinBalance(e.target.value)}
               />
-              <div className="pt-0.5">
-                <span className="text-[10px] text-slate-400 block mb-1">Quick Coins:</span>
-                <div className="flex flex-wrap gap-1">
-                  {["250", "850", "1500", "3200"].map((c) => (
-                    <button
-                      key={c}
-                      type="button"
-                      onClick={() => setCoinBalance(c)}
-                      className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
-                    >
-                      {c}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setCoinBalance("850")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  850
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCoinBalance("1500")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  1500
+                </button>
               </div>
             </div>
 
             {/* eFootball Points */}
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Input
                 label="eFootball Points"
                 type="number"
@@ -711,26 +646,28 @@ export default function CreateListingPage() {
                 value={efootballPoints}
                 onChange={(e) => setEfootballPoints(e.target.value)}
               />
-              <div className="pt-0.5">
-                <span className="text-[10px] text-slate-400 block mb-1">Quick Points:</span>
-                <div className="flex flex-wrap gap-1">
-                  {["5000", "12000", "25000"].map((pts) => (
-                    <button
-                      key={pts}
-                      type="button"
-                      onClick={() => setEfootballPoints(pts)}
-                      className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
-                    >
-                      {pts}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setEfootballPoints("12000")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  12k
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setEfootballPoints("25000")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  25k
+                </button>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Input
                 label="Current Division"
                 type="number"
@@ -740,21 +677,26 @@ export default function CreateListingPage() {
                 value={currentDivision}
                 onChange={(e) => setCurrentDivision(e.target.value)}
               />
-              <div className="flex gap-1 pt-0.5">
-                {["1", "2", "3", "4"].map((div) => (
-                  <button
-                    key={div}
-                    type="button"
-                    onClick={() => setCurrentDivision(div)}
-                    className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
-                  >
-                    Div {div}
-                  </button>
-                ))}
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setCurrentDivision("1")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  Div 1
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCurrentDivision("2")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  Div 2
+                </button>
               </div>
             </div>
 
-            <div className="space-y-1.5">
+            <div className="space-y-1">
               <Input
                 label="Highest Division Ever"
                 type="number"
@@ -764,17 +706,22 @@ export default function CreateListingPage() {
                 value={highestDivision}
                 onChange={(e) => setHighestDivision(e.target.value)}
               />
-              <div className="flex gap-1 pt-0.5">
-                {["1", "2", "3"].map((div) => (
-                  <button
-                    key={div}
-                    type="button"
-                    onClick={() => setHighestDivision(div)}
-                    className="text-[10px] px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:border-amber-400/50"
-                  >
-                    Div {div}
-                  </button>
-                ))}
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setHighestDivision("1")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  Div 1
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setHighestDivision("2")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  Div 2
+                </button>
               </div>
             </div>
 
@@ -798,11 +745,11 @@ export default function CreateListingPage() {
           </div>
         </div>
 
-        {/* Section 3: Squad Composition & Tactics */}
+        {/* Section 3: Special Player Cards & Tactics */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
             <span>3. Special Player Cards & Tactics</span>
-            <span className="text-xs font-normal text-amber-400">Tap cards to append to your list</span>
+            <span className="text-xs font-normal text-amber-400">1-2 examples per field</span>
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -843,7 +790,7 @@ export default function CreateListingPage() {
             />
           </div>
 
-          {/* Key Featured Player Names with Permanently Visible Suggestion Badges */}
+          {/* Key Featured Player Names with 2 Clean Examples */}
           <div className="space-y-2">
             <Input
               label="Key Featured Player Names (Comma separated)"
@@ -852,108 +799,81 @@ export default function CreateListingPage() {
               onChange={(e) => setKeyPlayers(e.target.value)}
             />
 
-            {/* Always Visible Suggestion Badges that never disappear and never clutter input text */}
-            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-semibold text-amber-300 flex items-center gap-1.5">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  Suggested Marquee Players (Click any badge to add to your list):
-                </span>
-                <span className="text-[10px] text-slate-400">Keeps your existing text intact</span>
-              </div>
-              <div className="flex flex-wrap gap-1.5 pt-1">
-                {[
-                  "105 Big Time Messi",
-                  "Booster Vieira",
-                  "Epic Rummenigge",
-                  "Booster Gullit",
-                  "Epic Cruyff",
-                  "Big Time Ronaldinho",
-                  "Booster Maldini",
-                  "Showtime Bellingham",
-                  "Epic Cech",
-                  "Booster Shevchenko",
-                  "Booster Pirlo",
-                  "Big Time Neymar",
-                  "Epic Roberto Carlos",
-                  "Booster Seedorf",
-                  "Epic Puyol",
-                  "Booster Kaka",
-                ].map((player) => (
-                  <button
-                    key={player}
-                    type="button"
-                    onClick={() => handleAddPlayerSuggestion(player)}
-                    className="text-[11px] px-2.5 py-1 rounded-full bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/50 hover:bg-pitch-surface/80 transition-all flex items-center gap-1 cursor-pointer"
-                  >
-                    <span>+ {player}</span>
-                  </button>
-                ))}
+            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-1.5">
+              <span className="text-xs font-semibold text-amber-300 flex items-center gap-1">
+                <Sparkles className="w-3.5 h-3.5" /> Examples of how to write player names:
+              </span>
+              <div className="flex flex-wrap items-center gap-2 pt-0.5">
+                <button
+                  type="button"
+                  onClick={() => setKeyPlayers("105 Big Time Messi, Booster Vieira, Epic Rummenigge")}
+                  className="text-xs px-3 py-1 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/60 transition-all text-left"
+                >
+                  <strong>Example 1:</strong> 105 Big Time Messi, Booster Vieira, Epic Rummenigge
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setKeyPlayers("Booster Gullit, Epic Cruyff, Big Time Ronaldinho")}
+                  className="text-xs px-3 py-1 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/60 transition-all text-left"
+                >
+                  <strong>Example 2:</strong> Booster Gullit, Epic Cruyff, Big Time Ronaldinho
+                </button>
               </div>
             </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {/* Manager with Visible Meta Suggestions */}
-            <div className="space-y-1.5">
+            {/* Manager with 2 Clean Examples */}
+            <div className="space-y-1">
               <Input
                 label="Head Coach / Manager"
                 placeholder="e.g. Pep Guardiola or G. Caputto"
                 value={managerName}
                 onChange={(e) => setManagerName(e.target.value)}
               />
-              <div className="pt-0.5">
-                <span className="text-[10px] text-slate-400 block mb-1">Top Managers (Click to set):</span>
-                <div className="flex flex-wrap gap-1">
-                  {[
-                    "Pep Guardiola",
-                    "G. Caputto",
-                    "L. Scaloni",
-                    "D. Deschamps",
-                  ].map((m) => (
-                    <button
-                      key={m}
-                      type="button"
-                      onClick={() => setManagerName(m)}
-                      className={`text-[10px] px-1.5 py-0.5 rounded border transition-all ${
-                        managerName === m
-                          ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
-                          : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
-                      }`}
-                    >
-                      {m}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setManagerName("Pep Guardiola")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  Pep Guardiola
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setManagerName("G. Caputto")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  G. Caputto
+                </button>
               </div>
             </div>
 
-            {/* Formation with Visible Meta Suggestions */}
-            <div className="space-y-1.5">
+            {/* Formation with 2 Clean Examples */}
+            <div className="space-y-1">
               <Input
                 label="Formation"
                 placeholder="e.g. 4-2-2-2 or 4-3-3"
                 value={formation}
                 onChange={(e) => setFormation(e.target.value)}
               />
-              <div className="pt-0.5">
-                <span className="text-[10px] text-slate-400 block mb-1">Meta Formations (Click to set):</span>
-                <div className="flex flex-wrap gap-1">
-                  {["4-2-2-2", "4-3-3", "4-1-2-3", "4-2-1-3", "5-2-1-2"].map((f) => (
-                    <button
-                      key={f}
-                      type="button"
-                      onClick={() => setFormation(f)}
-                      className={`text-[10px] px-1.5 py-0.5 rounded border transition-all ${
-                        formation === f
-                          ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
-                          : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
-                      }`}
-                    >
-                      {f}
-                    </button>
-                  ))}
-                </div>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400">
+                <span>Examples:</span>
+                <button
+                  type="button"
+                  onClick={() => setFormation("4-2-2-2")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  4-2-2-2
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setFormation("4-3-3")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  4-3-3
+                </button>
               </div>
             </div>
 
@@ -975,12 +895,12 @@ export default function CreateListingPage() {
           </div>
         </div>
 
-        {/* Section 4: Konami ID & REAL SQUAD SCREENSHOT IMAGE (DIRECT FILE UPLOAD ONLY - ZERO LINKS) */}
+        {/* Section 4: Konami ID & REAL QUALITY SQUAD SCREENSHOTS (UP TO 5 IMAGES) */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-6">
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
-            <span>4. Konami ID Security & Real Squad Screenshot</span>
+            <span>4. Konami ID Security & Real Squad Screenshots (Up to 5)</span>
             <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> Real Photo Upload Only
+              <ShieldCheck className="w-3.5 h-3.5" /> Real Quality • Up to 5 Images
             </span>
           </h2>
 
@@ -1017,176 +937,202 @@ export default function CreateListingPage() {
             </div>
           </div>
 
-          {/* Real Squad Screenshot Upload Component (No Link Allowed) */}
-          <div className="space-y-3">
+          {/* Real Squad Screenshots Gallery & Upload (Up to 5 images in original quality) */}
+          <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <label className="block text-xs font-semibold text-slate-200 flex items-center gap-1.5">
-                <Camera className="w-4 h-4 text-amber-400" />
-                <span>Upload Real Squad Screenshot</span>
-                <span className="text-rose-400">*</span>
-              </label>
-              <span className="text-[11px] text-slate-400">
-                Direct image upload required • No external links
-              </span>
+              <div>
+                <label className="block text-xs font-semibold text-slate-200 flex items-center gap-1.5">
+                  <Camera className="w-4 h-4 text-amber-400" />
+                  <span>Real Squad Screenshots</span>
+                  <span className="text-rose-400">*</span>
+                </label>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  Upload up to 5 real screenshots from your device in their original HD quality ({images.length}/5 uploaded)
+                </p>
+              </div>
+
+              {images.length < 5 && (
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => fileInputRef.current?.click()}
+                  disabled={uploadingImages}
+                  className="text-xs"
+                >
+                  <Plus className="w-3.5 h-3.5 mr-1" />
+                  Add Images
+                </Button>
+              )}
             </div>
 
             {uploadError && (
-              <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
+              <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
                 <span>{uploadError}</span>
               </div>
             )}
 
-            {/* Hidden File Input for Device/Gallery/Camera Image Selection */}
+            {/* Hidden Multi-file input */}
             <input
               type="file"
               ref={fileInputRef}
               onChange={handleFileChange}
               accept="image/png, image/jpeg, image/webp"
+              multiple
               className="hidden"
             />
 
-            {!imageUrl ? (
-              /* Drag & Drop Real Image Upload Box */
-              <div
-                onDragOver={handleDragOver}
-                onDragLeave={handleDragLeave}
-                onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()}
-                className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
-                  isDragOver
-                    ? "border-amber-400 bg-amber-500/10 shadow-xl"
-                    : "border-pitch-border hover:border-amber-400/60 bg-pitch-card/60 hover:bg-pitch-card"
-                }`}
-              >
-                {uploadingImage ? (
-                  <div className="flex flex-col items-center justify-center py-6 space-y-3">
-                    <Loader2 className="w-10 h-10 text-amber-400 animate-spin" />
-                    <p className="text-sm font-semibold text-slate-100">
-                      Uploading real screenshot to secure escrow storage...
-                    </p>
-                    <p className="text-xs text-slate-400">
-                      Processing high-resolution image file. Please wait...
-                    </p>
+            {/* Uploaded Images Grid */}
+            {images.length > 0 && (
+              <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
+                {images.map((img, index) => (
+                  <div
+                    key={img.url + index}
+                    className="relative rounded-2xl overflow-hidden border border-pitch-border bg-pitch-card group shadow-md"
+                  >
+                    {/* Full real quality preview */}
+                    <div className="aspect-[4/3] w-full bg-slate-950 relative overflow-hidden">
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img
+                        src={img.url}
+                        alt={`Screenshot ${index + 1}`}
+                        className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                      />
+                    </div>
+
+                    {/* Primary Badge or Set Primary Action */}
+                    <div className="absolute top-2 left-2 right-2 flex items-center justify-between gap-1 pointer-events-none">
+                      {index === 0 ? (
+                        <span className="px-2 py-0.5 rounded-full bg-amber-500 text-slate-950 font-bold text-[10px] shadow-md flex items-center gap-1">
+                          <Star className="w-2.5 h-2.5 fill-slate-950" />
+                          Cover
+                        </span>
+                      ) : (
+                        <span className="px-2 py-0.5 rounded-full bg-black/70 backdrop-blur-md text-slate-300 text-[10px] font-semibold border border-white/10">
+                          #{index + 1}
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Bottom Controls */}
+                    <div className="p-2 bg-pitch-surface/90 border-t border-pitch-border/60 flex items-center justify-between gap-1">
+                      {index !== 0 ? (
+                        <button
+                          type="button"
+                          onClick={() => handleSetPrimaryCover(index)}
+                          className="text-[10px] text-amber-400 hover:text-amber-300 font-semibold"
+                        >
+                          Make Cover
+                        </button>
+                      ) : (
+                        <span className="text-[10px] text-slate-400">Primary Photo</span>
+                      )}
+
+                      <button
+                        type="button"
+                        onClick={() => handleRemoveImage(index)}
+                        className="p-1 rounded text-slate-400 hover:text-rose-400 hover:bg-rose-950/40 transition-colors"
+                        title="Delete this image"
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
                   </div>
-                ) : (
-                  <div className="flex flex-col items-center justify-center space-y-3">
-                    <div className="w-16 h-16 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-inner">
-                      <UploadCloud className="w-8 h-8" />
-                    </div>
-                    <div>
-                      <p className="text-sm font-bold text-slate-100">
-                        Tap or drag & drop to upload your real squad screenshot
-                      </p>
-                      <p className="text-xs text-slate-400 mt-1 max-w-md mx-auto">
-                        Upload a clear screenshot showing your Starting XI formation, player ratings, and reserves from your mobile gallery or PC.
-                      </p>
-                    </div>
-                    <div className="flex items-center gap-2 pt-1">
-                      <span className="text-[11px] font-medium text-slate-400 px-2.5 py-1 rounded bg-pitch-surface border border-pitch-border">
-                        PNG, JPG, or WebP (Max 10MB)
-                      </span>
-                    </div>
-                    <Button
-                      type="button"
-                      variant="gold"
-                      size="sm"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        fileInputRef.current?.click();
-                      }}
-                      className="mt-2 font-semibold shadow-lg"
-                    >
-                      <Upload className="w-3.5 h-3.5 mr-1.5" />
-                      Select Real Screenshot from Device
-                    </Button>
+                ))}
+
+                {/* Slot to add more if under 5 */}
+                {images.length < 5 && (
+                  <div
+                    onClick={() => fileInputRef.current?.click()}
+                    className="border-2 border-dashed border-pitch-border hover:border-amber-500/60 rounded-2xl p-4 flex flex-col items-center justify-center text-center cursor-pointer bg-pitch-surface/40 hover:bg-pitch-surface transition-all aspect-[4/3]"
+                  >
+                    <Plus className="w-6 h-6 text-slate-400 mb-1" />
+                    <span className="text-xs font-semibold text-slate-300">Add Image</span>
+                    <span className="text-[10px] text-slate-500">({images.length}/5)</span>
                   </div>
                 )}
               </div>
-            ) : (
-              /* Real Uploaded Image Preview & Verification Card */
-              <div className="bg-pitch-card border border-pitch-border rounded-2xl p-5 space-y-4">
-                <div className="flex flex-col sm:flex-row items-center gap-5">
-                  <div className="relative w-full sm:w-56 h-36 rounded-xl overflow-hidden border border-pitch-border bg-slate-950 shrink-0 shadow-md flex items-center justify-center p-1">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src={imageUrl}
-                      alt="Uploaded Real Squad Screenshot"
-                      className="w-full h-full object-contain drop-shadow-md"
-                    />
-                  </div>
+            )}
 
-                  <div className="flex-1 w-full space-y-2.5">
-                    <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-700/60 text-emerald-300 text-xs font-semibold">
-                      <CheckCircle2 className="w-3.5 h-3.5" />
-                      <span>Real Image File Stored & Verified</span>
-                    </div>
-
-                    <p className="text-xs text-slate-200 font-medium truncate">
-                      {imageFileName || "Squad_Screenshot.png"}
-                    </p>
-
-                    {imageFileSize && (
-                      <p className="text-[11px] text-slate-400">
-                        File Size: {(imageFileSize / (1024 * 1024)).toFixed(2)} MB • Stored in escrow media repository
-                      </p>
-                    )}
-
-                    <div className="flex flex-wrap items-center gap-2 pt-1">
-                      <Button
-                        type="button"
-                        variant="secondary"
-                        size="sm"
-                        onClick={() => fileInputRef.current?.click()}
-                        disabled={uploadingImage}
-                        className="text-xs"
-                      >
-                        <RefreshCw className="w-3 h-3 mr-1" />
-                        Upload Different Screenshot
-                      </Button>
-
-                      <a
-                        href={imageUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-xl bg-pitch-surface hover:bg-slate-800 text-slate-300 hover:text-white border border-pitch-border text-xs font-medium transition-all"
-                        title="Inspect original uncompressed image"
-                      >
-                        <ExternalLink className="w-3 h-3 text-brand-400" />
-                        <span>Inspect Full HD</span>
-                      </a>
-
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={handleRemoveImage}
-                        disabled={uploadingImage}
-                        className="text-xs text-rose-400 hover:text-rose-300 hover:border-rose-700"
-                      >
-                        <Trash2 className="w-3 h-3 mr-1" />
-                        Remove
-                      </Button>
-                    </div>
-                  </div>
+            {/* Empty Upload Dropzone */}
+            {images.length === 0 && (
+              <div
+                onDrop={handleDrop}
+                onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onClick={() => fileInputRef.current?.click()}
+                className={`border-2 border-dashed rounded-2xl p-8 text-center cursor-pointer transition-all ${
+                  isDragOver
+                    ? "border-amber-400 bg-amber-500/10"
+                    : "border-pitch-border hover:border-slate-600 bg-pitch-card/40 hover:bg-pitch-card/70"
+                }`}
+              >
+                <div className="w-12 h-12 rounded-2xl bg-pitch-surface border border-pitch-border flex items-center justify-center text-amber-400 mx-auto mb-3 shadow-md">
+                  <UploadCloud className="w-6 h-6" />
                 </div>
+
+                <div className="space-y-1">
+                  <p className="text-sm font-bold text-white">
+                    {uploadingImages ? "Uploading in original quality..." : "Click or drag & drop squad screenshots here"}
+                  </p>
+                  <p className="text-xs text-slate-400">
+                    Upload up to 5 real screenshots in PNG, JPG, or WebP format (up to 10MB each)
+                  </p>
+                  <p className="text-[11px] text-emerald-400 pt-1 font-medium">
+                    ✓ Real quality preserved without blurriness or lossy downscaling
+                  </p>
+                </div>
+
+                <Button
+                  type="button"
+                  variant="gold"
+                  size="sm"
+                  disabled={uploadingImages}
+                  className="mt-4 text-xs font-semibold"
+                >
+                  {uploadingImages ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />
+                      Uploading Real Quality...
+                    </>
+                  ) : (
+                    <>
+                      <Camera className="w-3.5 h-3.5 mr-1.5" />
+                      Choose From Device (Up to 5)
+                    </>
+                  )}
+                </Button>
               </div>
             )}
           </div>
         </div>
 
-        {/* Submit Button */}
-        <Button
-          type="submit"
-          variant="gold"
-          size="lg"
-          className="w-full font-bold text-base shadow-2xl py-3.5"
-          isLoading={loading}
-        >
-          {isAuthenticated
-            ? "Publish Account to Escrow Marketplace"
-            : "Log In or Create Account to Publish"}
-        </Button>
+        {/* Submit Action */}
+        <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-pitch-border/60">
+          <Link href="/dashboard/seller">
+            <Button type="button" variant="secondary" size="md">
+              Cancel
+            </Button>
+          </Link>
+
+          <Button
+            type="submit"
+            variant="gold"
+            size="lg"
+            disabled={loading || uploadingImages}
+            className="w-full sm:w-auto font-bold px-8 shadow-xl"
+          >
+            {loading ? (
+              <>
+                <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                Publishing Listing to Marketplace...
+              </>
+            ) : (
+              "Publish Listing with Escrow Guarantee"
+            )}
+          </Button>
+        </div>
       </form>
     </div>
   );
