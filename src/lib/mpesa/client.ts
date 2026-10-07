@@ -174,6 +174,12 @@ class MpesaService {
     }
 
     // 2. Fallback to Safaricom Daraja API
+    if (!this.consumerKey || this.consumerKey === "dummy_consumer_key" || !this.passkey) {
+      throw new Error(
+        "M-Pesa payment credentials are not configured on this server. Please add UNIFIEDPAY_CONSUMER_KEY and UNIFIEDPAY_CONSUMER_SECRET to your hosting environment variables (e.g., Vercel)."
+      );
+    }
+
     const token = await this.getAccessToken();
     const { password, timestamp } = this.generatePasswordAndTimestamp();
 
