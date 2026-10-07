@@ -138,13 +138,37 @@ export class NewsService {
   }
 
   /**
+   * Update an article
+   */
+  async updateArticle(
+    id: string,
+    payload: Partial<Omit<NewsArticle, "id" | "created_at">>
+  ): Promise<NewsArticle> {
+    const { data, error } = await this.supabase
+      .from("news_articles")
+      .update({
+        ...payload,
+        updated_at: new Date().toISOString(),
+      })
+      .or(`id.eq.${id},slug.eq.${id}`)
+      .select()
+      .single();
+
+    if (error || !data) {
+      throw new Error(`Failed to update news article: ${error?.message}`);
+    }
+
+    return data as NewsArticle;
+  }
+
+  /**
    * Delete an article
    */
   async deleteArticle(id: string): Promise<void> {
     const { error } = await this.supabase
       .from("news_articles")
       .delete()
-      .eq("id", id);
+      .or(`id.eq.${id},slug.eq.${id}`);
 
     if (error) {
       throw new Error(`Failed to delete news article: ${error.message}`);

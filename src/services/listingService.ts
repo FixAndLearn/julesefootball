@@ -222,4 +222,91 @@ export class ListingService {
       return { isFavorited: true };
     }
   }
+
+  /**
+   * Updates an existing listing and optionally refreshes its gallery images.
+   */
+  async updateListing(
+    id: string,
+    userId: string,
+    listingData: Partial<Listing>,
+    imageUrls?: string[],
+    isAdmin = false
+  ): Promise<Listing> {
+    const { data: existing, error: findError } = await this.supabase
+      .from("listings")
+      .select("id, seller_id, status")
+      .eq("id", id)
+      .is("deleted_at", null)
+      .single();
+
+    if (findError || !existing) {
+      throw new Error("Listing not found or has been deleted.");
+    }
+
+    if (!isAdmin && existing.seller_id !== userId) {
+      throw new Error("Unauthorized: You can only edit your own listings.");
+    }
+
+    const { data: updated, error: updateError } = await this.supabase
+      .from("listings")
+      .update({
+        ...listingData,
+        updated_at: new Date().toISOString(),
+      })
+      .eq("id", id)
+      .select()
+      .single();
+
+    if (updateError) {
+      throw new Error(`Failed to update listing: ${updateError.message}`);
+    }
+
+    if (imageUrls && imageUrls.length > 0) {
+      await this.supabase.from("listing_images").delete().eq("listing_id", id);
+
+      const imageRecords = imageUrls.map((url, index) => ({
+        listing_id: id,
+        image_url: url,
+        display_order: index,
+        is_primary: index === 0,
+      }));
+
+      await this.supabase.from("listing_images").insert(imageRecords);
+    }
+
+    return updated as Listing;
+  }
+
+  /**
+   * Soft deletes an existing listing.
+   */
+  async deleteListing(id: string, userId: string, isAdmin = false): Promise<void> {
+    const { data: existing, error: findError } = await this.supabase
+      .from("listings")
+      .select("id, seller_id")
+      .eq("id", id)
+      .is("deleted_at", null)
+      .single();
+
+    if (findError || !existing) {
+      throw new Error("Listing not found.");
+    }
+
+    if (!isAdmin && existing.seller_id !== userId) {
+      throw new Error("Unauthorized: You can only delete your own listings.");
+    }
+
+    const { error: deleteError } = await this.supabase
+      .from("listings")
+      .update({
+        deleted_at: new Date().toISOString(),
+        status: "archived",
+      })
+      .eq("id", id);
+
+    if (deleteError) {
+      throw new Error(`Failed to delete listing: ${deleteError.message}`);
+    }
+  }
 }

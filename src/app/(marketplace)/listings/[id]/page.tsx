@@ -5,12 +5,14 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ListingService } from "@/services/listingService";
 import { BuyNowButton } from "@/components/marketplace/BuyNowButton";
 import { ListingGallery } from "@/components/marketplace/ListingGallery";
+import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
   CheckCircle2,
   Clock,
   Coins,
   CreditCard,
+  Edit3,
   Eye,
   Lock,
   Shield,
@@ -35,6 +37,10 @@ interface ListingDetailPageProps {
 
 export default async function ListingDetailPage({ params }: ListingDetailPageProps) {
   const supabase = createServerSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
   const listingService = new ListingService(supabase);
   const listing = await listingService.getListingById(params.id);
 
@@ -42,12 +48,13 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
     notFound();
   }
 
+  const isOwner = Boolean(user && listing.seller_id === user.id);
   const konamiStatus = getKonamiIdStatusInfo(listing.konami_id_status);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
       {/* Back button */}
-      <div className="mb-6">
+      <div className="mb-6 flex items-center justify-between">
         <Link
           href="/browse"
           className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors"
@@ -55,7 +62,35 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
           <ArrowLeft className="w-4 h-4" />
           <span>Back to Marketplace</span>
         </Link>
+        {isOwner && (
+          <Link href={`/seller/edit-listing/${listing.id}`}>
+            <Button variant="gold" size="sm">
+              <Edit3 className="w-3.5 h-3.5 mr-1.5" />
+              Edit Listing
+            </Button>
+          </Link>
+        )}
       </div>
+
+      {isOwner && (
+        <div className="mb-6 p-4 rounded-xl bg-amber-950/40 border border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div className="flex items-center gap-2.5">
+            <span className="p-2 rounded-lg bg-amber-500/20 text-amber-400">
+              <Edit3 className="w-4 h-4" />
+            </span>
+            <div>
+              <p className="text-sm font-semibold text-slate-100">You are the seller of this listing</p>
+              <p className="text-xs text-slate-400">You can edit your squad details, price, stats, or images at any time.</p>
+            </div>
+          </div>
+          <Link href={`/seller/edit-listing/${listing.id}`}>
+            <Button variant="gold" size="sm" className="whitespace-nowrap">
+              <Edit3 className="w-3.5 h-3.5 mr-1.5" />
+              Edit This Listing
+            </Button>
+          </Link>
+        </div>
+      )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Gallery & In-Depth Details (2 cols) */}
@@ -219,11 +254,25 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               </p>
             </div>
 
-            {/* Buy Now Interactive Button */}
-            <BuyNowButton
-              listingId={listing.id}
-              priceFormatted={formatCurrency(listing.price, listing.currency)}
-            />
+            {/* Buy Now or Edit Interactive Button */}
+            {isOwner ? (
+              <div className="space-y-2">
+                <Link href={`/seller/edit-listing/${listing.id}`} className="block">
+                  <Button variant="gold" size="lg" className="w-full">
+                    <Edit3 className="w-4 h-4 mr-2" />
+                    Edit This Listing
+                  </Button>
+                </Link>
+                <p className="text-[11px] text-center text-slate-400">
+                  You own this listing. Buyers see the Buy Now button.
+                </p>
+              </div>
+            ) : (
+              <BuyNowButton
+                listingId={listing.id}
+                priceFormatted={formatCurrency(listing.price, listing.currency)}
+              />
+            )}
 
             {/* Escrow Guarantee Bullets */}
             <div className="border-t border-pitch-border/60 pt-4 space-y-2.5 text-xs text-slate-300">

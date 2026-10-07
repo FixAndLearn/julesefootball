@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency, getPlatformLabel } from "@/lib/utils";
 import { Listing, Order } from "@/types/database";
-import { ArrowRight, ArrowUpRight, PlusCircle, ShieldCheck, Star, Trophy, Wallet } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Edit3, PlusCircle, ShieldCheck, Star, Trophy, Wallet } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -170,13 +170,19 @@ export function SellerDashboardView({
                   <h3 className="text-sm font-semibold text-slate-200 mt-1">{item.title}</h3>
                 </div>
 
-                <div className="flex items-center gap-4">
-                  <span className="text-base font-bold text-emerald-400 font-display font-mono">
+                <div className="flex items-center gap-2 sm:gap-3">
+                  <span className="text-base font-bold text-emerald-400 font-display font-mono mr-2">
                     {formatCurrency(item.price, item.currency)}
                   </span>
+                  <Link href={`/seller/edit-listing/${item.id}`}>
+                    <Button variant="gold" size="sm">
+                      <Edit3 className="w-3.5 h-3.5 mr-1" />
+                      Edit
+                    </Button>
+                  </Link>
                   <Link href={`/listings/${item.id}`}>
                     <Button variant="secondary" size="sm">
-                      View Listing
+                      View
                     </Button>
                   </Link>
                 </div>
