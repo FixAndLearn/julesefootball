@@ -84,6 +84,31 @@ assert.strictEqual(parsedFail.resultCode, 1032);
 assert.strictEqual(parsedFail.resultDesc, "Request cancelled by user.");
 console.log("✓ Daraja Callback parser for Success and Cancellation PASSED.");
 
+// 4. Test UnifiedPay Webhook Callback Parsing
+console.log("\n[TEST 4] Testing UnifiedPay Webhook Callback Parsing...");
+const mockUnifiedPayCallback = {
+  event: "transaction.completed",
+  transaction_request_id: "FL20261007121400123",
+  TransactionStatus: "Completed",
+  TransactionCode: "0",
+  ResultDesc: "The service request is processed successfully.",
+  TransactionReceipt: "TJ7890XYZ",
+  TransactionAmount: "3500.00",
+  Msisdn: "254712345678",
+  TransactionDate: "20261007121400",
+  TransactionReference: "ORD-9912",
+  CheckoutRequestID: "ws_CO_07102026121400",
+  MerchantRequestID: "merch-12345",
+};
+
+const parsedUnified = mpesaClient.parseCallback(mockUnifiedPayCallback);
+assert.strictEqual(parsedUnified.isSuccess, true);
+assert.strictEqual(parsedUnified.receiptNumber, "TJ7890XYZ");
+assert.strictEqual(parsedUnified.amount, 3500);
+assert.strictEqual(parsedUnified.phoneNumber, "254712345678");
+assert.strictEqual(parsedUnified.checkoutRequestId, "ws_CO_07102026121400");
+console.log("✓ UnifiedPay Webhook parser PASSED.");
+
 console.log("\n==================================================");
 console.log("ALL VERIFICATION SUITE ASSERTIONS PASSED (100% OK)");
 console.log("==================================================");

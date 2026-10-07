@@ -66,3 +66,49 @@ export interface B2CPayoutResponse {
   ResponseCode: string;
   ResponseDescription: string;
 }
+
+export interface UnifiedPayStkResponse {
+  ResponseCode: string;
+  success?: boolean;
+  message?: string;
+  transaction_request_id?: string;
+  MerchantRequestID?: string;
+  CheckoutRequestID?: string;
+  party_b?: string;
+  account_reference?: string;
+  transaction_type?: string;
+  errorMessage?: string;
+}
+
+export interface UnifiedPayStatusResponse {
+  ResultCode?: string | number;
+  transaction_request_id?: string;
+  TransactionStatus?: string;
+  TransactionCode?: string | number;
+  ResultDesc?: string;
+  TransactionReceipt?: string;
+  TransactionAmount?: string | number;
+  Msisdn?: string;
+  TransactionDate?: string;
+  TransactionReference?: string;
+  CheckoutRequestID?: string;
+  MerchantRequestID?: string;
+  errorMessage?: string;
+}
+
+export interface UnifiedPayWebhookBody {
+  event?: string;
+  transaction_request_id?: string;
+  TransactionStatus?: string;
+  TransactionCode?: string | number;
+  ResultDesc?: string;
+  TransactionReceipt?: string;
+  TransactionAmount?: string | number;
+  Msisdn?: string;
+  TransactionDate?: string;
+  TransactionReference?: string;
+  CheckoutRequestID?: string;
+  MerchantRequestID?: string;
+}
+
+export type AnyCallbackBody = StkCallbackBody | UnifiedPayWebhookBody;
