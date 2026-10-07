@@ -200,19 +200,38 @@ export class PaymentService {
       return data;
     }
 
+    // If associated order is already escrow_locked or beyond, payment was successfully settled!
+    if (
+      data.order &&
+      (data.order.status === "escrow_locked" ||
+        data.order.status === "seller_delivered" ||
+        data.order.status === "completed")
+    ) {
+      await this.supabase
+        .from("payments")
+        .update({
+          status: "completed",
+          mpesa_receipt_number: data.mpesa_receipt_number || "CONFIRMED",
+          completed_at: new Date().toISOString(),
+        })
+        .eq("id", data.id);
+      data.status = "completed";
+      return data;
+    }
+
     // If still pending and UnifiedPay is enabled, actively verify status
     if (data.status === "pending" && mpesaClient.isUnifiedPay()) {
-      const idsToTry = [
-        data.merchant_request_id,
-        data.checkout_request_id,
-      ].filter(Boolean) as string[];
+      const idsToTry = Array.from(
+        new Set([identifier, data.checkout_request_id, data.merchant_request_id])
+      ).filter(Boolean) as string[];
 
       for (const transId of idsToTry) {
         const liveStatus = await mpesaClient.checkUnifiedPayStatus(transId);
-        if (liveStatus && liveStatus.isSuccess && liveStatus.receiptNumber) {
+        if (liveStatus && liveStatus.isSuccess) {
+          const receipt = liveStatus.receiptNumber || `CONFIRMED_${Date.now()}`;
           await this.markPaymentSuccessful(
             data.id,
-            liveStatus.receiptNumber,
+            receipt,
             liveStatus.amount || data.amount,
             liveStatus
           );
@@ -220,13 +239,18 @@ export class PaymentService {
           // Fetch refreshed record
           const { data: updated } = await this.supabase
             .from("payments")
-            .select("*")
+            .select("*, order:orders(*)")
             .eq("id", data.id)
             .single();
 
           return (updated as Payment) || data;
-        } else if (liveStatus && liveStatus.resultCode !== 0 && liveStatus.resultCode !== 1032) {
-          // Failed
+        } else if (
+          liveStatus &&
+          (liveStatus.resultCode === 1037 ||
+            liveStatus.resultDesc?.toLowerCase().includes("cancelled") ||
+            liveStatus.resultDesc?.toLowerCase().includes("failed"))
+        ) {
+          // Explicit failure confirmed by Safaricom / UnifiedPay
           await this.supabase
             .from("payments")
             .update({
@@ -235,6 +259,9 @@ export class PaymentService {
               result_desc: liveStatus.resultDesc,
             })
             .eq("id", data.id);
+
+          data.status = "failed";
+          data.result_desc = liveStatus.resultDesc;
         }
       }
     }

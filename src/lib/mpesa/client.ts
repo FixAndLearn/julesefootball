@@ -160,11 +160,13 @@ class MpesaService {
         throw new Error(errorMsg);
       }
 
+      const unifiedTransId = data.transaction_request_id || "";
+      const safaricomCheckoutId = data.CheckoutRequestID || "";
+      const safaricomMerchantId = data.MerchantRequestID || "";
+
       return {
-        MerchantRequestID:
-          data.transaction_request_id || data.MerchantRequestID || "",
-        CheckoutRequestID:
-          data.CheckoutRequestID || data.transaction_request_id || "",
+        MerchantRequestID: unifiedTransId || safaricomMerchantId,
+        CheckoutRequestID: unifiedTransId || safaricomCheckoutId,
         ResponseCode: data.ResponseCode || "0",
         ResponseDescription: data.message || "STK push initiated",
         CustomerMessage:
@@ -243,19 +245,31 @@ class MpesaService {
       if (!response.ok) return null;
 
       const data = await response.json();
+      if (data.ResultCode === 404 || data.errorMessage === "Transaction not found") {
+        return null;
+      }
+
       const statusStr = String(data.TransactionStatus || "").toLowerCase();
-      const isSuccess = statusStr === "completed" || data.TransactionCode === "0" || data.TransactionCode === 0;
+      const isSuccess =
+        statusStr === "completed" ||
+        data.TransactionCode === "0" ||
+        data.TransactionCode === 0;
+
+      const isFailed =
+        statusStr === "failed" ||
+        statusStr === "cancelled" ||
+        String(data.TransactionStatus || "") === "Cancelled";
 
       return {
         merchantRequestId:
           data.MerchantRequestID || data.transaction_request_id || transactionId,
         checkoutRequestId:
           data.CheckoutRequestID || data.transaction_request_id || transactionId,
-        resultCode: isSuccess ? 0 : statusStr === "pending" ? 1032 : 1,
+        resultCode: isSuccess ? 0 : isFailed ? 1037 : 1032,
         resultDesc:
           data.ResultDesc ||
-          (isSuccess ? "Transaction completed successfully" : data.TransactionStatus || "Failed"),
-        receiptNumber: data.TransactionReceipt,
+          (isSuccess ? "Transaction completed successfully" : data.TransactionStatus || "Pending"),
+        receiptNumber: data.TransactionReceipt || undefined,
         amount: data.TransactionAmount ? Number(data.TransactionAmount) : undefined,
         phoneNumber: data.Msisdn,
         transactionDate: data.TransactionDate,

@@ -7,10 +7,11 @@ import { EscrowStatusStepper } from "@/components/escrow/EscrowStatusStepper";
 import { MpesaPaymentModal } from "@/components/payments/MpesaPaymentModal";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/utils";
+import { createClient } from "@/lib/supabase/client";
 import { EscrowState, Order, OrderStatus } from "@/types/database";
 import { AlertCircle, CheckCircle2, KeyRound, Lock, Send, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export interface OrderEscrowControllerProps {
   order: Order;
@@ -32,6 +33,85 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
   const [stepEmail, setStepEmail] = useState(false);
   const [releasingFunds, setReleasingFunds] = useState(false);
   const [releaseError, setReleaseError] = useState("");
+
+  // Real-time synchronization for order state across buyers & sellers
+  useEffect(() => {
+    try {
+      const supabase = createClient();
+      const channel = supabase
+        .channel(`escrow-order-live-${order.id}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "orders",
+            filter: `id=eq.${order.id}`,
+          },
+          (payload: any) => {
+            if (payload.new && payload.new.status !== order.status) {
+              router.refresh();
+            }
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "escrow_accounts",
+            filter: `order_id=eq.${order.id}`,
+          },
+          () => {
+            router.refresh();
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "account_deliveries",
+            filter: `order_id=eq.${order.id}`,
+          },
+          () => {
+            router.refresh();
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } catch (e) {
+      console.warn("Realtime order channel error:", e);
+    }
+  }, [order.id, order.status, router]);
+
+  // If order is payment_pending, poll gently every 4s to catch payments automatically
+  useEffect(() => {
+    if (order.status !== "payment_pending") return;
+
+    const interval = setInterval(async () => {
+      try {
+        const res = await fetch(
+          `/api/payments/status?orderId=${encodeURIComponent(order.id)}&_t=${Date.now()}`,
+          { cache: "no-store" }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === "completed") {
+            clearInterval(interval);
+            router.refresh();
+          }
+        }
+      } catch (e) {
+        // quiet fallback
+      }
+    }, 3500);
+
+    return () => clearInterval(interval);
+  }, [order.id, order.status, router]);
 
   const refreshPage = () => {
     router.refresh();

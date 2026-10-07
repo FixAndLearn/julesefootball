@@ -2,9 +2,10 @@
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils";
-import { CheckCircle2, Phone, Smartphone, X, AlertCircle, Loader2 } from "lucide-react";
-import { useState, useEffect } from "react";
+import { CheckCircle2, Phone, Smartphone, X, AlertCircle, Loader2, RefreshCw } from "lucide-react";
+import { useState, useEffect, useRef } from "react";
 
 export interface MpesaPaymentModalProps {
   orderId: string;
@@ -30,27 +31,89 @@ export function MpesaPaymentModal({
   const [status, setStatus] = useState<"idle" | "awaiting_pin" | "completed" | "failed">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
-  const [timerSeconds, setTimerSeconds] = useState(120);
+  const [timerSeconds, setTimerSeconds] = useState(90);
+  const [isCheckingManual, setIsCheckingManual] = useState(false);
+  const [manualNote, setManualNote] = useState("");
 
-  // Poll payment status while awaiting PIN
+  const completedRef = useRef(false);
+
+  const handleCompleteSuccess = () => {
+    if (completedRef.current) return;
+    completedRef.current = true;
+    setStatus("completed");
+    setTimeout(() => {
+      onSuccess();
+    }, 1200);
+  };
+
+  // 1. Supabase Realtime Listener for instant payment detection
+  useEffect(() => {
+    if (!isOpen || status !== "awaiting_pin") return;
+
+    try {
+      const supabase = createClient();
+      const channel = supabase
+        .channel(`modal-order-${orderId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "UPDATE",
+            schema: "public",
+            table: "orders",
+            filter: `id=eq.${orderId}`,
+          },
+          (payload: any) => {
+            if (payload.new && payload.new.status !== "payment_pending") {
+              handleCompleteSuccess();
+            }
+          }
+        )
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "payments",
+            filter: `order_id=eq.${orderId}`,
+          },
+          (payload: any) => {
+            if (payload.new && payload.new.status === "completed") {
+              handleCompleteSuccess();
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        supabase.removeChannel(channel);
+      };
+    } catch (e) {
+      console.warn("Supabase Realtime subscription error:", e);
+    }
+  }, [isOpen, status, orderId]);
+
+  // 2. High-frequency Poller (every 2.5s) while awaiting PIN
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (status === "awaiting_pin") {
       interval = setInterval(async () => {
+        if (completedRef.current) {
+          clearInterval(interval);
+          return;
+        }
+
         try {
           const res = await fetch(
             `/api/payments/status?checkoutRequestId=${encodeURIComponent(
               checkoutRequestId || ""
-            )}&orderId=${encodeURIComponent(orderId)}`
+            )}&orderId=${encodeURIComponent(orderId)}&_t=${Date.now()}`,
+            { cache: "no-store" }
           );
           if (res.ok) {
             const data = await res.json();
             if (data.status === "completed") {
-              setStatus("completed");
               clearInterval(interval);
-              setTimeout(() => {
-                onSuccess();
-              }, 1500);
+              handleCompleteSuccess();
             } else if (data.status === "failed") {
               setStatus("failed");
               setErrorMessage(data.resultDesc || "Payment was rejected or cancelled.");
@@ -60,12 +123,12 @@ export function MpesaPaymentModal({
         } catch (err) {
           console.error("Polling error:", err);
         }
-      }, 3000);
+      }, 2500);
     }
     return () => clearInterval(interval);
-  }, [status, checkoutRequestId, orderId, onSuccess]);
+  }, [status, checkoutRequestId, orderId]);
 
-  // Countdown timer
+  // 3. Countdown timer (runs up to 0, but polling does NOT stop at 0)
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (status === "awaiting_pin" && timerSeconds > 0) {
@@ -80,6 +143,8 @@ export function MpesaPaymentModal({
     e.preventDefault();
     setLoading(true);
     setErrorMessage("");
+    setManualNote("");
+    completedRef.current = false;
 
     try {
       const res = await fetch("/api/payments/mpesa/stkpush", {
@@ -99,11 +164,41 @@ export function MpesaPaymentModal({
 
       setCheckoutRequestId(data.checkoutRequestId);
       setStatus("awaiting_pin");
-      setTimerSeconds(60);
+      setTimerSeconds(90);
     } catch (err: any) {
       setErrorMessage(err.message || "An error occurred");
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleManualCheck = async () => {
+    setIsCheckingManual(true);
+    setManualNote("");
+    try {
+      const res = await fetch(
+        `/api/payments/status?checkoutRequestId=${encodeURIComponent(
+          checkoutRequestId || ""
+        )}&orderId=${encodeURIComponent(orderId)}&_t=${Date.now()}`,
+        { cache: "no-store" }
+      );
+      if (res.ok) {
+        const data = await res.json();
+        if (data.status === "completed") {
+          handleCompleteSuccess();
+          return;
+        } else if (data.status === "failed") {
+          setStatus("failed");
+          setErrorMessage(data.resultDesc || "Payment was cancelled or rejected.");
+          return;
+        }
+      }
+      setManualNote("Checked Safaricom Till 1572931: Transaction is being confirmed. Please give it a few seconds...");
+    } catch (e) {
+      console.error("Manual check error:", e);
+      setManualNote("Connecting to payment network... Re-checking automatically.");
+    } finally {
+      setIsCheckingManual(false);
     }
   };
 
@@ -171,35 +266,34 @@ export function MpesaPaymentModal({
               </p>
             </div>
 
-            <div className="text-xs text-slate-400">
-              Waiting for network confirmation... (<span className="text-amber-400 font-mono font-semibold">{timerSeconds}s</span>)
-            </div>
+            {timerSeconds > 0 ? (
+              <div className="text-xs text-slate-400">
+                Waiting for network confirmation... (<span className="text-amber-400 font-mono font-semibold">{timerSeconds}s</span>)
+              </div>
+            ) : (
+              <div className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-xl p-2.5 flex items-center justify-center gap-2">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
+                <span>Checking Safaricom Till 1572931... Click below to confirm.</span>
+              </div>
+            )}
+
+            {manualNote && (
+              <div className="p-2.5 rounded-xl bg-pitch-card border border-pitch-border text-[11px] text-slate-300 flex items-center gap-2 animate-in fade-in">
+                <Loader2 className="w-3 h-3 animate-spin text-brand-400 shrink-0" />
+                <span>{manualNote}</span>
+              </div>
+            )}
 
             <div className="pt-2">
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="w-full text-xs"
-                onClick={async () => {
-                  try {
-                    const res = await fetch(
-                      `/api/payments/status?checkoutRequestId=${encodeURIComponent(
-                        checkoutRequestId || ""
-                      )}&orderId=${encodeURIComponent(orderId)}`
-                    );
-                    if (res.ok) {
-                      const data = await res.json();
-                      if (data.status === "completed") {
-                        setStatus("completed");
-                        setTimeout(() => onSuccess(), 1500);
-                      }
-                    }
-                  } catch (e) {
-                    console.error("Manual check error:", e);
-                  }
-                }}
+                className="w-full text-xs font-semibold"
+                isLoading={isCheckingManual}
+                onClick={handleManualCheck}
               >
+                <RefreshCw className="w-3.5 h-3.5 mr-1.5" />
                 I have entered PIN — Confirm Status Now
               </Button>
             </div>

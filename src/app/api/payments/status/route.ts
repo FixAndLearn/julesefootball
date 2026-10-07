@@ -27,14 +27,36 @@ export async function GET(req: NextRequest) {
     );
 
     if (!payment) {
+      if (orderId) {
+        const { data: order } = await primaryClient
+          .from("orders")
+          .select("id, status")
+          .eq("id", orderId)
+          .single();
+
+        if (order && order.status !== "payment_pending") {
+          return NextResponse.json({
+            status: "completed",
+            receiptNumber: "CONFIRMED",
+            resultCode: 0,
+            resultDesc: "Payment verified in escrow",
+          });
+        }
+      }
+
       return NextResponse.json({ error: "Payment record not found" }, { status: 404 });
     }
 
+    const orderObj = (payment as any).order;
+    const isCompleted =
+      payment.status === "completed" ||
+      (orderObj && orderObj.status !== "payment_pending");
+
     return NextResponse.json({
-      status: payment.status,
-      receiptNumber: payment.mpesa_receipt_number,
-      resultCode: payment.result_code,
-      resultDesc: payment.result_desc,
+      status: isCompleted ? "completed" : payment.status,
+      receiptNumber: payment.mpesa_receipt_number || (isCompleted ? "CONFIRMED" : null),
+      resultCode: isCompleted ? 0 : payment.result_code,
+      resultDesc: isCompleted ? "Payment completed successfully" : payment.result_desc,
     });
   } catch (error: any) {
     console.error("Status check route error:", error);

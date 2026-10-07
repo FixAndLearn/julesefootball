@@ -262,6 +262,8 @@ export interface Payment {
   raw_callback: Record<string, unknown> | null;
   created_at: string;
   completed_at: string | null;
+  // Joined relations
+  order?: Order;
 }
 
 export interface Dispute {
