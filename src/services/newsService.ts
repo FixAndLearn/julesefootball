@@ -37,26 +37,60 @@ export class NewsService {
    * Fetch article by slug or ID directly from the database.
    * Returns null if not found.
    */
-  async getArticleBySlug(slug: string): Promise<NewsArticle | null> {
+  async getArticleBySlug(identifier: string): Promise<NewsArticle | null> {
     try {
-      const { data, error } = await this.supabase
-        .from("news_articles")
-        .select("*")
-        .or(`slug.eq.${slug},id.eq.${slug}`)
-        .single();
+      if (!identifier) return null;
+      const clean = decodeURIComponent(identifier).trim();
+      const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean);
 
-      if (!error && data) {
-        // Increment views count non-blockingly
-        this.supabase
+      let query = this.supabase.from("news_articles").select("*");
+
+      if (isUuid) {
+        query = query.or(`id.eq.${clean},slug.eq.${clean}`);
+      } else {
+        query = query.eq("slug", clean);
+      }
+
+      let { data, error } = await query.maybeSingle();
+
+      // Fallback: If not found and not a UUID, try case-insensitive slug match
+      if (!data && !isUuid) {
+        const fallback = await this.supabase
           .from("news_articles")
-          .update({ views_count: (data.views_count || 0) + 1 })
-          .eq("id", data.id)
-          .then();
+          .select("*")
+          .ilike("slug", clean)
+          .maybeSingle();
+        if (fallback.data) {
+          data = fallback.data;
+          error = null;
+        }
+      }
+
+      if (error) {
+        console.warn("getArticleBySlug query error:", error);
+        return null;
+      }
+
+      if (data) {
+        // Increment views count non-blockingly
+        try {
+          this.supabase
+            .from("news_articles")
+            .update({ views_count: (data.views_count || 0) + 1 })
+            .eq("id", data.id)
+            .then(
+              () => {},
+              () => {}
+            );
+        } catch {
+          // Non-blocking view increment
+        }
 
         return data as NewsArticle;
       }
       return null;
-    } catch {
+    } catch (err) {
+      console.warn("getArticleBySlug exception:", err);
       return null;
     }
   }
@@ -141,18 +175,24 @@ export class NewsService {
    * Update an article
    */
   async updateArticle(
-    id: string,
+    idOrSlug: string,
     payload: Partial<Omit<NewsArticle, "id" | "created_at">>
   ): Promise<NewsArticle> {
-    const { data, error } = await this.supabase
-      .from("news_articles")
-      .update({
-        ...payload,
-        updated_at: new Date().toISOString(),
-      })
-      .or(`id.eq.${id},slug.eq.${id}`)
-      .select()
-      .single();
+    const clean = decodeURIComponent(idOrSlug).trim();
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean);
+
+    let query = this.supabase.from("news_articles").update({
+      ...payload,
+      updated_at: new Date().toISOString(),
+    });
+
+    if (isUuid) {
+      query = query.or(`id.eq.${clean},slug.eq.${clean}`);
+    } else {
+      query = query.eq("slug", clean);
+    }
+
+    const { data, error } = await query.select().single();
 
     if (error || !data) {
       throw new Error(`Failed to update news article: ${error?.message}`);
@@ -164,11 +204,19 @@ export class NewsService {
   /**
    * Delete an article
    */
-  async deleteArticle(id: string): Promise<void> {
-    const { error } = await this.supabase
-      .from("news_articles")
-      .delete()
-      .or(`id.eq.${id},slug.eq.${id}`);
+  async deleteArticle(idOrSlug: string): Promise<void> {
+    const clean = decodeURIComponent(idOrSlug).trim();
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(clean);
+
+    let query = this.supabase.from("news_articles").delete();
+
+    if (isUuid) {
+      query = query.or(`id.eq.${clean},slug.eq.${clean}`);
+    } else {
+      query = query.eq("slug", clean);
+    }
+
+    const { error } = await query;
 
     if (error) {
       throw new Error(`Failed to delete news article: ${error.message}`);

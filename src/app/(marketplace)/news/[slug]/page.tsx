@@ -12,9 +12,11 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
+import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 
+export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 interface NewsArticlePageProps {
@@ -23,13 +25,53 @@ interface NewsArticlePageProps {
   };
 }
 
+export async function generateMetadata({ params }: NewsArticlePageProps): Promise<Metadata> {
+  try {
+    const resolvedParams = await Promise.resolve(params);
+    const slug = decodeURIComponent(resolvedParams?.slug || "").trim();
+    const primaryClient = hasServiceRoleKey() ? createAdminClient() : createServerSupabaseClient();
+    const service = new NewsService(primaryClient);
+    const article = await service.getArticleBySlug(slug);
+
+    if (!article) {
+      return {
+        title: "Bulletin Not Found | eFootballMarket",
+      };
+    }
+
+    return {
+      title: `${article.title} | eFootballMarket Intelligence`,
+      description: article.summary,
+      openGraph: {
+        title: article.title,
+        description: article.summary,
+        images: article.cover_image_url ? [article.cover_image_url] : [],
+      },
+    };
+  } catch {
+    return {
+      title: "eFootballMarket Bulletin",
+    };
+  }
+}
+
 export default async function NewsArticlePage({ params }: NewsArticlePageProps) {
+  const resolvedParams = await Promise.resolve(params);
+  const rawSlug = resolvedParams?.slug || "";
+  const decodedSlug = decodeURIComponent(rawSlug).trim();
+
   const supabase = createServerSupabaseClient();
   const adminSupabase = createAdminClient();
   const primaryClient = hasServiceRoleKey() ? adminSupabase : supabase;
 
   const service = new NewsService(primaryClient);
-  const article = await service.getArticleBySlug(params.slug);
+  let article = await service.getArticleBySlug(decodedSlug);
+
+  // Resilient fallback with user client if admin client had an issue
+  if (!article && primaryClient !== supabase) {
+    const fallbackService = new NewsService(supabase);
+    article = await fallbackService.getArticleBySlug(decodedSlug);
+  }
 
   if (!article) {
     notFound();

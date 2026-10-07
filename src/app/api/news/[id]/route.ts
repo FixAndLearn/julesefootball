@@ -55,13 +55,15 @@ export async function PATCH(
     const adminSupabase = createAdminClient();
     const primaryClient = hasServiceRoleKey() ? adminSupabase : supabase;
 
-    const { data: profile } = await primaryClient
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    const { data: userRole } = await primaryClient
+      .from("user_roles")
+      .select("role_id")
+      .eq("user_id", user.id)
+      .in("role_id", ["admin", "super_admin"])
+      .limit(1);
 
-    if (!isUserAdmin(user.email, profile?.role)) {
+    const isAdmin = Boolean((userRole && userRole.length > 0) || isUserAdmin(user.email));
+    if (!isAdmin) {
       return NextResponse.json(
         { error: "Forbidden: Super Administrator or Admin privileges required." },
         { status: 403 }
@@ -108,13 +110,15 @@ export async function DELETE(
     const adminSupabase = createAdminClient();
     const primaryClient = hasServiceRoleKey() ? adminSupabase : supabase;
 
-    const { data: profile } = await primaryClient
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    const { data: userRole } = await primaryClient
+      .from("user_roles")
+      .select("role_id")
+      .eq("user_id", user.id)
+      .in("role_id", ["admin", "super_admin"])
+      .limit(1);
 
-    if (!isUserAdmin(user.email, profile?.role)) {
+    const isAdmin = Boolean((userRole && userRole.length > 0) || isUserAdmin(user.email));
+    if (!isAdmin) {
       return NextResponse.json(
         { error: "Forbidden: Super Administrator or Admin privileges required." },
         { status: 403 }
