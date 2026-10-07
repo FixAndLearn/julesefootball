@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { Lock, ShieldAlert } from "lucide-react";
+import { CheckCircle2, Lock, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 export interface CredentialsDeliveryFormProps {
@@ -16,6 +16,7 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
   const [backupCodes, setBackupCodes] = useState("");
   const [instructions, setInstructions] = useState("");
   const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -29,10 +30,10 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId,
-          konamiEmail,
-          konamiPassword,
-          backupCodes: backupCodes || undefined,
-          transferInstructions: instructions || undefined,
+          konamiEmail: konamiEmail.trim(),
+          konamiPassword: konamiPassword.trim(),
+          backupCodes: backupCodes.trim() || undefined,
+          transferInstructions: instructions.trim() || undefined,
         }),
       });
 
@@ -41,7 +42,10 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
         throw new Error(data.error || "Failed to deliver credentials");
       }
 
-      onDelivered();
+      setSuccess(true);
+      setTimeout(() => {
+        onDelivered();
+      }, 700);
     } catch (err: any) {
       setError(err.message);
     } finally {
@@ -70,10 +74,17 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
         </div>
       )}
 
+      {success && (
+        <div className="p-3 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 shrink-0" />
+          <span>Credentials encrypted & saved successfully! Updating order status...</span>
+        </div>
+      )}
+
       <Input
         label="Konami ID Email / Username"
         type="text"
-        placeholder="konami-account@example.com"
+        placeholder="konami-account@example.com or Username"
         value={konamiEmail}
         onChange={(e) => setKonamiEmail(e.target.value)}
         required
@@ -110,8 +121,8 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
         />
       </div>
 
-      <Button type="submit" variant="gold" size="md" className="w-full" isLoading={loading}>
-        Encrypt & Deliver to Buyer
+      <Button type="submit" variant="gold" size="md" className="w-full" isLoading={loading || success}>
+        {success ? "Delivered!" : "Encrypt & Deliver to Buyer"}
       </Button>
     </form>
   );

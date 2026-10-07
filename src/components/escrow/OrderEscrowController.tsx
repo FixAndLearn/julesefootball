@@ -29,6 +29,9 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
 
   const refreshPage = () => {
     router.refresh();
+    setTimeout(() => {
+      window.location.reload();
+    }, 400);
   };
 
   return (
@@ -145,8 +148,20 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
               </div>
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-pitch-card text-xs text-slate-300">
-              Credentials successfully delivered to buyer. Funds will be released into your available balance automatically upon buyer confirmation or when the 24h inspection window expires.
+            <div className="space-y-3 pt-2">
+              <div className="p-3 rounded-xl bg-pitch-card text-xs text-slate-300">
+                Credentials successfully delivered to buyer. Funds will be released into your available balance automatically upon buyer confirmation or when the 24h inspection window expires.
+              </div>
+              <div className="flex gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setIsRevealModalOpen(true)}
+                >
+                  <KeyRound className="w-4 h-4 mr-2" />
+                  View Delivered Credentials
+                </Button>
+              </div>
             </div>
           )}
         </div>
@@ -207,6 +222,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       <CredentialsRevealModal
         orderId={order.id}
         isOpen={isRevealModalOpen}
+        isSeller={isSeller}
         onClose={() => setIsRevealModalOpen(false)}
         onConfirmedRelease={() => {
           setIsRevealModalOpen(false);

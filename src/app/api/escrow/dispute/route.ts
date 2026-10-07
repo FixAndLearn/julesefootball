@@ -1,7 +1,10 @@
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { EscrowService } from "@/services/escrowService";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+
+export const dynamic = "force-dynamic";
 
 const disputeSchema = z.object({
   orderId: z.string().uuid(),
@@ -25,7 +28,7 @@ export async function POST(req: NextRequest) {
     } = await supabase.auth.getUser();
 
     if (!user) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+      return NextResponse.json({ error: "Unauthorized. Please log in." }, { status: 401 });
     }
 
     const json = await req.json();
@@ -35,7 +38,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid dispute submission", details: parsed.error.format() }, { status: 400 });
     }
 
-    const escrowService = new EscrowService(supabase);
+    const adminSupabase = createAdminClient();
+    const serviceRoleConfigured = hasServiceRoleKey();
+    const primaryClient = serviceRoleConfigured ? adminSupabase : supabase;
+    const escrowService = new EscrowService(primaryClient);
     await escrowService.openDispute(
       parsed.data.orderId,
       user.id,

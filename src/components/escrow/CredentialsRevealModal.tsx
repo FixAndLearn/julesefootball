@@ -7,6 +7,7 @@ import { useState } from "react";
 export interface CredentialsRevealModalProps {
   orderId: string;
   isOpen: boolean;
+  isSeller?: boolean;
   onClose: () => void;
   onConfirmedRelease: () => void;
   onOpenDispute: () => void;
@@ -15,6 +16,7 @@ export interface CredentialsRevealModalProps {
 export function CredentialsRevealModal({
   orderId,
   isOpen,
+  isSeller = false,
   onClose,
   onConfirmedRelease,
   onOpenDispute,
@@ -92,8 +94,12 @@ export function CredentialsRevealModal({
             <KeyRound className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-100">Account Credentials Vault</h3>
-            <p className="text-xs text-slate-400">Authenticated Decryption</p>
+            <h3 className="text-base font-bold text-slate-100">
+              {isSeller ? "Delivered Credentials Preview" : "Account Credentials Vault"}
+            </h3>
+            <p className="text-xs text-slate-400">
+              {isSeller ? "AES-256-GCM Encrypted Storage" : "Authenticated Decryption"}
+            </p>
           </div>
         </div>
 
@@ -107,7 +113,9 @@ export function CredentialsRevealModal({
         {!credentials && (
           <div className="text-center py-6">
             <p className="text-xs text-slate-300 mb-4">
-              Click below to securely decrypt and retrieve your Konami ID login credentials.
+              {isSeller
+                ? "Click below to review the credentials you delivered for this order."
+                : "Click below to securely decrypt and retrieve your Konami ID login credentials."}
             </p>
             <Button variant="primary" size="md" onClick={fetchCredentials} isLoading={loading}>
               <Eye className="w-4 h-4 mr-1.5" />
@@ -177,24 +185,34 @@ export function CredentialsRevealModal({
             )}
 
             {/* Security Caution Box */}
-            <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs text-amber-300 space-y-1">
-              <span className="font-semibold block text-amber-200">Security Recommendation:</span>
-              <p>Log in immediately, update the account password, and link your own email address to the Konami ID before confirming release.</p>
-            </div>
+            {!isSeller && (
+              <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs text-amber-300 space-y-1">
+                <span className="font-semibold block text-amber-200">Security Recommendation:</span>
+                <p>Log in immediately, update the account password, and link your own email address to the Konami ID before confirming release.</p>
+              </div>
+            )}
 
             {/* Actions */}
             <div className="pt-2 flex flex-col gap-2">
-              <Button variant="gold" size="lg" className="w-full" onClick={handleRelease} isLoading={releasing}>
-                <ShieldCheck className="w-4 h-4 mr-2" />
-                I Have Verified Account (Release Funds)
-              </Button>
-              <button
-                type="button"
-                onClick={onOpenDispute}
-                className="text-xs text-rose-400 hover:text-rose-300 py-1 text-center font-medium"
-              >
-                Account does not match? Open an Escrow Dispute
-              </button>
+              {!isSeller ? (
+                <>
+                  <Button variant="gold" size="lg" className="w-full" onClick={handleRelease} isLoading={releasing}>
+                    <ShieldCheck className="w-4 h-4 mr-2" />
+                    I Have Verified Account (Release Funds)
+                  </Button>
+                  <button
+                    type="button"
+                    onClick={onOpenDispute}
+                    className="text-xs text-rose-400 hover:text-rose-300 py-1 text-center font-medium"
+                  >
+                    Account does not match? Open an Escrow Dispute
+                  </button>
+                </>
+              ) : (
+                <Button variant="outline" size="md" className="w-full" onClick={onClose}>
+                  Close Vault
+                </Button>
+              )}
             </div>
           </div>
         )}
