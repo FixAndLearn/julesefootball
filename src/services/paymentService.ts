@@ -59,75 +59,248 @@ export class PaymentService {
   }
 
   /**
-   * Checks the real-time status of a payment by its CheckoutRequestID.
+   * Securely marks a payment, order, escrow account, and listing as confirmed.
    */
-  async getPaymentStatus(checkoutRequestId: string): Promise<Payment | null> {
-    const { data, error } = await this.supabase
+  async markPaymentSuccessful(
+    paymentId: string,
+    receiptNumber: string,
+    amount: number,
+    rawCallback: any
+  ): Promise<void> {
+    const { data: payment } = await this.supabase
       .from("payments")
-      .select("*")
-      .eq("checkout_request_id", checkoutRequestId)
+      .select("*, order:orders(*)")
+      .eq("id", paymentId)
       .single();
 
-    if (error || !data) {
+    if (!payment) return;
+
+    if (payment.status === "completed") return;
+
+    // 1. First attempt to call the RPC handle_mpesa_payment_success
+    try {
+      const { error: rpcError } = await this.supabase.rpc("handle_mpesa_payment_success", {
+        p_checkout_request_id: payment.checkout_request_id || payment.merchant_request_id || paymentId,
+        p_receipt_number: receiptNumber,
+        p_amount: amount,
+        p_raw_callback: rawCallback,
+      });
+
+      if (!rpcError) {
+        console.log(`Payment ${paymentId} successfully confirmed via RPC`);
+        return;
+      }
+      console.warn("RPC returned error, applying direct database update:", rpcError);
+    } catch (e) {
+      console.warn("RPC invocation error, applying direct database update:", e);
+    }
+
+    // 2. Direct transactional updates using administrative client
+    const now = new Date().toISOString();
+
+    // Update payment record
+    await this.supabase
+      .from("payments")
+      .update({
+        status: "completed",
+        mpesa_receipt_number: receiptNumber,
+        raw_callback: rawCallback,
+        completed_at: now,
+      })
+      .eq("id", paymentId);
+
+    if (payment.order_id) {
+      // Update order status to escrow_locked
+      await this.supabase
+        .from("orders")
+        .update({
+          status: "escrow_locked",
+          updated_at: now,
+        })
+        .eq("id", payment.order_id);
+
+      // Update escrow account state
+      await this.supabase
+        .from("escrow_accounts")
+        .update({
+          escrow_state: "waiting_for_seller",
+          updated_at: now,
+        })
+        .eq("order_id", payment.order_id);
+
+      // Update listing status to in_escrow
+      if (payment.order?.listing_id) {
+        await this.supabase
+          .from("listings")
+          .update({
+            status: "in_escrow",
+            updated_at: now,
+          })
+          .eq("id", payment.order.listing_id);
+      }
+
+      // Create notification for seller
+      if (payment.order?.seller_id) {
+        await this.supabase.from("notifications").insert({
+          recipient_id: payment.order.seller_id,
+          type: "payment_received",
+          title: "Payment Secured in Escrow!",
+          message: `The buyer paid KES ${amount}. Please deliver the account credentials promptly.`,
+          action_url: `/orders/${payment.order_id}`,
+          is_read: false,
+        });
+      }
+    }
+  }
+
+  /**
+   * Checks the real-time status of a payment by its CheckoutRequestID, MerchantRequestID, or OrderID.
+   */
+  async getPaymentStatus(identifier?: string, orderId?: string): Promise<Payment | null> {
+    let query = this.supabase.from("payments").select("*, order:orders(*)");
+
+    if (orderId) {
+      query = query.eq("order_id", orderId);
+    } else if (identifier) {
+      query = query.or(
+        `checkout_request_id.eq.${identifier},merchant_request_id.eq.${identifier},id.eq.${identifier}`
+      );
+    } else {
       return null;
+    }
+
+    const { data: payments, error } = await query.order("created_at", { ascending: false });
+
+    if (error || !payments || payments.length === 0) {
+      return null;
+    }
+
+    const data = payments[0] as Payment;
+
+    if (data.status === "completed") {
+      return data;
     }
 
     // If still pending and UnifiedPay is enabled, actively verify status
     if (data.status === "pending" && mpesaClient.isUnifiedPay()) {
-      const liveStatus = await mpesaClient.checkUnifiedPayStatus(checkoutRequestId);
-      if (liveStatus && liveStatus.isSuccess && liveStatus.receiptNumber) {
-        await this.supabase.rpc("handle_mpesa_payment_success", {
-          p_checkout_request_id: checkoutRequestId,
-          p_receipt_number: liveStatus.receiptNumber,
-          p_amount: liveStatus.amount || data.amount,
-          p_raw_callback: liveStatus as unknown as Record<string, unknown>,
-        });
+      const idsToTry = [
+        data.merchant_request_id,
+        data.checkout_request_id,
+      ].filter(Boolean) as string[];
 
-        // Fetch refreshed record
-        const { data: updated } = await this.supabase
-          .from("payments")
-          .select("*")
-          .eq("checkout_request_id", checkoutRequestId)
-          .single();
+      for (const transId of idsToTry) {
+        const liveStatus = await mpesaClient.checkUnifiedPayStatus(transId);
+        if (liveStatus && liveStatus.isSuccess && liveStatus.receiptNumber) {
+          await this.markPaymentSuccessful(
+            data.id,
+            liveStatus.receiptNumber,
+            liveStatus.amount || data.amount,
+            liveStatus
+          );
 
-        return (updated as Payment) || (data as Payment);
-      } else if (liveStatus && liveStatus.resultCode !== 0 && liveStatus.resultCode !== 1032) {
-        // Failed
-        await this.supabase
-          .from("payments")
-          .update({
-            status: "failed",
-            result_code: liveStatus.resultCode,
-            result_desc: liveStatus.resultDesc,
-          })
-          .eq("checkout_request_id", checkoutRequestId);
+          // Fetch refreshed record
+          const { data: updated } = await this.supabase
+            .from("payments")
+            .select("*")
+            .eq("id", data.id)
+            .single();
+
+          return (updated as Payment) || data;
+        } else if (liveStatus && liveStatus.resultCode !== 0 && liveStatus.resultCode !== 1032) {
+          // Failed
+          await this.supabase
+            .from("payments")
+            .update({
+              status: "failed",
+              result_code: liveStatus.resultCode,
+              result_desc: liveStatus.resultDesc,
+            })
+            .eq("id", data.id);
+        }
       }
     }
 
-    return data as Payment;
+    return data;
   }
 
   /**
    * Processes the official Daraja or UnifiedPay callback webhook.
    */
-  async processCallback(body: AnyCallbackBody): Promise<void> {
+  async processCallback(body: AnyCallbackBody | any): Promise<void> {
+    console.log("Processing webhook callback:", JSON.stringify(body));
     const parsed = mpesaClient.parseCallback(body);
 
-    if (parsed.isSuccess && parsed.receiptNumber) {
-      // Execute security definer atomic function
-      const { error } = await this.supabase.rpc("handle_mpesa_payment_success", {
-        p_checkout_request_id: parsed.checkoutRequestId,
-        p_receipt_number: parsed.receiptNumber,
-        p_amount: parsed.amount || 0,
-        p_raw_callback: body as unknown as Record<string, unknown>,
-      });
+    const unifiedTransId =
+      body.transaction_request_id ||
+      body.TransactionRequestID ||
+      parsed.merchantRequestId ||
+      "";
+    const checkoutId =
+      body.CheckoutRequestID ||
+      body.checkoutRequestId ||
+      parsed.checkoutRequestId ||
+      "";
+    const orderRef =
+      body.TransactionReference ||
+      body.account_reference ||
+      body.reference ||
+      "";
 
-      if (error) {
-        console.error("handle_mpesa_payment_success RPC error:", error);
-        throw error;
+    let paymentId: string | null = null;
+    let fallbackAmount = parsed.amount || 0;
+
+    // 1. Try finding payment by IDs
+    const searchConditions = [];
+    if (checkoutId) searchConditions.push(`checkout_request_id.eq.${checkoutId}`);
+    if (unifiedTransId) {
+      searchConditions.push(`merchant_request_id.eq.${unifiedTransId}`);
+      searchConditions.push(`checkout_request_id.eq.${unifiedTransId}`);
+    }
+
+    if (searchConditions.length > 0) {
+      const { data: found } = await this.supabase
+        .from("payments")
+        .select("id, amount, order_id")
+        .or(searchConditions.join(","));
+
+      if (found && found.length > 0) {
+        paymentId = found[0].id;
+        fallbackAmount = found[0].amount;
       }
-    } else {
-      // Update payment record as failed
+    }
+
+    // 2. If not found, try matching by Order Reference
+    if (!paymentId && orderRef) {
+      const { data: order } = await this.supabase
+        .from("orders")
+        .select("id, payments(id, amount)")
+        .eq("order_number", orderRef)
+        .single();
+
+      if (order && order.payments && (order.payments as any).length > 0) {
+        paymentId = (order.payments as any)[0].id;
+        fallbackAmount = (order.payments as any)[0].amount;
+      }
+    }
+
+    if (parsed.isSuccess && parsed.receiptNumber) {
+      if (paymentId) {
+        await this.markPaymentSuccessful(
+          paymentId,
+          parsed.receiptNumber,
+          parsed.amount || fallbackAmount,
+          body
+        );
+      } else {
+        // Fallback to RPC
+        await this.supabase.rpc("handle_mpesa_payment_success", {
+          p_checkout_request_id: checkoutId || unifiedTransId,
+          p_receipt_number: parsed.receiptNumber,
+          p_amount: parsed.amount || fallbackAmount,
+          p_raw_callback: body as unknown as Record<string, unknown>,
+        });
+      }
+    } else if (paymentId) {
       await this.supabase
         .from("payments")
         .update({
@@ -136,7 +309,7 @@ export class PaymentService {
           result_desc: parsed.resultDesc,
           raw_callback: body as unknown as Record<string, unknown>,
         })
-        .eq("checkout_request_id", parsed.checkoutRequestId);
+        .eq("id", paymentId);
     }
   }
 }

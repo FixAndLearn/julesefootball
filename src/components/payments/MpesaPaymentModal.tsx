@@ -30,15 +30,19 @@ export function MpesaPaymentModal({
   const [status, setStatus] = useState<"idle" | "awaiting_pin" | "completed" | "failed">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
-  const [timerSeconds, setTimerSeconds] = useState(60);
+  const [timerSeconds, setTimerSeconds] = useState(120);
 
   // Poll payment status while awaiting PIN
   useEffect(() => {
     let interval: NodeJS.Timeout;
-    if (status === "awaiting_pin" && checkoutRequestId) {
+    if (status === "awaiting_pin") {
       interval = setInterval(async () => {
         try {
-          const res = await fetch(`/api/payments/status?checkoutRequestId=${checkoutRequestId}`);
+          const res = await fetch(
+            `/api/payments/status?checkoutRequestId=${encodeURIComponent(
+              checkoutRequestId || ""
+            )}&orderId=${encodeURIComponent(orderId)}`
+          );
           if (res.ok) {
             const data = await res.json();
             if (data.status === "completed") {
@@ -59,7 +63,7 @@ export function MpesaPaymentModal({
       }, 3000);
     }
     return () => clearInterval(interval);
-  }, [status, checkoutRequestId, onSuccess]);
+  }, [status, checkoutRequestId, orderId, onSuccess]);
 
   // Countdown timer
   useEffect(() => {
@@ -169,6 +173,35 @@ export function MpesaPaymentModal({
 
             <div className="text-xs text-slate-400">
               Waiting for network confirmation... (<span className="text-amber-400 font-mono font-semibold">{timerSeconds}s</span>)
+            </div>
+
+            <div className="pt-2">
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                className="w-full text-xs"
+                onClick={async () => {
+                  try {
+                    const res = await fetch(
+                      `/api/payments/status?checkoutRequestId=${encodeURIComponent(
+                        checkoutRequestId || ""
+                      )}&orderId=${encodeURIComponent(orderId)}`
+                    );
+                    if (res.ok) {
+                      const data = await res.json();
+                      if (data.status === "completed") {
+                        setStatus("completed");
+                        setTimeout(() => onSuccess(), 1500);
+                      }
+                    }
+                  } catch (e) {
+                    console.error("Manual check error:", e);
+                  }
+                }}
+              >
+                I have entered PIN — Confirm Status Now
+              </Button>
             </div>
           </div>
         )}

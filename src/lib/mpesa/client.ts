@@ -162,7 +162,7 @@ class MpesaService {
 
       return {
         MerchantRequestID:
-          data.MerchantRequestID || data.transaction_request_id || "",
+          data.transaction_request_id || data.MerchantRequestID || "",
         CheckoutRequestID:
           data.CheckoutRequestID || data.transaction_request_id || "",
         ResponseCode: data.ResponseCode || "0",

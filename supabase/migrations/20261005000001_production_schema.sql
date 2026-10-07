@@ -555,19 +555,25 @@ CREATE OR REPLACE FUNCTION handle_mpesa_payment_success(
   p_amount NUMERIC,
   p_raw_callback JSONB
 )
-RETURNS VOID AS $$
+RETURNS VOID
+LANGUAGE plpgsql
+SECURITY DEFINER
+AS $$
 DECLARE
   v_payment RECORD;
   v_order RECORD;
 BEGIN
-  -- Locate and lock payment row
+  -- Locate and lock payment row by checkout_request_id OR merchant_request_id
   SELECT * INTO v_payment
   FROM payments
   WHERE checkout_request_id = p_checkout_request_id
+     OR merchant_request_id = p_checkout_request_id
+  ORDER BY created_at DESC
+  LIMIT 1
   FOR UPDATE;
 
   IF NOT FOUND THEN
-    RAISE EXCEPTION 'Payment record with checkout_request_id % not found', p_checkout_request_id;
+    RAISE EXCEPTION 'Payment record with ID % not found in payments table', p_checkout_request_id;
   END IF;
 
   IF v_payment.status = 'completed' THEN
