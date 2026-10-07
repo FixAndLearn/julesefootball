@@ -37,9 +37,9 @@ export class OrderService {
     }
 
     const price = Number(listing.price);
-    const platformFeeRate = 0.05; // 5% fee
-    const platformFee = Math.round(price * platformFeeRate);
-    const sellerNetAmount = price - platformFee;
+    const platformFeeRate = 0.00; // 0% platform fee - Launch promo (seller receives 100%)
+    const platformFee = 0;
+    const sellerNetAmount = price;
     const orderNumber = this.generateOrderNumber();
 
     // 2. Insert order

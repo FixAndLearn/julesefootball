@@ -1,7 +1,49 @@
+"use client";
+
 import { Shield, Lock, CreditCard, Building2 } from "lucide-react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 
 export function Footer() {
+  const pathname = usePathname();
+  const isHomePage = pathname === "/";
+
+  // Compact footer for non-home pages (orders, dashboards, chat, browse, etc.)
+  if (!isHomePage) {
+    return (
+      <footer className="w-full border-t border-pitch-border/60 bg-pitch-surface/60 backdrop-blur-sm text-slate-400 text-xs mt-auto py-4">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
+          <div className="flex items-center gap-4 flex-wrap text-slate-400">
+            <Link href="/" className="font-semibold text-slate-200 hover:text-white transition-colors">
+              eFootballMarket
+            </Link>
+            <span className="text-slate-600">•</span>
+            <Link href="/browse" className="hover:text-slate-200 transition-colors">
+              Browse Accounts
+            </Link>
+            <span className="text-slate-600">•</span>
+            <Link href="/news" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">
+              🚨 Alerts & News
+            </Link>
+            <span className="text-slate-600">•</span>
+            <Link href="/escrow-guarantee" className="hover:text-slate-200 transition-colors">
+              Escrow Protection
+            </Link>
+            <span className="text-slate-600">•</span>
+            <Link href="/terms" className="hover:text-slate-200 transition-colors">
+              Terms
+            </Link>
+          </div>
+
+          <div className="text-[11px] text-slate-500">
+            © {new Date().getFullYear()} eFootballMarket Inc. Under Executive Leadership of Brian Okibo, CEO.
+          </div>
+        </div>
+      </footer>
+    );
+  }
+
+  // Full detailed footer for the homepage
   return (
     <footer className="w-full border-t border-pitch-border/80 bg-pitch-card/90 text-slate-400 text-sm mt-auto">
       {/* Trust & Escrow Guarantee Ribbon */}

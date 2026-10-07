@@ -5,7 +5,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency } from "@/lib/utils";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { ArrowLeft, Building2, Smartphone } from "lucide-react";
+import { AlertCircle, ArrowLeft, Building2, CheckCircle2, Clock, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -56,7 +56,7 @@ export default async function SellerEarningsPage() {
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
             <h1 className="text-2xl sm:text-3xl font-bold text-white font-display">
-              Seller Earnings & M-Pesa Withdrawals
+              Seller Earnings &amp; M-Pesa Withdrawals
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
               Direct disbursements to your registered Safaricom M-Pesa line.
@@ -64,7 +64,7 @@ export default async function SellerEarningsPage() {
           </div>
           <Link href="/dashboard/seller">
             <Button variant="primary" size="md">
-              Manage Listings & Orders
+              Manage Listings &amp; Orders
             </Button>
           </Link>
         </div>
@@ -123,6 +123,38 @@ export default async function SellerEarningsPage() {
         </div>
       </div>
 
+      {/* Clear Explanation: What does "Pending" mean? */}
+      <div className="p-5 rounded-2xl bg-pitch-surface border border-amber-500/30 shadow-xl space-y-3">
+        <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
+          <Clock className="w-4 h-4" />
+          <span>Understanding Withdrawal Status &amp; Processing</span>
+        </div>
+        <p className="text-xs text-slate-300 leading-relaxed">
+          When you submit a withdrawal, it is marked <strong className="text-amber-400">PENDING</strong> while our financial administration team prepares the payout from the platform Till to your Safaricom M-Pesa line.
+        </p>
+
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 pt-2 text-xs">
+          <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
+            <span className="font-bold text-slate-200 block text-[11px]">1. Balance Reserved</span>
+            <p className="text-[11px] text-slate-400 leading-normal">
+              Your available balance is deducted instantly to prevent double-spending.
+            </p>
+          </div>
+          <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
+            <span className="font-bold text-amber-400 block text-[11px]">2. Payout Queued (Pending)</span>
+            <p className="text-[11px] text-slate-400 leading-normal">
+              Disbursed to your Safaricom M-Pesa phone number (processed within 15–30 minutes).
+            </p>
+          </div>
+          <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
+            <span className="font-bold text-emerald-400 block text-[11px]">3. Status Completed</span>
+            <p className="text-[11px] text-slate-400 leading-normal">
+              Once money reaches your phone, status marks as Paid. If wrong phone number, funds are refunded.
+            </p>
+          </div>
+        </div>
+      </div>
+
       {/* Withdrawal History Table */}
       <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
         <h2 className="text-base font-bold text-slate-100 font-display">
@@ -131,28 +163,64 @@ export default async function SellerEarningsPage() {
 
         {withdrawals && withdrawals.length > 0 ? (
           <div className="divide-y divide-pitch-border/60">
-            {withdrawals.map((w: any) => (
-              <div key={w.id} className="py-3.5 flex items-center justify-between">
-                <div>
-                  <div className="flex items-center gap-2">
-                    <span className="font-mono text-xs text-slate-300">
-                      To: {w.phone_number}
-                    </span>
-                    <Badge variant={w.status === "completed" ? "success" : "warning"} size="sm">
-                      {w.status.toUpperCase()}
-                    </Badge>
+            {withdrawals.map((w: any) => {
+              const isPending = w.status === "pending";
+              const isCompleted = w.status === "completed";
+              const isRejected = w.status === "rejected";
+
+              return (
+                <div key={w.id} className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                  <div className="space-y-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <span className="font-mono text-xs font-semibold text-slate-200">
+                        To: {w.phone_number}
+                      </span>
+                      {isPending && (
+                        <Badge variant="warning" size="sm" className="font-bold">
+                          PENDING DISBURSEMENT
+                        </Badge>
+                      )}
+                      {isCompleted && (
+                        <Badge variant="success" size="sm" className="font-bold">
+                          COMPLETED &amp; PAID
+                        </Badge>
+                      )}
+                      {isRejected && (
+                        <Badge variant="danger" size="sm" className="font-bold">
+                          REJECTED (REFUNDED)
+                        </Badge>
+                      )}
+                    </div>
+
+                    <div className="flex items-center gap-2 text-[11px] text-slate-500">
+                      <span>{new Date(w.created_at).toLocaleString()}</span>
+                      <span>&bull;</span>
+                      {isPending && (
+                        <span className="text-amber-400/90 font-medium">
+                          Queued for platform Till payout (15–30 mins)
+                        </span>
+                      )}
+                      {isCompleted && (
+                        <span className="text-emerald-400/90 font-medium">
+                          Disbursed to Safaricom line
+                        </span>
+                      )}
+                      {isRejected && (
+                        <span className="text-rose-400/90 font-medium">
+                          {w.failure_reason ? `Reason: ${w.failure_reason}` : "Balance restored"}
+                        </span>
+                      )}
+                    </div>
                   </div>
-                  <span className="text-[11px] text-slate-500 mt-1 block">
-                    {new Date(w.created_at).toLocaleString()}
-                  </span>
+
+                  <div className="text-left sm:text-right">
+                    <span className="text-base font-bold text-emerald-400 font-mono">
+                      {formatCurrency(w.amount)}
+                    </span>
+                  </div>
                 </div>
-                <div className="text-right">
-                  <span className="text-base font-bold text-emerald-400 font-mono">
-                    {formatCurrency(w.amount)}
-                  </span>
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <EmptyState

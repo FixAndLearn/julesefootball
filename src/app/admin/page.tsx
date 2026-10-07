@@ -9,7 +9,11 @@ import {
   AlertTriangle,
   ArrowRight,
   Ban,
+  Banknote,
+  Check,
   CheckCircle2,
+  Clock,
+  Copy,
   Crown,
   Eye,
   FileText,
@@ -40,7 +44,7 @@ function AdminControlCenterContent() {
   const searchParams = useSearchParams();
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<"listings" | "users" | "news">(
+  const [activeTab, setActiveTab] = useState<"listings" | "users" | "news" | "withdrawals">(
     (searchParams.get("tab") as any) || "listings"
   );
 
@@ -48,6 +52,7 @@ function AdminControlCenterContent() {
   const [listings, setListings] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [articles, setArticles] = useState<NewsArticle[]>([]);
+  const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
@@ -55,6 +60,9 @@ function AdminControlCenterContent() {
   // Search filters
   const [listingSearch, setListingSearch] = useState("");
   const [userSearch, setUserSearch] = useState("");
+  const [withdrawalSearch, setWithdrawalSearch] = useState("");
+  const [withdrawalFilter, setWithdrawalFilter] = useState<"all" | "pending" | "completed" | "rejected">("pending");
+  const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
 
   // Post News Form state
   const [newsTitle, setNewsTitle] = useState("");
@@ -67,6 +75,10 @@ function AdminControlCenterContent() {
   // Modal for Takedown Reason
   const [takedownTarget, setTakedownTarget] = useState<any | null>(null);
   const [takedownReason, setTakedownReason] = useState("");
+
+  // Modal for Withdrawal Rejection
+  const [rejectModalTarget, setRejectModalTarget] = useState<any | null>(null);
+  const [rejectModalReason, setRejectModalReason] = useState("");
 
   const isSuperAdmin = isSuperAdminEmail(user?.email);
   const isAdmin = isUserAdmin(user?.email, profile?.role);
@@ -103,6 +115,13 @@ function AdminControlCenterContent() {
       if (newsRes.ok) {
         const data = await newsRes.json();
         setArticles(data.articles || []);
+      }
+
+      // 4. Load Withdrawals
+      const withdrawalsRes = await fetch("/api/admin/withdrawals");
+      if (withdrawalsRes.ok) {
+        const data = await withdrawalsRes.json();
+        setWithdrawals(data.withdrawals || []);
       }
     } catch (err: any) {
       console.warn("Error loading admin data:", err);
@@ -218,6 +237,43 @@ function AdminControlCenterContent() {
     }
   };
 
+  // Handle Withdrawal Approval / Rejection
+  const handleWithdrawalAction = async (
+    withdrawalId: string,
+    status: "completed" | "rejected",
+    failureReason?: string
+  ) => {
+    setActionLoading(true);
+    setFeedback(null);
+    try {
+      const res = await fetch("/api/admin/withdrawals", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ withdrawalId, status, failureReason }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to update withdrawal status");
+
+      setFeedback({
+        type: "success",
+        message: data.message || `Withdrawal marked as ${status}.`,
+      });
+      setRejectModalTarget(null);
+      setRejectModalReason("");
+      loadAdminData();
+    } catch (err: any) {
+      setFeedback({ type: "error", message: err.message });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleCopyPhone = (phone: string) => {
+    navigator.clipboard.writeText(phone);
+    setCopiedPhone(phone);
+    setTimeout(() => setCopiedPhone(null), 2000);
+  };
+
   if (authLoading) {
     return (
       <div className="py-24 text-center space-y-3">
@@ -263,6 +319,27 @@ function AdminControlCenterContent() {
       u.username?.toLowerCase().includes(q) ||
       u.email?.toLowerCase().includes(q) ||
       u.phone_number?.toLowerCase().includes(q)
+    );
+  });
+
+  const pendingWithdrawals = withdrawals.filter((w) => w.status === "pending");
+  const pendingWithdrawalsCount = pendingWithdrawals.length;
+  const pendingWithdrawalsSum = pendingWithdrawals.reduce(
+    (sum, w) => sum + Number(w.amount || 0),
+    0
+  );
+
+  const filteredWithdrawals = withdrawals.filter((w) => {
+    if (withdrawalFilter !== "all" && w.status !== withdrawalFilter) {
+      return false;
+    }
+    if (!withdrawalSearch.trim()) return true;
+    const q = withdrawalSearch.toLowerCase();
+    return (
+      w.phone_number?.toLowerCase().includes(q) ||
+      w.seller?.username?.toLowerCase().includes(q) ||
+      w.seller?.email?.toLowerCase().includes(q) ||
+      String(w.amount).includes(q)
     );
   });
 
@@ -335,7 +412,7 @@ function AdminControlCenterContent() {
       )}
 
       {/* Key Metric Overview Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
         <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
           <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
             Total Accounts
@@ -349,6 +426,20 @@ function AdminControlCenterContent() {
           <p className="text-2xl font-black text-brand-400 font-display">{listings.length}</p>
         </div>
         <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
+          <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Pending Payouts</span>
+            {pendingWithdrawalsCount > 0 && (
+              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+            )}
+          </span>
+          <p className="text-2xl font-black text-amber-400 font-display">
+            {pendingWithdrawalsCount}
+          </p>
+          <span className="text-[10px] text-slate-400 block font-mono truncate">
+            {formatCurrency(pendingWithdrawalsSum)} queued
+          </span>
+        </div>
+        <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
           <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
             Active Bans
           </span>
@@ -360,16 +451,16 @@ function AdminControlCenterContent() {
           <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
             News & Alerts
           </span>
-          <p className="text-2xl font-black text-amber-400 font-display">{articles.length}</p>
+          <p className="text-2xl font-black text-indigo-400 font-display">{articles.length}</p>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex items-center border-b border-pitch-border/80 gap-2">
+      <div className="flex items-center border-b border-pitch-border/80 gap-2 overflow-x-auto">
         <button
           type="button"
           onClick={() => setActiveTab("listings")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
             activeTab === "listings"
               ? "border-amber-400 text-amber-400 bg-pitch-surface"
               : "border-transparent text-slate-400 hover:text-slate-200"
@@ -385,14 +476,14 @@ function AdminControlCenterContent() {
         <button
           type="button"
           onClick={() => setActiveTab("users")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
             activeTab === "users"
               ? "border-amber-400 text-amber-400 bg-pitch-surface"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
           <Users className="w-4 h-4" />
-          <span>User Management & Admin Privileges</span>
+          <span>User Management</span>
           <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
             {users.length}
           </span>
@@ -400,15 +491,37 @@ function AdminControlCenterContent() {
 
         <button
           type="button"
+          onClick={() => setActiveTab("withdrawals")}
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+            activeTab === "withdrawals"
+              ? "border-amber-400 text-amber-400 bg-pitch-surface"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Banknote className="w-4 h-4" />
+          <span>Seller Withdrawals (M-Pesa)</span>
+          {pendingWithdrawalsCount > 0 ? (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 animate-pulse">
+              {pendingWithdrawalsCount} pending
+            </span>
+          ) : (
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
+              {withdrawals.length}
+            </span>
+          )}
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab("news")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
             activeTab === "news"
               ? "border-amber-400 text-amber-400 bg-pitch-surface"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
           <Newspaper className="w-4 h-4" />
-          <span>Post News & Scammer Alerts</span>
+          <span>Post News & Alerts</span>
           <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
             {articles.length}
           </span>
@@ -859,6 +972,236 @@ function AdminControlCenterContent() {
         </div>
       )}
 
+      {/* TAB 4: SELLER WITHDRAWALS (M-PESA PAYOUTS) */}
+      {activeTab === "withdrawals" && (
+        <div className="space-y-6">
+          {/* Executive Instructions / Operations Manual */}
+          <div className="p-5 rounded-2xl bg-pitch-surface border border-pitch-border space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-pitch-border/60 pb-3">
+              <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
+                <Banknote className="w-4 h-4" />
+                <span>Executive Till Operations &amp; Seller Payouts</span>
+              </div>
+              <span className="text-[11px] font-mono text-slate-400">
+                UnifiedPay Till: <strong className="text-white">1572931</strong>
+              </span>
+            </div>
+
+            <p className="text-xs text-slate-300 leading-relaxed">
+              When a seller requests a withdrawal, their available balance is reserved immediately. Follow this standard operating procedure:
+            </p>
+
+            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
+              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
+                <span className="font-bold text-amber-400 block text-[11px]">Step 1: Check Seller &amp; Phone</span>
+                <p className="text-[11px] text-slate-400">Click &quot;Copy&quot; next to the seller&apos;s phone number to paste it into M-Pesa.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
+                <span className="font-bold text-amber-400 block text-[11px]">Step 2: Disburse Funds</span>
+                <p className="text-[11px] text-slate-400">Send the requested KES amount from your Till (1572931) to their M-Pesa line.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
+                <span className="font-bold text-emerald-400 block text-[11px]">Step 3: Mark Paid</span>
+                <p className="text-[11px] text-slate-400">Click &quot;Mark Paid / Completed&quot;. The seller receives an instant success alert.</p>
+              </div>
+              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
+                <span className="font-bold text-rose-400 block text-[11px]">Alternative: Reject &amp; Refund</span>
+                <p className="text-[11px] text-slate-400">If the phone is invalid, reject with a reason to automatically restore their balance.</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Filters & Search */}
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
+            <div className="flex items-center gap-1.5 p-1 rounded-xl bg-pitch-surface border border-pitch-border text-xs overflow-x-auto">
+              {(["all", "pending", "completed", "rejected"] as const).map((filter) => {
+                const count =
+                  filter === "all"
+                    ? withdrawals.length
+                    : withdrawals.filter((w) => w.status === filter).length;
+                return (
+                  <button
+                    key={filter}
+                    type="button"
+                    onClick={() => setWithdrawalFilter(filter)}
+                    className={`px-3 py-1.5 rounded-lg font-medium transition-all capitalize flex items-center gap-1.5 shrink-0 ${
+                      withdrawalFilter === filter
+                        ? "bg-amber-500 text-pitch-dark font-bold shadow"
+                        : "text-slate-400 hover:text-slate-200"
+                    }`}
+                  >
+                    <span>{filter}</span>
+                    <span
+                      className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                        withdrawalFilter === filter
+                          ? "bg-black/20 text-pitch-dark font-bold"
+                          : "bg-pitch-card text-slate-400"
+                      }`}
+                    >
+                      {count}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
+
+            <div className="relative min-w-[240px]">
+              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+              <input
+                type="text"
+                placeholder="Search phone, seller, amount..."
+                value={withdrawalSearch}
+                onChange={(e) => setWithdrawalSearch(e.target.value)}
+                className="w-full pl-9 pr-3 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+              />
+            </div>
+          </div>
+
+          {/* Table / List */}
+          {filteredWithdrawals.length === 0 ? (
+            <div className="p-12 text-center rounded-2xl bg-pitch-surface border border-pitch-border text-slate-400 space-y-2">
+              <Banknote className="w-8 h-8 mx-auto text-slate-600" />
+              <p className="text-xs font-semibold text-slate-300">No withdrawal requests found</p>
+              <p className="text-[11px] text-slate-500">
+                {withdrawalFilter !== "all"
+                  ? `There are no withdrawals with status "${withdrawalFilter}".`
+                  : "No sellers have requested withdrawals yet."}
+              </p>
+            </div>
+          ) : (
+            <div className="overflow-hidden rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl">
+              <div className="overflow-x-auto">
+                <table className="w-full text-left text-xs text-slate-300">
+                  <thead className="bg-pitch-card/60 border-b border-pitch-border text-[11px] text-slate-400 uppercase tracking-wider font-semibold">
+                    <tr>
+                      <th className="px-4 py-3">Seller</th>
+                      <th className="px-4 py-3">M-Pesa Phone</th>
+                      <th className="px-4 py-3">Amount</th>
+                      <th className="px-4 py-3">Status</th>
+                      <th className="px-4 py-3">Requested Date</th>
+                      <th className="px-4 py-3 text-right">Actions</th>
+                    </tr>
+                  </thead>
+                  <tbody className="divide-y divide-pitch-border/50">
+                    {filteredWithdrawals.map((w) => {
+                      const isPending = w.status === "pending";
+                      const isCompleted = w.status === "completed";
+                      const isRejected = w.status === "rejected";
+
+                      return (
+                        <tr key={w.id} className="hover:bg-pitch-card/30 transition-colors">
+                          <td className="px-4 py-3.5">
+                            <div className="font-semibold text-white">
+                              {w.seller?.username || "Unknown Seller"}
+                            </div>
+                            <div className="text-[10px] text-slate-500 font-mono">
+                              {w.seller?.email || w.seller_id}
+                            </div>
+                          </td>
+
+                          <td className="px-4 py-3.5">
+                            <div className="flex items-center gap-2 font-mono text-slate-200">
+                              <span>{w.phone_number}</span>
+                              <button
+                                type="button"
+                                onClick={() => handleCopyPhone(w.phone_number)}
+                                className="p-1 rounded hover:bg-pitch-card text-slate-400 hover:text-white transition-colors"
+                                title="Copy phone number"
+                              >
+                                {copiedPhone === w.phone_number ? (
+                                  <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                ) : (
+                                  <Copy className="w-3.5 h-3.5" />
+                                )}
+                              </button>
+                            </div>
+                          </td>
+
+                          <td className="px-4 py-3.5 font-mono font-bold text-emerald-400 text-sm">
+                            {formatCurrency(w.amount)}
+                          </td>
+
+                          <td className="px-4 py-3.5">
+                            {isPending && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-500/10 border border-amber-500/30 text-amber-300">
+                                <Clock className="w-3 h-3 animate-spin text-amber-400" />
+                                Pending Payout
+                              </span>
+                            )}
+                            {isCompleted && (
+                              <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-500/10 border border-emerald-500/30 text-emerald-300">
+                                <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                                Completed / Paid
+                              </span>
+                            )}
+                            {isRejected && (
+                              <div className="space-y-0.5">
+                                <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold bg-rose-500/10 border border-rose-500/30 text-rose-300">
+                                <XCircle className="w-3 h-3 text-rose-400" />
+                                Rejected &amp; Refunded
+                              </span>
+                                {w.failure_reason && (
+                                  <p className="text-[10px] text-slate-500 italic max-w-xs truncate">
+                                    Reason: {w.failure_reason}
+                                  </p>
+                                )}
+                              </div>
+                            )}
+                          </td>
+
+                          <td className="px-4 py-3.5 text-[11px] text-slate-400">
+                            {new Date(w.created_at).toLocaleString()}
+                          </td>
+
+                          <td className="px-4 py-3.5 text-right">
+                            {isPending ? (
+                              <div className="flex items-center justify-end gap-2">
+                                <Button
+                                  variant="danger"
+                                  size="sm"
+                                  onClick={() => {
+                                    setRejectModalTarget(w);
+                                    setRejectModalReason("");
+                                  }}
+                                  disabled={actionLoading}
+                                  className="text-xs"
+                                >
+                                  Reject &amp; Refund
+                                </Button>
+                                <Button
+                                  variant="gold"
+                                  size="sm"
+                                  onClick={() => {
+                                    if (
+                                      confirm(
+                                        `Confirm that you have sent ${formatCurrency(w.amount)} to M-Pesa line ${w.phone_number}?`
+                                      )
+                                    ) {
+                                      handleWithdrawalAction(w.id, "completed");
+                                    }
+                                  }}
+                                  disabled={actionLoading}
+                                  className="text-xs font-bold"
+                                >
+                                  <Check className="w-3.5 h-3.5 mr-1" />
+                                  Mark Paid
+                                </Button>
+                              </div>
+                            ) : (
+                              <span className="text-[11px] text-slate-500 italic">No action needed</span>
+                            )}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
+
       {/* Modal: Takedown Listing with Reason */}
       {takedownTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
@@ -912,6 +1255,78 @@ function AdminControlCenterContent() {
                 className="text-xs font-bold"
               >
                 Confirm Takedown
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Modal: Reject Withdrawal with Reason */}
+      {rejectModalTarget && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
+          <div className="relative w-full max-w-md bg-pitch-surface border border-pitch-border rounded-3xl p-6 shadow-2xl space-y-4">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-2 text-rose-400">
+                <AlertTriangle className="w-5 h-5" />
+                <h3 className="text-base font-bold text-white">Reject Withdrawal &amp; Refund</h3>
+              </div>
+              <button
+                type="button"
+                onClick={() => setRejectModalTarget(null)}
+                className="text-slate-400 hover:text-white"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <p className="text-xs text-slate-300">
+              You are rejecting the withdrawal of{" "}
+              <strong className="text-emerald-400 font-mono">
+                {formatCurrency(rejectModalTarget.amount)}
+              </strong>{" "}
+              for{" "}
+              <strong className="text-white">
+                {rejectModalTarget.seller?.username || rejectModalTarget.phone_number}
+              </strong>
+              . The funds will be automatically credited back to their Available Balance.
+            </p>
+
+            <div className="space-y-1.5">
+              <label className="block text-xs font-semibold text-slate-200">
+                Rejection Reason (Sent to Seller)
+              </label>
+              <textarea
+                value={rejectModalReason}
+                onChange={(e) => setRejectModalReason(e.target.value)}
+                placeholder="e.g. Invalid phone number format, M-Pesa name mismatch, or network bounce."
+                rows={3}
+                className="w-full rounded-xl bg-pitch-card border border-pitch-border p-3 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-rose-500"
+              />
+            </div>
+
+            <div className="flex items-center justify-end gap-2 pt-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setRejectModalTarget(null)}
+                className="text-xs"
+              >
+                Cancel
+              </Button>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() =>
+                  handleWithdrawalAction(
+                    rejectModalTarget.id,
+                    "rejected",
+                    rejectModalReason || "Declined by platform administrator. Funds refunded."
+                  )
+                }
+                isLoading={actionLoading}
+                className="text-xs font-bold"
+              >
+                Confirm Rejection &amp; Refund
               </Button>
             </div>
           </div>

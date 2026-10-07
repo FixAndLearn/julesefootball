@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { Check, Copy, Eye, KeyRound, ShieldAlert, ShieldCheck, X } from "lucide-react";
+import { Check, Copy, Eye, KeyRound, MessageSquare, ShieldAlert, ShieldCheck, X } from "lucide-react";
 import { useState } from "react";
 
 export interface CredentialsRevealModalProps {
@@ -9,7 +9,7 @@ export interface CredentialsRevealModalProps {
   isOpen: boolean;
   isSeller?: boolean;
   onClose: () => void;
-  onConfirmedRelease: () => void;
+  onConfirmedRelease?: () => void;
   onOpenDispute: () => void;
 }
 
@@ -29,7 +29,6 @@ export function CredentialsRevealModal({
   } | null>(null);
   const [loading, setLoading] = useState(false);
   const [copiedField, setCopiedField] = useState<string | null>(null);
-  const [releasing, setReleasing] = useState(false);
   const [error, setError] = useState("");
 
   const fetchCredentials = async () => {
@@ -57,25 +56,6 @@ export function CredentialsRevealModal({
     setTimeout(() => setCopiedField(null), 2000);
   };
 
-  const handleRelease = async () => {
-    setReleasing(true);
-    setError("");
-    try {
-      const res = await fetch("/api/escrow/release", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ orderId }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || "Failed to release escrow funds");
-      onConfirmedRelease();
-    } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setReleasing(false);
-    }
-  };
-
   if (!isOpen) return null;
 
   return (
@@ -95,10 +75,10 @@ export function CredentialsRevealModal({
           </div>
           <div>
             <h3 className="text-base font-bold text-slate-100">
-              {isSeller ? "Delivered Credentials Preview" : "Account Credentials Vault"}
+              {isSeller ? "Delivered Opening Credentials" : "Initial Konami ID Opening Credentials"}
             </h3>
             <p className="text-xs text-slate-400">
-              {isSeller ? "AES-256-GCM Encrypted Storage" : "Authenticated Decryption"}
+              {isSeller ? "AES-256-GCM Vault Record" : "Step 1 of 4: Initial Login Information"}
             </p>
           </div>
         </div>
@@ -114,19 +94,19 @@ export function CredentialsRevealModal({
           <div className="text-center py-6">
             <p className="text-xs text-slate-300 mb-4">
               {isSeller
-                ? "Click below to review the credentials you delivered for this order."
-                : "Click below to securely decrypt and retrieve your Konami ID login credentials."}
+                ? "Click below to review the opening credentials you delivered for this order."
+                : "Click below to decrypt and retrieve the initial Konami ID credentials for login."}
             </p>
             <Button variant="primary" size="md" onClick={fetchCredentials} isLoading={loading}>
               <Eye className="w-4 h-4 mr-1.5" />
-              Decrypt & Reveal Credentials
+              {isSeller ? "View Delivered Credentials" : "Decrypt & Reveal Opening Credentials"}
             </Button>
           </div>
         )}
 
         {credentials && (
           <div className="space-y-4">
-            {/* Konami Email */}
+            {/* Konami Email / Username */}
             <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border">
               <div className="flex items-center justify-between mb-1">
                 <span className="text-[11px] font-medium text-slate-400 uppercase">Konami ID / Email</span>
@@ -145,7 +125,7 @@ export function CredentialsRevealModal({
             {/* Konami Password */}
             <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border">
               <div className="flex items-center justify-between mb-1">
-                <span className="text-[11px] font-medium text-slate-400 uppercase">Password</span>
+                <span className="text-[11px] font-medium text-slate-400 uppercase">Opening Password</span>
                 <button
                   type="button"
                   onClick={() => copyToClipboard(credentials.konamiPassword, "password")}
@@ -184,11 +164,16 @@ export function CredentialsRevealModal({
               </div>
             )}
 
-            {/* Security Caution Box */}
+            {/* Two-Way Handover Caution Box for Buyer */}
             {!isSeller && (
-              <div className="p-3 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs text-amber-300 space-y-1">
-                <span className="font-semibold block text-amber-200">Security Recommendation:</span>
-                <p>Log in immediately, update the account password, and link your own email address to the Konami ID before confirming release.</p>
+              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs text-amber-200 space-y-1.5">
+                <span className="font-bold block text-amber-300">⚠️ Important: 2-Way Handover in Progress</span>
+                <p>
+                  These are <strong>opening credentials</strong> only. Please attempt login now. If Konami asks for a 2-Step verification code, request it from the seller in the <strong>Order Chat</strong>.
+                </p>
+                <p className="text-[11px] text-amber-300/80">
+                  Ensure you change <strong>BOTH</strong> the password and registered email address to your own before releasing funds!
+                </p>
               </div>
             )}
 
@@ -196,16 +181,16 @@ export function CredentialsRevealModal({
             <div className="pt-2 flex flex-col gap-2">
               {!isSeller ? (
                 <>
-                  <Button variant="gold" size="lg" className="w-full" onClick={handleRelease} isLoading={releasing}>
-                    <ShieldCheck className="w-4 h-4 mr-2" />
-                    I Have Verified Account (Release Funds)
+                  <Button variant="gold" size="md" className="w-full font-bold" onClick={onClose}>
+                    <MessageSquare className="w-4 h-4 mr-2" />
+                    Got Credentials — Go to Chat for 2FA Codes
                   </Button>
                   <button
                     type="button"
                     onClick={onOpenDispute}
                     className="text-xs text-rose-400 hover:text-rose-300 py-1 text-center font-medium"
                   >
-                    Account does not match? Open an Escrow Dispute
+                    Wrong details or cannot login? Open an Escrow Dispute
                   </button>
                 </>
               ) : (

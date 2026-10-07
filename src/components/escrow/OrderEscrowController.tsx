@@ -8,7 +8,7 @@ import { MpesaPaymentModal } from "@/components/payments/MpesaPaymentModal";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/utils";
 import { EscrowState, Order, OrderStatus } from "@/types/database";
-import { AlertCircle, CheckCircle2, KeyRound, Lock, Send, ShieldAlert, Smartphone } from "lucide-react";
+import { AlertCircle, CheckCircle2, KeyRound, Lock, Send, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 
@@ -27,11 +27,41 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
   const isSeller = currentUserId === order.seller_id;
   const escrowState = (order.escrow?.escrow_state || "pending") as EscrowState;
 
+  const [stepLogin, setStepLogin] = useState(false);
+  const [stepPassword, setStepPassword] = useState(false);
+  const [stepEmail, setStepEmail] = useState(false);
+  const [releasingFunds, setReleasingFunds] = useState(false);
+  const [releaseError, setReleaseError] = useState("");
+
   const refreshPage = () => {
     router.refresh();
     setTimeout(() => {
       window.location.reload();
     }, 400);
+  };
+
+  const handleConfirmAndRelease = async () => {
+    if (!stepLogin || !stepPassword || !stepEmail) {
+      setReleaseError("Please tick all 3 checkpoints verifying you have logged in, changed the password, and linked your own email.");
+      return;
+    }
+
+    setReleasingFunds(true);
+    setReleaseError("");
+    try {
+      const res = await fetch("/api/escrow/release", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ orderId: order.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to release escrow funds");
+      refreshPage();
+    } catch (err: any) {
+      setReleaseError(err.message);
+    } finally {
+      setReleasingFunds(false);
+    }
   };
 
   return (
@@ -108,50 +138,156 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
         </div>
       )}
 
-      {/* Stage 3: Seller Delivered (Buyer Reviewing & Inspection Window) */}
+      {/* Stage 3: Seller Delivered (Buyer Reviewing & 2-Way Code Transfer Window) */}
       {order.status === "seller_delivered" && (
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4">
+        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
               <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
                 <KeyRound className="w-5 h-5" />
               </div>
               <div>
-                <h3 className="text-base font-bold text-slate-100">Credentials Delivered by Seller</h3>
-                <p className="text-xs text-slate-400">24-Hour Inspection & Binding Window Active</p>
+                <h3 className="text-base font-bold text-slate-100">
+                  {isBuyer ? "Account Handover in Progress (2-Way Code Transfer)" : "Credentials Delivered — Handover Active"}
+                </h3>
+                <p className="text-xs text-slate-400">24-Hour Security & Binding Window Active</p>
               </div>
             </div>
           </div>
 
           {isBuyer ? (
-            <div className="space-y-4 pt-2">
-              <p className="text-xs text-slate-300 leading-relaxed">
-                The seller has securely submitted the Konami ID credentials. Access the encrypted vault below, log into eFootball, verify the players & GP, and bind your own email.
-              </p>
-              <div className="flex flex-wrap gap-3">
+            <div className="space-y-4 pt-1">
+              <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs text-amber-200 space-y-1.5">
+                <span className="font-bold text-amber-300 block">💬 Two-Way Verification in Progress:</span>
+                <p>
+                  Konami ID security requires login OTP codes and email change confirmations. View opening credentials below, log into eFootball, and use the <strong>Order Chat</strong> to get the 2-step codes from the seller so you can change <strong>both the password and registered email address</strong>.
+                </p>
+              </div>
+
+              {/* Step 1: Opening Credentials */}
+              <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div>
+                  <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 text-xs flex items-center justify-center font-bold">1</span>
+                    Opening Credentials Vault
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Konami ID email & temporary opening login details.
+                  </p>
+                </div>
                 <Button
                   variant="gold"
-                  size="md"
+                  size="sm"
                   onClick={() => setIsRevealModalOpen(true)}
                 >
-                  <KeyRound className="w-4 h-4 mr-2" />
-                  Decrypt & Reveal Account Credentials
+                  <KeyRound className="w-4 h-4 mr-1.5" />
+                  View Opening Credentials
                 </Button>
+              </div>
+
+              {/* Step 2: Live Chat for Codes */}
+              <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border flex items-center justify-between">
+                <div>
+                  <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 text-xs flex items-center justify-center font-bold">2</span>
+                    Request 2FA / OTP in Chat
+                  </h4>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Ask seller for the Konami 2-Step verification code sent to their email.
+                  </p>
+                </div>
+                <span className="text-xs text-emerald-400 font-semibold bg-emerald-950/60 border border-emerald-800/60 px-2.5 py-1 rounded-lg">
+                  Chat Active
+                </span>
+              </div>
+
+              {/* Step 3: Security Transfer Checklist */}
+              <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-3">
+                <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                  <span className="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 text-xs flex items-center justify-center font-bold">3</span>
+                  Security Transfer Checklist
+                </h4>
+                <p className="text-xs text-slate-400">
+                  Ensure full account ownership before approving fund release:
+                </p>
+
+                <div className="space-y-2 pt-1 text-xs">
+                  <label className="flex items-center gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepLogin}
+                      onChange={(e) => setStepLogin(e.target.checked)}
+                      className="w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+                    />
+                    <span>I have logged into the eFootball account and verified squad details</span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepPassword}
+                      onChange={(e) => setStepPassword(e.target.checked)}
+                      className="w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+                    />
+                    <span>I have updated the Konami ID password to my own private password</span>
+                  </label>
+
+                  <label className="flex items-center gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepEmail}
+                      onChange={(e) => setStepEmail(e.target.checked)}
+                      className="w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+                    />
+                    <span>I have linked my own email address and unlinked the seller</span>
+                  </label>
+                </div>
+              </div>
+
+              {releaseError && (
+                <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
+                  <ShieldAlert className="w-4 h-4 shrink-0" />
+                  <span>{releaseError}</span>
+                </div>
+              )}
+
+              {/* Step 4: Final Handover Release */}
+              <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                <Button
+                  variant="gold"
+                  size="lg"
+                  className="w-full sm:flex-1 font-bold"
+                  onClick={handleConfirmAndRelease}
+                  isLoading={releasingFunds}
+                  disabled={!stepLogin || !stepPassword || !stepEmail}
+                >
+                  <ShieldCheck className="w-5 h-5 mr-2" />
+                  Complete Handover & Release Funds to Seller
+                </Button>
+
                 <Button
                   variant="danger"
                   size="md"
+                  className="w-full sm:w-auto"
                   onClick={() => setIsDisputeModalOpen(true)}
                 >
                   <ShieldAlert className="w-4 h-4 mr-2" />
-                  Report Issue / Open Dispute
+                  Report Problem / Dispute
                 </Button>
               </div>
             </div>
           ) : (
-            <div className="space-y-3 pt-2">
-              <div className="p-3 rounded-xl bg-pitch-card text-xs text-slate-300">
-                Credentials successfully delivered to buyer. Funds will be released into your available balance automatically upon buyer confirmation or when the 24h inspection window expires.
+            <div className="space-y-4 pt-1">
+              <div className="p-4 rounded-xl bg-amber-950/30 border border-amber-800/50 text-xs text-amber-200 space-y-2">
+                <span className="font-bold text-amber-300 block text-sm">⚡ Action Needed in Order Chat:</span>
+                <p>
+                  The buyer is currently attempting login and updating the Konami account. Please stay active in the <strong>Order Chat</strong> below to send the <strong>2-Step OTP codes</strong> when prompted!
+                </p>
+                <p className="text-[11px] text-amber-300/80">
+                  Once the buyer finishes binding both their password and email, the escrow funds will be cleared automatically to your Available Balance.
+                </p>
               </div>
+
               <div className="flex gap-2">
                 <Button
                   variant="outline"
@@ -159,7 +295,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
                   onClick={() => setIsRevealModalOpen(true)}
                 >
                   <KeyRound className="w-4 h-4 mr-2" />
-                  View Delivered Credentials
+                  View Delivered Opening Credentials
                 </Button>
               </div>
             </div>

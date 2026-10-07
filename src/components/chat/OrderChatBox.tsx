@@ -273,30 +273,85 @@ export function OrderChatBox({
           )}
         </div>
       ) : (
-        <form
-          onSubmit={handleSendMessage}
-          className="p-3 border-t border-pitch-border bg-pitch-card/60 flex items-center gap-2"
-        >
-          <input
-            type="text"
-            value={inputContent}
-            onChange={(e) => {
-              setInputContent(e.target.value);
-              if (securityAlert) setSecurityAlert(null);
-            }}
-            placeholder="Type a message regarding credentials, verification..."
-            className="flex-1 rounded-xl bg-pitch border border-pitch-border px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
-          />
-          <Button
-            type="submit"
-            variant="primary"
-            size="sm"
-            isLoading={sending}
-            disabled={!inputContent.trim()}
+        <div className="border-t border-pitch-border bg-pitch-card/60">
+          {/* Quick Handover Helper Chips */}
+          <div className="px-3 pt-2 pb-1 flex items-center gap-1.5 overflow-x-auto text-[11px] no-scrollbar">
+            {isBuyer ? (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setInputContent("Please send the Konami login verification code")}
+                  className="whitespace-nowrap px-2 py-0.5 rounded-md bg-pitch border border-pitch-border text-slate-300 hover:text-white hover:border-brand-500/50 transition-colors"
+                >
+                  🔑 Request Login Code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputContent("I requested email change, please send the confirmation code")}
+                  className="whitespace-nowrap px-2 py-0.5 rounded-md bg-pitch border border-pitch-border text-slate-300 hover:text-white hover:border-brand-500/50 transition-colors"
+                >
+                  📧 Request Email Change Code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputContent("I have updated both password and email to my own!")}
+                  className="whitespace-nowrap px-2 py-0.5 rounded-md bg-pitch border border-pitch-border text-slate-300 hover:text-white hover:border-brand-500/50 transition-colors"
+                >
+                  ✅ Updated Both!
+                </button>
+              </>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setInputContent("Checking my email for the Konami code now...")}
+                  className="whitespace-nowrap px-2 py-0.5 rounded-md bg-pitch border border-pitch-border text-slate-300 hover:text-white hover:border-brand-500/50 transition-colors"
+                >
+                  ⏳ Checking Email for Code...
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputContent("Your Konami verification code is: ")}
+                  className="whitespace-nowrap px-2 py-0.5 rounded-md bg-pitch border border-pitch-border text-slate-300 hover:text-white hover:border-brand-500/50 transition-colors"
+                >
+                  🔢 Send Code
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputContent("Please link your email in Konami settings and let me know")}
+                  className="whitespace-nowrap px-2 py-0.5 rounded-md bg-pitch border border-pitch-border text-slate-300 hover:text-white hover:border-brand-500/50 transition-colors"
+                >
+                  📩 Link Your Email
+                </button>
+              </>
+            )}
+          </div>
+
+          <form
+            onSubmit={handleSendMessage}
+            className="p-3 pt-1.5 flex items-center gap-2"
           >
-            <Send className="w-3.5 h-3.5" />
-          </Button>
-        </form>
+            <input
+              type="text"
+              value={inputContent}
+              onChange={(e) => {
+                setInputContent(e.target.value);
+                if (securityAlert) setSecurityAlert(null);
+              }}
+              placeholder="Type message or 2FA verification code..."
+              className="flex-1 rounded-xl bg-pitch border border-pitch-border px-3.5 py-2 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
+            />
+            <Button
+              type="submit"
+              variant="primary"
+              size="sm"
+              isLoading={sending}
+              disabled={!inputContent.trim()}
+            >
+              <Send className="w-3.5 h-3.5" />
+            </Button>
+          </form>
+        </div>
       )}
 
       {/* Payment Modal for Quick Pay */}

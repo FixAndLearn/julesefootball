@@ -84,9 +84,9 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        {/* Left Column: Escrow Lifecycle & Controls (2 cols) */}
-        <div className="lg:col-span-2 space-y-6">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
+        {/* Left Column: Handover Controller & Overview (7 cols) */}
+        <div className="lg:col-span-7 space-y-6">
           <OrderEscrowController order={order} currentUserId={user.id} />
 
           {/* Account Overview Summary */}
@@ -115,8 +115,8 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
           )}
         </div>
 
-        {/* Right Column: Order Secure Chat & Audit (1 col) */}
-        <div className="lg:col-span-1 space-y-6">
+        {/* Right Column: Order Secure 2-Way Chat & Verification (5 cols) */}
+        <div className="lg:col-span-5 space-y-6">
           <OrderChatBox
             conversationId={conversation.id}
             currentUserId={user.id}
