@@ -47,7 +47,7 @@ export function SellerDashboardView({
             size="sm"
             className="mt-3 w-full"
             onClick={() => setIsWithdrawModalOpen(true)}
-            disabled={sellerProfile.available_balance < 200}
+            disabled={sellerProfile.available_balance < 10 && sellerProfile.escrow_balance <= 0}
           >
             <ArrowUpRight className="w-4 h-4 mr-1.5" />
             Withdraw M-Pesa
@@ -202,6 +202,7 @@ export function SellerDashboardView({
 
       <WithdrawModal
         availableBalance={sellerProfile.available_balance}
+        escrowBalance={sellerProfile.escrow_balance}
         isOpen={isWithdrawModalOpen}
         onClose={() => setIsWithdrawModalOpen(false)}
         onSuccess={() => {

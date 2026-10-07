@@ -1,10 +1,11 @@
-import { WithdrawModal } from "@/components/seller/WithdrawModal";
+import { EarningsWithdrawSection } from "@/components/seller/EarningsWithdrawSection";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency } from "@/lib/utils";
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { ArrowLeft, ArrowUpRight, CheckCircle2, Clock, Smartphone, Building2, Wallet } from "lucide-react";
+import { ArrowLeft, Building2, Smartphone } from "lucide-react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 
@@ -20,15 +21,19 @@ export default async function SellerEarningsPage() {
     redirect("/login?redirect=/seller/earnings");
   }
 
+  const adminSupabase = createAdminClient();
+  const serviceRoleConfigured = hasServiceRoleKey();
+  const primaryClient = serviceRoleConfigured ? adminSupabase : supabase;
+
   // Fetch seller profile balances
-  const { data: profile } = await supabase
+  const { data: profile } = await primaryClient
     .from("profiles")
     .select("available_balance, escrow_balance, completed_sales_count, phone_number")
     .eq("id", user.id)
     .single();
 
   // Fetch past withdrawals
-  const { data: withdrawals } = await supabase
+  const { data: withdrawals } = await primaryClient
     .from("seller_withdrawals")
     .select("*")
     .eq("seller_id", user.id)
@@ -54,7 +59,7 @@ export default async function SellerEarningsPage() {
               Seller Earnings & M-Pesa Withdrawals
             </h1>
             <p className="text-xs sm:text-sm text-slate-400 mt-1">
-              Direct B2C disbursements via Safaricom Daraja API v2.
+              Direct disbursements to your registered Safaricom M-Pesa line.
             </p>
           </div>
           <Link href="/dashboard/seller">
@@ -72,6 +77,12 @@ export default async function SellerEarningsPage() {
           Financial settlement infrastructure operated under the executive oversight of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong> with automated ledger auditing and atomic balance deductions.
         </span>
       </div>
+
+      {/* Prominent Active Withdrawal Banner & Action */}
+      <EarningsWithdrawSection
+        availableBalance={availableBalance}
+        escrowBalance={escrowBalance}
+      />
 
       {/* Financial Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
@@ -95,7 +106,7 @@ export default async function SellerEarningsPage() {
             {formatCurrency(escrowBalance)}
           </span>
           <p className="text-[11px] text-slate-400 mt-2">
-            Awaiting buyer 24h inspection or delivery confirmation.
+            Awaiting buyer inspection or order completion.
           </p>
         </div>
 

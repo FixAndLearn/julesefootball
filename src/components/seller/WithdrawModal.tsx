@@ -3,17 +3,18 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
-import { ArrowUpRight, CheckCircle2, Phone, Smartphone, X, AlertCircle } from "lucide-react";
+import { ArrowUpRight, CheckCircle2, Phone, Smartphone, X, AlertCircle, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 export interface WithdrawModalProps {
   availableBalance: number;
+  escrowBalance?: number;
   isOpen: boolean;
   onClose: () => void;
   onSuccess: () => void;
 }
 
-export function WithdrawModal({ availableBalance, isOpen, onClose, onSuccess }: WithdrawModalProps) {
+export function WithdrawModal({ availableBalance, escrowBalance = 0, isOpen, onClose, onSuccess }: WithdrawModalProps) {
   const [amount, setAmount] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
   const [loading, setLoading] = useState(false);
@@ -34,13 +35,19 @@ export function WithdrawModal({ availableBalance, isOpen, onClose, onSuccess }: 
       return;
     }
 
+    if (parsedAmount < 10) {
+      setError("Minimum withdrawal amount is KES 10.");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/withdrawals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: parsedAmount,
-          phoneNumber,
+          phoneNumber: phoneNumber.trim(),
         }),
       });
 
@@ -87,7 +94,7 @@ export function WithdrawModal({ availableBalance, isOpen, onClose, onSuccess }: 
             </div>
             <h4 className="text-base font-bold text-slate-100">Withdrawal Submitted!</h4>
             <p className="text-xs text-slate-300">
-              Funds are being transferred to your M-Pesa mobile line.
+              Funds request has been queued and is being disbursed to your M-Pesa line.
             </p>
           </div>
         ) : (
@@ -99,6 +106,15 @@ export function WithdrawModal({ availableBalance, isOpen, onClose, onSuccess }: 
               </span>
             </div>
 
+            {escrowBalance > 0 && (
+              <div className="p-3 rounded-xl bg-amber-950/30 border border-amber-800/50 flex items-start gap-2.5 text-xs text-amber-300">
+                <ShieldAlert className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                <span>
+                  <strong>{formatCurrency(escrowBalance)}</strong> is currently in escrow. It will move to your Available Balance once the buyer confirms receipt of the account.
+                </span>
+              </div>
+            )}
+
             {error && (
               <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
                 <AlertCircle className="w-4 h-4 shrink-0" />
@@ -109,12 +125,12 @@ export function WithdrawModal({ availableBalance, isOpen, onClose, onSuccess }: 
             <Input
               label="Withdrawal Amount (KES)"
               type="number"
-              min={200}
+              min={10}
               max={availableBalance}
-              placeholder="e.g. 5000"
+              placeholder="e.g. 500"
               value={amount}
               onChange={(e) => setAmount(e.target.value)}
-              helperText="Minimum payout threshold: KES 200"
+              helperText={`Minimum withdrawal threshold: KES 10 (Up to ${formatCurrency(availableBalance)})`}
               required
             />
 
@@ -135,9 +151,9 @@ export function WithdrawModal({ availableBalance, isOpen, onClose, onSuccess }: 
               size="md"
               className="w-full mt-2"
               isLoading={loading}
-              disabled={availableBalance < 200}
+              disabled={availableBalance < 10}
             >
-              Confirm M-Pesa Withdrawal
+              {availableBalance < 10 ? "Insufficient Available Balance" : "Confirm M-Pesa Withdrawal"}
             </Button>
           </form>
         )}

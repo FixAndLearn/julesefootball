@@ -920,6 +920,34 @@ CREATE POLICY "Order parties can update payments" ON payments
     )
   );
 
+-- Seller Withdrawals: Accessible by the seller and platform admins
+DROP POLICY IF EXISTS "Sellers can view own withdrawals" ON seller_withdrawals;
+CREATE POLICY "Sellers can view own withdrawals" ON seller_withdrawals
+  FOR SELECT USING (
+    auth.uid() = seller_id
+    OR EXISTS (
+      SELECT 1 FROM user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role_id IN ('admin', 'super_admin')
+    )
+  );
+
+DROP POLICY IF EXISTS "Sellers can insert own withdrawals" ON seller_withdrawals;
+CREATE POLICY "Sellers can insert own withdrawals" ON seller_withdrawals
+  FOR INSERT WITH CHECK (
+    auth.uid() = seller_id
+    OR EXISTS (
+      SELECT 1 FROM user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role_id IN ('admin', 'super_admin')
+    )
+  );
+
+DROP POLICY IF EXISTS "Admins can update withdrawals" ON seller_withdrawals;
+CREATE POLICY "Admins can update withdrawals" ON seller_withdrawals
+  FOR UPDATE USING (
+    auth.uid() = seller_id
+    OR EXISTS (
+      SELECT 1 FROM user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role_id IN ('admin', 'super_admin')
+    )
+  );
+
 -- Disputes: Visible and manageable by participants
 DROP POLICY IF EXISTS "Disputes visible to order parties" ON disputes;
 CREATE POLICY "Disputes visible to order parties" ON disputes
