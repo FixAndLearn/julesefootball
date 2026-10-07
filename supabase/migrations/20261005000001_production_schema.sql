@@ -1155,16 +1155,30 @@ WHERE ur.user_id IS NULL
 ON CONFLICT (user_id, role_id) DO NOTHING;
 
 -- 13. USER ROLES & NEWS ARTICLES
-ALTER TABLE profiles ADD COLUMN IF NOT EXISTS role VARCHAR(20) NOT NULL DEFAULT 'user';
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role VARCHAR(30) NOT NULL DEFAULT 'user';
 
--- Automatically set brianokibo@gmail.com as super_admin if profile exists
-UPDATE profiles
-SET role = 'super_admin'
-WHERE id IN (
-  SELECT id FROM auth.users WHERE lower(email) = 'brianokibo@gmail.com'
-);
+-- Automatically set brianokibo@gmail.com as super_admin in user_roles
+INSERT INTO public.user_roles (user_id, role_id)
+SELECT id, 'super_admin'
+FROM auth.users
+WHERE lower(email) = 'brianokibo@gmail.com'
+ON CONFLICT (user_id, role_id) DO NOTHING;
 
-CREATE TABLE IF NOT EXISTS news_articles (
+DO $$
+BEGIN
+  IF EXISTS (
+    SELECT 1 FROM information_schema.columns
+    WHERE table_schema = 'public' AND table_name = 'profiles' AND column_name = 'role'
+  ) THEN
+    UPDATE public.profiles
+    SET role = 'super_admin'
+    WHERE id IN (
+      SELECT id FROM auth.users WHERE lower(email) = 'brianokibo@gmail.com'
+    );
+  END IF;
+END $$;
+
+CREATE TABLE IF NOT EXISTS public.news_articles (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   title VARCHAR(300) NOT NULL,
   slug VARCHAR(350) UNIQUE NOT NULL,
@@ -1172,8 +1186,8 @@ CREATE TABLE IF NOT EXISTS news_articles (
   summary TEXT NOT NULL,
   content TEXT NOT NULL,
   cover_image_url TEXT,
-  author_id UUID REFERENCES profiles(id) ON DELETE SET NULL,
-  author_name VARCHAR(150) DEFAULT 'eFootballMarket Editorial',
+  author_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL,
+  author_name VARCHAR(150) DEFAULT 'Brian Okibo, Chief Executive Officer (CEO)',
   is_pinned BOOLEAN NOT NULL DEFAULT FALSE,
   is_published BOOLEAN NOT NULL DEFAULT TRUE,
   views_count INTEGER NOT NULL DEFAULT 0,
@@ -1181,19 +1195,32 @@ CREATE TABLE IF NOT EXISTS news_articles (
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
 );
 
-ALTER TABLE news_articles ENABLE ROW LEVEL SECURITY;
+CREATE INDEX IF NOT EXISTS idx_news_articles_slug ON public.news_articles(slug);
+CREATE INDEX IF NOT EXISTS idx_news_articles_category ON public.news_articles(category);
+CREATE INDEX IF NOT EXISTS idx_news_articles_published ON public.news_articles(is_published, created_at DESC);
 
-DROP POLICY IF EXISTS "Public can view published news" ON news_articles;
-CREATE POLICY "Public can view published news" ON news_articles
+ALTER TABLE public.news_articles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Public can view published news" ON public.news_articles;
+CREATE POLICY "Public can view published news" ON public.news_articles
   FOR SELECT USING (is_published = true);
 
-DROP POLICY IF EXISTS "Admins can manage news" ON news_articles;
-CREATE POLICY "Admins can manage news" ON news_articles
+DROP POLICY IF EXISTS "Admins can manage news" ON public.news_articles;
+CREATE POLICY "Admins can manage news" ON public.news_articles
   FOR ALL USING (
-    EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND (profiles.role = 'admin' OR profiles.role = 'super_admin')
-    ) OR
-    EXISTS (
-      SELECT 1 FROM auth.users WHERE auth.users.id = auth.uid() AND lower(auth.users.email) = 'brianokibo@gmail.com'
+    auth.uid() IS NOT NULL AND (
+      EXISTS (
+        SELECT 1 FROM public.user_roles ur
+        WHERE ur.user_id = auth.uid() AND ur.role_id IN ('admin', 'super_admin')
+      ) OR
+      EXISTS (
+        SELECT 1 FROM auth.users u
+        WHERE u.id = auth.uid() AND lower(u.email) = 'brianokibo@gmail.com'
+      )
     )
   );
+
+GRANT SELECT ON public.news_articles TO anon, authenticated;
+GRANT ALL ON public.news_articles TO authenticated, service_role;
+
+NOTIFY pgrst, 'reload schema';

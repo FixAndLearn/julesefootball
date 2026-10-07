@@ -15,6 +15,8 @@ import {
   Clock,
   Copy,
   Crown,
+  Database,
+  ExternalLink,
   Eye,
   FileText,
   KeyRound,
@@ -63,6 +65,7 @@ function AdminControlCenterContent() {
   const [withdrawalSearch, setWithdrawalSearch] = useState("");
   const [withdrawalFilter, setWithdrawalFilter] = useState<"all" | "pending" | "completed" | "rejected">("pending");
   const [copiedPhone, setCopiedPhone] = useState<string | null>(null);
+  const [copiedNewsSql, setCopiedNewsSql] = useState(false);
 
   // Post News Form state
   const [newsTitle, setNewsTitle] = useState("");
@@ -274,6 +277,21 @@ function AdminControlCenterContent() {
     setTimeout(() => setCopiedPhone(null), 2000);
   };
 
+  const handleCopyNewsSql = async () => {
+    try {
+      const res = await fetch("/api/setup-database/sql?migration=news");
+      const sql = await res.text();
+      await navigator.clipboard.writeText(sql);
+      setCopiedNewsSql(true);
+      setTimeout(() => setCopiedNewsSql(false), 4000);
+    } catch (err: any) {
+      setFeedback({
+        type: "error",
+        message: "Failed to copy SQL to clipboard. Please check /setup page.",
+      });
+    }
+  };
+
   if (authLoading) {
     return (
       <div className="py-24 text-center space-y-3">
@@ -393,13 +411,34 @@ function AdminControlCenterContent() {
               : "bg-rose-950/60 border-rose-500/40 text-rose-200"
           }`}
         >
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             {feedback.type === "success" ? (
               <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
             ) : (
               <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
             )}
             <span>{feedback.message}</span>
+            {feedback.message.includes("news_articles") && (
+              <Button
+                type="button"
+                variant="gold"
+                size="sm"
+                onClick={handleCopyNewsSql}
+                className="text-[11px] h-7 px-2 font-semibold ml-2"
+              >
+                {copiedNewsSql ? (
+                  <>
+                    <Check className="w-3 h-3 mr-1 text-slate-950" />
+                    Copied SQL!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3 h-3 mr-1" />
+                    Copy News Table SQL
+                  </>
+                )}
+              </Button>
+            )}
           </div>
           <button
             type="button"
@@ -811,7 +850,60 @@ function AdminControlCenterContent() {
 
       {/* TAB 3: POST NEWS & SCAMMER ALERTS */}
       {activeTab === "news" && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        <div className="space-y-6">
+          {/* Quick News DB Migration Helper Card */}
+          <div className="bg-pitch-surface border border-amber-500/30 rounded-2xl p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4 shadow-lg">
+            <div className="flex items-start gap-3">
+              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
+                <Database className="w-5 h-5" />
+              </div>
+              <div>
+                <p className="text-xs font-bold text-white flex items-center gap-2">
+                  <span>Supabase &apos;news_articles&apos; Table Setup</span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-300 border border-amber-500/20 text-[10px] font-semibold">
+                    1-Click Migration
+                  </span>
+                </p>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  If the table is missing or you see &quot;Could not find table public.news_articles&quot;, copy this standalone SQL script and run it in the Supabase SQL Editor.
+                </p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-2 shrink-0">
+              <Button
+                type="button"
+                variant="gold"
+                size="sm"
+                onClick={handleCopyNewsSql}
+                className="text-xs font-semibold"
+              >
+                {copiedNewsSql ? (
+                  <>
+                    <Check className="w-3.5 h-3.5 mr-1 text-slate-950" />
+                    Copied SQL!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-3.5 h-3.5 mr-1" />
+                    Copy News Table SQL
+                  </>
+                )}
+              </Button>
+              <a
+                href="https://supabase.com/dashboard/project/_/sql/new"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                <Button variant="secondary" size="sm" className="text-xs">
+                  <ExternalLink className="w-3.5 h-3.5 mr-1 text-amber-400" />
+                  Supabase SQL Editor
+                </Button>
+              </a>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           {/* Left Column: Post Form */}
           <div className="lg:col-span-2 bg-pitch-surface border border-pitch-border rounded-3xl p-6 sm:p-8 shadow-xl space-y-6">
             <div>
@@ -970,6 +1062,7 @@ function AdminControlCenterContent() {
             </div>
           </div>
         </div>
+      </div>
       )}
 
       {/* TAB 4: SELLER WITHDRAWALS (M-PESA PAYOUTS) */}

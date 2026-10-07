@@ -48,14 +48,16 @@ export async function POST(req: NextRequest) {
     const adminSupabase = createAdminClient();
     const primaryClient = hasServiceRoleKey() ? adminSupabase : supabase;
 
-    // Check admin privilege
-    const { data: profile } = await primaryClient
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    // Check admin privilege via user_roles or super admin email
+    const { data: userRole } = await primaryClient
+      .from("user_roles")
+      .select("role_id")
+      .eq("user_id", user.id)
+      .in("role_id", ["admin", "super_admin"])
+      .limit(1);
 
-    if (!isUserAdmin(user.email, profile?.role)) {
+    const isAdmin = Boolean((userRole && userRole.length > 0) || isUserAdmin(user.email));
+    if (!isAdmin) {
       return NextResponse.json(
         { error: "Forbidden: Super Administrator or Admin privileges required." },
         { status: 403 }
@@ -77,6 +79,18 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, article }, { status: 201 });
   } catch (error: any) {
+    console.error("News POST error:", error);
+    const msg = error.message || "";
+    if (msg.includes("Could not find the table") || msg.includes("news_articles")) {
+      return NextResponse.json(
+        {
+          error:
+            "Table 'public.news_articles' is not initialized in Supabase yet. Please run the SQL migration in your Supabase Dashboard SQL Editor (see /setup for the script).",
+          needsMigration: true,
+        },
+        { status: 500 }
+      );
+    }
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
@@ -102,13 +116,15 @@ export async function DELETE(req: NextRequest) {
     const adminSupabase = createAdminClient();
     const primaryClient = hasServiceRoleKey() ? adminSupabase : supabase;
 
-    const { data: profile } = await primaryClient
-      .from("profiles")
-      .select("role")
-      .eq("id", user.id)
-      .single();
+    const { data: userRole } = await primaryClient
+      .from("user_roles")
+      .select("role_id")
+      .eq("user_id", user.id)
+      .in("role_id", ["admin", "super_admin"])
+      .limit(1);
 
-    if (!isUserAdmin(user.email, profile?.role)) {
+    const isAdmin = Boolean((userRole && userRole.length > 0) || isUserAdmin(user.email));
+    if (!isAdmin) {
       return NextResponse.json(
         { error: "Forbidden: Only administrators can delete news bulletins." },
         { status: 403 }

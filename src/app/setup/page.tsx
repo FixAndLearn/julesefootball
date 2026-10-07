@@ -22,6 +22,7 @@ export default function SetupPage() {
   const [migrating, setMigrating] = useState(false);
   const [statusData, setStatusData] = useState<any>(null);
   const [copied, setCopied] = useState(false);
+  const [copiedNews, setCopiedNews] = useState(false);
   const [copyError, setCopyError] = useState("");
   const [actionMessage, setActionMessage] = useState("");
 
@@ -53,6 +54,19 @@ export default function SetupPage() {
       setTimeout(() => setCopied(false), 4000);
     } catch (err: any) {
       setCopyError("Could not copy automatically. You can find the file at supabase/migrations/20261005000001_production_schema.sql");
+    }
+  };
+
+  const handleCopyNewsSql = async () => {
+    setCopyError("");
+    try {
+      const res = await fetch("/api/setup-database/sql?migration=news");
+      const sql = await res.text();
+      await navigator.clipboard.writeText(sql);
+      setCopiedNews(true);
+      setTimeout(() => setCopiedNews(false), 4000);
+    } catch (err: any) {
+      setCopyError("Could not copy automatically. You can find the file at supabase/migrations/20261007000004_create_news_articles.sql");
     }
   };
 
@@ -274,6 +288,77 @@ export default function SetupPage() {
             )}
           </div>
         )}
+      </div>
+
+      {/* Standalone News & Scammer Alerts Table Setup Card */}
+      <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
+        <div className="flex items-center justify-between border-b border-pitch-border/60 pb-3">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400">
+              <Database className="w-5 h-5" />
+            </div>
+            <div>
+              <h2 className="text-base font-bold text-white flex items-center gap-2">
+                <span>Community News &amp; Scammer Alerts Setup</span>
+                {statusData?.hasNews ? (
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 text-[10px] font-bold">
+                    Active &amp; Ready
+                  </span>
+                ) : (
+                  <span className="px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-400 border border-amber-500/30 text-[10px] font-bold">
+                    Action Needed
+                  </span>
+                )}
+              </h2>
+              <p className="text-xs text-slate-400">
+                Creates &apos;public.news_articles&apos; table, RLS policies, indexes, and grants admin privileges to Brian Okibo.
+              </p>
+            </div>
+          </div>
+        </div>
+
+        <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div className="space-y-1">
+            <p className="text-xs font-semibold text-slate-100">
+              Standalone News Migration Script (78 Lines)
+            </p>
+            <p className="text-[11px] text-slate-400">
+              Safe and idempotent. Can be executed independently in your Supabase SQL Editor.
+            </p>
+          </div>
+
+          <div className="flex items-center gap-2 shrink-0">
+            <Button
+              type="button"
+              variant="gold"
+              size="sm"
+              onClick={handleCopyNewsSql}
+              className="text-xs font-semibold"
+            >
+              {copiedNews ? (
+                <>
+                  <Check className="w-3.5 h-3.5 mr-1.5 text-slate-950" />
+                  Copied News SQL!
+                </>
+              ) : (
+                <>
+                  <Copy className="w-3.5 h-3.5 mr-1.5" />
+                  Copy News SQL
+                </>
+              )}
+            </Button>
+            <a
+              href="https://supabase.com/dashboard/project/_/sql/new"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              <Button variant="secondary" size="sm" className="text-xs">
+                <ExternalLink className="w-3.5 h-3.5 mr-1.5 text-amber-400" />
+                Open SQL Editor
+              </Button>
+            </a>
+          </div>
+        </div>
       </div>
     </div>
   );
