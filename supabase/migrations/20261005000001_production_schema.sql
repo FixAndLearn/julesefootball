@@ -863,7 +863,7 @@ CREATE POLICY "Account credentials strictly visible to order parties" ON account
       SELECT 1 FROM orders WHERE orders.id = account_deliveries.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
     )
     OR EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+      SELECT 1 FROM user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role_id IN ('admin', 'super_admin')
     )
   );
 
@@ -873,7 +873,7 @@ CREATE POLICY "Sellers can insert credentials" ON account_deliveries
       SELECT 1 FROM orders WHERE orders.id = account_deliveries.order_id AND orders.seller_id = auth.uid()
     )
     OR EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+      SELECT 1 FROM user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role_id IN ('admin', 'super_admin')
     )
   );
 
@@ -883,7 +883,7 @@ CREATE POLICY "Order parties can update deliveries" ON account_deliveries
       SELECT 1 FROM orders WHERE orders.id = account_deliveries.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
     )
     OR EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+      SELECT 1 FROM user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role_id IN ('admin', 'super_admin')
     )
   )
   WITH CHECK (
@@ -891,7 +891,7 @@ CREATE POLICY "Order parties can update deliveries" ON account_deliveries
       SELECT 1 FROM orders WHERE orders.id = account_deliveries.order_id AND (orders.buyer_id = auth.uid() OR orders.seller_id = auth.uid())
     )
     OR EXISTS (
-      SELECT 1 FROM profiles WHERE profiles.id = auth.uid() AND profiles.role = 'admin'
+      SELECT 1 FROM user_roles WHERE user_roles.user_id = auth.uid() AND user_roles.role_id IN ('admin', 'super_admin')
     )
   );
 

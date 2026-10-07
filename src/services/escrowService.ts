@@ -24,6 +24,42 @@ export class EscrowService {
   constructor(private supabase: SupabaseClient) {}
 
   /**
+   * Helper to verify if a user has admin privileges via user_roles or profiles.
+   */
+  private async checkIsAdmin(userId: string): Promise<boolean> {
+    try {
+      const { data: userRoles } = await this.supabase
+        .from("user_roles")
+        .select("role_id")
+        .eq("user_id", userId)
+        .in("role_id", ["admin", "super_admin"])
+        .limit(1);
+
+      if (userRoles && userRoles.length > 0) {
+        return true;
+      }
+    } catch {
+      // Ignore error if user_roles table is being queried
+    }
+
+    try {
+      const { data: profile } = await this.supabase
+        .from("profiles")
+        .select("*")
+        .eq("id", userId)
+        .single();
+
+      if (profile && (profile.role === "admin" || profile.role === "super_admin")) {
+        return true;
+      }
+    } catch {
+      // Ignore if profiles doesn't have role column
+    }
+
+    return false;
+  }
+
+  /**
    * Seller submits account credentials. Sensitive payload is encrypted via AES-256-GCM.
    */
   async submitDelivery(payload: DeliverySubmissionPayload): Promise<void> {
@@ -42,13 +78,8 @@ export class EscrowService {
 
     // Verify ownership: seller or admin
     if (order.seller_id !== sellerId) {
-      const { data: profile } = await this.supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", sellerId)
-        .single();
-
-      if (profile?.role !== "admin") {
+      const isAdmin = await this.checkIsAdmin(sellerId);
+      if (!isAdmin) {
         throw new Error("Unauthorized. Only the assigned seller can deliver credentials.");
       }
     }
@@ -136,13 +167,8 @@ export class EscrowService {
     }
 
     if (order.buyer_id !== requesterId && order.seller_id !== requesterId) {
-      const { data: profile } = await this.supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", requesterId)
-        .single();
-
-      if (profile?.role !== "admin") {
+      const isAdmin = await this.checkIsAdmin(requesterId);
+      if (!isAdmin) {
         throw new Error("Unauthorized access to account credentials.");
       }
     }
@@ -181,13 +207,8 @@ export class EscrowService {
     }
 
     if (order.buyer_id !== buyerId) {
-      const { data: profile } = await this.supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", buyerId)
-        .single();
-
-      if (profile?.role !== "admin") {
+      const isAdmin = await this.checkIsAdmin(buyerId);
+      if (!isAdmin) {
         throw new Error("Unauthorized. Only the buyer can confirm release.");
       }
     }
@@ -335,13 +356,8 @@ export class EscrowService {
     }
 
     if (order.buyer_id !== openedBy && order.seller_id !== openedBy) {
-      const { data: profile } = await this.supabase
-        .from("profiles")
-        .select("role")
-        .eq("id", openedBy)
-        .single();
-
-      if (profile?.role !== "admin") {
+      const isAdmin = await this.checkIsAdmin(openedBy);
+      if (!isAdmin) {
         throw new Error("Unauthorized to dispute this order.");
       }
     }
