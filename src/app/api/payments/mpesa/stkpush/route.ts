@@ -1,7 +1,10 @@
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PaymentService } from "@/services/paymentService";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
+
+export const dynamic = "force-dynamic";
 
 const stkPushSchema = z.object({
   orderId: z.string().uuid(),
@@ -26,7 +29,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Invalid payment request", details: parsed.error.format() }, { status: 400 });
     }
 
-    const paymentService = new PaymentService(supabase);
+    const adminSupabase = createAdminClient();
+    const primaryClient = hasServiceRoleKey() ? adminSupabase : supabase;
+    const paymentService = new PaymentService(primaryClient);
     const result = await paymentService.initiateOrderPayment(
       parsed.data.orderId,
       parsed.data.phoneNumber

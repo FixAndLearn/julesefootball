@@ -139,13 +139,32 @@ export class PaymentService {
           .eq("id", payment.order.listing_id);
       }
 
-      // Create notification for seller
+      // Update seller's escrow balance and create notification
       if (payment.order?.seller_id) {
+        const netAmount =
+          Number(payment.order.seller_net_amount) ||
+          Number(payment.order.total_amount ? Math.round(payment.order.total_amount * 0.95) : amount);
+
+        const { data: sellerProfile } = await this.supabase
+          .from("profiles")
+          .select("escrow_balance")
+          .eq("id", payment.order.seller_id)
+          .single();
+
+        const currentEscrow = Number(sellerProfile?.escrow_balance || 0);
+        await this.supabase
+          .from("profiles")
+          .update({
+            escrow_balance: currentEscrow + netAmount,
+            updated_at: now,
+          })
+          .eq("id", payment.order.seller_id);
+
         await this.supabase.from("notifications").insert({
           recipient_id: payment.order.seller_id,
           type: "payment_received",
           title: "Payment Secured in Escrow!",
-          message: `The buyer paid KES ${amount}. Please deliver the account credentials promptly.`,
+          message: `Buyer paid KES ${amount}. Net KES ${netAmount} is locked in your escrow balance. Deliver credentials to complete.`,
           action_url: `/orders/${payment.order_id}`,
           is_read: false,
         });

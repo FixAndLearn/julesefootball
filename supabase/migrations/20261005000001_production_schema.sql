@@ -617,7 +617,14 @@ BEGIN
     updated_at = NOW()
   WHERE id = v_order.listing_id;
 
-  -- 5. Notify seller
+  -- 5. Credit seller escrow balance
+  UPDATE profiles
+  SET
+    escrow_balance = COALESCE(escrow_balance, 0) + v_order.seller_net_amount,
+    updated_at = NOW()
+  WHERE id = v_order.seller_id;
+
+  -- 6. Notify seller
   INSERT INTO notifications (recipient_id, type, title, message, action_url)
   VALUES (
     v_order.seller_id,
