@@ -1,6 +1,6 @@
 "use client";
 
-import { Shield, Lock, CreditCard, Building2 } from "lucide-react";
+import { Shield, Lock, CreditCard, Building2, Phone, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -33,6 +33,11 @@ export function Footer() {
             <Link href="/terms" className="hover:text-slate-200 transition-colors">
               Terms
             </Link>
+            <span className="text-slate-600">•</span>
+            <a href="tel:0794400365" className="hover:text-emerald-400 transition-colors flex items-center gap-1 text-slate-300 font-medium">
+              <Phone className="w-3 h-3 text-emerald-400" />
+              <span>0794400365</span>
+            </a>
           </div>
 
           <div className="text-[11px] text-slate-500">
@@ -128,6 +133,29 @@ export function Footer() {
             <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/60 text-emerald-400 text-xs font-semibold mb-4">
               <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
               M-PESA STK Verified
+            </div>
+
+            {/* Official Customer Support & Escrow Helpline */}
+            <div className="pt-2 border-t border-pitch-border/60">
+              <span className="text-[11px] text-slate-400 block mb-1">Official Escrow & Support Hotline:</span>
+              <div className="flex flex-col gap-1.5 mb-3">
+                <a
+                  href="tel:0794400365"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors w-fit"
+                >
+                  <Phone className="w-3.5 h-3.5" />
+                  <span>0794400365</span>
+                </a>
+                <a
+                  href="https://wa.me/254794400365"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-emerald-950/60 border border-emerald-800/80 text-xs font-semibold text-emerald-300 hover:text-emerald-200 transition-colors w-fit"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>WhatsApp: +254 794 400 365</span>
+                </a>
+              </div>
             </div>
 
             {/* Corporate Governance Badge */}

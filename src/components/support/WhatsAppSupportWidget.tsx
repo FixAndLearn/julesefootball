@@ -8,8 +8,8 @@ export function WhatsAppSupportWidget() {
   const [customMessage, setCustomMessage] = useState("");
   const [selectedTopic, setSelectedTopic] = useState<string>("M-Pesa Payment or STK Push Help");
 
-  // Configurable support number from environment or official line
-  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254700000000";
+  // Official verified support line: 0794400365
+  const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254794400365";
 
   const topics = [
     { label: "M-Pesa STK Push / Payment Issue", query: "Hello eFootballMarket Support, I need help with an M-Pesa STK push or payment verification." },
