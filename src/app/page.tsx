@@ -12,6 +12,8 @@ import { Listing } from "@/types/database";
 import { HeroBall3D } from "@/components/3d/HeroBall3D";
 import { TacticsPitch3D } from "@/components/3d/TacticsPitch3D";
 import { EscrowSteps3D } from "@/components/3d/EscrowSteps3D";
+import { SquadValuationCalculator } from "@/components/calculator/SquadValuationCalculator";
+import { KonamiTransferChecklistTrigger } from "@/components/escrow/KonamiTransferChecklistModal";
 
 export const revalidate = 0; // Dynamic server-rendered for real DB metrics
 
@@ -207,8 +209,24 @@ export default async function HomePage() {
       {/* 3D Interactive Tactical Pitch Section */}
       <TacticsPitch3D />
 
-      {/* 3D Escrow Protection Stepper */}
-      <EscrowSteps3D />
+      {/* Interactive Account Valuation Calculator */}
+      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
+        <SquadValuationCalculator />
+      </section>
+
+      {/* 3D Escrow Protection Stepper & Interactive Transfer Checklist */}
+      <section className="relative">
+        <EscrowSteps3D />
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-pitch-border/60 bg-[#070b12] text-center sm:text-left">
+          <div>
+            <h4 className="text-sm font-bold text-white">Need step-by-step transfer guidance?</h4>
+            <p className="text-xs text-slate-400 mt-0.5">
+              Review our 6-step interactive Konami ID transfer checklist with 2FA and store-unlinking instructions.
+            </p>
+          </div>
+          <KonamiTransferChecklistTrigger />
+        </div>
+      </section>
     </div>
   );
 }
