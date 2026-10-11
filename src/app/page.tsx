@@ -12,7 +12,6 @@ import { Listing } from "@/types/database";
 import { HeroBall3D } from "@/components/3d/HeroBall3D";
 import { TacticsPitch3D } from "@/components/3d/TacticsPitch3D";
 import { EscrowSteps3D } from "@/components/3d/EscrowSteps3D";
-import { SquadValuationCalculator } from "@/components/calculator/SquadValuationCalculator";
 import { KonamiTransferChecklistTrigger } from "@/components/escrow/KonamiTransferChecklistModal";
 
 export const revalidate = 0; // Dynamic server-rendered for real DB metrics
@@ -208,11 +207,6 @@ export default async function HomePage() {
 
       {/* 3D Interactive Tactical Pitch Section */}
       <TacticsPitch3D />
-
-      {/* Interactive Account Valuation Calculator */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-        <SquadValuationCalculator />
-      </section>
 
       {/* 3D Escrow Protection Stepper & Interactive Transfer Checklist */}
       <section className="relative">

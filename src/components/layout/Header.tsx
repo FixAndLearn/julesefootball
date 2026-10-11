@@ -18,7 +18,6 @@ import {
   User as UserIcon,
   X,
   Sparkles,
-  Calculator,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import Link from "next/link";
@@ -116,13 +115,6 @@ export function Header() {
               </Link>
               <Link href="/browse?minStrength=3100" className="hover:text-white transition-colors">
                 OVR 3100+
-              </Link>
-              <Link
-                href="/calculator"
-                className="hover:text-amber-300 flex items-center gap-1.5 transition-colors text-slate-300"
-              >
-                <Calculator className="w-3.5 h-3.5 text-amber-400" />
-                <span>Value Calculator</span>
               </Link>
               <Link
                 href="/news"
@@ -376,15 +368,6 @@ export function Header() {
             >
               <span>News & Scammer Alerts</span>
               <Newspaper className="w-4 h-4 text-amber-400" />
-            </Link>
-
-            <Link
-              href="/calculator"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-300 font-semibold"
-            >
-              <span>Account Value Calculator</span>
-              <Calculator className="w-4 h-4 text-amber-400" />
             </Link>
 
             <Link

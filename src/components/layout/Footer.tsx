@@ -95,7 +95,6 @@ export function Footer() {
             <h4 className="text-xs uppercase font-semibold tracking-wider text-slate-200 mb-4">Marketplace</h4>
             <ul className="space-y-2.5 text-xs">
               <li><Link href="/browse" className="hover:text-white transition-colors">All Accounts</Link></li>
-              <li><Link href="/calculator" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">⚡ Squad Value Calculator</Link></li>
               <li><Link href="/browse?platform=android" className="hover:text-white transition-colors">Android Accounts</Link></li>
               <li><Link href="/browse?platform=ios" className="hover:text-white transition-colors">iOS Accounts</Link></li>
               <li><Link href="/browse?platform=pc_steam" className="hover:text-white transition-colors">PC / Steam</Link></li>
