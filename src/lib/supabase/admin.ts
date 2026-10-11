@@ -10,11 +10,11 @@ export function hasServiceRoleKey(): boolean {
 }
 
 export function createAdminClient() {
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://mock-efootball-market.supabase.co";
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || "https://fdnflvbknoopethbihns.supabase.co";
   const serviceRoleKey =
     process.env.SUPABASE_SERVICE_ROLE_KEY ||
     process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-    "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.e30.placeholder_service_role_key";
+    "sb_publishable_2W5Vw61fMy7dK3NGBXofEA_SL1lLSe1";
 
   return createClient(supabaseUrl, serviceRoleKey, {
     auth: {
