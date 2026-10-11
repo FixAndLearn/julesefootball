@@ -1,12 +1,13 @@
 "use client";
 
 import { WithdrawModal } from "@/components/seller/WithdrawModal";
+import { WhatsAppFlyerModal } from "@/components/seller/WhatsAppFlyerModal";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency, getPlatformLabel } from "@/lib/utils";
 import { Listing, Order } from "@/types/database";
-import { ArrowRight, ArrowUpRight, Edit3, PlusCircle, ShieldCheck, Star, Trophy, Wallet } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Edit3, PlusCircle, ShieldCheck, Star, Trophy, Wallet, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
@@ -30,6 +31,7 @@ export function SellerDashboardView({
 }: SellerDashboardViewProps) {
   const router = useRouter();
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
+  const [selectedFlyerListing, setSelectedFlyerListing] = useState<Listing | null>(null);
 
   return (
     <div className="space-y-8">
@@ -174,6 +176,15 @@ export function SellerDashboardView({
                   <span className="text-base font-bold text-emerald-400 font-display font-mono mr-2">
                     {formatCurrency(item.price, item.currency)}
                   </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="text-xs text-amber-300 border-amber-500/40 hover:bg-amber-500/10"
+                    onClick={() => setSelectedFlyerListing(item)}
+                  >
+                    <Sparkles className="w-3.5 h-3.5 mr-1 text-amber-400" />
+                    Flyer
+                  </Button>
                   <Link href={`/seller/edit-listing/${item.id}`}>
                     <Button variant="gold" size="sm">
                       <Edit3 className="w-3.5 h-3.5 mr-1" />
@@ -209,6 +220,14 @@ export function SellerDashboardView({
           router.refresh();
         }}
       />
+
+      {selectedFlyerListing && (
+        <WhatsAppFlyerModal
+          listing={selectedFlyerListing}
+          isOpen={Boolean(selectedFlyerListing)}
+          onClose={() => setSelectedFlyerListing(null)}
+        />
+      )}
     </div>
   );
 }

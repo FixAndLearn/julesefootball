@@ -7,6 +7,7 @@ import { BuyNowButton } from "@/components/marketplace/BuyNowButton";
 import { ListingGallery } from "@/components/marketplace/ListingGallery";
 import { WhatsAppShareButton } from "@/components/marketplace/WhatsAppShareButton";
 import { VerifiedSellerBadge } from "@/components/marketplace/VerifiedSellerBadge";
+import { FlyerTriggerButton } from "@/components/seller/FlyerTriggerButton";
 import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
@@ -24,6 +25,8 @@ import {
   Trophy,
   Users,
   Zap,
+  ArrowRightLeft,
+  MessageCircle,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -276,9 +279,36 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               />
             )}
 
-            {/* 1-Click WhatsApp Share for Viral Group Traffic */}
-            <div className="pt-2">
+            {/* Account Swap + Cash Offer Box */}
+            {listing.allows_swap && (
+              <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 space-y-2 mt-2">
+                <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-300">
+                  <ArrowRightLeft className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Account Swap + Cash Welcome!</span>
+                </div>
+                {listing.swap_preferences && (
+                  <p className="text-[11px] text-slate-300 leading-relaxed">
+                    Seller preferences: <em>"{listing.swap_preferences}"</em>
+                  </p>
+                )}
+                <a
+                  href={`https://wa.me/${listing.seller?.phone_number ? listing.seller.phone_number.replace(/[^0-9]/g, "") : "254794400365"}?text=${encodeURIComponent(
+                    `Hello ${listing.seller?.username || "Seller"}, I saw your listing "${listing.title}" on eFootballMarket. I want to propose an Account Swap + Cash deal!\nEscrow will be held via Till 1572931: https://www.efootballmarket.co.ke/listings/${listing.id}`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-3 py-2 rounded-lg bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md active:scale-95"
+                >
+                  <MessageCircle className="w-3.5 h-3.5 fill-white" />
+                  <span>Propose Swap to Seller</span>
+                </a>
+              </div>
+            )}
+
+            {/* 1-Click WhatsApp Share & Promo Flyer Tools */}
+            <div className="pt-2 space-y-2">
               <WhatsAppShareButton listing={listing} />
+              <FlyerTriggerButton listing={listing} />
             </div>
 
             {/* Escrow Guarantee Bullets */}

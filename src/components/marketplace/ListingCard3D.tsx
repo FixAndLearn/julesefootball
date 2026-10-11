@@ -127,9 +127,16 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
             style={{ transform: "translateZ(45px)" }}
             className="absolute top-3 left-3 right-3 flex items-center justify-between gap-2 pointer-events-none"
           >
-            <Badge variant="brand" size="sm" className="font-semibold shadow-xl backdrop-blur-md">
-              {getPlatformLabel(listing.platform)}
-            </Badge>
+            <div className="flex items-center gap-1.5 flex-wrap">
+              <Badge variant="brand" size="sm" className="font-semibold shadow-xl backdrop-blur-md">
+                {getPlatformLabel(listing.platform)}
+              </Badge>
+              {listing.allows_swap && (
+                <span className="px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-[10px] font-bold text-emerald-300 shadow-md">
+                  🔁 Swap Welcome
+                </span>
+              )}
+            </div>
 
             <div className="flex items-center gap-1.5">
               <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-amber-400/40 text-[11px] font-bold text-amber-300 shadow-lg shadow-amber-500/20">

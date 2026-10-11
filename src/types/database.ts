@@ -177,6 +177,8 @@ export interface Listing {
   views_count: number;
   favorites_count: number;
   is_featured: boolean;
+  allows_swap?: boolean;
+  swap_preferences?: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

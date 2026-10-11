@@ -64,6 +64,8 @@ export default function CreateListingPage() {
   const [platform, setPlatform] = useState("android");
   const [gameVersion, setGameVersion] = useState("v4.0.0");
   const [region, setRegion] = useState("Global");
+  const [allowsSwap, setAllowsSwap] = useState(false);
+  const [swapPreferences, setSwapPreferences] = useState("");
 
   // Account Strength & Balances
   const [accountLevel, setAccountLevel] = useState("");
@@ -280,6 +282,8 @@ export default function CreateListingPage() {
         konami_id_status: konamiIdStatus,
         linked_email_status: linkedEmailStatus,
         image_urls: images.map((img) => img.url),
+        allows_swap: allowsSwap,
+        swap_preferences: allowsSwap && swapPreferences.trim() ? swapPreferences.trim() : null,
       };
 
       const res = await fetch("/api/listings", {
@@ -556,6 +560,37 @@ export default function CreateListingPage() {
                 <span>+ Use example description</span>
               </button>
             </div>
+          </div>
+
+          {/* Account Swap + Cash Top-Up Option */}
+          <div className="p-4 rounded-xl bg-pitch-card/90 border border-pitch-border space-y-3">
+            <label className="flex items-center gap-2.5 cursor-pointer text-slate-200 select-none">
+              <input
+                type="checkbox"
+                checked={allowsSwap}
+                onChange={(e) => setAllowsSwap(e.target.checked)}
+                className="w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+              />
+              <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                <span>🔁 Accept Account Swap + Cash Top-Up Offers</span>
+                <span className="text-[10px] text-slate-400 font-normal">(Attracts more Kenyan traders)</span>
+              </span>
+            </label>
+
+            {allowsSwap && (
+              <div className="pt-1 space-y-1.5 pl-6">
+                <label className="block text-[11px] font-medium text-slate-300">
+                  What kind of squad or top-up are you looking for?
+                </label>
+                <input
+                  type="text"
+                  placeholder="e.g. Open to swapping for 3110+ OVR Long Ball Counter squad or KES 1,000 cash top-up"
+                  value={swapPreferences}
+                  onChange={(e) => setSwapPreferences(e.target.value)}
+                  className="w-full bg-pitch-surface border border-pitch-border rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-amber-400"
+                />
+              </div>
+            )}
           </div>
         </div>
 
