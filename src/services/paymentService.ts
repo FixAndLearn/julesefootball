@@ -1,5 +1,6 @@
 import { mpesaClient } from "@/lib/mpesa/client";
 import { AnyCallbackBody, StkCallbackBody } from "@/lib/mpesa/types";
+import { dispatchAdminOrderAlert } from "@/lib/notifications/adminAlert";
 import { Payment } from "@/types/database";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -169,6 +170,18 @@ export class PaymentService {
           is_read: false,
         });
       }
+
+      // Dispatch instant alert to CEO Brian Okibo (0794400365)
+      dispatchAdminOrderAlert({
+        orderId: payment.order_id || paymentId,
+        orderNumber: payment.order?.order_number || `ORD-${paymentId.slice(0, 8)}`,
+        listingTitle: payment.order?.listing?.title || "eFootball Verified Squad",
+        amount: amount || Number(payment.order?.total_amount) || 0,
+        currency: "KES",
+        buyerPhone: payment.phone_number || "",
+        receiptNumber: receiptNumber,
+        eventType: "PAYMENT_RECEIVED",
+      }).catch((err) => console.error("Admin order alert error:", err));
     }
   }
 

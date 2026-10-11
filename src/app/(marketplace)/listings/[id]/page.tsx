@@ -5,6 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ListingService } from "@/services/listingService";
 import { BuyNowButton } from "@/components/marketplace/BuyNowButton";
 import { ListingGallery } from "@/components/marketplace/ListingGallery";
+import { WhatsAppShareButton } from "@/components/marketplace/WhatsAppShareButton";
 import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
@@ -273,6 +274,11 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 priceFormatted={formatCurrency(listing.price, listing.currency)}
               />
             )}
+
+            {/* 1-Click WhatsApp Share for Viral Group Traffic */}
+            <div className="pt-2">
+              <WhatsAppShareButton listing={listing} />
+            </div>
 
             {/* Escrow Guarantee Bullets */}
             <div className="border-t border-pitch-border/60 pt-4 space-y-2.5 text-xs text-slate-300">

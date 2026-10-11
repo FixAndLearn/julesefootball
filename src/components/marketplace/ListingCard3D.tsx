@@ -6,7 +6,7 @@ import Image from "next/image";
 import { Listing } from "@/types/database";
 import { Badge } from "@/components/ui/Badge";
 import { formatCompactNumber, formatCurrency, getPlatformLabel, getPlaystyleLabel } from "@/lib/utils";
-import { ShieldCheck, Star, Trophy, Users, Zap, Sparkles } from "lucide-react";
+import { ShieldCheck, Star, Trophy, Users, Zap, Sparkles, MessageCircle } from "lucide-react";
 
 export interface ListingCard3DProps {
   listing: Listing;
@@ -144,16 +144,32 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
           {/* Bottom Playstyle Chip with 3D elevation */}
           <div
             style={{ transform: "translateZ(30px)" }}
-            className="absolute bottom-2 left-3 right-3 flex items-center justify-between pointer-events-none"
+            className="absolute bottom-2 left-3 right-3 flex items-center justify-between"
           >
-            <span className="text-[11px] font-medium text-slate-200 bg-slate-900/90 backdrop-blur-md px-2.5 py-0.5 rounded-md border border-slate-700/80 shadow-md">
+            <span className="text-[11px] font-medium text-slate-200 bg-slate-900/90 backdrop-blur-md px-2.5 py-0.5 rounded-md border border-slate-700/80 shadow-md pointer-events-none">
               {getPlaystyleLabel(listing.primary_playstyle)}
             </span>
-            {listing.images && listing.images.length > 1 && (
-              <span className="text-[10px] font-semibold text-slate-200 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10 flex items-center gap-1">
-                📷 {listing.images.length} photos
-              </span>
-            )}
+            <div className="flex items-center gap-1.5">
+              {listing.images && listing.images.length > 1 && (
+                <span className="text-[10px] font-semibold text-slate-200 bg-black/80 backdrop-blur-md px-2 py-0.5 rounded-md border border-white/10 flex items-center gap-1 pointer-events-none">
+                  📷 {listing.images.length} photos
+                </span>
+              )}
+              <button
+                type="button"
+                title="Share to WhatsApp Group"
+                onClick={(e) => {
+                  e.preventDefault();
+                  e.stopPropagation();
+                  const origin = typeof window !== "undefined" ? window.location.origin : "https://www.efootballmarket.co.ke";
+                  const text = `⚽ *[OVR ${listing.overall_team_strength}]* ${listing.title} for ${formatCurrency(listing.price, listing.currency)} on eFootballMarket.\n🛡️ Escrow Protected via M-Pesa: ${origin}/listings/${listing.id}`;
+                  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
+                }}
+                className="p-1 rounded-md bg-emerald-950/90 hover:bg-emerald-700 text-emerald-300 hover:text-white border border-emerald-500/60 shadow-md transition-all active:scale-95"
+              >
+                <MessageCircle className="w-3.5 h-3.5 fill-emerald-400" />
+              </button>
+            </div>
           </div>
         </div>
 

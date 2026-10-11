@@ -6,7 +6,7 @@ import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { MessageService } from "@/services/messageService";
 import { OrderService } from "@/services/orderService";
-import { ArrowLeft, Clock, ShieldCheck, User } from "lucide-react";
+import { ArrowLeft, Clock, ShieldCheck, User, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 
@@ -82,6 +82,37 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
           <Clock className="w-4 h-4" />
           <span>Created {new Date(order.created_at).toLocaleDateString()}</span>
         </div>
+      </div>
+
+      {/* Escrow Officer Helpline Card */}
+      <div className="mb-6 bg-gradient-to-r from-emerald-950/70 via-pitch-card to-slate-900 border border-emerald-500/40 rounded-2xl p-4 sm:p-5 shadow-xl flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 shrink-0">
+            <MessageCircle className="w-5 h-5 fill-emerald-400" />
+          </div>
+          <div>
+            <h4 className="text-sm font-bold text-white flex items-center gap-2">
+              <span>Escrow Officer: Brian Okibo</span>
+              <span className="text-[10px] font-semibold text-emerald-300 bg-emerald-950 px-2 py-0.5 rounded-full border border-emerald-800">
+                Online
+              </span>
+            </h4>
+            <p className="text-xs text-slate-300 mt-0.5">
+              Need immediate assistance with Order #{order.order_number}? Connect with platform administration directly on WhatsApp.
+            </p>
+          </div>
+        </div>
+        <a
+          href={`https://wa.me/254794400365?text=${encodeURIComponent(
+            `Hello Brian Okibo, I need assistance with Order #${order.order_number} (${order.listing?.title || "eFootball Squad"}). Escrow Amount: KES ${order.total_amount}.`
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition-all shrink-0 active:scale-95"
+        >
+          <MessageCircle className="w-4 h-4 fill-white" />
+          <span>WhatsApp Brian (0794400365)</span>
+        </a>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
