@@ -19,8 +19,6 @@ import {
   X,
   Sparkles,
   Target,
-  Handshake,
-  Trophy,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import Link from "next/link";
@@ -119,20 +117,6 @@ export function Header() {
               >
                 <Target className="w-3.5 h-3.5 text-amber-400" />
                 <span>Wanted</span>
-              </Link>
-              <Link
-                href="/middleman"
-                className="hover:text-emerald-300 flex items-center gap-1 transition-colors font-semibold text-emerald-400"
-              >
-                <Handshake className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Middleman</span>
-              </Link>
-              <Link
-                href="/tournaments"
-                className="hover:text-amber-300 flex items-center gap-1 transition-colors font-semibold text-amber-300"
-              >
-                <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                <span>Tournaments</span>
               </Link>
               <Link href="/browse?playstyle=quick_counter" className="hover:text-white transition-colors">
                 Quick Counter
@@ -411,23 +395,6 @@ export function Header() {
               <Target className="w-4 h-4 text-amber-400" />
             </Link>
 
-            <Link
-              href="/middleman"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-emerald-400 font-semibold"
-            >
-              <span>Bring-Your-Own-Deal Middleman</span>
-              <Handshake className="w-4 h-4 text-emerald-400" />
-            </Link>
-
-            <Link
-              href="/tournaments"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-300 font-semibold"
-            >
-              <span>Kenyan Tournaments & Cups</span>
-              <Trophy className="w-4 h-4 text-amber-400" />
-            </Link>
 
             <Link
               href="/browse?playstyle=quick_counter"
