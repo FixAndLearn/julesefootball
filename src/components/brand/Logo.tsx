@@ -36,7 +36,7 @@ export function Logo({
   }[size];
 
   const LogoIcon = (
-    <div className={`relative ${iconDimensions} shrink-0 group-hover:scale-105 transition-transform duration-200`}>
+    <div className={`relative ${iconDimensions} shrink-0 group-hover:scale-110 group-hover:-rotate-3 transition-all duration-300 drop-shadow-[0_4px_12px_rgba(245,158,11,0.35)]`}>
       <svg
         viewBox="0 0 48 48"
         fill="none"

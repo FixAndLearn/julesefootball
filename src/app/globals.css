@@ -33,3 +33,145 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #475569;
 }
+
+/* 3D Depth Utilities */
+.perspective-800 {
+  perspective: 800px;
+}
+
+.perspective-1000 {
+  perspective: 1000px;
+}
+
+.perspective-1500 {
+  perspective: 1500px;
+}
+
+.perspective-2000 {
+  perspective: 2000px;
+}
+
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.backface-hidden {
+  backface-visibility: hidden;
+}
+
+/* 3D Transform Utilities for Child Layers */
+.translate-z-10 {
+  transform: translateZ(10px);
+}
+
+.translate-z-20 {
+  transform: translateZ(20px);
+}
+
+.translate-z-30 {
+  transform: translateZ(30px);
+}
+
+.translate-z-40 {
+  transform: translateZ(40px);
+}
+
+.translate-z-50 {
+  transform: translateZ(50px);
+}
+
+/* 3D Keyframe Animations */
+@keyframes float3d {
+  0%, 100% {
+    transform: translateY(0px) rotateX(0deg) rotateY(0deg);
+  }
+  50% {
+    transform: translateY(-10px) rotateX(3deg) rotateY(-3deg);
+  }
+}
+
+@keyframes floatGentle3d {
+  0%, 100% {
+    transform: translateY(0px) rotateZ(0deg);
+  }
+  50% {
+    transform: translateY(-6px) rotateZ(1deg);
+  }
+}
+
+@keyframes spin3dSlow {
+  from {
+    transform: rotateY(0deg) rotateX(15deg);
+  }
+  to {
+    transform: rotateY(360deg) rotateX(15deg);
+  }
+}
+
+@keyframes holographicShimmer {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.animate-float-3d {
+  animation: float3d 6s ease-in-out infinite;
+}
+
+.animate-float-gentle {
+  animation: floatGentle3d 4s ease-in-out infinite;
+}
+
+.animate-spin-3d {
+  animation: spin3dSlow 20s linear infinite;
+}
+
+.holographic-gradient {
+  background: linear-gradient(
+    135deg,
+    rgba(255, 255, 255, 0.15) 0%,
+    rgba(245, 158, 11, 0.25) 25%,
+    rgba(56, 189, 248, 0.3) 50%,
+    rgba(168, 85, 247, 0.25) 75%,
+    rgba(255, 255, 255, 0.15) 100%
+  );
+  background-size: 200% 200%;
+}
+
+/* 3D Tactile Buttons */
+.btn-3d-gold {
+  box-shadow: 0 4px 0 #b45309, 0 8px 16px rgba(245, 158, 11, 0.35);
+  transition: all 0.15s ease-out;
+}
+
+.btn-3d-gold:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #b45309, 0 12px 20px rgba(245, 158, 11, 0.45);
+}
+
+.btn-3d-gold:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #b45309, 0 4px 8px rgba(245, 158, 11, 0.3);
+}
+
+.btn-3d-brand {
+  box-shadow: 0 4px 0 #3730a3, 0 8px 16px rgba(99, 102, 241, 0.35);
+  transition: all 0.15s ease-out;
+}
+
+.btn-3d-brand:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 0 #3730a3, 0 12px 20px rgba(99, 102, 241, 0.45);
+}
+
+.btn-3d-brand:active {
+  transform: translateY(2px);
+  box-shadow: 0 2px 0 #3730a3, 0 4px 8px rgba(99, 102, 241, 0.3);
+}
+
