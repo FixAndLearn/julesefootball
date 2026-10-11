@@ -19,6 +19,8 @@ import {
   X,
   Sparkles,
   Target,
+  Handshake,
+  Trophy,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import Link from "next/link";
@@ -118,11 +120,19 @@ export function Header() {
                 <Target className="w-3.5 h-3.5 text-amber-400" />
                 <span>Wanted</span>
               </Link>
-              <Link href="/browse?playstyle=quick_counter" className="hover:text-white transition-colors">
-                Quick Counter
+              <Link
+                href="/middleman"
+                className="hover:text-emerald-300 flex items-center gap-1.5 transition-colors font-medium text-emerald-400"
+              >
+                <Handshake className="w-3.5 h-3.5" />
+                <span>Middleman</span>
               </Link>
-              <Link href="/browse?minStrength=3100" className="hover:text-white transition-colors">
-                OVR 3100+
+              <Link
+                href="/tournaments"
+                className="hover:text-amber-300 flex items-center gap-1.5 transition-colors font-medium text-amber-300"
+              >
+                <Trophy className="w-3.5 h-3.5" />
+                <span>Tournaments</span>
               </Link>
               <Link
                 href="/news"
@@ -397,18 +407,21 @@ export function Header() {
 
 
             <Link
-              href="/browse?playstyle=quick_counter"
+              href="/middleman"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg hover:bg-pitch-card hover:text-white"
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-emerald-400 font-semibold"
             >
-              Quick Counter Squads
+              <span>Bring-Your-Own-Deal Middleman</span>
+              <Handshake className="w-4 h-4 text-emerald-400" />
             </Link>
+
             <Link
-              href="/browse?minStrength=3100"
+              href="/tournaments"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg hover:bg-pitch-card hover:text-white"
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-300 font-semibold"
             >
-              OVR 3100+ Squads
+              <span>Kenyan Tournaments & Cups</span>
+              <Trophy className="w-4 h-4 text-amber-400" />
             </Link>
             <Link
               href="/escrow-guarantee"
