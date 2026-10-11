@@ -5,54 +5,8 @@ import { WantedRequest } from "@/types/database";
 
 export const dynamic = "force-dynamic";
 
-// Initial realistic seed requests from Kenyan eFootball gamers
-const INITIAL_WANTED_REQUESTS: WantedRequest[] = [
-  {
-    id: "req_seed_1",
-    buyer_name: "Kevin Omondi",
-    buyer_phone: "254712345678",
-    title: "Looking for 3120+ OVR Long Ball Counter with Blitz Curler Son + Vieira",
-    description: "Looking for a top-tier LBC squad on Android. Must have Blitz Curler Son, Epic Vieira, and 105 Messi. Budget ready in M-Pesa.",
-    min_overall_rating: 3120,
-    target_playstyle: "long_ball_counter",
-    preferred_platform: "android",
-    budget_kes: 3500,
-    key_players_wanted: ["Blitz Curler Son", "Epic Vieira", "105 Messi", "Gullit"],
-    status: "active",
-    created_at: new Date(Date.now() - 3600000 * 5).toISOString(),
-  },
-  {
-    id: "req_seed_2",
-    buyer_name: "Dennis Mwangi",
-    buyer_phone: "254798765432",
-    title: "Need iOS Quick Counter Squad with Big Time Rummenigge",
-    description: "Want an iOS account with Rummenigge, Makelele, and Casillas. Division 1 or Division 2 dream team. Cash ready.",
-    min_overall_rating: 3100,
-    target_playstyle: "quick_counter",
-    preferred_platform: "ios",
-    budget_kes: 4200,
-    key_players_wanted: ["BT Rummenigge", "Epic Makelele", "Casillas", "Nesta"],
-    status: "active",
-    created_at: new Date(Date.now() - 3600000 * 12).toISOString(),
-  },
-  {
-    id: "req_seed_3",
-    buyer_name: "Brian Kiprop",
-    buyer_phone: "254722114455",
-    title: "Budget Android Account with 105 Messi + 1500+ Coins",
-    description: "Looking for a fresh or mid-tier account with 105 Copa Messi and extra coins to spin upcoming booster packs. Paying via Till 1572931.",
-    min_overall_rating: 3050,
-    target_playstyle: "possession",
-    preferred_platform: "android",
-    budget_kes: 1800,
-    key_players_wanted: ["105 Messi", "Neymar Jr", "Rodri"],
-    status: "active",
-    created_at: new Date(Date.now() - 3600000 * 24).toISOString(),
-  },
-];
-
 // Persistent in-memory storage for requests submitted in runtime
-let memoryRequests: WantedRequest[] = [...INITIAL_WANTED_REQUESTS];
+let memoryRequests: WantedRequest[] = [];
 
 export async function GET(req: NextRequest) {
   try {

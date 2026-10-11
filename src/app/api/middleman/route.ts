@@ -22,25 +22,7 @@ export interface MiddlemanDeal {
 }
 
 // In-memory runtime persistence
-const MEMORY_DEALS: MiddlemanDeal[] = [
-  {
-    id: "mdm_demo_1",
-    deal_code: "EFM-78241",
-    buyer_name: "Kelvin Mutua",
-    buyer_phone: "254712345678",
-    seller_name: "Eric Kiprotich",
-    seller_phone: "254798765432",
-    deal_title: "3118 OVR Quick Counter Account Swap Deal",
-    deal_description: "Agreed via Nairobi eFootball WhatsApp group. Full Konami ID email binding.",
-    item_amount_kes: 2200,
-    escrow_fee_kes: 110,
-    total_amount_kes: 2310,
-    status: "completed",
-    till_number: "1572931",
-    mpesa_receipt: "SL8291KDP9",
-    created_at: new Date(Date.now() - 3600000 * 8).toISOString(),
-  },
-];
+const MEMORY_DEALS: MiddlemanDeal[] = [];
 
 export async function GET(req: NextRequest) {
   try {

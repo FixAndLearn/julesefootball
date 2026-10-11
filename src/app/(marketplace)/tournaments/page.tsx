@@ -134,10 +134,28 @@ export default function TournamentsPage() {
           <span className="text-xs text-slate-400">Weekly Knockouts • Kenya Time (EAT)</span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {tournaments.map((t) => {
-            const isFull = t.registered_count >= t.max_players;
-            const progressPercent = Math.round((t.registered_count / t.max_players) * 100);
+        {tournaments.length === 0 ? (
+          <div className="text-center py-16 bg-pitch-surface border border-pitch-border rounded-3xl p-8 space-y-4">
+            <Trophy className="w-12 h-12 text-slate-500 mx-auto stroke-[1.5]" />
+            <h3 className="text-lg font-bold text-white">No Active Tournaments Scheduled</h3>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              Upcoming weekly knockout cups will be posted here. Join our community alerts to register as soon as brackets open!
+            </p>
+            <a
+              href="https://wa.me/254794400365?text=Hello%20Brian%2C%20I%20want%20to%20be%20notified%20about%20the%20next%20eFootball%20tournament"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md"
+            >
+              <MessageCircle className="w-4 h-4" />
+              <span>Join Tournament WhatsApp Alerts</span>
+            </a>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {tournaments.map((t) => {
+              const isFull = t.registered_count >= t.max_players;
+              const progressPercent = Math.round((t.registered_count / t.max_players) * 100);
 
             return (
               <div
@@ -233,6 +251,7 @@ export default function TournamentsPage() {
             );
           })}
         </div>
+        )}
       </div>
 
       {/* Interactive Bracket Viewer */}
