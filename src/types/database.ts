@@ -348,3 +348,31 @@ export interface WantedRequest {
   created_at: string;
 }
 
+export type OfferStatus = 'pending' | 'accepted' | 'declined' | 'countered' | 'expired';
+
+export interface ListingOffer {
+  id: string;
+  listing_id: string;
+  seller_id?: string;
+  buyer_id?: string;
+  buyer_name: string;
+  buyer_phone: string;
+  offered_price: number;
+  original_price: number;
+  discount_percentage: number;
+  status: OfferStatus;
+  note?: string;
+  counter_price?: number;
+  expires_at?: string;
+  created_at: string;
+  updated_at?: string;
+  listing?: {
+    id: string;
+    title: string;
+    price: number;
+    platform: Platform;
+    overall_team_strength: number;
+    manager_name?: string;
+  };
+}
+

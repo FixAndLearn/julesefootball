@@ -8,6 +8,9 @@ import { ListingGallery } from "@/components/marketplace/ListingGallery";
 import { WhatsAppShareButton } from "@/components/marketplace/WhatsAppShareButton";
 import { VerifiedSellerBadge } from "@/components/marketplace/VerifiedSellerBadge";
 import { FlyerTriggerButton } from "@/components/seller/FlyerTriggerButton";
+import { MakeOfferButton } from "@/components/marketplace/MakeOfferButton";
+import { FastBuyLinkButton } from "@/components/marketplace/FastBuyLinkButton";
+import { SellerListingOffersPanel } from "@/components/marketplace/SellerListingOffersPanel";
 import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
@@ -261,22 +264,29 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
 
             {/* Buy Now or Edit Interactive Button */}
             {isOwner ? (
-              <div className="space-y-2">
+              <div className="space-y-4">
                 <Link href={`/seller/edit-listing/${listing.id}`} className="block">
                   <Button variant="gold" size="lg" className="w-full">
                     <Edit3 className="w-4 h-4 mr-2" />
                     Edit This Listing
                   </Button>
                 </Link>
+
+                {/* Seller Offers Management Panel */}
+                <SellerListingOffersPanel listingId={listing.id} />
+
                 <p className="text-[11px] text-center text-slate-400">
-                  You own this listing. Buyers see the Buy Now button.
+                  You own this listing. Buyers see the Buy Now and Make Offer buttons.
                 </p>
               </div>
             ) : (
-              <BuyNowButton
-                listingId={listing.id}
-                priceFormatted={formatCurrency(listing.price, listing.currency)}
-              />
+              <div className="space-y-2.5">
+                <BuyNowButton
+                  listingId={listing.id}
+                  priceFormatted={formatCurrency(listing.price, listing.currency)}
+                />
+                <MakeOfferButton listing={listing} />
+              </div>
             )}
 
             {/* Account Swap + Cash Offer Box */}
@@ -305,8 +315,13 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               </div>
             )}
 
-            {/* 1-Click WhatsApp Share & Promo Flyer Tools */}
+            {/* 1-Click WhatsApp Share, Fast Buy Link & Promo Flyer Tools */}
             <div className="pt-2 space-y-2">
+              <FastBuyLinkButton
+                listingId={listing.id}
+                listingTitle={listing.title}
+                price={Number(listing.price)}
+              />
               <WhatsAppShareButton listing={listing} />
               <FlyerTriggerButton listing={listing} />
             </div>

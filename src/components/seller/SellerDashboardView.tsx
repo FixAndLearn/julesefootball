@@ -2,6 +2,7 @@
 
 import { WithdrawModal } from "@/components/seller/WithdrawModal";
 import { WhatsAppFlyerModal } from "@/components/seller/WhatsAppFlyerModal";
+import { FastBuyLinkButton } from "@/components/marketplace/FastBuyLinkButton";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
@@ -185,6 +186,7 @@ export function SellerDashboardView({
                     <Sparkles className="w-3.5 h-3.5 mr-1 text-amber-400" />
                     Flyer
                   </Button>
+                  <FastBuyLinkButton listingId={item.id} variant="compact" />
                   <Link href={`/seller/edit-listing/${item.id}`}>
                     <Button variant="gold" size="sm">
                       <Edit3 className="w-3.5 h-3.5 mr-1" />
