@@ -4,6 +4,7 @@ import { CredentialsDeliveryForm } from "@/components/escrow/CredentialsDelivery
 import { CredentialsRevealModal } from "@/components/escrow/CredentialsRevealModal";
 import { DisputeModal } from "@/components/escrow/DisputeModal";
 import { EscrowStatusStepper } from "@/components/escrow/EscrowStatusStepper";
+import { KonamiTransferChecklistModal } from "@/components/escrow/KonamiTransferChecklistModal";
 import { MpesaPaymentModal } from "@/components/payments/MpesaPaymentModal";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/utils";
@@ -31,6 +32,9 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
   const [stepLogin, setStepLogin] = useState(false);
   const [stepPassword, setStepPassword] = useState(false);
   const [stepEmail, setStepEmail] = useState(false);
+  const [step2FA, setStep2FA] = useState(false);
+  const [stepUnlink, setStepUnlink] = useState(false);
+  const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
   const [releasingFunds, setReleasingFunds] = useState(false);
   const [releaseError, setReleaseError] = useState("");
 
@@ -121,8 +125,8 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
   };
 
   const handleConfirmAndRelease = async () => {
-    if (!stepLogin || !stepPassword || !stepEmail) {
-      setReleaseError("Please tick all 3 checkpoints verifying you have logged in, changed the password, and linked your own email.");
+    if (!stepLogin || !stepPassword || !stepEmail || !step2FA || !stepUnlink) {
+      setReleaseError("Please verify all 5 security transfer checkpoints (Login, Password, Email, 2FA, & Unlinking) before releasing escrow funds.");
       return;
     }
 
@@ -281,46 +285,89 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
                 </span>
               </div>
 
-              {/* Step 3: Security Transfer Checklist */}
-              <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-3">
-                <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
-                  <span className="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 text-xs flex items-center justify-center font-bold">3</span>
-                  Security Transfer Checklist
-                </h4>
+              {/* Step 3: Konami ID Security Transfer Checklist (5-Point Protocol) */}
+              <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-3.5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <h4 className="text-sm font-bold text-slate-100 flex items-center gap-2">
+                    <span className="w-5 h-5 rounded-full bg-brand-500/20 text-brand-400 text-xs flex items-center justify-center font-bold">3</span>
+                    Konami ID Handover Safety Checklist
+                  </h4>
+                  <button
+                    type="button"
+                    onClick={() => setIsChecklistModalOpen(true)}
+                    className="inline-flex items-center gap-1.5 text-xs font-semibold text-emerald-400 hover:text-emerald-300 underline underline-offset-2"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>View Visual Handover Guide</span>
+                  </button>
+                </div>
+
                 <p className="text-xs text-slate-400">
-                  Ensure full account ownership before approving fund release:
+                  Complete all 5 security protocols below before releasing escrow funds:
                 </p>
 
-                <div className="space-y-2 pt-1 text-xs">
-                  <label className="flex items-center gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
+                <div className="space-y-2.5 pt-1 text-xs">
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
                     <input
                       type="checkbox"
                       checked={stepLogin}
                       onChange={(e) => setStepLogin(e.target.checked)}
-                      className="w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
                     />
-                    <span>I have logged into the eFootball account and verified squad details</span>
+                    <span><strong>1. Account Inspection:</strong> Logged in and verified all squad players, OVR, Epics, and Coin balances match the listing.</span>
                   </label>
 
-                  <label className="flex items-center gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
-                    <input
-                      type="checkbox"
-                      checked={stepPassword}
-                      onChange={(e) => setStepPassword(e.target.checked)}
-                      className="w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
-                    />
-                    <span>I have updated the Konami ID password to my own private password</span>
-                  </label>
-
-                  <label className="flex items-center gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
                     <input
                       type="checkbox"
                       checked={stepEmail}
                       onChange={(e) => setStepEmail(e.target.checked)}
-                      className="w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
                     />
-                    <span>I have linked my own email address and unlinked the seller</span>
+                    <span><strong>2. Primary Email Binding:</strong> Changed registered email at <em>my.konami.net</em> to my own personal email and confirmed OTP code.</span>
                   </label>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepPassword}
+                      onChange={(e) => setStepPassword(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+                    />
+                    <span><strong>3. Password & Security:</strong> Updated Konami ID password and security question to new private combinations.</span>
+                  </label>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
+                    <input
+                      type="checkbox"
+                      checked={step2FA}
+                      onChange={(e) => setStep2FA(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+                    />
+                    <span><strong>4. Two-Step Verification (2FA):</strong> Enabled Konami 2-Step OTP on my own handset to block previous owner access.</span>
+                  </label>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 hover:text-white select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepUnlink}
+                      onChange={(e) => setStepUnlink(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+                    />
+                    <span><strong>5. Unlink Social Logins:</strong> Checked <em>Linked Accounts</em> at my.konami.net and ensured Google Play / Apple ID / Game Center from seller are removed.</span>
+                  </label>
+                </div>
+
+                <div className="pt-1 flex items-center justify-between text-[11px] text-slate-400 border-t border-pitch-border/60">
+                  <span>Completed: <strong>{[stepLogin, stepEmail, stepPassword, step2FA, stepUnlink].filter(Boolean).length} / 5</strong></span>
+                  <a
+                    href="https://my.konami.net"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-amber-400 hover:text-amber-300 font-semibold"
+                  >
+                    Open official my.konami.net ↗
+                  </a>
                 </div>
               </div>
 
@@ -339,7 +386,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
                   className="w-full sm:flex-1 font-bold"
                   onClick={handleConfirmAndRelease}
                   isLoading={releasingFunds}
-                  disabled={!stepLogin || !stepPassword || !stepEmail}
+                  disabled={!stepLogin || !stepPassword || !stepEmail || !step2FA || !stepUnlink}
                 >
                   <ShieldCheck className="w-5 h-5 mr-2" />
                   Complete Handover & Release Funds to Seller
@@ -458,6 +505,11 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
           setIsDisputeModalOpen(false);
           refreshPage();
         }}
+      />
+
+      <KonamiTransferChecklistModal
+        isOpen={isChecklistModalOpen}
+        onClose={() => setIsChecklistModalOpen(false)}
       />
     </div>
   );

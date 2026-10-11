@@ -5,6 +5,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { Listing } from "@/types/database";
 import { Badge } from "@/components/ui/Badge";
+import { VerifiedSellerBadge } from "@/components/marketplace/VerifiedSellerBadge";
 import { formatCompactNumber, formatCurrency, getPlatformLabel, getPlaystyleLabel } from "@/lib/utils";
 import { ShieldCheck, Star, Trophy, Users, Zap, Sparkles, MessageCircle } from "lucide-react";
 
@@ -213,11 +214,9 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
                 {listing.seller?.username ? listing.seller.username.slice(0, 2).toUpperCase() : <Users className="w-3.5 h-3.5" />}
               </div>
               <div>
-                <div className="flex items-center gap-1">
+                <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-xs font-medium text-slate-300">{listing.seller?.username || "Verified Seller"}</span>
-                  {listing.seller?.is_verified_seller && (
-                    <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  )}
+                  <VerifiedSellerBadge seller={listing.seller} size="sm" showPopover={true} />
                 </div>
                 <div className="flex items-center gap-1 text-[10px] text-slate-400">
                   {(listing.seller?.completed_sales_count || 0) > 0 && listing.seller?.seller_rating ? (

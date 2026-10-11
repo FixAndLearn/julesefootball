@@ -28,6 +28,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
+import { watermarkSquadImage } from "@/lib/utils/watermark";
 
 interface UploadedImage {
   url: string;
@@ -37,7 +38,7 @@ interface UploadedImage {
 
 export default function CreateListingPage() {
   const router = useRouter();
-  const { isAuthenticated, loading: authLoading } = useAuth();
+  const { isAuthenticated, loading: authLoading, displayName } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [loading, setLoading] = useState(false);
@@ -95,6 +96,7 @@ export default function CreateListingPage() {
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadError, setUploadError] = useState("");
   const [isDragOver, setIsDragOver] = useState(false);
+  const [autoWatermark, setAutoWatermark] = useState(true);
 
   // Upload handler for up to 5 images
   const handleFilesUpload = async (fileList: FileList | File[]) => {
@@ -127,8 +129,21 @@ export default function CreateListingPage() {
           throw new Error(`"${file.name}" exceeds 10MB limit.`);
         }
 
+        // Apply auto-watermarking to protect seller squad screenshots from theft/scam reposts
+        let processedFile = file;
+        if (autoWatermark) {
+          try {
+            processedFile = await watermarkSquadImage(file, {
+              sellerUsername: displayName || "Trader",
+              websiteUrl: "efootballmarket.co.ke",
+            });
+          } catch (wmErr) {
+            console.warn("Watermark preprocessing warning:", wmErr);
+          }
+        }
+
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", processedFile);
 
         const res = await fetch("/api/upload", {
           method: "POST",
@@ -949,6 +964,18 @@ export default function CreateListingPage() {
                 <p className="text-[11px] text-slate-400 mt-0.5">
                   Upload up to 5 real screenshots from your device in their original HD quality ({images.length}/5 uploaded)
                 </p>
+                {/* Anti-Scam Watermark Protection Pill */}
+                <div className="mt-2 flex items-center gap-2">
+                  <label className="inline-flex items-center gap-2 px-2.5 py-1 rounded-lg bg-emerald-950/60 border border-emerald-500/40 text-[11px] text-emerald-300 font-medium cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={autoWatermark}
+                      onChange={(e) => setAutoWatermark(e.target.checked)}
+                      className="w-3.5 h-3.5 rounded border-emerald-500 text-emerald-500 focus:ring-emerald-500/30"
+                    />
+                    <span>🛡️ Auto-Stamp Escrow Watermark (Stops Scammers & Image Theft)</span>
+                  </label>
+                </div>
               </div>
 
               {images.length < 5 && (

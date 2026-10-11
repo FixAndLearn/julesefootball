@@ -1,6 +1,7 @@
 import { mpesaClient } from "@/lib/mpesa/client";
 import { AnyCallbackBody, StkCallbackBody } from "@/lib/mpesa/types";
 import { dispatchAdminOrderAlert } from "@/lib/notifications/adminAlert";
+import { sendBuyerPaymentConfirmedSms, sendSellerOrderReceivedSms } from "@/lib/notifications/smsAlert";
 import { Payment } from "@/types/database";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -182,6 +183,39 @@ export class PaymentService {
         receiptNumber: receiptNumber,
         eventType: "PAYMENT_RECEIVED",
       }).catch((err) => console.error("Admin order alert error:", err));
+
+      // Dispatch instant SMS to Buyer
+      if (payment.phone_number) {
+        sendBuyerPaymentConfirmedSms(
+          payment.phone_number,
+          payment.order?.order_number || `ORD-${paymentId.slice(0, 8)}`,
+          amount || Number(payment.order?.total_amount) || 0,
+          payment.order_id || paymentId
+        ).catch((err) => console.warn("Buyer payment SMS failed:", err));
+      }
+
+      // Dispatch instant SMS to Seller to deliver Konami credentials
+      if (payment.order?.seller_id) {
+        try {
+          const { data: sellerProf } = await this.supabase
+            .from("profiles")
+            .select("phone_number")
+            .eq("id", payment.order.seller_id)
+            .single();
+
+          if (sellerProf?.phone_number) {
+            await sendSellerOrderReceivedSms(
+              sellerProf.phone_number,
+              payment.order?.order_number || `ORD-${paymentId.slice(0, 8)}`,
+              amount || Number(payment.order?.total_amount) || 0,
+              payment.order?.listing?.title || "eFootball Verified Squad",
+              payment.order_id || paymentId
+            );
+          }
+        } catch (err) {
+          console.warn("Seller order SMS dispatch notice:", err);
+        }
+      }
     }
   }
 

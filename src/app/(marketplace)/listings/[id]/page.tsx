@@ -6,6 +6,7 @@ import { ListingService } from "@/services/listingService";
 import { BuyNowButton } from "@/components/marketplace/BuyNowButton";
 import { ListingGallery } from "@/components/marketplace/ListingGallery";
 import { WhatsAppShareButton } from "@/components/marketplace/WhatsAppShareButton";
+import { VerifiedSellerBadge } from "@/components/marketplace/VerifiedSellerBadge";
 import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
@@ -306,11 +307,9 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                   {listing.seller?.username ? listing.seller.username.slice(0, 2).toUpperCase() : <Users className="w-4 h-4" />}
                 </div>
                 <div>
-                  <div className="flex items-center gap-1.5">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm font-semibold text-slate-200">{listing.seller?.username || "Verified Seller"}</span>
-                    {listing.seller?.is_verified_seller && (
-                      <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                    )}
+                    <VerifiedSellerBadge seller={listing.seller} size="sm" showPopover={true} />
                   </div>
                   <div className="flex items-center gap-1.5 text-xs text-slate-400 mt-0.5">
                     {(listing.seller?.completed_sales_count || 0) > 0 && listing.seller?.seller_rating ? (

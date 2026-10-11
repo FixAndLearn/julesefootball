@@ -329,3 +329,20 @@ export interface Review {
   updated_at: string;
   reviewer?: Profile;
 }
+
+export interface WantedRequest {
+  id: string;
+  buyer_id?: string;
+  buyer_name: string;
+  buyer_phone: string;
+  title: string;
+  description: string;
+  min_overall_rating: number;
+  target_playstyle: Playstyle;
+  preferred_platform: Platform;
+  budget_kes: number;
+  key_players_wanted: string[];
+  status: "active" | "fulfilled" | "closed";
+  created_at: string;
+}
+

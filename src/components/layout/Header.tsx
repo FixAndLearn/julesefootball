@@ -18,6 +18,7 @@ import {
   User as UserIcon,
   X,
   Sparkles,
+  Target,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import Link from "next/link";
@@ -109,6 +110,13 @@ export function Header() {
             <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
               <Link href="/browse" className="hover:text-white transition-colors">
                 Browse Accounts
+              </Link>
+              <Link
+                href="/wanted"
+                className="hover:text-amber-300 flex items-center gap-1 transition-colors font-semibold text-amber-400"
+              >
+                <Target className="w-3.5 h-3.5 text-amber-400" />
+                <span>Wanted Board</span>
               </Link>
               <Link href="/browse?playstyle=quick_counter" className="hover:text-white transition-colors">
                 Quick Counter
@@ -376,6 +384,15 @@ export function Header() {
               className="block px-3 py-2 rounded-lg hover:bg-pitch-card hover:text-white"
             >
               Browse Accounts
+            </Link>
+
+            <Link
+              href="/wanted"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-300 font-semibold"
+            >
+              <span>Wanted Squads (Buyer Requests)</span>
+              <Target className="w-4 h-4 text-amber-400" />
             </Link>
 
             <Link

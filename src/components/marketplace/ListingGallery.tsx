@@ -18,6 +18,7 @@ import {
   ZoomIn,
   ZoomOut,
   RotateCcw,
+  ShieldCheck,
 } from "lucide-react";
 import Image from "next/image";
 import { useEffect, useState, useCallback } from "react";
@@ -171,7 +172,14 @@ export function ListingGallery({
                 </button>
               </div>
 
-              {/* Bottom Subtle Guidance Hint */}
+              {/* Bottom Subtle Guidance Hint & Escrow Watermark */}
+              <div className="absolute bottom-3 left-4 z-20 pointer-events-none flex items-center gap-2">
+                <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[10px] sm:text-[11px] text-emerald-300 border border-emerald-500/30 font-medium flex items-center gap-1 shadow-lg">
+                  <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>efootballmarket.co.ke • Escrow Protected Asset</span>
+                </span>
+              </div>
+
               <div className="absolute bottom-3 right-4 z-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                 <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[11px] text-slate-300 border border-white/10 font-mono">
                   🔍 Click image to zoom & inspect cards
