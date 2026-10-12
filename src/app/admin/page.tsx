@@ -11,6 +11,8 @@ import {
   ArrowRight,
   Ban,
   Banknote,
+  Bell,
+  Bot,
   Check,
   CheckCircle2,
   Clock,
@@ -28,6 +30,7 @@ import {
   PlusCircle,
   RefreshCw,
   Search,
+  Send,
   Shield,
   ShieldAlert,
   ShieldCheck,
@@ -54,11 +57,18 @@ function AdminControlCenterContent() {
     (searchParams.get("tab") as any) || "listings"
   );
 
-  // WhatsApp Integration State
+  // WhatsApp & Telegram Integration State
   const [whatsappInfo, setWhatsappInfo] = useState<any>(null);
+  const [telegramInfo, setTelegramInfo] = useState<any>(null);
   const [testWaPhone, setTestWaPhone] = useState("254794400365");
   const [testWaLoading, setTestWaLoading] = useState(false);
   const [testWaResult, setTestWaResult] = useState<any>(null);
+
+  // Telegram test state
+  const [testTgLoading, setTestTgLoading] = useState(false);
+  const [testTgResult, setTestTgResult] = useState<any>(null);
+  const [customTgChatId, setCustomTgChatId] = useState("");
+  const [customTgToken, setCustomTgToken] = useState("");
 
   // Data states
   const [listings, setListings] = useState<any[]>([]);
@@ -147,6 +157,7 @@ function AdminControlCenterContent() {
     if (isAdmin) {
       loadAdminData();
       loadWhatsAppStatus();
+      loadTelegramStatus();
     }
   }, [isAdmin, loadAdminData]);
 
@@ -159,6 +170,53 @@ function AdminControlCenterContent() {
       }
     } catch {
       // non-blocking
+    }
+  };
+
+  const loadTelegramStatus = async () => {
+    try {
+      const res = await fetch("/api/telegram/send-test");
+      if (res.ok) {
+        const data = await res.json();
+        setTelegramInfo(data);
+      }
+    } catch {
+      // non-blocking
+    }
+  };
+
+  const handleSendTestTelegram = async (testType: "standard" | "simulated_payment" = "standard") => {
+    setTestTgLoading(true);
+    setTestTgResult(null);
+    try {
+      const res = await fetch("/api/telegram/send-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chatId: customTgChatId.trim() || undefined,
+          token: customTgToken.trim() || undefined,
+          testType,
+        }),
+      });
+      const data = await res.json();
+      setTestTgResult(data);
+      if (data.success) {
+        setFeedback({
+          type: "success",
+          message: `Telegram alert delivered to chat ${data.chatId || "ID"}! Check your phone.`,
+        });
+        loadTelegramStatus();
+      } else {
+        setFeedback({
+          type: "error",
+          message: `Telegram dispatch failed: ${data.error || "Check bot token and chat ID"}`,
+        });
+      }
+    } catch (err: any) {
+      setTestTgResult({ error: err.message });
+      setFeedback({ type: "error", message: `Error sending Telegram test: ${err.message}` });
+    } finally {
+      setTestTgLoading(false);
     }
   };
 
@@ -624,17 +682,28 @@ function AdminControlCenterContent() {
           onClick={() => {
             setActiveTab("whatsapp");
             loadWhatsAppStatus();
+            loadTelegramStatus();
           }}
           className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
             activeTab === "whatsapp"
-              ? "border-emerald-400 text-emerald-400 bg-pitch-surface"
+              ? "border-indigo-400 text-indigo-400 bg-pitch-surface"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
-          <MessageCircle className="w-4 h-4 text-emerald-400" />
-          <span>WhatsApp Business Hub</span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
-            {whatsappInfo?.isConfigured ? "Connected" : "Setup"}
+          <Bot className="w-4 h-4 text-indigo-400" />
+          <span>Telegram &amp; Alerts Hub</span>
+          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+            telegramInfo?.isConfigured
+              ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40"
+              : whatsappInfo?.isConfigured
+              ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+              : "bg-amber-500/20 text-amber-300 border-amber-500/40"
+          }`}>
+            {telegramInfo?.isConfigured
+              ? "Telegram Active ⚡"
+              : whatsappInfo?.isConfigured
+              ? "WhatsApp Active"
+              : "Setup Alerts"}
           </span>
         </button>
       </div>
@@ -1376,22 +1445,175 @@ function AdminControlCenterContent() {
         </div>
       )}
 
-      {/* TAB 5: WHATSAPP BUSINESS INTEGRATION HUB */}
+      {/* TAB 5: TELEGRAM & WHATSAPP NOTIFICATION HUB */}
       {activeTab === "whatsapp" && (
         <div className="space-y-6 animate-in fade-in">
-          {/* Header Card */}
+          {/* PRIMARY HERO: TELEGRAM SMARTPHONE PUSH NOTIFICATIONS */}
+          <div className="p-6 rounded-3xl bg-pitch-surface border border-indigo-500/50 shadow-2xl relative overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 text-xs font-bold mb-2">
+                  <Bot className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Primary Executive Push Channel (100% Free Forever)</span>
+                </div>
+                <h2 className="text-2xl font-bold text-white font-display flex flex-wrap items-center gap-2">
+                  <span>Telegram Smartphone Bot Alerts</span>
+                  {telegramInfo?.isConfigured ? (
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold">
+                      ACTIVE &amp; READY ⚡
+                    </span>
+                  ) : (
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold">
+                      AWAITING BOT TOKEN
+                    </span>
+                  )}
+                </h2>
+                <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                  Directly buzzes Brian Okibo&apos;s phone (+254 794 400 365) the second an M-Pesa Till 1572931 payment arrives, a new account is listed, Konami credentials are submitted, or a withdrawal is requested. Instant sound/banner notifications with zero Meta approvals.
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-pitch-card border border-pitch-border space-y-1 shrink-0 text-right">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Status</span>
+                <span className={`text-sm font-bold ${telegramInfo?.isConfigured ? "text-emerald-400" : "text-amber-400"}`}>
+                  {telegramInfo?.isConfigured ? "Connected" : "Not Configured"}
+                </span>
+                <span className="text-[10px] text-slate-400 block font-mono">
+                  {telegramInfo?.maskedChatId ? `Chat: ${telegramInfo.maskedChatId}` : "Escrow Till: 1572931"}
+                </span>
+              </div>
+            </div>
+
+            {/* Telegram Live Testing & Dispatch */}
+            <div className="mt-6 pt-6 border-t border-pitch-border space-y-4">
+              <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
+                <div>
+                  <h3 className="text-sm font-bold text-white flex items-center gap-2">
+                    <Zap className="w-4 h-4 text-amber-400" />
+                    <span>Send Live Push Alert to Brian&apos;s Phone</span>
+                  </h3>
+                  <p className="text-xs text-slate-400 mt-0.5">
+                    Test your Telegram bot connection immediately or simulate a live M-Pesa transaction alert.
+                  </p>
+                </div>
+                <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+                  <Button
+                    variant="gold"
+                    size="md"
+                    onClick={() => handleSendTestTelegram("standard")}
+                    isLoading={testTgLoading}
+                    className="flex-1 sm:flex-initial text-xs font-bold"
+                  >
+                    <Send className="w-4 h-4 mr-1.5" />
+                    Send Test Ping
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="md"
+                    onClick={() => handleSendTestTelegram("simulated_payment")}
+                    isLoading={testTgLoading}
+                    className="flex-1 sm:flex-initial text-xs font-bold border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/10"
+                  >
+                    <Banknote className="w-4 h-4 mr-1.5" />
+                    Simulate Till 1572931 Payment
+                  </Button>
+                </div>
+              </div>
+
+              {/* Optional On-the-Fly Inputs */}
+              {!telegramInfo?.isConfigured && (
+                <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-3">
+                  <span className="text-xs font-bold text-slate-300 block">
+                    Quick Connect (Test before saving to .env.local):
+                  </span>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <input
+                      type="text"
+                      value={customTgToken}
+                      onChange={(e) => setCustomTgToken(e.target.value)}
+                      placeholder="Bot Token (e.g. 123456:ABC-DEF...)"
+                      className="px-3.5 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
+                    />
+                    <input
+                      type="text"
+                      value={customTgChatId}
+                      onChange={(e) => setCustomTgChatId(e.target.value)}
+                      placeholder="Your Numeric Chat ID (e.g. 987654321)"
+                      className="px-3.5 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {testTgResult && (
+                <div
+                  className={`p-3.5 rounded-xl border text-xs font-mono space-y-1 ${
+                    testTgResult.success
+                      ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
+                      : "bg-rose-950/60 border-rose-500/40 text-rose-300"
+                  }`}
+                >
+                  <div className="flex items-center justify-between">
+                    <span>
+                      <strong>Result:</strong> {testTgResult.success ? "DELIVERED TO PHONE ✅" : "DISPATCH FAILED ❌"}
+                    </span>
+                    {testTgResult.messageId && (
+                      <span className="text-[11px] text-slate-400">Telegram msg_id: {testTgResult.messageId}</span>
+                    )}
+                  </div>
+                  {testTgResult.chatId && (
+                    <div><strong>Chat ID:</strong> {testTgResult.chatId}</div>
+                  )}
+                  {testTgResult.error && (
+                    <div><strong>Error:</strong> {testTgResult.error}</div>
+                  )}
+                </div>
+              )}
+
+              {/* 30-Second Quick Setup Guide */}
+              <div className="p-4 rounded-2xl bg-slate-950/80 border border-pitch-border space-y-2">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-indigo-400" />
+                  <span>30-Second Telegram Setup for Brian Okibo</span>
+                </span>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-300">
+                  <div className="p-2.5 rounded-xl bg-pitch-surface/60 border border-pitch-border/60">
+                    <div className="font-bold text-indigo-300 mb-1">1. Create Bot</div>
+                    <p className="text-[11px] text-slate-400">
+                      Open Telegram on your phone, message <strong>@BotFather</strong>, send <code>/newbot</code>, and copy your API Token.
+                    </p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-pitch-surface/60 border border-pitch-border/60">
+                    <div className="font-bold text-indigo-300 mb-1">2. Get Your Chat ID</div>
+                    <p className="text-[11px] text-slate-400">
+                      Message <strong>@userinfobot</strong> on Telegram and copy your numeric <strong>Id</strong>.
+                    </p>
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-pitch-surface/60 border border-pitch-border/60">
+                    <div className="font-bold text-indigo-300 mb-1">3. Put in .env.local</div>
+                    <p className="text-[11px] text-slate-400 font-mono text-[10px] text-indigo-300">
+                      TELEGRAM_BOT_TOKEN=&quot;...&quot;<br />
+                      TELEGRAM_CHAT_ID=&quot;...&quot;
+                    </p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* SECONDARY: WHATSAPP BUSINESS INTEGRATION HUB */}
           <div className="p-6 rounded-3xl bg-pitch-surface border border-emerald-500/40 shadow-2xl relative overflow-hidden">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
               <div>
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold mb-2">
                   <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>Official Automated Alerts & Customer Bot</span>
+                  <span>Secondary Multi-Channel Alert &amp; Customer Bot</span>
                 </div>
                 <h2 className="text-2xl font-bold text-white font-display">
                   WhatsApp Business Integration Hub
                 </h2>
                 <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
-                  Automatically delivers instant receipts to buyers, handover requests to sellers, and real-time transaction alerts to Brian Okibo (+254 794 400 365).
+                  Delivers instant receipts to buyers, handover requests to sellers, and WhatsApp backups to Brian Okibo (+254 794 400 365).
                 </p>
               </div>
 

@@ -6,6 +6,7 @@
 import { formatDisplayPhone, formatInternationalPhone } from "@/lib/utils/phone";
 import { isMetaCloudApiConfigured, sendWhatsAppMessage } from "@/lib/whatsapp/cloudApi";
 import { sendSmsAlert } from "./smsAlert";
+import { dispatchAdminTelegramAlert, isTelegramConfigured } from "./telegramAlert";
 
 export const ADMIN_PHONE_NUMBER = "0794400365";
 export const ADMIN_WHATSAPP_NUMBER = "254794400365";
@@ -193,9 +194,23 @@ export function getAdminWhatsAppAlertUrl(payload: AdminAlertPayload): string {
  */
 export async function dispatchAdminWhatsAppAlert(payload: AdminAlertPayload): Promise<void> {
   const alertText = formatAdminWhatsAppMessage(payload);
-  console.log(`[WHATSAPP AUTOMATED ALERT -> ${ADMIN_INTERNATIONAL_PHONE}]`, alertText);
+  console.log(`[ADMIN NOTIFICATION -> ${ADMIN_INTERNATIONAL_PHONE}]`, alertText);
 
-  // 1. Automated Meta WhatsApp Business Cloud API (Official Graph API v21.0)
+  // 1. Instant Push Notification via Telegram Bot (Priority #1 - 100% Free, instant smartphone banner & sound)
+  if (isTelegramConfigured()) {
+    try {
+      const tgRes = await dispatchAdminTelegramAlert(payload);
+      if (tgRes.success) {
+        console.log(`[Telegram:Bot] Alert delivered successfully (msg_id=${tgRes.messageId})`);
+      } else {
+        console.warn(`[Telegram:Bot] Delivery note: ${tgRes.error}`);
+      }
+    } catch (err: any) {
+      console.warn("[Telegram:Bot] Dispatch error:", err.message);
+    }
+  }
+
+  // 2. Automated Meta WhatsApp Business Cloud API (Official Graph API v21.0)
   if (isMetaCloudApiConfigured()) {
     try {
       const res = await sendWhatsAppMessage({
@@ -211,7 +226,7 @@ export async function dispatchAdminWhatsAppAlert(payload: AdminAlertPayload): Pr
     }
   }
 
-  // 2. Automated WhatsApp Dispatch via CallMeBot API (Instant WhatsApp message to 254794400365)
+  // 3. Automated WhatsApp Dispatch via CallMeBot API (Instant WhatsApp message to 254794400365)
   const callmebotKey = process.env.CALLMEBOT_API_KEY || process.env.WHATSAPP_BOT_API_KEY;
   if (callmebotKey) {
     try {
@@ -225,7 +240,7 @@ export async function dispatchAdminWhatsAppAlert(payload: AdminAlertPayload): Pr
     }
   }
 
-  // 2. Automated Webhook (Zapier, Make, Wassenger, or custom WhatsApp gateway)
+  // 4. Automated Webhook (Zapier, Make, Wassenger, or custom WhatsApp gateway)
   const webhookUrl = process.env.ADMIN_ALERT_WEBHOOK_URL || process.env.WHATSAPP_WEBHOOK_URL;
   if (webhookUrl) {
     try {
@@ -247,10 +262,10 @@ export async function dispatchAdminWhatsAppAlert(payload: AdminAlertPayload): Pr
     }
   }
 
-  // 3. Fallback High-Priority SMS to Brian Okibo for Financial Events (Payments / Disputes / Withdrawals)
+  // 5. Fallback High-Priority SMS to Brian Okibo for Financial Events (Payments / Disputes / Withdrawals)
   if (["PAYMENT_RECEIVED", "DISPUTE_OPENED", "WITHDRAWAL_REQUESTED"].includes(payload.eventType)) {
     try {
-      const smsSummary = `[eFootballMarket] ${payload.eventType}: ${payload.orderNumber || payload.listingTitle || ""} KES ${payload.amount || ""}. Check WhatsApp/Admin.`;
+      const smsSummary = `[eFootballMarket] ${payload.eventType}: ${payload.orderNumber || payload.listingTitle || ""} KES ${payload.amount || ""}. Check WhatsApp/Telegram/Admin.`;
       await sendSmsAlert({
         toPhone: ADMIN_INTERNATIONAL_PHONE,
         message: smsSummary,
@@ -262,8 +277,14 @@ export async function dispatchAdminWhatsAppAlert(payload: AdminAlertPayload): Pr
 }
 
 /**
+ * Unified dispatch alias: routes to Telegram + WhatsApp + SMS.
+ */
+export const dispatchAdminAlert = dispatchAdminWhatsAppAlert;
+
+/**
  * Backward compatibility wrapper.
  */
 export async function dispatchAdminOrderAlert(payload: AdminAlertPayload): Promise<void> {
   return dispatchAdminWhatsAppAlert(payload);
 }
+export { isTelegramConfigured };
