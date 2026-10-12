@@ -66,40 +66,6 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
         </p>
       </div>
 
-      {/* Contextual Auth Guidance for Unauthenticated Visitors */}
-      {!user && (
-        <div className="mb-6 p-4 rounded-2xl bg-pitch-surface border border-pitch-border flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-brand-500/10 border border-brand-500/30 flex items-center justify-center text-brand-400 shrink-0">
-              <ShieldCheck className="w-5 h-5" />
-            </div>
-            <div>
-              <p className="text-xs font-bold text-slate-100 flex items-center gap-1.5">
-                <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-                Trading on eFootballMarket?
-              </p>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Create a free account or log in to secure your purchases in automated M-Pesa escrow, chat with sellers, or publish your own squad.
-              </p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <Link
-              href="/login?redirect=/browse"
-              className="px-3.5 py-1.5 rounded-lg text-xs font-semibold bg-pitch-card border border-pitch-border text-slate-200 hover:text-white transition-colors"
-            >
-              Log In
-            </Link>
-            <Link
-              href="/register?redirect=/browse"
-              className="px-4 py-1.5 rounded-lg text-xs font-bold bg-brand-500 text-slate-950 hover:bg-brand-400 transition-colors shadow-md"
-            >
-              Create Account
-            </Link>
-          </div>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-8 items-start">
         {/* Sidebar Filters */}
         <div className="lg:col-span-1 sticky top-20">

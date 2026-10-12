@@ -11,7 +11,6 @@ import { Listing } from "@/types/database";
 
 import { HeroDesktopSpotlight } from "@/components/marketplace/HeroDesktopSpotlight";
 import { EscrowSteps3D } from "@/components/3d/EscrowSteps3D";
-import { KonamiTransferChecklistTrigger } from "@/components/escrow/KonamiTransferChecklistModal";
 
 export const revalidate = 0; // Dynamic server-rendered for real DB metrics
 
@@ -75,7 +74,7 @@ export default async function HomePage() {
                   <input
                     type="text"
                     name="search"
-                    placeholder="Search by epic player, formation, division (e.g. Messi, 3100 OVR, 4-2-2-2)..."
+                    placeholder="Search epic player, formation, OVR (e.g. Messi, 3100)..."
                     className="w-full pl-11 pr-32 py-3.5 rounded-xl bg-pitch-surface/90 border border-pitch-border text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500 text-sm backdrop-blur-md shadow-inner"
                   />
                   <div className="absolute inset-y-1.5 right-1.5 flex items-center">
@@ -204,19 +203,8 @@ export default async function HomePage() {
         )}
       </section>
 
-      {/* 3D Escrow Protection Stepper & Interactive Transfer Checklist */}
-      <section className="relative">
-        <EscrowSteps3D />
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pb-16 flex flex-col sm:flex-row items-center justify-between gap-4 border-b border-pitch-border/60 bg-[#070b12] text-center sm:text-left">
-          <div>
-            <h4 className="text-sm font-bold text-white">Need step-by-step transfer guidance?</h4>
-            <p className="text-xs text-slate-400 mt-0.5">
-              Review our 6-step interactive Konami ID transfer checklist with 2FA and store-unlinking instructions.
-            </p>
-          </div>
-          <KonamiTransferChecklistTrigger />
-        </div>
-      </section>
+      {/* Escrow Protection Stepper */}
+      <EscrowSteps3D />
     </div>
   );
 }

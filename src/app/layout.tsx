@@ -3,7 +3,6 @@ import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
-import { PitchAtmosphere3D } from "@/components/3d/PitchAtmosphere3D";
 import { WhatsAppSupportWidget } from "@/components/support/WhatsAppSupportWidget";
 import { PwaInstallPrompt } from "@/components/pwa/PwaInstallPrompt";
 
@@ -112,7 +111,6 @@ export default function RootLayout({
         <JsonLd siteUrl={siteUrl} />
       </head>
       <body className="bg-[#090d16] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white relative">
-        <PitchAtmosphere3D />
         <Header />
         <main className="flex-1 flex flex-col relative z-10">{children}</main>
         <Footer />

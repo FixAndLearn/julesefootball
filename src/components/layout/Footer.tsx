@@ -49,7 +49,7 @@ export function Footer() {
           </div>
 
           <div className="text-[11px] text-slate-500">
-            © {new Date().getFullYear()} eFootballMarket Inc. Under Executive Leadership of Brian Okibo, CEO.
+            © {new Date().getFullYear()} eFootballMarket Inc. All rights reserved.
           </div>
         </div>
       </footer>
@@ -180,7 +180,7 @@ export function Footer() {
 
         {/* Bottom Attribution */}
         <div className="border-t border-pitch-border/60 mt-12 pt-6 flex flex-col sm:flex-row items-center justify-between text-xs text-slate-500">
-          <p>© {new Date().getFullYear()} eFootballMarket Inc. Under Executive Leadership of Brian Okibo, CEO. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} eFootballMarket Inc. All rights reserved.</p>
           <p className="mt-2 sm:mt-0 text-[11px] text-slate-400">
             eFootball™ is a trademark of Konami Digital Entertainment. eFootballMarket is an independent escrow intermediary.
           </p>

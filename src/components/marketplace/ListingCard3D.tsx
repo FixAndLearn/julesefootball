@@ -139,12 +139,12 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
             </div>
 
             <div className="flex items-center gap-1.5">
-              <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-amber-400/40 text-[11px] font-bold text-amber-300 shadow-lg shadow-amber-500/20">
+              <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/90 backdrop-blur-md border border-amber-400 text-[11px] font-black text-amber-300 shadow-md shadow-amber-500/20">
                 <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
-                <span>OVR {listing.overall_team_strength}</span>
+                <span>{listing.overall_team_strength} OVR</span>
               </div>
-              <div className="px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/10 text-[11px] font-semibold text-slate-200 shadow-md">
-                Div {listing.current_division}
+              <div className="px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-[11px] font-semibold text-slate-200 shadow-md">
+                Div {listing.current_division || 1}
               </div>
             </div>
           </div>
@@ -240,8 +240,8 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
             </div>
 
             <div className="text-right">
-              <span className="block text-[10px] text-slate-400 uppercase font-medium">Escrow Price</span>
-              <span className="text-base font-bold text-emerald-400 font-display">
+              <span className="block text-[10px] text-slate-400 uppercase font-semibold">M-Pesa Escrow</span>
+              <span className="text-base font-extrabold text-emerald-400 font-mono tracking-tight">
                 {formatCurrency(listing.price, listing.currency)}
               </span>
             </div>
