@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
+import { dispatchAdminTelegramAlert } from "@/lib/notifications/telegramAlert";
 
 export const dynamic = "force-dynamic";
 
@@ -129,8 +130,8 @@ export async function POST(req: NextRequest) {
 
     MEMORY_DEALS.unshift(newDeal);
 
-    // Automated WhatsApp alert to Brian Okibo (+254794400365)
-    dispatchAdminWhatsAppAlert({
+    // Automated Telegram push alert to Brian Okibo (+254794400365)
+    dispatchAdminTelegramAlert({
       eventType: "MIDDLEMAN_DEAL_CREATED",
       orderNumber: dealCode,
       listingTitle: deal_title,

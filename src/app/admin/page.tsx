@@ -23,12 +23,14 @@ import {
   KeyRound,
   Layers,
   Lock,
+  Megaphone,
   MessageCircle,
   Newspaper,
   PlusCircle,
   RefreshCw,
   Search,
   Send,
+  Share2,
   Shield,
   ShieldAlert,
   ShieldCheck,
@@ -65,6 +67,10 @@ function AdminControlCenterContent() {
   const [customTgToken, setCustomTgToken] = useState("");
   const [registeringWebhook, setRegisteringWebhook] = useState(false);
   const [broadcastingListingId, setBroadcastingListingId] = useState<string | null>(null);
+  const [channelInput, setChannelInput] = useState("");
+  const [testChannelLoading, setTestChannelLoading] = useState(false);
+  const [testChannelResult, setTestChannelResult] = useState<any>(null);
+  const [selectedSquadToBroadcast, setSelectedSquadToBroadcast] = useState("");
 
   // Data states
   const [listings, setListings] = useState<any[]>([]);
@@ -263,9 +269,73 @@ function AdminControlCenterContent() {
     }
   };
 
+  const handleTestChannelBroadcast = async () => {
+    setTestChannelLoading(true);
+    setTestChannelResult(null);
+    try {
+      const res = await fetch("/api/telegram/send-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "test_deals_channel",
+          channel: channelInput.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      setTestChannelResult(data);
+      if (data.success) {
+        setFeedback({
+          type: "success",
+          message: `Sample Deal Card sent to Telegram Deals Channel (${data.channelUsed || channelInput || "configured channel"})! Check your Telegram channel! 🎉`,
+        });
+      } else {
+        setFeedback({
+          type: "error",
+          message: `Channel Broadcast failed: ${data.error || "Make sure @efootballmaket_bot is added as Administrator with Post Messages permission."}`,
+        });
+      }
+    } catch (err: any) {
+      setTestChannelResult({ error: err.message });
+      setFeedback({ type: "error", message: `Broadcast error: ${err.message}` });
+    } finally {
+      setTestChannelLoading(false);
+    }
+  };
 
+  const handleBroadcastSelectedSquad = async () => {
+    if (!selectedSquadToBroadcast) return;
+    const targetListing = listings.find((l) => l.id === selectedSquadToBroadcast);
+    if (!targetListing) return;
 
-  // Handle Listing Takedown / Reinstate
+    setBroadcastingListingId(targetListing.id);
+    try {
+      const res = await fetch("/api/telegram/send-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "broadcast_listing",
+          listingId: targetListing.id,
+          channel: channelInput.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFeedback({
+          type: "success",
+          message: `"${targetListing.title}" broadcasted to Telegram Deals Channel (${data.channelUsed || channelInput || "channel"})! ⚽🔥`,
+        });
+      } else {
+        setFeedback({
+          type: "error",
+          message: `Broadcast failed: ${data.error || "Check channel permissions"}`,
+        });
+      }
+    } catch (err: any) {
+      setFeedback({ type: "error", message: `Error: ${err.message}` });
+    } finally {
+      setBroadcastingListingId(null);
+    }
+  };
   const handleModerateListing = async (listingId: string, action: "take_down" | "reinstate", reason?: string) => {
     setActionLoading(true);
     setFeedback(null);
@@ -1540,6 +1610,146 @@ function AdminControlCenterContent() {
                       TELEGRAM_CHAT_ID=&quot;...&quot;
                     </p>
                   </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* TELEGRAM PUBLIC DEALS CHANNEL SUITE */}
+          <div className="p-6 rounded-3xl bg-pitch-surface border border-indigo-500/40 shadow-2xl space-y-5">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-pitch-border/80 pb-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-indigo-500/15 border border-indigo-500/40 text-indigo-300 text-xs font-bold mb-2">
+                  <Megaphone className="w-3.5 h-3.5 text-indigo-400" />
+                  <span>Automated Community Growth &amp; Broadcasts</span>
+                </div>
+                <h3 className="text-xl font-bold text-white font-display flex flex-wrap items-center gap-2">
+                  <span>Telegram Deals Channel Auto-Broadcast</span>
+                  {telegramInfo?.channelConfigured ? (
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-mono font-bold">
+                      CHANNEL LINKED ✅
+                    </span>
+                  ) : (
+                    <span className="text-xs px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 font-mono font-bold">
+                      OPTIONAL BROADCAST
+                    </span>
+                  )}
+                </h3>
+                <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                  Automatically posts verified squad cards to your public Telegram gaming channel (e.g. <code>@efootballmarket_deals</code>). Every broadcast includes high-resolution squad screenshots, OVR rating, KES price, and a direct 1-tap Buy via Till 1572931 button!
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-pitch-card border border-pitch-border space-y-1 shrink-0 text-right">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Target Channel</span>
+                <span className="text-sm font-bold text-indigo-400 font-mono">
+                  {channelInput.trim() || telegramInfo?.maskedChannel || "@efootballmarket_deals"}
+                </span>
+                <span className="text-[10px] text-slate-400 block font-mono">
+                  Bot: @efootballmaket_bot
+                </span>
+              </div>
+            </div>
+
+            {/* Channel Dispatch Actions Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+              {/* Left Column: Test Broadcast & Custom Target */}
+              <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-3">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-amber-400" />
+                  <span>1. Test Channel Dispatch</span>
+                </span>
+                <p className="text-xs text-slate-400">
+                  Enter your channel username or numeric ID. Make sure <strong>@efootballmaket_bot</strong> is an <strong>Administrator</strong> in the channel with <em>Post Messages</em> permissions.
+                </p>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-slate-300 block">
+                    Channel Username / ID (leave blank to use .env default):
+                  </label>
+                  <input
+                    type="text"
+                    value={channelInput}
+                    onChange={(e) => setChannelInput(e.target.value)}
+                    placeholder="e.g. @efootballmarket_deals or -100xxxxxxxxxx"
+                    className="w-full px-3.5 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
+                  />
+                </div>
+
+                <Button
+                  variant="gold"
+                  size="sm"
+                  onClick={handleTestChannelBroadcast}
+                  isLoading={testChannelLoading}
+                  className="w-full font-bold text-xs"
+                >
+                  <Send className="w-3.5 h-3.5 mr-1.5" />
+                  Post Test Deal Card to Channel
+                </Button>
+
+                {testChannelResult && (
+                  <div
+                    className={`p-3 rounded-xl border text-xs font-mono space-y-0.5 ${
+                      testChannelResult.success
+                        ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
+                        : "bg-rose-950/60 border-rose-500/40 text-rose-300"
+                    }`}
+                  >
+                    <div>
+                      <strong>Channel Post:</strong> {testChannelResult.success ? "POSTED TO CHANNEL ✅" : "FAILED ❌"}
+                    </div>
+                    {testChannelResult.messageId && (
+                      <div>Telegram msg_id: {testChannelResult.messageId}</div>
+                    )}
+                    {testChannelResult.error && (
+                      <div>Error: {testChannelResult.error}</div>
+                    )}
+                  </div>
+                )}
+              </div>
+
+              {/* Right Column: Broadcast Any Active Marketplace Squad */}
+              <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-3">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <Share2 className="w-4 h-4 text-emerald-400" />
+                  <span>2. Manually Broadcast Live Listing</span>
+                </span>
+                <p className="text-xs text-slate-400">
+                  Select any approved marketplace squad to instantly push to your community subscribers right now.
+                </p>
+
+                <div className="space-y-2">
+                  <label className="text-[11px] font-semibold text-slate-300 block">
+                    Select Active Squad to Push:
+                  </label>
+                  <select
+                    value={selectedSquadToBroadcast}
+                    onChange={(e) => setSelectedSquadToBroadcast(e.target.value)}
+                    className="w-full px-3.5 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-100 focus:outline-none focus:border-emerald-500"
+                  >
+                    <option value="">-- Choose squad from marketplace --</option>
+                    {listings.filter((l) => l.status === "active").map((l) => (
+                      <option key={l.id} value={l.id}>
+                        {l.title} (KES {Number(l.price).toLocaleString()} • {l.collective_strength || l.squad_rating || "Top"} OVR)
+                      </option>
+                    ))}
+                  </select>
+                </div>
+
+                <Button
+                  variant="primary"
+                  size="sm"
+                  onClick={handleBroadcastSelectedSquad}
+                  isLoading={Boolean(broadcastingListingId)}
+                  disabled={!selectedSquadToBroadcast}
+                  className="w-full font-bold text-xs bg-emerald-600 hover:bg-emerald-500 text-white"
+                >
+                  <Megaphone className="w-3.5 h-3.5 mr-1.5" />
+                  Broadcast Squad to Deals Channel Now
+                </Button>
+
+                <div className="p-2.5 rounded-xl bg-slate-950/70 border border-pitch-border text-[11px] text-slate-400">
+                  💡 <strong>Pro Tip:</strong> Re-broadcasting top squads at 8:00 PM EAT gives maximum exposure when Kenyan gamers are most active on WhatsApp &amp; Telegram.
                 </div>
               </div>
             </div>

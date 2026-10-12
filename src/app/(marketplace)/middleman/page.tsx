@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect, Suspense } from "react";
+import { useSearchParams } from "next/navigation";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -22,10 +23,14 @@ import {
   AlertTriangle,
   ArrowRight,
   UserCheck,
+  Share2,
+  Link2,
+  Check,
 } from "lucide-react";
 
-export default function MiddlemanPage() {
-  const [activeTab, setActiveTab] = useState<"create" | "track">("create");
+function MiddlemanContent() {
+  const searchParams = useSearchParams();
+  const [activeTab, setActiveTab] = useState<"create" | "generator" | "track">("create");
 
   // Create Deal Form
   const [buyerName, setBuyerName] = useState("");
@@ -40,15 +45,101 @@ export default function MiddlemanPage() {
   const [formError, setFormError] = useState("");
   const [copiedCode, setCopiedCode] = useState(false);
 
+  // Generator State
+  const [genTitle, setGenTitle] = useState("");
+  const [genAmount, setGenAmount] = useState("");
+  const [genSellerPhone, setGenSellerPhone] = useState("");
+  const [genBuyerPhone, setGenBuyerPhone] = useState("");
+  const [copiedInviteText, setCopiedInviteText] = useState(false);
+  const [copiedInviteUrl, setCopiedInviteUrl] = useState(false);
+
   // Track Deal
   const [searchCode, setSearchCode] = useState("");
   const [trackingLoading, setTrackingLoading] = useState(false);
   const [trackedDeals, setTrackedDeals] = useState<MiddlemanDeal[] | null>(null);
   const [trackError, setTrackError] = useState("");
 
+  const searchDealByCode = async (codeToSearch: string) => {
+    if (!codeToSearch) return;
+    setTrackingLoading(true);
+    setTrackError("");
+    try {
+      const isPhone = codeToSearch.replace(/[^0-9]/g, "").length >= 9;
+      const url = isPhone
+        ? `/api/middleman?phone=${encodeURIComponent(codeToSearch)}`
+        : `/api/middleman?code=${encodeURIComponent(codeToSearch)}`;
+
+      const res = await fetch(url);
+      const data = await res.json();
+      if (data.deals && data.deals.length > 0) {
+        setTrackedDeals(data.deals);
+      } else {
+        setTrackError("No active escrow contract found with this code or phone.");
+        setTrackedDeals([]);
+      }
+    } catch {
+      setTrackError("Error searching for deal.");
+    } finally {
+      setTrackingLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    const qCode = searchParams.get("code");
+    const qTitle = searchParams.get("title");
+    const qAmount = searchParams.get("amount");
+    const qSeller = searchParams.get("seller") || searchParams.get("seller_phone");
+    const qBuyer = searchParams.get("buyer") || searchParams.get("buyer_phone");
+    const qTab = searchParams.get("tab");
+
+    if (qCode) {
+      setSearchCode(qCode);
+      setActiveTab("track");
+      searchDealByCode(qCode);
+    } else if (qTitle || qAmount || qSeller || qBuyer) {
+      if (qTitle) {
+        setDealTitle(qTitle);
+        setGenTitle(qTitle);
+      }
+      if (qAmount) {
+        setDealAmount(qAmount);
+        setGenAmount(qAmount);
+      }
+      if (qSeller) {
+        setSellerPhone(qSeller);
+        setGenSellerPhone(qSeller);
+      }
+      if (qBuyer) {
+        setBuyerPhone(qBuyer);
+        setGenBuyerPhone(qBuyer);
+      }
+      if (qTab === "generator") {
+        setActiveTab("generator");
+      } else {
+        setActiveTab("create");
+      }
+    } else if (qTab === "generator") {
+      setActiveTab("generator");
+    }
+  }, [searchParams]);
+
   const numAmount = Number(dealAmount) || 0;
   const escrowFee = numAmount > 0 ? Math.max(50, Math.min(350, Math.round(numAmount * 0.05))) : 0;
   const totalPayable = numAmount + escrowFee;
+
+  const appBaseUrl = typeof window !== "undefined" ? window.location.origin : "https://www.efootballmarket.co.ke";
+  const effectiveGenTitle = genTitle || dealTitle || "eFootball Squad";
+  const effectiveGenAmount = genAmount || dealAmount || "1500";
+  const generatedInviteUrl = `${appBaseUrl}/middleman?title=${encodeURIComponent(effectiveGenTitle)}&amount=${encodeURIComponent(effectiveGenAmount)}${genSellerPhone ? `&seller=${encodeURIComponent(genSellerPhone)}` : ""}${genBuyerPhone ? `&buyer=${encodeURIComponent(genBuyerPhone)}` : ""}`;
+
+  const generatedWhatsAppGroupMessage =
+    `🔒 *OFFICIAL ESCROW TRADE CONTRACT*\n\n` +
+    `🎮 *Squad / Item:* ${effectiveGenTitle}\n` +
+    `💰 *Agreed Price:* KES ${Number(effectiveGenAmount).toLocaleString()}\n` +
+    `🛡️ *Escrow Vault:* Safaricom Till 1572931 (EFootballMarket)\n` +
+    `👤 *Escrow Officer:* Brian Okibo (+254 794 400 365)\n\n` +
+    `⚠️ *Protection Policy:* Funds remain locked until the buyer inspects squad players, coins, and changes Konami ID credentials.\n\n` +
+    `👉 *Open & Lock Contract:* ${generatedInviteUrl}`;
 
   const handleCreateDeal = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,11 +249,11 @@ export default function MiddlemanPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex items-center gap-3 mb-8 border-b border-pitch-border/60 pb-3">
+      <div className="flex flex-wrap items-center gap-3 mb-8 border-b border-pitch-border/60 pb-3">
         <button
           type="button"
           onClick={() => setActiveTab("create")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
             activeTab === "create"
               ? "bg-emerald-600 text-white shadow-lg"
               : "bg-pitch-surface border border-pitch-border text-slate-300 hover:text-white"
@@ -174,8 +265,24 @@ export default function MiddlemanPage() {
 
         <button
           type="button"
+          onClick={() => setActiveTab("generator")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+            activeTab === "generator"
+              ? "bg-indigo-600 text-white shadow-lg"
+              : "bg-pitch-surface border border-pitch-border text-slate-300 hover:text-white"
+          }`}
+        >
+          <Share2 className="w-4 h-4 text-emerald-400" />
+          <span>WhatsApp Group Link Generator</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+            Viral for Groups 🔥
+          </span>
+        </button>
+
+        <button
+          type="button"
           onClick={() => setActiveTab("track")}
-          className={`flex items-center gap-2 px-4 py-2 rounded-xl text-sm font-bold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
             activeTab === "track"
               ? "bg-emerald-600 text-white shadow-lg"
               : "bg-pitch-surface border border-pitch-border text-slate-300 hover:text-white"
@@ -447,6 +554,146 @@ export default function MiddlemanPage() {
         </div>
       )}
 
+      {/* Tab: WhatsApp Group Link Generator */}
+      {activeTab === "generator" && (
+        <div className="bg-pitch-surface border border-emerald-500/50 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+          <div className="border-b border-pitch-border/80 pb-4">
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold mb-2">
+              <Share2 className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Viral Growth Tool for WhatsApp Gaming Groups</span>
+            </div>
+            <h3 className="text-xl font-bold text-white font-display">
+              Generate 1-Click WhatsApp Escrow Contract Invite
+            </h3>
+            <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+              Drop a formatted escrow invitation into your WhatsApp gaming groups or send it directly to a buyer/seller. When they tap the link, the contract opens pre-filled and ready to lock funds via <strong>Safaricom Till 1572931</strong>!
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {/* Form Inputs */}
+            <div className="space-y-4">
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-200 block">
+                  Squad / Deal Title <span className="text-amber-400">*</span>
+                </label>
+                <input
+                  type="text"
+                  value={genTitle}
+                  onChange={(e) => setGenTitle(e.target.value)}
+                  placeholder="e.g. 3120 OVR Epic Neymar + Rummenigge Account"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-xs font-semibold text-slate-200 block">
+                  Agreed Price (KES) <span className="text-amber-400">*</span>
+                </label>
+                <input
+                  type="number"
+                  value={genAmount}
+                  onChange={(e) => setGenAmount(e.target.value)}
+                  placeholder="e.g. 2500"
+                  className="w-full px-3.5 py-2.5 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 font-mono"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-200 block">
+                    Seller Phone (Optional)
+                  </label>
+                  <input
+                    type="tel"
+                    value={genSellerPhone}
+                    onChange={(e) => setGenSellerPhone(e.target.value)}
+                    placeholder="0712345678"
+                    className="w-full px-3.5 py-2 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+
+                <div className="space-y-1.5">
+                  <label className="text-xs font-semibold text-slate-200 block">
+                    Buyer Phone (Optional)
+                  </label>
+                  <input
+                    type="tel"
+                    value={genBuyerPhone}
+                    onChange={(e) => setGenBuyerPhone(e.target.value)}
+                    placeholder="0798765432"
+                    className="w-full px-3.5 py-2 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+                  />
+                </div>
+              </div>
+
+              <div className="pt-2 flex flex-col sm:flex-row items-center gap-2.5">
+                <a
+                  href={`https://wa.me/?text=${encodeURIComponent(generatedWhatsAppGroupMessage)}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full sm:flex-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-lg transition-all"
+                >
+                  <MessageCircle className="w-4 h-4 fill-white" />
+                  <span>Share Directly to WhatsApp</span>
+                </a>
+
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    navigator.clipboard.writeText(generatedInviteUrl);
+                    setCopiedInviteUrl(true);
+                    setTimeout(() => setCopiedInviteUrl(false), 3000);
+                  }}
+                  className="w-full sm:w-auto text-xs"
+                >
+                  {copiedInviteUrl ? <Check className="w-3.5 h-3.5 mr-1 text-emerald-400" /> : <Link2 className="w-3.5 h-3.5 mr-1" />}
+                  {copiedInviteUrl ? "Copied Link!" : "Copy Link"}
+                </Button>
+              </div>
+            </div>
+
+            {/* Live Message Preview Card */}
+            <div className="p-5 rounded-2xl bg-pitch-card border border-pitch-border space-y-3 flex flex-col justify-between">
+              <div className="space-y-2">
+                <span className="text-[11px] font-bold text-emerald-400 uppercase tracking-wider block">
+                  WhatsApp Preview (Formatted for Kenyan Gaming Groups)
+                </span>
+                <div className="p-3.5 rounded-xl bg-slate-950/90 border border-pitch-border text-xs text-slate-200 font-mono whitespace-pre-wrap leading-relaxed select-all">
+                  {generatedWhatsAppGroupMessage}
+                </div>
+              </div>
+
+              <Button
+                type="button"
+                variant="gold"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(generatedWhatsAppGroupMessage);
+                  setCopiedInviteText(true);
+                  setTimeout(() => setCopiedInviteText(false), 3000);
+                }}
+                className="w-full font-bold text-xs mt-2"
+              >
+                {copiedInviteText ? (
+                  <>
+                    <Check className="w-4 h-4 mr-1.5 text-slate-950" />
+                    Copied WhatsApp Message!
+                  </>
+                ) : (
+                  <>
+                    <Copy className="w-4 h-4 mr-1.5" />
+                    Copy Formatted Group Message
+                  </>
+                )}
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Tab 2: Track Existing Deal */}
       {activeTab === "track" && (
         <div className="bg-pitch-surface border border-pitch-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
@@ -511,5 +758,20 @@ export default function MiddlemanPage() {
         </div>
       )}
     </div>
+  );
+}
+
+export default function MiddlemanPage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="py-24 text-center space-y-3">
+          <div className="w-8 h-8 rounded-full border-2 border-brand-400 border-t-transparent animate-spin mx-auto" />
+          <p className="text-xs text-slate-400">Loading escrow contract room...</p>
+        </div>
+      }
+    >
+      <MiddlemanContent />
+    </Suspense>
   );
 }

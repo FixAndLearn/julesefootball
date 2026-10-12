@@ -241,7 +241,7 @@ export async function editTelegramMessageText(
 export async function broadcastListingToTelegramChannel(
   listing: any,
   customChannel?: string
-): Promise<{ success: boolean; messageId?: number; error?: string }> {
+): Promise<{ success: boolean; messageId?: number; channelUsed?: string; error?: string }> {
   const channel =
     customChannel ||
     process.env.TELEGRAM_CHANNEL_ID ||
@@ -260,27 +260,70 @@ export async function broadcastListingToTelegramChannel(
   const listingUrl = `${APP_URL}/listings/${listing.id}`;
 
   const captionHtml =
-    `🔥 <b>NEW ACCOUNT FOR SALE ON EFOOTBALLMARKET</b> ⚽\n\n` +
-    `🎮 <b>Squad:</b> <b>${title}</b>\n` +
-    `⭐ <b>Team Strength:</b> <code>${ovr} OVR</code>\n` +
+    `🔥 <b>NEW VERIFIED LISTING ON EFOOTBALLMARKET</b> ⚽\n\n` +
+    `🎮 <b>Account:</b> <b>${title}</b>\n` +
+    `⭐ <b>Squad Strength:</b> <code>${ovr} OVR</code>\n` +
     `💰 <b>Price:</b> <b>${priceKes}</b>\n` +
-    `🛡️ <b>Escrow Protection:</b> Till 1572931 (100% Guaranteed)\n` +
     `📱 <b>Platform:</b> ${platform}\n` +
+    `🛡️ <b>Escrow Protection:</b> Safaricom Till 1572931\n` +
     `🔐 <b>Konami ID:</b> Transferable &amp; Email Bindable\n\n` +
-    `⚡ <i>Buy safely — seller gets paid ONLY after you verify access!</i>\n\n` +
-    `🏛️ <b>eFootballMarket Kenya</b>`;
+    `⚡ <i>Funds held in escrow until buyer verifies squad players &amp; coin balances!</i>\n\n` +
+    `#eFootball #eFootballKenya #eFootballMarket #GamingKE`;
 
   const buttons = [
     [{ text: "🛒 Buy Safely via Escrow", url: listingUrl }],
-    [{ text: "⚽ Browse Marketplace", url: `${APP_URL}/marketplace` }],
+    [{ text: "⚽ Browse All Squads", url: `${APP_URL}/marketplace` }],
   ];
 
-  return sendTelegramMessage(captionHtml, {
+  // Try sending high-impact squad screenshot first if available
+  const photoUrl =
+    (Array.isArray(listing.images) && listing.images[0]) ||
+    listing.images?.[0] ||
+    listing.primary_image_url ||
+    listing.image_url ||
+    listing.cover_image_url;
+
+  if (photoUrl && typeof photoUrl === "string" && photoUrl.startsWith("http")) {
+    try {
+      const photoEndpoint = `https://api.telegram.org/bot${token.trim()}/sendPhoto`;
+      const photoRes = await fetch(photoEndpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: channel.trim(),
+          photo: photoUrl,
+          caption: captionHtml,
+          parse_mode: "HTML",
+          reply_markup: {
+            inline_keyboard: buttons,
+          },
+        }),
+      });
+
+      const photoData = await photoRes.json();
+      if (photoRes.ok && photoData?.ok) {
+        return {
+          success: true,
+          messageId: photoData.result?.message_id,
+          channelUsed: channel,
+        };
+      }
+    } catch {
+      // Graceful fallback to text message
+    }
+  }
+
+  const textRes = await sendTelegramMessage(captionHtml, {
     chatId: channel,
     token,
     parseMode: "HTML",
     inlineButtons: buttons,
   });
+
+  return {
+    ...textRes,
+    channelUsed: channel,
+  };
 }
 
 /**
