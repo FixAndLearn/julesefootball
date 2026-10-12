@@ -2,6 +2,7 @@ import { mpesaClient } from "@/lib/mpesa/client";
 import { AnyCallbackBody, StkCallbackBody } from "@/lib/mpesa/types";
 import { dispatchAdminOrderAlert } from "@/lib/notifications/adminAlert";
 import { sendBuyerPaymentConfirmedSms, sendSellerOrderReceivedSms } from "@/lib/notifications/smsAlert";
+import { sendBuyerPaymentSecuredWhatsApp, sendSellerDeliverCredentialsWhatsApp } from "@/lib/whatsapp/notifications";
 import { Payment } from "@/types/database";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -184,7 +185,7 @@ export class PaymentService {
         eventType: "PAYMENT_RECEIVED",
       }).catch((err) => console.error("Admin order alert error:", err));
 
-      // Dispatch instant SMS to Buyer
+      // Dispatch instant SMS & WhatsApp to Buyer
       if (payment.phone_number) {
         sendBuyerPaymentConfirmedSms(
           payment.phone_number,
@@ -192,9 +193,17 @@ export class PaymentService {
           amount || Number(payment.order?.total_amount) || 0,
           payment.order_id || paymentId
         ).catch((err) => console.warn("Buyer payment SMS failed:", err));
+
+        sendBuyerPaymentSecuredWhatsApp(
+          payment.phone_number,
+          payment.order?.order_number || `ORD-${paymentId.slice(0, 8)}`,
+          amount || Number(payment.order?.total_amount) || 0,
+          payment.order?.listing?.title || "eFootball Verified Squad",
+          payment.order_id || paymentId
+        ).catch((err) => console.warn("Buyer payment WhatsApp notice:", err));
       }
 
-      // Dispatch instant SMS to Seller to deliver Konami credentials
+      // Dispatch instant SMS & WhatsApp to Seller to deliver Konami credentials
       if (payment.order?.seller_id) {
         try {
           const { data: sellerProf } = await this.supabase
@@ -204,16 +213,24 @@ export class PaymentService {
             .single();
 
           if (sellerProf?.phone_number) {
-            await sendSellerOrderReceivedSms(
+            sendSellerOrderReceivedSms(
               sellerProf.phone_number,
               payment.order?.order_number || `ORD-${paymentId.slice(0, 8)}`,
               amount || Number(payment.order?.total_amount) || 0,
               payment.order?.listing?.title || "eFootball Verified Squad",
               payment.order_id || paymentId
-            );
+            ).catch((err) => console.warn("Seller order SMS notice:", err));
+
+            sendSellerDeliverCredentialsWhatsApp(
+              sellerProf.phone_number,
+              payment.order?.order_number || `ORD-${paymentId.slice(0, 8)}`,
+              amount || Number(payment.order?.total_amount) || 0,
+              payment.order?.listing?.title || "eFootball Verified Squad",
+              payment.order_id || paymentId
+            ).catch((err) => console.warn("Seller order WhatsApp notice:", err));
           }
         } catch (err) {
-          console.warn("Seller order SMS dispatch notice:", err);
+          console.warn("Seller order notification notice:", err);
         }
       }
     }

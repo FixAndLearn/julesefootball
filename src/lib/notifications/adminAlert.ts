@@ -4,6 +4,7 @@
  */
 
 import { formatDisplayPhone, formatInternationalPhone } from "@/lib/utils/phone";
+import { isMetaCloudApiConfigured, sendWhatsAppMessage } from "@/lib/whatsapp/cloudApi";
 import { sendSmsAlert } from "./smsAlert";
 
 export const ADMIN_PHONE_NUMBER = "0794400365";
@@ -194,7 +195,23 @@ export async function dispatchAdminWhatsAppAlert(payload: AdminAlertPayload): Pr
   const alertText = formatAdminWhatsAppMessage(payload);
   console.log(`[WHATSAPP AUTOMATED ALERT -> ${ADMIN_INTERNATIONAL_PHONE}]`, alertText);
 
-  // 1. Automated WhatsApp Dispatch via CallMeBot API (Instant WhatsApp message to 254794400365)
+  // 1. Automated Meta WhatsApp Business Cloud API (Official Graph API v21.0)
+  if (isMetaCloudApiConfigured()) {
+    try {
+      const res = await sendWhatsAppMessage({
+        toPhone: ADMIN_WHATSAPP_NUMBER,
+        message: alertText,
+      });
+      if (res.success && res.provider === "meta_cloud_api") {
+        console.log(`[MetaCloud:WhatsApp] Delivered to ${ADMIN_INTERNATIONAL_PHONE}: ${res.messageId}`);
+        return;
+      }
+    } catch (err: any) {
+      console.warn("Meta Cloud API alert notice:", err.message);
+    }
+  }
+
+  // 2. Automated WhatsApp Dispatch via CallMeBot API (Instant WhatsApp message to 254794400365)
   const callmebotKey = process.env.CALLMEBOT_API_KEY || process.env.WHATSAPP_BOT_API_KEY;
   if (callmebotKey) {
     try {

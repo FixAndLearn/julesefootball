@@ -1,5 +1,6 @@
 import { decryptCredential, encryptCredential } from "@/lib/encryption/crypto";
 import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
+import { sendBuyerCredentialsDeliveredWhatsApp, sendSellerFundsReleasedWhatsApp } from "@/lib/whatsapp/notifications";
 import { AccountDelivery, EscrowAccount, EscrowState } from "@/types/database";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -147,6 +148,22 @@ export class EscrowService {
           action_url: `/orders/${orderId}`,
           is_read: false,
         });
+
+        // Dispatch WhatsApp notification to buyer
+        const { data: buyerProf } = await this.supabase
+          .from("profiles")
+          .select("phone_number")
+          .eq("id", order.buyer_id)
+          .single();
+
+        if (buyerProf?.phone_number) {
+          sendBuyerCredentialsDeliveredWhatsApp(
+            buyerProf.phone_number,
+            order.order_number,
+            (order as any)?.listing?.title || "eFootball Squad",
+            orderId
+          ).catch((e) => console.warn("Buyer credentials WhatsApp alert notice:", e));
+        }
       } catch (notifErr) {
         console.warn("Failed to notify buyer:", notifErr);
       }
@@ -346,6 +363,21 @@ export class EscrowService {
         action_url: "/seller/earnings",
         is_read: false,
       });
+
+      // Dispatch WhatsApp notification to seller
+      const { data: sellerProf } = await this.supabase
+        .from("profiles")
+        .select("phone_number")
+        .eq("id", order.seller_id)
+        .single();
+
+      if (sellerProf?.phone_number) {
+        sendSellerFundsReleasedWhatsApp(
+          sellerProf.phone_number,
+          order.order_number,
+          Number(order.seller_net_amount || order.total_amount || 0)
+        ).catch((e) => console.warn("Seller funds released WhatsApp notice:", e));
+      }
     } catch (e) {
       console.warn("Failed to create seller notification:", e);
     }

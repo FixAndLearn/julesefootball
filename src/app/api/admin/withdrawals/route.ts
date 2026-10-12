@@ -1,6 +1,7 @@
 import { isUserAdmin } from "@/lib/security/adminAuth";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { sendSellerWithdrawalStatusWhatsApp } from "@/lib/whatsapp/notifications";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -143,6 +144,15 @@ export async function PATCH(req: NextRequest) {
         action_url: "/seller/earnings",
         is_read: false,
       });
+      // Dispatch WhatsApp message to seller
+      if (withdrawal.phone_number && (status === "completed" || status === "rejected")) {
+        sendSellerWithdrawalStatusWhatsApp(
+          withdrawal.phone_number,
+          Number(withdrawal.amount),
+          status,
+          failureReason
+        ).catch((err) => console.warn("Seller withdrawal WhatsApp notice:", err));
+      }
     } catch (e) {
       console.warn("Failed to notify seller:", e);
     }

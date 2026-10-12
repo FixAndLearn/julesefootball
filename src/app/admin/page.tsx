@@ -31,6 +31,7 @@ import {
   Shield,
   ShieldAlert,
   ShieldCheck,
+  Smartphone,
   Trash2,
   UserCheck,
   UserMinus,
@@ -38,6 +39,7 @@ import {
   Users,
   X,
   XCircle,
+  Zap,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -48,9 +50,15 @@ function AdminControlCenterContent() {
   const searchParams = useSearchParams();
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
 
-  const [activeTab, setActiveTab] = useState<"listings" | "users" | "news" | "withdrawals">(
+  const [activeTab, setActiveTab] = useState<"listings" | "users" | "news" | "withdrawals" | "whatsapp">(
     (searchParams.get("tab") as any) || "listings"
   );
+
+  // WhatsApp Integration State
+  const [whatsappInfo, setWhatsappInfo] = useState<any>(null);
+  const [testWaPhone, setTestWaPhone] = useState("254794400365");
+  const [testWaLoading, setTestWaLoading] = useState(false);
+  const [testWaResult, setTestWaResult] = useState<any>(null);
 
   // Data states
   const [listings, setListings] = useState<any[]>([]);
@@ -138,8 +146,51 @@ function AdminControlCenterContent() {
   useEffect(() => {
     if (isAdmin) {
       loadAdminData();
+      loadWhatsAppStatus();
     }
   }, [isAdmin, loadAdminData]);
+
+  const loadWhatsAppStatus = async () => {
+    try {
+      const res = await fetch("/api/whatsapp/send-test");
+      if (res.ok) {
+        const data = await res.json();
+        setWhatsappInfo(data);
+      }
+    } catch {
+      // non-blocking
+    }
+  };
+
+  const handleSendTestWhatsApp = async () => {
+    setTestWaLoading(true);
+    setTestWaResult(null);
+    try {
+      const res = await fetch("/api/whatsapp/send-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ toPhone: testWaPhone }),
+      });
+      const data = await res.json();
+      setTestWaResult(data);
+      if (data.success) {
+        setFeedback({
+          type: "success",
+          message: `WhatsApp test message dispatched via ${data.provider} to ${data.recipient}!`,
+        });
+      } else {
+        setFeedback({
+          type: "error",
+          message: `WhatsApp dispatch issue: ${data.error || "Check credentials"}`,
+        });
+      }
+    } catch (err: any) {
+      setTestWaResult({ error: err.message });
+      setFeedback({ type: "error", message: `Error sending WhatsApp test: ${err.message}` });
+    } finally {
+      setTestWaLoading(false);
+    }
+  };
 
   // Handle Listing Takedown / Reinstate
   const handleModerateListing = async (listingId: string, action: "take_down" | "reinstate", reason?: string) => {
@@ -565,6 +616,25 @@ function AdminControlCenterContent() {
           <span>Post News & Alerts</span>
           <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
             {articles.length}
+          </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => {
+            setActiveTab("whatsapp");
+            loadWhatsAppStatus();
+          }}
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+            activeTab === "whatsapp"
+              ? "border-emerald-400 text-emerald-400 bg-pitch-surface"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <MessageCircle className="w-4 h-4 text-emerald-400" />
+          <span>WhatsApp Business Hub</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40">
+            {whatsappInfo?.isConfigured ? "Connected" : "Setup"}
           </span>
         </button>
       </div>
@@ -1303,6 +1373,201 @@ function AdminControlCenterContent() {
               </div>
             </div>
           )}
+        </div>
+      )}
+
+      {/* TAB 5: WHATSAPP BUSINESS INTEGRATION HUB */}
+      {activeTab === "whatsapp" && (
+        <div className="space-y-6 animate-in fade-in">
+          {/* Header Card */}
+          <div className="p-6 rounded-3xl bg-pitch-surface border border-emerald-500/40 shadow-2xl relative overflow-hidden">
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
+              <div>
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold mb-2">
+                  <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                  <span>Official Automated Alerts & Customer Bot</span>
+                </div>
+                <h2 className="text-2xl font-bold text-white font-display">
+                  WhatsApp Business Integration Hub
+                </h2>
+                <p className="text-xs text-slate-300 mt-1 max-w-2xl leading-relaxed">
+                  Automatically delivers instant receipts to buyers, handover requests to sellers, and real-time transaction alerts to Brian Okibo (+254 794 400 365).
+                </p>
+              </div>
+
+              <div className="p-3.5 rounded-2xl bg-pitch-card border border-pitch-border space-y-1 shrink-0 text-right">
+                <span className="text-[10px] text-slate-400 uppercase font-bold block">Active Provider</span>
+                <span className="text-sm font-bold text-emerald-400">
+                  {whatsappInfo?.activeProvider || "Detecting..."}
+                </span>
+                <span className="text-[10px] text-slate-400 block font-mono">
+                  Till: 1572931 (EFootballMarket)
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Quick Test Alert Section */}
+          <div className="p-6 rounded-3xl bg-pitch-surface border border-pitch-border space-y-4">
+            <h3 className="text-sm font-bold text-white flex items-center gap-2">
+              <Zap className="w-4 h-4 text-amber-400" />
+              <span>Send Live Test WhatsApp Alert</span>
+            </h3>
+            <p className="text-xs text-slate-400">
+              Test your WhatsApp connection right now by sending a verified alert to your phone.
+            </p>
+
+            <div className="flex flex-col sm:flex-row items-center gap-3">
+              <input
+                type="text"
+                value={testWaPhone}
+                onChange={(e) => setTestWaPhone(e.target.value)}
+                placeholder="254794400365"
+                className="w-full sm:w-80 px-4 py-2.5 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-100 font-mono focus:outline-none focus:border-emerald-500"
+              />
+              <Button
+                variant="gold"
+                size="md"
+                onClick={handleSendTestWhatsApp}
+                isLoading={testWaLoading}
+                className="w-full sm:w-auto text-xs font-bold"
+              >
+                <MessageCircle className="w-4 h-4 mr-1.5" />
+                Dispatch Test Message
+              </Button>
+            </div>
+
+            {testWaResult && (
+              <div
+                className={`p-3.5 rounded-xl border text-xs font-mono space-y-1 ${
+                  testWaResult.success
+                    ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-300"
+                    : "bg-rose-950/60 border-rose-500/40 text-rose-300"
+                }`}
+              >
+                <div>
+                  <strong>Status:</strong> {testWaResult.success ? "DELIVERED SUCCESS" : "DISPATCH FAILED"}
+                </div>
+                <div>
+                  <strong>Provider:</strong> {testWaResult.provider}
+                </div>
+                {testWaResult.messageId && (
+                  <div>
+                    <strong>Message ID:</strong> {testWaResult.messageId}
+                  </div>
+                )}
+                {testWaResult.error && (
+                  <div>
+                    <strong>Details:</strong> {testWaResult.error}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+
+          {/* Integration Provider Setup Options Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Option 1: UltraMsg QR Code */}
+            <div className="p-5 rounded-2xl bg-pitch-card border border-pitch-border space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <Smartphone className="w-4 h-4 text-emerald-400" />
+                  <span>Option 1: UltraMsg (Scan QR Code - 1 Minute)</span>
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
+                  Recommended for Speed
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Connect your actual phone (0794400365) in under 60 seconds by scanning a QR code with WhatsApp, exactly like WhatsApp Web. Zero Meta approvals needed.
+              </p>
+              <ol className="text-xs text-slate-400 space-y-1.5 list-decimal list-inside">
+                <li>Sign up at <strong>ultramsg.com</strong> (Free trial).</li>
+                <li>Go to WhatsApp on your phone ➔ Linked Devices ➔ Scan the QR code.</li>
+                <li>Add these two variables to your <code>.env.local</code>:</li>
+              </ol>
+              <div className="p-2.5 rounded-xl bg-slate-950 border border-pitch-border text-[11px] font-mono text-emerald-300 select-all">
+                ULTRAMSG_INSTANCE_ID=&quot;instanceXXXXX&quot;<br />
+                ULTRAMSG_TOKEN=&quot;your_token_here&quot;
+              </div>
+            </div>
+
+            {/* Option 2: Meta WhatsApp Cloud API */}
+            <div className="p-5 rounded-2xl bg-pitch-card border border-pitch-border space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-brand-400" />
+                  <span>Option 2: Meta Cloud API (Official &amp; 1,000 Free/Mo)</span>
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-brand-500/20 text-brand-300 border border-brand-500/40">
+                  100% Free Meta Tier
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Official API directly from Facebook/Meta. Gives you 1,000 free service conversations every month with zero third-party subscription fees.
+              </p>
+              <ol className="text-xs text-slate-400 space-y-1.5 list-decimal list-inside">
+                <li>Open <strong>developers.facebook.com</strong> ➔ Create App (Business).</li>
+                <li>Add &quot;WhatsApp&quot; product to generate a permanent access token.</li>
+                <li>Add these variables to your <code>.env.local</code>:</li>
+              </ol>
+              <div className="p-2.5 rounded-xl bg-slate-950 border border-pitch-border text-[11px] font-mono text-brand-300 select-all">
+                WHATSAPP_CLOUD_API_TOKEN=&quot;EAAG...&quot;<br />
+                WHATSAPP_PHONE_NUMBER_ID=&quot;123456789...&quot;
+              </div>
+            </div>
+
+            {/* Option 3: Telegram Smartphone Bot */}
+            <div className="p-5 rounded-2xl bg-pitch-card border border-pitch-border space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <Zap className="w-4 h-4 text-indigo-400" />
+                  <span>Option 3: Telegram Bot Alerts (100% Free Forever)</span>
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 border border-indigo-500/40">
+                  Instant Smartphone Backup
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Want instant notifications buzz on your phone right now while setting up WhatsApp? A Telegram bot delivers real-time notifications with zero ban risk and zero cost.
+              </p>
+              <ol className="text-xs text-slate-400 space-y-1.5 list-decimal list-inside">
+                <li>Message <strong>@BotFather</strong> on Telegram ➔ <code>/newbot</code>.</li>
+                <li>Get your bot token and your chat ID (via <strong>@userinfobot</strong>).</li>
+                <li>Add to your <code>.env.local</code>:</li>
+              </ol>
+              <div className="p-2.5 rounded-xl bg-slate-950 border border-pitch-border text-[11px] font-mono text-indigo-300 select-all">
+                TELEGRAM_BOT_TOKEN=&quot;123456:ABC-DEF...&quot;<br />
+                TELEGRAM_CHAT_ID=&quot;your_chat_id&quot;
+              </div>
+            </div>
+
+            {/* Option 4: Webhook & 24/7 Bot Assistant */}
+            <div className="p-5 rounded-2xl bg-pitch-card border border-pitch-border space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                  <ExternalLink className="w-4 h-4 text-amber-400" />
+                  <span>Inbound Webhook &amp; 24/7 Escrow Chatbot</span>
+                </span>
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40">
+                  Active
+                </span>
+              </div>
+              <p className="text-xs text-slate-300 leading-relaxed">
+                When customers message your WhatsApp Business line, the built-in bot auto-replies with Till 1572931 verification, escrow policies, or looks up order status.
+              </p>
+              <div className="space-y-1 text-xs text-slate-400">
+                <div><strong>Webhook URL:</strong></div>
+                <div className="p-2 rounded-lg bg-slate-950 border border-pitch-border font-mono text-slate-200 select-all text-[11px]">
+                  https://www.efootballmarket.co.ke/api/whatsapp/webhook
+                </div>
+                <div className="pt-1"><strong>Verify Token:</strong></div>
+                <div className="p-2 rounded-lg bg-slate-950 border border-pitch-border font-mono text-amber-300 select-all text-[11px]">
+                  efootball_market_webhook_verify
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       )}
 
