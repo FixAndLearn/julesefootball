@@ -99,6 +99,75 @@ export async function sendTelegramMessage(
 }
 
 /**
+ * Fetches information about the bot (username, bot id, name) using getMe.
+ */
+export async function getTelegramBotInfo(customToken?: string): Promise<{ success: boolean; bot?: any; error?: string }> {
+  const token = customToken || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
+  if (!token) return { success: false, error: "Telegram Bot Token is not configured." };
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token.trim()}/getMe`);
+    const data = await res.json();
+    if (res.ok && data?.ok) {
+      return { success: true, bot: data.result };
+    }
+    return { success: false, error: data?.description || "Failed to fetch bot details" };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Registers webhook URL with Telegram so incoming messages to the bot trigger 2-way replies.
+ */
+export async function setTelegramWebhook(
+  webhookUrl: string,
+  customToken?: string
+): Promise<{ success: boolean; description?: string; error?: string }> {
+  const token = customToken || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
+  if (!token) return { success: false, error: "Telegram Bot Token is not configured." };
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token.trim()}/setWebhook`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        url: webhookUrl,
+        drop_pending_updates: true,
+      }),
+    });
+    const data = await res.json();
+    if (res.ok && data?.ok) {
+      return { success: true, description: data.description };
+    }
+    return { success: false, error: data?.description || "Failed to register webhook" };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Gets current webhook status from Telegram API.
+ */
+export async function getTelegramWebhookInfo(
+  customToken?: string
+): Promise<{ success: boolean; info?: any; error?: string }> {
+  const token = customToken || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
+  if (!token) return { success: false, error: "Telegram Bot Token is not configured." };
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token.trim()}/getWebhookInfo`);
+    const data = await res.json();
+    if (res.ok && data?.ok) {
+      return { success: true, info: data.result };
+    }
+    return { success: false, error: data?.description || "Failed to fetch webhook info" };
+  } catch (err: any) {
+    return { success: false, error: err.message };
+  }
+}
+
+/**
  * Formats a clean, high-priority HTML Telegram notification for Brian Okibo (CEO).
  */
 export function formatTelegramAlertHtml(payload: AdminAlertPayload): { text: string; buttons: any[] } {

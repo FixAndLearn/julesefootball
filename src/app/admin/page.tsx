@@ -69,6 +69,7 @@ function AdminControlCenterContent() {
   const [testTgResult, setTestTgResult] = useState<any>(null);
   const [customTgChatId, setCustomTgChatId] = useState("");
   const [customTgToken, setCustomTgToken] = useState("");
+  const [registeringWebhook, setRegisteringWebhook] = useState(false);
 
   // Data states
   const [listings, setListings] = useState<any[]>([]);
@@ -217,6 +218,37 @@ function AdminControlCenterContent() {
       setFeedback({ type: "error", message: `Error sending Telegram test: ${err.message}` });
     } finally {
       setTestTgLoading(false);
+    }
+  };
+
+  const handleRegisterTelegramWebhook = async () => {
+    setRegisteringWebhook(true);
+    try {
+      const res = await fetch("/api/telegram/send-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "register_webhook",
+          token: customTgToken.trim() || undefined,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFeedback({
+          type: "success",
+          message: data.message || "Telegram webhook activated! The bot will now auto-reply to messages in Telegram.",
+        });
+        loadTelegramStatus();
+      } else {
+        setFeedback({
+          type: "error",
+          message: `Webhook activation failed: ${data.error || data.message || "Check bot token"}`,
+        });
+      }
+    } catch (err: any) {
+      setFeedback({ type: "error", message: `Error registering webhook: ${err.message}` });
+    } finally {
+      setRegisteringWebhook(false);
     }
   };
 
@@ -1515,7 +1547,17 @@ function AdminControlCenterContent() {
                     className="flex-1 sm:flex-initial text-xs font-bold border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/10"
                   >
                     <Banknote className="w-4 h-4 mr-1.5" />
-                    Simulate Till 1572931 Payment
+                    Simulate Payment Alert
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="md"
+                    onClick={handleRegisterTelegramWebhook}
+                    isLoading={registeringWebhook}
+                    className="flex-1 sm:flex-initial text-xs font-bold border-emerald-500/40 text-emerald-300 hover:bg-emerald-500/10"
+                  >
+                    <Bot className="w-4 h-4 mr-1.5" />
+                    {telegramInfo?.webhook?.url ? "Re-sync Webhook" : "Activate Auto-Replies"}
                   </Button>
                 </div>
               </div>
