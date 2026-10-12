@@ -9,7 +9,7 @@ import { ArrowRight, Search, ShieldCheck, Trophy, Zap, Sparkles } from "lucide-r
 import Link from "next/link";
 import { Listing } from "@/types/database";
 
-import { HeroBall3D } from "@/components/3d/HeroBall3D";
+import { HeroDesktopSpotlight } from "@/components/marketplace/HeroDesktopSpotlight";
 import { EscrowSteps3D } from "@/components/3d/EscrowSteps3D";
 import { KonamiTransferChecklistTrigger } from "@/components/escrow/KonamiTransferChecklistModal";
 
@@ -32,7 +32,7 @@ export default async function HomePage() {
 
   try {
     const [listingsResult, metricsResult] = await Promise.all([
-      listingService.getListings({ limit: 6, sortBy: "newest" }),
+      listingService.getListings({ limit: 8, sortBy: "newest" }),
       analyticsService.getPlatformOverview(),
     ]);
     listings = listingsResult.listings;
@@ -50,9 +50,9 @@ export default async function HomePage() {
         <div className="absolute top-1/3 left-1/4 w-[400px] h-[350px] bg-konami-blue/10 rounded-full blur-[110px] pointer-events-none" />
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center">
+          <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-10 items-center">
             {/* Hero Left Column (Copy & Search) */}
-            <div className="lg:col-span-7 text-center lg:text-left">
+            <div className="lg:col-span-6 xl:col-span-5 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-950/80 border border-brand-800/80 text-brand-300 text-xs font-semibold mb-6 shadow-inner backdrop-blur-md">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
                 <span>Safe M-Pesa Escrow (Till 1572931) & Instant Delivery</span>
@@ -119,9 +119,9 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Hero Right Column (Interactive 3D Three.js Ball Scene) */}
-            <div className="lg:col-span-5 relative flex items-center justify-center">
-              <HeroBall3D />
+            {/* Hero Right Column (Live Desktop Deck or 3D Ball) */}
+            <div className="lg:col-span-6 xl:col-span-7 relative flex items-center justify-center w-full">
+              <HeroDesktopSpotlight listings={listings} />
             </div>
           </div>
         </div>
@@ -188,7 +188,7 @@ export default async function HomePage() {
 
         {/* Database Listings or Real Empty State */}
         {listings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
             {listings.map((listing) => (
               <ListingCard key={listing.id} listing={listing} />
             ))}

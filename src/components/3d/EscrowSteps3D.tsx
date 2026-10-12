@@ -84,6 +84,13 @@ export function EscrowSteps3D() {
                     : "border-pitch-border/80 shadow-xl shadow-black/40"
                 }`}
               >
+                {/* Connecting Arrow for Wide Screens */}
+                {idx < 3 && (
+                  <div className="hidden lg:flex absolute -right-3.5 top-1/2 -translate-y-1/2 z-20 w-7 h-7 rounded-full bg-pitch-card border border-pitch-border items-center justify-center text-slate-400 shadow-lg pointer-events-none">
+                    <ArrowRight className="w-3.5 h-3.5 text-amber-400" />
+                  </div>
+                )}
+
                 {/* 3D Floating Top Badges */}
                 <div style={{ transform: "translateZ(30px)" }} className="flex items-center justify-between mb-6">
                   {/* Glowing 3D Number Block */}
