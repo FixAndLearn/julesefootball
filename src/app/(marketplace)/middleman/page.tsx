@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { MiddlemanDeal } from "@/app/api/middleman/route";
 import {
   Handshake,
@@ -65,9 +66,9 @@ export default function MiddlemanPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           buyer_name: buyerName || "Verified Buyer",
-          buyer_phone: buyerPhone,
+          buyer_phone: normalizePhoneNumber(buyerPhone).international,
           seller_name: sellerName || "Verified Seller",
-          seller_phone: sellerPhone,
+          seller_phone: normalizePhoneNumber(sellerPhone).international,
           deal_title: dealTitle,
           deal_description: dealDescription,
           item_amount_kes: numAmount,
@@ -150,7 +151,7 @@ export default function MiddlemanPage() {
               <Smartphone className="w-4 h-4 text-amber-400" /> M-Pesa Till 1572931
             </span>
             <span className="flex items-center gap-1.5 font-semibold text-indigo-300">
-              <UserCheck className="w-4 h-4 text-indigo-400" /> Officer: Brian Okibo (0794400365)
+              <UserCheck className="w-4 h-4 text-indigo-400" /> Officer: Brian Okibo (+254 794 400 365)
             </span>
           </div>
         </div>
@@ -348,7 +349,7 @@ export default function MiddlemanPage() {
                     />
                     <Input
                       label="Buyer Safaricom Phone"
-                      placeholder="e.g. 0712345678"
+                      placeholder="e.g. +254 712 345 678"
                       value={buyerPhone}
                       onChange={(e) => setBuyerPhone(e.target.value)}
                       required
@@ -365,7 +366,7 @@ export default function MiddlemanPage() {
                     />
                     <Input
                       label="Seller Safaricom Phone"
-                      placeholder="e.g. 0798765432"
+                      placeholder="e.g. +254 798 765 432"
                       value={sellerPhone}
                       onChange={(e) => setSellerPhone(e.target.value)}
                       required

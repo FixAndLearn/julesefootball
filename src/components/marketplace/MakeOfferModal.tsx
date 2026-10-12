@@ -4,6 +4,7 @@ import { useState } from "react";
 import { Button } from "@/components/ui/Button";
 import { Listing } from "@/types/database";
 import { formatCurrency } from "@/lib/utils";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
 import {
   Handshake,
   Tag,
@@ -76,9 +77,9 @@ export function MakeOfferModal({
       return;
     }
 
-    const cleanPhone = buyerPhone.replace(/[^0-9]/g, "");
-    if (!cleanPhone || cleanPhone.length < 9) {
-      setError("Please provide a valid phone number so the seller can contact you.");
+    const norm = normalizePhoneNumber(buyerPhone);
+    if (!norm.isValid) {
+      setError("Please provide a valid phone number (e.g. 0794400365 or +254 794 400 365).");
       return;
     }
 
@@ -91,7 +92,7 @@ export function MakeOfferModal({
         body: JSON.stringify({
           listing_id: listing.id,
           buyer_name: buyerName.trim() || "Trader",
-          buyer_phone: cleanPhone,
+          buyer_phone: norm.international,
           offered_price: numericOffer,
           note: note.trim(),
           buyer_id: buyerId,
@@ -278,11 +279,11 @@ export function MakeOfferModal({
 
               <div>
                 <label className="block text-xs font-semibold text-slate-300 mb-1">
-                  M-Pesa Phone Number <span className="text-rose-400">*</span>
+                  M-Pesa Phone (WhatsApp / International) <span className="text-rose-400">*</span>
                 </label>
                 <input
                   type="tel"
-                  placeholder="07XX XXX XXX"
+                  placeholder="e.g. 0794400365 or +254 794 400 365"
                   value={buyerPhone}
                   onChange={(e) => setBuyerPhone(e.target.value)}
                   required

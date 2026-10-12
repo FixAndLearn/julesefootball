@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { isSuperAdminEmail, isUserAdmin, PRIMARY_SUPER_ADMIN_EMAIL } from "@/lib/security/adminAuth";
 import { formatCurrency } from "@/lib/utils";
+import { formatDisplayPhone, formatWhatsAppPhone } from "@/lib/utils/phone";
 import { Listing, NewsArticle, NewsCategory } from "@/types/database";
 import {
   AlertTriangle,
@@ -22,6 +23,7 @@ import {
   KeyRound,
   Layers,
   Lock,
+  MessageCircle,
   Newspaper,
   PlusCircle,
   RefreshCw,
@@ -1194,7 +1196,7 @@ function AdminControlCenterContent() {
 
                           <td className="px-4 py-3.5">
                             <div className="flex items-center gap-2 font-mono text-slate-200">
-                              <span>{w.phone_number}</span>
+                              <span>{formatDisplayPhone(w.phone_number)}</span>
                               <button
                                 type="button"
                                 onClick={() => handleCopyPhone(w.phone_number)}
@@ -1207,6 +1209,15 @@ function AdminControlCenterContent() {
                                   <Copy className="w-3.5 h-3.5" />
                                 )}
                               </button>
+                              <a
+                                href={`https://wa.me/${formatWhatsAppPhone(w.phone_number)}`}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="p-1 rounded hover:bg-emerald-950/60 text-emerald-400 hover:text-emerald-300 transition-colors"
+                                title="Chat on WhatsApp"
+                              >
+                                <MessageCircle className="w-3.5 h-3.5" />
+                              </a>
                             </div>
                           </td>
 

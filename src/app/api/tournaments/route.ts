@@ -1,3 +1,5 @@
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -58,7 +60,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "This tournament is already full." }, { status: 400 });
     }
 
+    const normalizedPhone = normalizePhoneNumber(phone_number).international;
     tourney.registered_count += 1;
+
+    // Dispatch automated WhatsApp alert to CEO Brian Okibo (0794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "MIDDLEMAN_DEAL_CREATED", // reuse or details
+      listingTitle: `Tournament: ${tourney.title}`,
+      amount: tourney.entry_fee_kes,
+      currency: "KES",
+      buyerPhone: normalizedPhone,
+      details: `Player: ${gamer_tag} (Friend ID: ${friend_id})`,
+    }).catch((err) => console.error("Admin tournament alert error:", err));
 
     return NextResponse.json({
       success: true,
@@ -68,7 +81,7 @@ export async function POST(req: NextRequest) {
       player: {
         gamer_tag,
         friend_id,
-        phone_number,
+        phone_number: normalizedPhone,
       },
     });
   } catch (error: any) {

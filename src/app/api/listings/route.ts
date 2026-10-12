@@ -1,6 +1,7 @@
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ListingService } from "@/services/listingService";
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -277,6 +278,15 @@ export async function POST(req: NextRequest) {
         throw createError;
       }
     }
+
+    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "NEW_LISTING_CREATED",
+      listingTitle: listing.title,
+      amount: Number(listing.price),
+      username: fallbackUsername,
+      sellerPhone: phoneNumber,
+    }).catch(() => {});
 
     return NextResponse.json({ success: true, listing }, { status: 201 });
   } catch (error: any) {

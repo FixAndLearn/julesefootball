@@ -1,5 +1,7 @@
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { OrderService } from "@/services/orderService";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -43,7 +45,9 @@ export async function POST(req: NextRequest) {
       emailPrefix ||
       "Trader";
     const lastName = user.user_metadata?.last_name?.trim() || "";
-    const phoneNumber = user.user_metadata?.phone_number?.trim() || "";
+    const rawPhoneNumber = user.user_metadata?.phone_number?.trim() || "";
+    const phoneMeta = rawPhoneNumber ? normalizePhoneNumber(rawPhoneNumber) : null;
+    const phoneNumber = phoneMeta ? phoneMeta.international : rawPhoneNumber;
 
     const profileData = {
       id: user.id,
@@ -94,6 +98,17 @@ export async function POST(req: NextRequest) {
         throw createErr;
       }
     }
+
+    // Dispatch automated WhatsApp alert to CEO Brian Okibo (0794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "NEW_ORDER_CREATED",
+      orderId: order.id,
+      orderNumber: order.order_number,
+      amount: Number(order.total_amount),
+      currency: order.currency || "KES",
+      buyerPhone: phoneNumber || undefined,
+      username: fallbackUsername,
+    }).catch((err) => console.error("Admin new order alert error:", err));
 
     return NextResponse.json({ success: true, order }, { status: 201 });
   } catch (error: any) {

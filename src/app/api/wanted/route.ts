@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { WantedRequest } from "@/types/database";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 
 export const dynamic = "force-dynamic";
 
@@ -79,10 +81,13 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const norm = normalizePhoneNumber(buyer_phone || "0794400365");
+    const internationalPhone = norm.isValid ? norm.international : buyer_phone?.trim() || "+254794400365";
+
     const newRequest: WantedRequest = {
       id: `req_${Date.now()}_${Math.random().toString(36).substring(2, 7)}`,
       buyer_name: buyer_name?.trim() || "Verified Buyer",
-      buyer_phone: buyer_phone?.trim() || "0794400365",
+      buyer_phone: internationalPhone,
       title: title.trim(),
       description: description?.trim() || "Ready to purchase through eFootballMarket escrow immediately.",
       min_overall_rating: Number(min_overall_rating) || 3000,
@@ -107,6 +112,14 @@ export async function POST(req: NextRequest) {
     }
 
     memoryRequests.unshift(newRequest);
+
+    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "WANTED_REQUEST_POSTED",
+      listingTitle: title.trim(),
+      amount: Number(budget_kes),
+      buyerPhone: internationalPhone,
+    }).catch(() => {});
 
     return NextResponse.json({ success: true, request: newRequest }, { status: 201 });
   } catch (error: any) {

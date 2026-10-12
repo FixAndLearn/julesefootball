@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { ArrowUpRight, CheckCircle2, Phone, Smartphone, X, AlertCircle, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
@@ -41,13 +42,20 @@ export function WithdrawModal({ availableBalance, escrowBalance = 0, isOpen, onC
       return;
     }
 
+    const normPhone = normalizePhoneNumber(phoneNumber.trim());
+    if (!normPhone.isValid) {
+      setError("Please enter a valid Safaricom phone number (e.g. +254 7XX XXX XXX or 07XXXXXXXX).");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/withdrawals", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           amount: parsedAmount,
-          phoneNumber: phoneNumber.trim(),
+          phoneNumber: normPhone.international,
         }),
       });
 
@@ -137,7 +145,7 @@ export function WithdrawModal({ availableBalance, escrowBalance = 0, isOpen, onC
             <Input
               label="M-Pesa Phone Number"
               type="text"
-              placeholder="07XXXXXXXX or 254XXXXXXXXX"
+              placeholder="e.g. +254 7XX XXX XXX or 07XXXXXXXX"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               leftIcon={<Phone className="w-4 h-4" />}

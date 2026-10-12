@@ -1,4 +1,5 @@
 import { decryptCredential, encryptCredential } from "@/lib/encryption/crypto";
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 import { AccountDelivery, EscrowAccount, EscrowState } from "@/types/database";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -68,7 +69,7 @@ export class EscrowService {
     // Verify order exists
     const { data: order, error: orderError } = await this.supabase
       .from("orders")
-      .select("id, seller_id, buyer_id, order_number, status")
+      .select("id, seller_id, buyer_id, order_number, status, total_amount, listing:listings(title)")
       .eq("id", orderId)
       .single();
 
@@ -150,6 +151,15 @@ export class EscrowService {
         console.warn("Failed to notify buyer:", notifErr);
       }
     }
+
+    // Dispatch automated WhatsApp alert to CEO Brian Okibo (0794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "CREDENTIALS_DELIVERED",
+      orderId,
+      orderNumber: order.order_number,
+      listingTitle: (order as any)?.listing?.title || "eFootball Squad",
+      amount: Number(order.total_amount) || 0,
+    }).catch((err) => console.error("Admin credentials delivered alert error:", err));
   }
 
   /**
@@ -198,7 +208,7 @@ export class EscrowService {
   async confirmAndRelease(orderId: string, buyerId: string): Promise<void> {
     const { data: order } = await this.supabase
       .from("orders")
-      .select("id, buyer_id, seller_id, order_number, listing_id, status")
+      .select("id, buyer_id, seller_id, order_number, listing_id, status, total_amount, seller_net_amount, listing:listings(title)")
       .eq("id", orderId)
       .single();
 
@@ -339,6 +349,15 @@ export class EscrowService {
     } catch (e) {
       console.warn("Failed to create seller notification:", e);
     }
+
+    // Dispatch automated WhatsApp alert to CEO Brian Okibo (0794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "ESCROW_RELEASED",
+      orderId,
+      orderNumber: order.order_number,
+      listingTitle: (order as any)?.listing?.title || "eFootball Squad",
+      amount: Number(order.seller_net_amount || order.total_amount || 0),
+    }).catch((err) => console.error("Admin escrow released alert error:", err));
   }
 
   /**
@@ -347,7 +366,7 @@ export class EscrowService {
   async openDispute(orderId: string, openedBy: string, reason: string, description: string): Promise<void> {
     const { data: order } = await this.supabase
       .from("orders")
-      .select("id, buyer_id, seller_id, order_number, status")
+      .select("id, buyer_id, seller_id, order_number, status, total_amount, listing:listings(title)")
       .eq("id", orderId)
       .single();
 
@@ -401,5 +420,15 @@ export class EscrowService {
         console.warn("Failed to send dispute notification:", e);
       }
     }
+
+    // Dispatch automated WhatsApp alert to CEO Brian Okibo (0794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "DISPUTE_OPENED",
+      orderId,
+      orderNumber: order.order_number,
+      listingTitle: (order as any)?.listing?.title || "eFootball Squad",
+      amount: Number(order.total_amount || 0),
+      details: `${reason}: ${description}`,
+    }).catch((err) => console.error("Admin dispute alert error:", err));
   }
 }

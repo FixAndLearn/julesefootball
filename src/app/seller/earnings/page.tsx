@@ -3,6 +3,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency } from "@/lib/utils";
+import { formatDisplayPhone } from "@/lib/utils/phone";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { AlertCircle, ArrowLeft, Building2, CheckCircle2, Clock, Smartphone } from "lucide-react";
@@ -173,7 +174,7 @@ export default async function SellerEarningsPage() {
                   <div className="space-y-1">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="font-mono text-xs font-semibold text-slate-200">
-                        To: {w.phone_number}
+                        To: {formatDisplayPhone(w.phone_number)}
                       </span>
                       {isPending && (
                         <Badge variant="warning" size="sm" className="font-bold">

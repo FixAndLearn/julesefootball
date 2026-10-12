@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency, getPlatformLabel } from "@/lib/utils";
+import { normalizePhoneNumber, formatDisplayPhone } from "@/lib/utils/phone";
 import { Listing, ListingOffer } from "@/types/database";
 import {
   ShieldCheck,
@@ -138,9 +139,9 @@ export function DirectCheckoutForm({
     e.preventDefault();
     setError("");
 
-    const cleanPhone = phoneNumber.replace(/[^0-9]/g, "");
-    if (!cleanPhone || cleanPhone.length < 9) {
-      setError("Please enter a valid Safaricom phone number (e.g., 0712345678 or 254712345678).");
+    const norm = normalizePhoneNumber(phoneNumber);
+    if (!norm.isValid) {
+      setError("Please enter a valid Safaricom phone number (e.g. 0794400365 or +254 794 400 365).");
       return;
     }
 
@@ -152,7 +153,7 @@ export function DirectCheckoutForm({
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           listingId: listing.id,
-          phoneNumber: cleanPhone,
+          phoneNumber: norm.digits,
           buyerName: buyerName || "eFootball Trader",
           offerId: activeOffer?.id,
         }),
@@ -290,12 +291,12 @@ export function DirectCheckoutForm({
           <div className="space-y-4">
             <div>
               <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                M-Pesa Phone Number <span className="text-rose-400">*</span>
+                M-Pesa Phone Number (Auto International Format) <span className="text-rose-400">*</span>
               </label>
               <div className="relative">
                 <input
                   type="tel"
-                  placeholder="e.g. 0712 345 678"
+                  placeholder="e.g. 0794400365 or +254 794 400 365"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
                   required
@@ -303,7 +304,7 @@ export function DirectCheckoutForm({
                 />
               </div>
               <p className="text-[11px] text-slate-400 mt-1">
-                You will receive a prompt on this phone to enter your M-Pesa PIN for <strong>Till 1572931 (EFootballMarket)</strong>.
+                Supports local (07/01) or international (+254) formats. PIN prompt will appear for <strong>Till 1572931 (EFootballMarket)</strong>.
               </p>
             </div>
 

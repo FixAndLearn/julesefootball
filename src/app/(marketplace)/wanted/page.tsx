@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency, getPlatformLabel, getPlaystyleLabel } from "@/lib/utils";
+import { formatWhatsAppPhone, normalizePhoneNumber } from "@/lib/utils/phone";
 import { Platform, Playstyle, WantedRequest } from "@/types/database";
 import {
   Target,
@@ -84,7 +85,7 @@ export default function WantedBoardPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           buyer_name: buyerName || "Verified Buyer",
-          buyer_phone: buyerPhone || "0794400365",
+          buyer_phone: buyerPhone ? normalizePhoneNumber(buyerPhone).international : "+254794400365",
           title: reqTitle,
           description: reqDescription,
           min_overall_rating: parseInt(reqMinOvr, 10) || 3000,
@@ -293,7 +294,7 @@ export default function WantedBoardPage() {
                 </div>
 
                 <a
-                  href={`https://wa.me/${req.buyer_phone?.replace(/[^0-9]/g, "") || "254794400365"}?text=${encodeURIComponent(
+                  href={`https://wa.me/${formatWhatsAppPhone(req.buyer_phone || "254794400365")}?text=${encodeURIComponent(
                     `Hello ${req.buyer_name}, I saw your request on eFootballMarket: "${req.title}". I have a squad available! Let's complete the trade via Escrow (Till 1572931): https://www.efootballmarket.co.ke`
                   )}`}
                   target="_blank"
@@ -377,7 +378,7 @@ export default function WantedBoardPage() {
                     />
                     <Input
                       label="Your Phone / WhatsApp"
-                      placeholder="e.g. 0794400365"
+                      placeholder="e.g. +254 794 400 365"
                       value={buyerPhone}
                       onChange={(e) => setBuyerPhone(e.target.value)}
                       required

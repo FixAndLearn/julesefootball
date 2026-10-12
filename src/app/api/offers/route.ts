@@ -1,6 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { ListingOffer } from "@/types/database";
+import { normalizePhoneNumber, formatWhatsAppPhone } from "@/lib/utils/phone";
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 
 export const dynamic = "force-dynamic";
 
@@ -124,13 +126,16 @@ export async function POST(req: NextRequest) {
     const discountPercentage = Math.round(((originalPrice - offerNum) / originalPrice) * 100);
     const offerId = `off_${Date.now()}_${Math.floor(Math.random() * 1000)}`;
 
+    const normBuyerPhone = normalizePhoneNumber(buyer_phone);
+    const internationalBuyerPhone = normBuyerPhone.isValid ? normBuyerPhone.international : buyer_phone.trim();
+
     const newOffer: ListingOffer = {
       id: offerId,
       listing_id,
       seller_id: listing.seller_id,
       buyer_id: buyer_id || undefined,
       buyer_name: buyer_name.trim(),
-      buyer_phone: buyer_phone.trim().replace(/[^0-9+]/g, ""),
+      buyer_phone: internationalBuyerPhone,
       offered_price: offerNum,
       original_price: originalPrice,
       discount_percentage: discountPercentage,
@@ -156,12 +161,21 @@ export async function POST(req: NextRequest) {
     MEMORY_OFFERS.unshift(newOffer);
 
     // Build pre-filled WhatsApp alert text for buyer to ping seller
-    const sellerPhone = (listing.seller as any)?.phone_number || "254794400365";
-    const cleanSellerPhone = sellerPhone.replace(/[^0-9]/g, "");
+    const rawSellerPhone = (listing.seller as any)?.phone_number || "254794400365";
+    const cleanSellerPhone = formatWhatsAppPhone(rawSellerPhone) || "254794400365";
     const waText = encodeURIComponent(
-      `Hello! I just submitted an offer of KES ${offerNum.toLocaleString()} (${discountPercentage}% off) for your eFootball squad "${listing.title}" on eFootballMarket.\n\nSquad Link: https://www.efootballmarket.co.ke/listings/${listing.id}\nMy Name: ${buyer_name}\nMy Phone: ${buyer_phone}\nEscrow Guaranteed via Till 1572931!`
+      `Hello! I just submitted an offer of KES ${offerNum.toLocaleString()} (${discountPercentage}% off) for your eFootball squad "${listing.title}" on eFootballMarket.\n\nSquad Link: https://www.efootballmarket.co.ke/listings/${listing.id}\nMy Name: ${buyer_name}\nMy Phone: ${internationalBuyerPhone}\nEscrow Guaranteed via Till 1572931!`
     );
     const whatsappUrl = `https://wa.me/${cleanSellerPhone}?text=${waText}`;
+
+    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "NEW_OFFER_SUBMITTED",
+      listingTitle: listing.title,
+      amount: offerNum,
+      buyerPhone: internationalBuyerPhone,
+      details: note || `${discountPercentage}% discount proposed by ${buyer_name}`,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,
@@ -242,7 +256,7 @@ export async function PATCH(req: NextRequest) {
     const checkoutUrl = `/pay/${updatedOffer.listing_id}?offer=${updatedOffer.id}`;
 
     // Generate WhatsApp notification to buyer
-    const cleanBuyerPhone = updatedOffer.buyer_phone.replace(/[^0-9]/g, "");
+    const cleanBuyerPhone = formatWhatsAppPhone(updatedOffer.buyer_phone);
     let buyerWaMessage = "";
     if (action === "accept") {
       buyerWaMessage = encodeURIComponent(

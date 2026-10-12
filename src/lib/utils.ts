@@ -91,3 +91,13 @@ export function getKonamiIdStatusInfo(status: string): { label: string; safe: bo
       };
   }
 }
+
+// Re-export phone normalization & WhatsApp helpers
+export {
+  normalizePhoneNumber,
+  formatInternationalPhone,
+  formatDisplayPhone,
+  formatWhatsAppPhone,
+  buildWhatsAppLink,
+  type NormalizedPhone,
+} from "./utils/phone";

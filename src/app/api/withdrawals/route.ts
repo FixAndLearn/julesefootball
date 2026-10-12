@@ -1,6 +1,7 @@
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { mpesaClient } from "@/lib/mpesa/client";
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -127,6 +128,14 @@ export async function POST(req: NextRequest) {
     } catch (notifErr) {
       console.warn("Notification error:", notifErr);
     }
+
+    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "WITHDRAWAL_REQUESTED",
+      amount,
+      sellerPhone: normalizedPhone,
+      username: (profile as any)?.username || user.email,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

@@ -1,5 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 
 export const dynamic = "force-dynamic";
 
@@ -95,13 +97,18 @@ export async function POST(req: NextRequest) {
     const randomSuffix = Math.floor(10000 + Math.random() * 90000);
     const dealCode = `EFM-${randomSuffix}`;
 
+    const normBuyer = normalizePhoneNumber(buyer_phone);
+    const normSeller = normalizePhoneNumber(seller_phone);
+    const internationalBuyerPhone = normBuyer.isValid ? normBuyer.international : buyer_phone.trim();
+    const internationalSellerPhone = normSeller.isValid ? normSeller.international : seller_phone.trim();
+
     const newDeal: MiddlemanDeal = {
       id: `mdm_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
       deal_code: dealCode,
       buyer_name: buyer_name.trim(),
-      buyer_phone: buyer_phone.trim(),
+      buyer_phone: internationalBuyerPhone,
       seller_name: seller_name?.trim() || "Trader",
-      seller_phone: seller_phone.trim(),
+      seller_phone: internationalSellerPhone,
       deal_title: deal_title.trim(),
       deal_description: deal_description?.trim() || "Private trade secured via eFootballMarket Escrow.",
       item_amount_kes: amount,
@@ -121,6 +128,16 @@ export async function POST(req: NextRequest) {
     }
 
     MEMORY_DEALS.unshift(newDeal);
+
+    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "MIDDLEMAN_DEAL_CREATED",
+      orderNumber: dealCode,
+      listingTitle: deal_title,
+      amount: total,
+      buyerPhone: internationalBuyerPhone,
+      sellerPhone: internationalSellerPhone,
+    }).catch(() => {});
 
     return NextResponse.json({ success: true, deal: newDeal }, { status: 201 });
   } catch (error: any) {

@@ -2,6 +2,8 @@ import { NextRequest, NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PaymentService } from "@/services/paymentService";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -68,20 +70,23 @@ export async function POST(req: NextRequest) {
       data: { user },
     } = await serverSupabase.auth.getUser();
 
+    const normPhone = normalizePhoneNumber(phoneNumber);
+    const internationalPhone = normPhone.isValid ? normPhone.international : phoneNumber;
+    const cleanDigits = normPhone.digits || phoneNumber.replace(/\D/g, "");
+
     let buyerId = user?.id;
 
     if (!buyerId) {
       // Create or ensure guest buyer record
-      const cleanPhone = phoneNumber.replace(/[^0-9]/g, "");
-      const paddedSuffix = cleanPhone.slice(-12).padStart(12, "0");
+      const paddedSuffix = cleanDigits.slice(-12).padStart(12, "0");
       buyerId = `00000000-0000-4000-8000-${paddedSuffix}`;
 
-      const name = buyerName?.trim() || `Buyer_${cleanPhone.slice(-4)}`;
+      const name = buyerName?.trim() || `Buyer_${cleanDigits.slice(-4)}`;
       const guestProfile = {
         id: buyerId,
         username: name.toLowerCase().replace(/\s+/g, "_"),
         first_name: name,
-        phone_number: cleanPhone,
+        phone_number: internationalPhone,
         country: "KEN",
         is_verified_seller: false,
         available_balance: 0.0,
@@ -145,7 +150,17 @@ export async function POST(req: NextRequest) {
 
     // 6. Trigger M-Pesa STK Push
     const paymentService = new PaymentService(adminSupabase);
-    const paymentResult = await paymentService.initiateOrderPayment(order.id, phoneNumber);
+    const paymentResult = await paymentService.initiateOrderPayment(order.id, cleanDigits);
+
+    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    dispatchAdminWhatsAppAlert({
+      eventType: "NEW_ORDER_CREATED",
+      orderId: order.id,
+      orderNumber: order.order_number,
+      listingTitle: listing.title,
+      amount: finalPrice,
+      buyerPhone: internationalPhone,
+    }).catch(() => {});
 
     return NextResponse.json({
       success: true,

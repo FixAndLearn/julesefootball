@@ -5,6 +5,7 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { Tournament, TournamentMatch } from "@/app/api/tournaments/route";
 import {
   Trophy,
@@ -72,7 +73,7 @@ export default function TournamentsPage() {
           tournament_id: selectedTourney.id,
           gamer_tag: gamerTag,
           friend_id: friendId,
-          phone_number: phone,
+          phone_number: normalizePhoneNumber(phone).international,
         }),
       });
 
@@ -454,7 +455,7 @@ export default function TournamentsPage() {
 
                   <Input
                     label="Safaricom Phone Number (For M-Pesa Payout)"
-                    placeholder="e.g. 0712345678"
+                    placeholder="e.g. +254 712 345 678"
                     value={phone}
                     onChange={(e) => setPhone(e.target.value)}
                     required

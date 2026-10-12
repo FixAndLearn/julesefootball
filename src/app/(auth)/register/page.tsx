@@ -3,6 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { Lock, Mail, Phone, ShieldCheck, User, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -41,6 +42,16 @@ function RegisterForm() {
       return;
     }
 
+    // Normalize phone number to strict international E.164 format (+254XXXXXXXXX)
+    const normalized = normalizePhoneNumber(phoneNumber);
+    if (!normalized.isValid) {
+      setError("Please enter a valid phone number (e.g., 0794400365 or +254794400365).");
+      setLoading(false);
+      return;
+    }
+
+    const internationalPhone = normalized.international;
+
     try {
       const supabase = createClient();
       const { data: authData, error: authError } = await supabase.auth.signUp({
@@ -51,7 +62,7 @@ function RegisterForm() {
             first_name: firstName,
             last_name: lastName,
             username: username.toLowerCase().trim(),
-            phone_number: phoneNumber,
+            phone_number: internationalPhone,
           },
         },
       });
@@ -61,13 +72,13 @@ function RegisterForm() {
       }
 
       if (authData.user) {
-        // Insert profile row
+        // Insert profile row with international phone
         await supabase.from("profiles").upsert({
           id: authData.user.id,
           username: username.toLowerCase().trim(),
           first_name: firstName,
           last_name: lastName,
-          phone_number: phoneNumber,
+          phone_number: internationalPhone,
           country: "KEN",
           is_verified_seller: false,
           available_balance: 0.0,
@@ -79,6 +90,21 @@ function RegisterForm() {
           user_id: authData.user.id,
           role_id: "buyer",
         });
+
+        // Dispatch instant automated WhatsApp notification to Brian Okibo (+254794400365)
+        try {
+          fetch("/api/auth/register-alert", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              username: username.toLowerCase().trim(),
+              email,
+              phoneNumber: internationalPhone,
+            }),
+          }).catch(() => {});
+        } catch {
+          // Non-blocking
+        }
       }
 
       router.push(redirect);
@@ -147,13 +173,13 @@ function RegisterForm() {
         />
 
         <Input
-          label="Safaricom Phone Number (for M-Pesa Escrow)"
+          label="Phone Number (WhatsApp & M-Pesa Escrow)"
           type="text"
-          placeholder="0712345678 or 254712345678"
+          placeholder="0794400365 or +254 794 400 365"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
-          leftIcon={<Phone className="w-4 h-4" />}
-          helperText="Required for instant M-Pesa STK push and seller balance withdrawals"
+          leftIcon={<Phone className="w-4 h-4 text-emerald-400" />}
+          helperText="Auto-formats to international standard (+254) for WhatsApp & Lipa Na M-Pesa"
           required
         />
 

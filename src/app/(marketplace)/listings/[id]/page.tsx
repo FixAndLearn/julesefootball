@@ -1,6 +1,7 @@
 import { Badge } from "@/components/ui/Badge";
 import { Card, CardContent } from "@/components/ui/Card";
 import { formatCompactNumber, formatCurrency, getKonamiIdStatusInfo, getPlatformLabel, getPlaystyleLabel } from "@/lib/utils";
+import { formatWhatsAppPhone } from "@/lib/utils/phone";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ListingService } from "@/services/listingService";
 import { BuyNowButton } from "@/components/marketplace/BuyNowButton";
@@ -302,7 +303,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                   </p>
                 )}
                 <a
-                  href={`https://wa.me/${listing.seller?.phone_number ? listing.seller.phone_number.replace(/[^0-9]/g, "") : "254794400365"}?text=${encodeURIComponent(
+                  href={`https://wa.me/${formatWhatsAppPhone(listing.seller?.phone_number || "254794400365")}?text=${encodeURIComponent(
                     `Hello ${listing.seller?.username || "Seller"}, I saw your listing "${listing.title}" on eFootballMarket. I want to propose an Account Swap + Cash deal!\nEscrow will be held via Till 1572931: https://www.efootballmarket.co.ke/listings/${listing.id}`
                   )}`}
                   target="_blank"

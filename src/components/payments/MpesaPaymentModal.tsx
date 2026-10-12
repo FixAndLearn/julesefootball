@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils";
+import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { CheckCircle2, Phone, Smartphone, X, AlertCircle, Loader2, RefreshCw } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
@@ -146,13 +147,20 @@ export function MpesaPaymentModal({
     setManualNote("");
     completedRef.current = false;
 
+    const normPhone = normalizePhoneNumber(phoneNumber.trim());
+    if (!normPhone.isValid) {
+      setErrorMessage("Please enter a valid Safaricom phone number (e.g. +254 7XX XXX XXX or 07XXXXXXXX).");
+      setLoading(false);
+      return;
+    }
+
     try {
       const res = await fetch("/api/payments/mpesa/stkpush", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           orderId,
-          phoneNumber,
+          phoneNumber: normPhone.digits,
         }),
       });
 
@@ -234,7 +242,7 @@ export function MpesaPaymentModal({
 
             <Input
               label="Safaricom M-Pesa Phone Number"
-              placeholder="e.g. 0712345678 or 254712345678"
+              placeholder="e.g. +254 7XX XXX XXX or 07XXXXXXXX"
               value={phoneNumber}
               onChange={(e) => setPhoneNumber(e.target.value)}
               leftIcon={<Phone className="w-4 h-4" />}
