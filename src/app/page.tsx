@@ -56,15 +56,15 @@ export default async function HomePage() {
             <div className="lg:col-span-7 text-center lg:text-left">
               <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-brand-950/80 border border-brand-800/80 text-brand-300 text-xs font-semibold mb-6 shadow-inner backdrop-blur-md">
                 <ShieldCheck className="w-4 h-4 text-emerald-400" />
-                <span>Non-Custodial Escrow & Instant M-Pesa Settlement</span>
+                <span>Safe M-Pesa Escrow (Till 1572931) & Instant Delivery</span>
               </div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold tracking-tight text-white font-display leading-[1.12]">
-                Trade High-OVR <span className="bg-gradient-to-r from-amber-400 via-sky-300 to-brand-400 bg-clip-text text-transparent">eFootball Accounts</span> with 3D Escrow Safety.
+                Buy & Sell Verified <span className="bg-gradient-to-r from-amber-400 via-sky-300 to-brand-400 bg-clip-text text-transparent">eFootball Accounts</span> Safely.
               </h1>
 
               <p className="mt-5 text-base sm:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed">
-                Eliminate peer-to-peer scams. Every account transfer is held in strict cryptographic escrow until you verify full Konami ID access on your phone.
+                Zero scams. Your payment stays locked in M-Pesa escrow until you log into the Konami ID and verify the squad on your phone.
               </p>
 
               {/* Quick Search Bar */}
@@ -104,12 +104,12 @@ export default async function HomePage() {
                 </div>
               </div>
 
-              {/* Action Buttons with 3D Tactile Styling */}
+              {/* Action Buttons */}
               <div className="mt-8 flex flex-wrap items-center justify-center lg:justify-start gap-4">
                 <Link href="/browse">
                   <Button variant="gold" size="lg" className="btn-3d-gold font-bold px-6">
                     <Sparkles className="w-4 h-4 mr-2" />
-                    Explore 3D Marketplace
+                    Browse Accounts
                   </Button>
                 </Link>
                 <Link href="/seller/create-listing">
@@ -128,7 +128,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Real Live Database Metrics Bar with 3D Depth */}
+      {/* Real Live Database Metrics Bar */}
       <section className="border-b border-pitch-border/60 bg-pitch-surface/60 py-6 relative z-10 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
@@ -161,25 +161,25 @@ export default async function HomePage() {
                 {metrics.verifiedSellersCount}
               </span>
               <span className="text-xs text-slate-400 uppercase tracking-wider font-semibold">
-                Verified KYC Sellers
+                Verified Sellers
               </span>
             </div>
           </div>
         </div>
       </section>
 
-      {/* Featured / Fresh Published Listings with 3D Holographic Cards */}
+      {/* Featured / Fresh Published Listings */}
       <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
         <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
           <div>
             <div className="inline-flex items-center gap-1.5 text-xs uppercase font-bold tracking-wider text-amber-400 mb-1">
               <Zap className="w-3.5 h-3.5 fill-amber-400" />
-              Interactive 3D Holographic Showcase
+              Verified Listings
             </div>
             <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 font-display">
               Latest eFootball Accounts
             </h2>
-            <p className="text-xs text-slate-400 mt-1">Hover over any card to reveal 3D specular shine, tilt perspective, and multi-tier depth.</p>
+            <p className="text-xs text-slate-400 mt-1">Click any card to inspect player stats, squad strength, and buy with instant M-Pesa escrow.</p>
           </div>
           <Link href="/browse" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-400 hover:text-brand-300 transition-colors">
             <span>Explore All Listings</span>

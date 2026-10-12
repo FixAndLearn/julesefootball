@@ -10,32 +10,32 @@ export function EscrowSteps3D() {
     {
       num: "01",
       icon: Smartphone,
-      title: "Buy Now via M-Pesa",
-      description: "Trigger Safaricom M-Pesa STK Push directly to your phone. Confirm your PIN in complete privacy.",
-      tag: "Instant STK",
+      title: "Pay via M-Pesa",
+      description: "Trigger Safaricom M-Pesa STK Push to your phone. Confirm your PIN in complete privacy.",
+      tag: "M-Pesa STK",
       glowColor: "from-emerald-500 to-teal-400",
     },
     {
       num: "02",
       icon: Lock,
-      title: "Funds Held in Escrow",
-      description: "Payment is safely locked in non-custodial smart escrow. The seller cannot touch funds until delivery.",
-      tag: "Non-Custodial",
+      title: "Funds Locked in Escrow",
+      description: "Payment is held safely in M-Pesa Escrow (Till 1572931). The seller cannot touch your money until you receive the account.",
+      tag: "Escrow Locked",
       glowColor: "from-brand-500 to-indigo-400",
     },
     {
       num: "03",
       icon: KeyRound,
-      title: "Encrypted Delivery",
-      description: "Seller submits Konami ID email and password, encrypted via military-grade AES-256 for your eyes only.",
-      tag: "AES-256 Secret",
+      title: "Safe Login Handover",
+      description: "Seller submits the Konami ID email and password securely inside your private order dashboard.",
+      tag: "Private & Secure",
       glowColor: "from-amber-500 to-orange-400",
     },
     {
       num: "04",
       icon: CheckCircle2,
-      title: "Inspect & Release",
-      description: "Take 24 hours to verify full squad players, change security passwords, and release settlement when 100% satisfied.",
+      title: "Inspect & Confirm",
+      description: "Take up to 24 hours to verify squad players, link your own email, and release payment when 100% satisfied.",
       tag: "Buyer Guarantee",
       glowColor: "from-sky-500 to-blue-400",
     },
@@ -43,20 +43,20 @@ export function EscrowSteps3D() {
 
   return (
     <section className="py-24 border-t border-pitch-border/60 bg-gradient-to-b from-pitch via-pitch-surface/40 to-[#070b12] relative overflow-hidden">
-      {/* 3D Ambient background lights */}
+      {/* Ambient background lights */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[300px] bg-brand-600/10 rounded-full blur-[140px] pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <div className="text-center max-w-3xl mx-auto mb-16">
           <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-300 text-xs font-bold mb-4 shadow-inner">
             <ShieldCheck className="w-4 h-4 text-emerald-400" />
-            <span>Cryptographic Non-Custodial Vault</span>
+            <span>M-Pesa Escrow Protection</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
-            How <span className="bg-gradient-to-r from-emerald-400 via-sky-300 to-brand-400 bg-clip-text text-transparent">3D Escrow Protection</span> Secures Your Trade
+            How <span className="bg-gradient-to-r from-emerald-400 via-sky-300 to-brand-400 bg-clip-text text-transparent">Escrow Protection</span> Secures Your Trade
           </h2>
           <p className="mt-3 text-sm sm:text-base text-slate-300">
-            Never risk direct peer-to-peer transfers. Your money stays shielded in escrow until you log in and bind your personal email to the Konami ID.
+            Never send money directly to strangers. Your payment stays protected in escrow until you log into the Konami ID and bind your personal email.
           </p>
         </div>
 

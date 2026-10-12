@@ -95,13 +95,13 @@ export function TacticsPitch3D() {
         <div className="text-center max-w-3xl mx-auto mb-12">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold mb-4 shadow-inner">
             <Trophy className="w-4 h-4 text-amber-400" />
-            <span>Interactive 3D Tactics Engine</span>
+            <span>Tactical Formation Explorer</span>
           </div>
           <h2 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
-            Inspect Meta <span className="bg-gradient-to-r from-amber-400 via-sky-300 to-brand-400 bg-clip-text text-transparent">3100+ OVR Squads</span> in 3D
+            Explore Top <span className="bg-gradient-to-r from-amber-400 via-sky-300 to-brand-400 bg-clip-text text-transparent">eFootball Formations</span>
           </h2>
           <p className="mt-3 text-sm text-slate-300">
-            Rotate the stadium camera, swap meta formations, and click any 3D player token to inspect authentic booster ratings before buying.
+            Switch formations and tap any player token to preview in-game positions and booster stats.
           </p>
         </div>
 

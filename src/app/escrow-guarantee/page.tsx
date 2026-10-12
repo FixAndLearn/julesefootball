@@ -29,12 +29,12 @@ export default function EscrowGuaranteePage() {
               Escrow Architecture Governed by Brian Okibo, CEO
             </h2>
             <p className="text-xs text-emerald-400 font-medium">
-              Institutional Zero-Custody Financial Ledger
+              Secure Automated M-Pesa Escrow (Till 1572931)
             </p>
           </div>
         </div>
         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          The escrow engine of <strong>eFootballMarket Inc.</strong> was engineered under the executive direction of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>. Every shilling locked in escrow is bound to an automated PostgreSQL state machine, ensuring money is never disbursed until account access is verified by the buyer.
+          The escrow engine of <strong>eFootballMarket Inc.</strong> was engineered under the executive direction of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>. Every shilling locked in escrow is bound to an automated transaction system, ensuring money is never disbursed to the seller until the account access is fully verified by the buyer.
         </p>
       </div>
 
