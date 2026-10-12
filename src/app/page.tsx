@@ -10,7 +10,6 @@ import Link from "next/link";
 import { Listing } from "@/types/database";
 
 import { HeroBall3D } from "@/components/3d/HeroBall3D";
-import { TacticsPitch3D } from "@/components/3d/TacticsPitch3D";
 import { EscrowSteps3D } from "@/components/3d/EscrowSteps3D";
 import { KonamiTransferChecklistTrigger } from "@/components/escrow/KonamiTransferChecklistModal";
 
@@ -204,9 +203,6 @@ export default async function HomePage() {
           />
         )}
       </section>
-
-      {/* 3D Interactive Tactical Pitch Section */}
-      <TacticsPitch3D />
 
       {/* 3D Escrow Protection Stepper & Interactive Transfer Checklist */}
       <section className="relative">
