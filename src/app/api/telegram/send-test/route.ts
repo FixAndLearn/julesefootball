@@ -6,7 +6,9 @@ import {
   getTelegramBotInfo,
   getTelegramWebhookInfo,
   setTelegramWebhook,
+  broadcastListingToTelegramChannel,
 } from "@/lib/notifications/telegramAlert";
+import { createAdminClient } from "@/lib/supabase/admin";
 
 export const dynamic = "force-dynamic";
 
@@ -80,6 +82,28 @@ export async function POST(req: NextRequest) {
           ? "Webhook registered successfully! The bot will now auto-reply to messages in Telegram."
           : reg.error || "Failed to register webhook with Telegram.",
       });
+    }
+
+    // Action: Broadcast listing to Telegram Deals Channel
+    if (action === "broadcast_listing") {
+      const listingId = body.listingId;
+      if (!listingId) {
+        return NextResponse.json({ success: false, error: "listingId is required to broadcast." });
+      }
+
+      const adminSupabase = createAdminClient();
+      const { data: listing, error: fetchErr } = await adminSupabase
+        .from("listings")
+        .select("*")
+        .eq("id", listingId)
+        .single();
+
+      if (fetchErr || !listing) {
+        return NextResponse.json({ success: false, error: "Listing not found in database." });
+      }
+
+      const bResult = await broadcastListingToTelegramChannel(listing);
+      return NextResponse.json(bResult);
     }
 
     const time = new Date().toLocaleTimeString("en-KE", {

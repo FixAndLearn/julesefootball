@@ -279,14 +279,22 @@ export async function POST(req: NextRequest) {
       }
     }
 
-    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    // Automated WhatsApp & Telegram alerts to Brian Okibo (+254794400365)
     dispatchAdminWhatsAppAlert({
       eventType: "NEW_LISTING_CREATED",
+      orderId: listing.id,
       listingTitle: listing.title,
       amount: Number(listing.price),
       username: fallbackUsername,
       sellerPhone: phoneNumber,
     }).catch(() => {});
+
+    // Auto-broadcast new verified listing to public Telegram Deals Channel
+    import("@/lib/notifications/telegramAlert").then(({ broadcastListingToTelegramChannel }) => {
+      broadcastListingToTelegramChannel(listing).catch((err) =>
+        console.warn("Deals channel broadcast notice:", err.message)
+      );
+    });
 
     return NextResponse.json({ success: true, listing }, { status: 201 });
   } catch (error: any) {

@@ -218,3 +218,19 @@ export async function sendSellerFundsReleasedSms(
   const message = `EFootballMarket: Handover complete for Order #${orderNumber}! KES ${netAmountKes} is credited to your wallet balance. You can withdraw to M-Pesa anytime.`;
   return sendSmsAlert({ toPhone: sellerPhone, message });
 }
+
+/**
+ * Alert seller immediately when an M-Pesa withdrawal is completed or rejected.
+ */
+export async function sendSellerWithdrawalStatusSms(
+  sellerPhone: string,
+  amountKes: number,
+  status: "completed" | "rejected",
+  failureReason?: string
+): Promise<SmsDispatchResult> {
+  const message =
+    status === "completed"
+      ? `EFootballMarket: Your M-Pesa withdrawal of KES ${amountKes.toLocaleString()} has been approved & disbursed! Check your M-Pesa for incoming funds.`
+      : `EFootballMarket: Withdrawal of KES ${amountKes.toLocaleString()} could not be processed.${failureReason ? ` Reason: ${failureReason}.` : ""} Funds refunded to your balance.`;
+  return sendSmsAlert({ toPhone: sellerPhone, message });
+}

@@ -1,6 +1,7 @@
 import { isUserAdmin } from "@/lib/security/adminAuth";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
+import { sendSellerWithdrawalStatusSms } from "@/lib/notifications/smsAlert";
 import { sendSellerWithdrawalStatusWhatsApp } from "@/lib/whatsapp/notifications";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -144,7 +145,7 @@ export async function PATCH(req: NextRequest) {
         action_url: "/seller/earnings",
         is_read: false,
       });
-      // Dispatch WhatsApp message to seller
+      // Dispatch WhatsApp & SMS messages to seller
       if (withdrawal.phone_number && (status === "completed" || status === "rejected")) {
         sendSellerWithdrawalStatusWhatsApp(
           withdrawal.phone_number,
@@ -152,6 +153,13 @@ export async function PATCH(req: NextRequest) {
           status,
           failureReason
         ).catch((err) => console.warn("Seller withdrawal WhatsApp notice:", err));
+
+        sendSellerWithdrawalStatusSms(
+          withdrawal.phone_number,
+          Number(withdrawal.amount),
+          status,
+          failureReason
+        ).catch((err) => console.warn("Seller withdrawal SMS notice:", err));
       }
     } catch (e) {
       console.warn("Failed to notify seller:", e);

@@ -132,6 +132,7 @@ export async function POST(req: NextRequest) {
     // Automated WhatsApp alert to Brian Okibo (+254794400365)
     dispatchAdminWhatsAppAlert({
       eventType: "WITHDRAWAL_REQUESTED",
+      orderId: withdrawal.id,
       amount,
       sellerPhone: normalizedPhone,
       username: (profile as any)?.username || user.email,

@@ -4,7 +4,13 @@ import {
   getTelegramWebhookInfo,
   sendTelegramMessage,
   setTelegramWebhook,
+  answerTelegramCallbackQuery,
+  editTelegramMessageText,
+  broadcastListingToTelegramChannel,
 } from "@/lib/notifications/telegramAlert";
+import { createAdminClient } from "@/lib/supabase/admin";
+import { sendSellerWithdrawalStatusWhatsApp } from "@/lib/whatsapp/notifications";
+import { sendSellerWithdrawalStatusSms } from "@/lib/notifications/smsAlert";
 
 export const dynamic = "force-dynamic";
 
@@ -67,11 +73,265 @@ export async function GET(req: NextRequest) {
 
 /**
  * POST /api/telegram/webhook
- * Receives incoming messages from Telegram and replies back in real time!
+ * Receives incoming messages and callback queries from Telegram!
  */
 export async function POST(req: NextRequest) {
   try {
     const body = await req.json().catch(() => ({}));
+
+    const time = new Date().toLocaleTimeString("en-KE", {
+      timeZone: "Africa/Nairobi",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+
+    // =========================================================================
+    // 1. HANDLE TELEGRAM 1-TAP INLINE BUTTON ACTIONS (CALLBACK QUERIES)
+    // =========================================================================
+    const callbackQuery = body?.callback_query;
+    if (callbackQuery) {
+      const queryId = callbackQuery.id;
+      const fromId = String(callbackQuery.from?.id);
+      const data = String(callbackQuery.data || "").trim();
+      const message = callbackQuery.message;
+      const chatId = message?.chat?.id;
+      const messageId = message?.message_id;
+      const originalText = message?.text || "";
+
+      const adminChatId =
+        process.env.TELEGRAM_CHAT_ID ||
+        process.env.TELEGRAM_ADMIN_CHAT_ID ||
+        "8418652559";
+
+      // Security check: Only CEO Brian Okibo can execute administrative actions
+      if (fromId !== adminChatId) {
+        await answerTelegramCallbackQuery(
+          queryId,
+          "⚠️ Unauthorized: Only CEO Brian Okibo can execute admin actions.",
+          true
+        );
+        return NextResponse.json({ ok: true });
+      }
+
+      const adminSupabase = createAdminClient();
+
+      // Action 1: Approve & Disburse Seller Withdrawal
+      if (data.startsWith("approve_withdrawal:")) {
+        const withdrawalId = data.replace("approve_withdrawal:", "").trim();
+
+        const { data: withdrawal, error: fetchErr } = await adminSupabase
+          .from("seller_withdrawals")
+          .select("*, seller:profiles(id, username, phone_number)")
+          .eq("id", withdrawalId)
+          .single();
+
+        if (fetchErr || !withdrawal) {
+          await answerTelegramCallbackQuery(queryId, "⚠️ Withdrawal record not found.", true);
+          return NextResponse.json({ ok: true });
+        }
+
+        if (withdrawal.status === "completed") {
+          await answerTelegramCallbackQuery(queryId, "ℹ️ Withdrawal is already marked as completed.");
+          return NextResponse.json({ ok: true });
+        }
+
+        // Mark as completed in database
+        await adminSupabase
+          .from("seller_withdrawals")
+          .update({
+            status: "completed",
+            reviewed_by: "Brian Okibo (Telegram Admin)",
+            updated_at: new Date().toISOString(),
+          })
+          .eq("id", withdrawalId);
+
+        // Notify seller via in-app notifications
+        await adminSupabase.from("notifications").insert({
+          recipient_id: withdrawal.seller_id,
+          type: "order_update",
+          title: "M-Pesa Withdrawal Disbursed!",
+          message: `Your withdrawal of KES ${Number(withdrawal.amount).toLocaleString()} has been approved and disbursed.`,
+          action_url: "/seller/earnings",
+          is_read: false,
+        });
+
+        // Notify seller via WhatsApp & SMS
+        if (withdrawal.phone_number) {
+          sendSellerWithdrawalStatusWhatsApp(
+            withdrawal.phone_number,
+            Number(withdrawal.amount),
+            "completed"
+          ).catch(() => {});
+
+          sendSellerWithdrawalStatusSms(
+            withdrawal.phone_number,
+            Number(withdrawal.amount),
+            "completed"
+          ).catch(() => {});
+        }
+
+        await answerTelegramCallbackQuery(
+          queryId,
+          `✅ Disbursed KES ${Number(withdrawal.amount).toLocaleString()} for @${withdrawal.seller?.username || "seller"}!`
+        );
+
+        if (chatId && messageId) {
+          const updatedText =
+            `${escapeHtml(originalText)}\n\n` +
+            `✅ <b>DISBURSED &amp; APPROVED BY BRIAN OKIBO</b>\n` +
+            `⏰ <i>Executed at ${time} EAT via Telegram 1-Tap Action</i>`;
+
+          await editTelegramMessageText(chatId, messageId, updatedText, [
+            [{ text: "🏦 Open Withdrawals in Admin", url: `${APP_URL}/admin?tab=withdrawals` }],
+          ]);
+        }
+
+        return NextResponse.json({ ok: true });
+      }
+
+      // Action 2: Reject & Refund Seller Withdrawal
+      if (data.startsWith("reject_withdrawal:")) {
+        const withdrawalId = data.replace("reject_withdrawal:", "").trim();
+
+        const { data: withdrawal } = await adminSupabase
+          .from("seller_withdrawals")
+          .select("*, seller:profiles(id, username, available_balance)")
+          .eq("id", withdrawalId)
+          .single();
+
+        if (withdrawal && withdrawal.status !== "rejected") {
+          const currentBal = Number(withdrawal.seller?.available_balance || 0);
+          await adminSupabase
+            .from("profiles")
+            .update({
+              available_balance: currentBal + Number(withdrawal.amount),
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", withdrawal.seller_id);
+
+          await adminSupabase
+            .from("seller_withdrawals")
+            .update({
+              status: "rejected",
+              failure_reason: "Rejected by CEO review via Telegram 1-Tap Action",
+              reviewed_by: "Brian Okibo (Telegram Admin)",
+              updated_at: new Date().toISOString(),
+            })
+            .eq("id", withdrawalId);
+
+          if (withdrawal.phone_number) {
+            sendSellerWithdrawalStatusWhatsApp(
+              withdrawal.phone_number,
+              Number(withdrawal.amount),
+              "rejected",
+              "Admin review rejection"
+            ).catch(() => {});
+
+            sendSellerWithdrawalStatusSms(
+              withdrawal.phone_number,
+              Number(withdrawal.amount),
+              "rejected",
+              "Admin review rejection"
+            ).catch(() => {});
+          }
+
+          await answerTelegramCallbackQuery(
+            queryId,
+            `❌ Withdrawal rejected and KES ${Number(withdrawal.amount).toLocaleString()} refunded to seller balance.`
+          );
+
+          if (chatId && messageId) {
+            const updatedText =
+              `${escapeHtml(originalText)}\n\n` +
+              `❌ <b>REJECTED &amp; REFUNDED TO WALLET</b>\n` +
+              `⏰ <i>Executed by Brian Okibo at ${time} EAT</i>`;
+
+            await editTelegramMessageText(chatId, messageId, updatedText, [
+              [{ text: "🏦 Review in Admin", url: `${APP_URL}/admin?tab=withdrawals` }],
+            ]);
+          }
+        } else {
+          await answerTelegramCallbackQuery(queryId, "Withdrawal already updated.");
+        }
+
+        return NextResponse.json({ ok: true });
+      }
+
+      // Action 3: Take Down Listing
+      if (data.startsWith("takedown_listing:")) {
+        const listingId = data.replace("takedown_listing:", "").trim();
+
+        const { data: listing } = await adminSupabase
+          .from("listings")
+          .select("id, title, seller_id")
+          .eq("id", listingId)
+          .single();
+
+        if (listing) {
+          await adminSupabase
+            .from("listings")
+            .update({ status: "suspended" })
+            .eq("id", listingId);
+
+          await adminSupabase.from("notifications").insert({
+            recipient_id: listing.seller_id,
+            type: "listing_moderated",
+            title: "⚠️ Listing Brought Down by Administration",
+            message: `Your squad listing "${listing.title}" was suspended by CEO review for non-conformance.`,
+            action_url: "/seller/guidelines",
+            is_read: false,
+          });
+
+          await answerTelegramCallbackQuery(queryId, "🚨 Listing taken down from marketplace catalog.");
+
+          if (chatId && messageId) {
+            const updatedText =
+              `${escapeHtml(originalText)}\n\n` +
+              `🚨 <b>BROUGHT DOWN &amp; SUSPENDED</b>\n` +
+              `⏰ <i>Executed by Brian Okibo at ${time} EAT</i>`;
+
+            await editTelegramMessageText(chatId, messageId, updatedText, [
+              [{ text: "⚽ Review in Admin", url: `${APP_URL}/admin?tab=listings` }],
+            ]);
+          }
+        } else {
+          await answerTelegramCallbackQuery(queryId, "Listing not found.");
+        }
+
+        return NextResponse.json({ ok: true });
+      }
+
+      // Action 4: Broadcast Listing to Public Deals Channel
+      if (data.startsWith("broadcast_listing:")) {
+        const listingId = data.replace("broadcast_listing:", "").trim();
+
+        const { data: listing } = await adminSupabase
+          .from("listings")
+          .select("*")
+          .eq("id", listingId)
+          .single();
+
+        if (listing) {
+          const bRes = await broadcastListingToTelegramChannel(listing);
+          if (bRes.success) {
+            await answerTelegramCallbackQuery(queryId, "📢 Deal broadcasted to Telegram Deals Channel! 🎉");
+          } else {
+            await answerTelegramCallbackQuery(queryId, `Broadcast note: ${bRes.error || "Broadcast sent"}`);
+          }
+        } else {
+          await answerTelegramCallbackQuery(queryId, "Listing not found.");
+        }
+
+        return NextResponse.json({ ok: true });
+      }
+
+      await answerTelegramCallbackQuery(queryId, "Action acknowledged.");
+      return NextResponse.json({ ok: true });
+    }
+
+    // =========================================================================
+    // 2. HANDLE CONVERSATIONAL TEXT MESSAGES
+    // =========================================================================
     const message = body?.message || body?.edited_message;
 
     if (!message || !message.chat?.id) {
@@ -83,12 +343,6 @@ export async function POST(req: NextRequest) {
     const text = (message.text || "").trim();
     const senderName = message.from?.first_name || message.from?.username || "Trader";
     const senderHandle = message.from?.username ? `@${message.from.username}` : senderName;
-
-    const time = new Date().toLocaleTimeString("en-KE", {
-      timeZone: "Africa/Nairobi",
-      hour: "2-digit",
-      minute: "2-digit",
-    });
 
     console.log(`[Telegram:Incoming] Message from ${senderHandle} (${chatId}): "${text}"`);
 

@@ -168,6 +168,122 @@ export async function getTelegramWebhookInfo(
 }
 
 /**
+ * Acknowledges a Telegram callback query (button tap) and shows toast/alert.
+ */
+export async function answerTelegramCallbackQuery(
+  callbackQueryId: string,
+  text?: string,
+  showAlert = false,
+  customToken?: string
+): Promise<boolean> {
+  const token = customToken || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
+  if (!token) return false;
+
+  try {
+    const res = await fetch(`https://api.telegram.org/bot${token.trim()}/answerCallbackQuery`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        callback_query_id: callbackQueryId,
+        text,
+        show_alert: showAlert,
+      }),
+    });
+    const data = await res.json();
+    return Boolean(res.ok && data?.ok);
+  } catch (err: any) {
+    console.warn("[Telegram:Callback] answerCallbackQuery error:", err.message);
+    return false;
+  }
+}
+
+/**
+ * Edits the text and buttons of an existing message in Telegram.
+ */
+export async function editTelegramMessageText(
+  chatId: string | number,
+  messageId: number,
+  textHtml: string,
+  inlineButtons?: Array<Array<{ text: string; url?: string; callback_data?: string }>>,
+  customToken?: string
+): Promise<boolean> {
+  const token = customToken || process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
+  if (!token) return false;
+
+  try {
+    const payload: any = {
+      chat_id: String(chatId).trim(),
+      message_id: messageId,
+      text: textHtml,
+      parse_mode: "HTML",
+    };
+
+    if (inlineButtons) {
+      payload.reply_markup = { inline_keyboard: inlineButtons };
+    }
+
+    const res = await fetch(`https://api.telegram.org/bot${token.trim()}/editMessageText`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload),
+    });
+    const data = await res.json();
+    return Boolean(res.ok && data?.ok);
+  } catch (err: any) {
+    console.warn("[Telegram:Edit] editMessageText error:", err.message);
+    return false;
+  }
+}
+
+/**
+ * Broadcasts a verified listing deal to a public Telegram Channel (e.g. @efootballmarket_deals).
+ */
+export async function broadcastListingToTelegramChannel(
+  listing: any,
+  customChannel?: string
+): Promise<{ success: boolean; messageId?: number; error?: string }> {
+  const channel =
+    customChannel ||
+    process.env.TELEGRAM_CHANNEL_ID ||
+    process.env.TELEGRAM_DEALS_CHANNEL ||
+    process.env.TELEGRAM_CHAT_ID;
+
+  const token = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
+  if (!token || !channel) {
+    return { success: false, error: "Telegram Bot Token or Channel is not configured." };
+  }
+
+  const priceKes = listing.price ? `KES ${Number(listing.price).toLocaleString()}` : "Price on Inquiry";
+  const ovr = listing.collective_strength || listing.squad_rating || "Top Tier";
+  const platform = listing.platform ? String(listing.platform).toUpperCase() : "MOBILE";
+  const title = listing.title || "eFootball Squad";
+  const listingUrl = `${APP_URL}/listings/${listing.id}`;
+
+  const captionHtml =
+    `🔥 <b>NEW ACCOUNT FOR SALE ON EFOOTBALLMARKET</b> ⚽\n\n` +
+    `🎮 <b>Squad:</b> <b>${title}</b>\n` +
+    `⭐ <b>Team Strength:</b> <code>${ovr} OVR</code>\n` +
+    `💰 <b>Price:</b> <b>${priceKes}</b>\n` +
+    `🛡️ <b>Escrow Protection:</b> Till 1572931 (100% Guaranteed)\n` +
+    `📱 <b>Platform:</b> ${platform}\n` +
+    `🔐 <b>Konami ID:</b> Transferable &amp; Email Bindable\n\n` +
+    `⚡ <i>Buy safely — seller gets paid ONLY after you verify access!</i>\n\n` +
+    `🏛️ <b>eFootballMarket Kenya</b>`;
+
+  const buttons = [
+    [{ text: "🛒 Buy Safely via Escrow", url: listingUrl }],
+    [{ text: "⚽ Browse Marketplace", url: `${APP_URL}/marketplace` }],
+  ];
+
+  return sendTelegramMessage(captionHtml, {
+    chatId: channel,
+    token,
+    parseMode: "HTML",
+    inlineButtons: buttons,
+  });
+}
+
+/**
  * Formats a clean, high-priority HTML Telegram notification for Brian Okibo (CEO).
  */
 export function formatTelegramAlertHtml(payload: AdminAlertPayload): { text: string; buttons: any[] } {
@@ -226,9 +342,19 @@ export function formatTelegramAlertHtml(payload: AdminAlertPayload): { text: str
         payload.sellerPhone ? `📱 <b>Phone:</b> <code>${formatDisplayPhone(payload.sellerPhone)}</code>` : "",
         `⏰ <b>Listed:</b> ${time} EAT`,
       ];
-      inlineButtons = [
-        [{ text: "⚽ Review Marketplace Listings", url: `${APP_URL}/admin?tab=listings` }],
-      ];
+      if (payload.orderId) {
+        inlineButtons = [
+          [
+            { text: "📢 Broadcast Deal", callback_data: `broadcast_listing:${payload.orderId}` },
+            { text: "🚨 Take Down", callback_data: `takedown_listing:${payload.orderId}` },
+          ],
+          [{ text: "⚽ Review in Admin", url: `${APP_URL}/admin?tab=listings` }],
+        ];
+      } else {
+        inlineButtons = [
+          [{ text: "⚽ Review Marketplace Listings", url: `${APP_URL}/admin?tab=listings` }],
+        ];
+      }
       break;
 
     case "CREDENTIALS_DELIVERED":
@@ -314,9 +440,19 @@ export function formatTelegramAlertHtml(payload: AdminAlertPayload): { text: str
         payload.sellerPhone ? `📱 <b>M-Pesa Line:</b> <code>${formatDisplayPhone(payload.sellerPhone)}</code>` : "",
         `⚡ <b>Action:</b> Disburse via M-Pesa B2C or Till payout.`,
       ];
-      inlineButtons = [
-        [{ text: "🏦 Approve Payout in Admin", url: `${APP_URL}/admin?tab=withdrawals` }],
-      ];
+      if (payload.orderId) {
+        inlineButtons = [
+          [
+            { text: "✅ Disburse & Approve", callback_data: `approve_withdrawal:${payload.orderId}` },
+            { text: "❌ Reject & Refund", callback_data: `reject_withdrawal:${payload.orderId}` },
+          ],
+          [{ text: "🏦 Open in Admin Dashboard", url: `${APP_URL}/admin?tab=withdrawals` }],
+        ];
+      } else {
+        inlineButtons = [
+          [{ text: "🏦 Approve Payout in Admin", url: `${APP_URL}/admin?tab=withdrawals` }],
+        ];
+      }
       break;
 
     default:

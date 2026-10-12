@@ -70,6 +70,7 @@ function AdminControlCenterContent() {
   const [customTgChatId, setCustomTgChatId] = useState("");
   const [customTgToken, setCustomTgToken] = useState("");
   const [registeringWebhook, setRegisteringWebhook] = useState(false);
+  const [broadcastingListingId, setBroadcastingListingId] = useState<string | null>(null);
 
   // Data states
   const [listings, setListings] = useState<any[]>([]);
@@ -249,6 +250,36 @@ function AdminControlCenterContent() {
       setFeedback({ type: "error", message: `Error registering webhook: ${err.message}` });
     } finally {
       setRegisteringWebhook(false);
+    }
+  };
+
+  const handleBroadcastListing = async (listing: any) => {
+    setBroadcastingListingId(listing.id);
+    try {
+      const res = await fetch("/api/telegram/send-test", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "broadcast_listing",
+          listingId: listing.id,
+        }),
+      });
+      const data = await res.json();
+      if (data.success) {
+        setFeedback({
+          type: "success",
+          message: `Listing "${listing.title}" broadcasted to Telegram Deals Channel! 🎉`,
+        });
+      } else {
+        setFeedback({
+          type: "error",
+          message: `Broadcast issue: ${data.error || "Check channel settings"}`,
+        });
+      }
+    } catch (err: any) {
+      setFeedback({ type: "error", message: `Broadcast error: ${err.message}` });
+    } finally {
+      setBroadcastingListingId(null);
     }
   };
 
@@ -812,6 +843,17 @@ function AdminControlCenterContent() {
                         </td>
                         <td className="p-3.5 text-right">
                           <div className="flex items-center justify-end gap-2">
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => handleBroadcastListing(l)}
+                              isLoading={broadcastingListingId === l.id}
+                              className="text-xs py-1 px-2.5 border-indigo-500/40 text-indigo-300 hover:bg-indigo-500/10"
+                            >
+                              <Send className="w-3.5 h-3.5 mr-1" />
+                              Broadcast
+                            </Button>
                             {l.status === "active" ? (
                               <Button
                                 type="button"
