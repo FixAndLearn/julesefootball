@@ -575,6 +575,13 @@ export default function CreateListingPage() {
                 >
                   3150
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setOverallStrength("3210")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  3210
+                </button>
               </div>
             </div>
 

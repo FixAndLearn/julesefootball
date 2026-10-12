@@ -74,7 +74,7 @@ export default async function HomePage() {
                   <input
                     type="text"
                     name="search"
-                    placeholder="Search epic player, formation, OVR (e.g. Messi, 3100)..."
+                    placeholder="Search epic player, formation, OVR (e.g. Messi, 3200)..."
                     className="w-full pl-11 pr-32 py-3.5 rounded-xl bg-pitch-surface/90 border border-pitch-border text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500 text-sm backdrop-blur-md shadow-inner"
                   />
                   <div className="absolute inset-y-1.5 right-1.5 flex items-center">
@@ -93,8 +93,8 @@ export default async function HomePage() {
                   <Link href="/browse?platform=ios" className="px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-slate-300 hover:text-white hover:border-slate-500 transition-colors">
                     iOS
                   </Link>
-                  <Link href="/browse?minStrength=3100" className="px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-amber-300 hover:border-amber-500/60 transition-colors">
-                    3100+ OVR
+                  <Link href="/browse?minStrength=3200" className="px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-amber-300 hover:border-amber-500/60 transition-colors font-semibold">
+                    3200+ OVR
                   </Link>
                   <Link href="/browse?playstyle=quick_counter" className="px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-slate-300 hover:text-white hover:border-slate-500 transition-colors">
                     Quick Counter

@@ -4,7 +4,6 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { WhatsAppSupportWidget } from "@/components/support/WhatsAppSupportWidget";
-import { PwaInstallPrompt } from "@/components/pwa/PwaInstallPrompt";
 
 const siteUrl =
   process.env.NEXT_PUBLIC_APP_URL ||
@@ -38,7 +37,7 @@ export const metadata: Metadata = {
     "M-Pesa gaming account",
     "Konami ID accounts",
     "eFootball 2026 accounts",
-    "3100 OVR eFootball account",
+    "3200 OVR eFootball account",
     "Epic booster player account",
     "buy PES mobile account M-Pesa",
     "eFootball accounts Nairobi",
@@ -115,7 +114,6 @@ export default function RootLayout({
         <main className="flex-1 flex flex-col relative z-10">{children}</main>
         <Footer />
         <WhatsAppSupportWidget />
-        <PwaInstallPrompt />
       </body>
     </html>
   );

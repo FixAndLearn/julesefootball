@@ -111,6 +111,7 @@ export function ListingFilters() {
           <option value="3050">3050+ OVR</option>
           <option value="3100">3100+ OVR</option>
           <option value="3150">3150+ OVR (Elite)</option>
+          <option value="3200">3200+ OVR (Meta Booster)</option>
         </select>
       </div>
 

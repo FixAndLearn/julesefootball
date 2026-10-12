@@ -37,7 +37,7 @@ export default function WantedBoardPage() {
   const [buyerPhone, setBuyerPhone] = useState("");
   const [reqTitle, setReqTitle] = useState("");
   const [reqDescription, setReqDescription] = useState("");
-  const [reqMinOvr, setReqMinOvr] = useState("3100");
+  const [reqMinOvr, setReqMinOvr] = useState("3200");
   const [reqPlatform, setReqPlatform] = useState<Platform>("android");
   const [reqPlaystyle, setReqPlaystyle] = useState<Playstyle>("quick_counter");
   const [reqBudget, setReqBudget] = useState("");
@@ -387,7 +387,7 @@ export default function WantedBoardPage() {
 
                   <Input
                     label="Request Title"
-                    placeholder="e.g. Looking for 3120+ OVR with Blitz Curler Son + Vieira"
+                    placeholder="e.g. Looking for 3200+ OVR with Blitz Curler Son + Vieira"
                     value={reqTitle}
                     onChange={(e) => setReqTitle(e.target.value)}
                     required
@@ -425,7 +425,7 @@ export default function WantedBoardPage() {
                     <Input
                       label="Min OVR Rating"
                       type="number"
-                      placeholder="3100"
+                      placeholder="3200"
                       value={reqMinOvr}
                       onChange={(e) => setReqMinOvr(e.target.value)}
                     />
