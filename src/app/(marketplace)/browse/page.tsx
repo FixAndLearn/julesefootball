@@ -106,8 +106,39 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
           <ListingFilters />
         </div>
 
-        {/* Listings Grid */}
+        {/* Listings Grid with Active Filter Badges */}
         <div className="lg:col-span-3">
+          {(searchParams.search || (searchParams.platform && searchParams.platform !== "all") || (searchParams.playstyle && searchParams.playstyle !== "all") || searchParams.minStrength) && (
+            <div className="flex flex-wrap items-center gap-2 mb-4 p-2.5 rounded-xl bg-pitch-card/60 border border-pitch-border/60">
+              <span className="text-xs text-slate-400 font-semibold">Active:</span>
+              {searchParams.search && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-pitch-surface border border-pitch-border text-xs text-slate-200">
+                  Keyword: "{searchParams.search}"
+                </span>
+              )}
+              {searchParams.platform && searchParams.platform !== "all" && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-pitch-surface border border-pitch-border text-xs text-slate-200 capitalize">
+                  {searchParams.platform}
+                </span>
+              )}
+              {searchParams.minStrength && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-pitch-surface border border-amber-500/40 text-xs text-amber-300 font-bold">
+                  {searchParams.minStrength}+ OVR
+                </span>
+              )}
+              {searchParams.playstyle && searchParams.playstyle !== "all" && (
+                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-pitch-surface border border-pitch-border text-xs text-slate-200 capitalize">
+                  {searchParams.playstyle.replace("_", " ")}
+                </span>
+              )}
+              <Link
+                href="/browse"
+                className="text-xs text-rose-400 hover:text-rose-300 font-semibold underline ml-auto"
+              >
+                Reset Filters
+              </Link>
+            </div>
+          )}
           <ListingGrid listings={listings} />
         </div>
       </div>

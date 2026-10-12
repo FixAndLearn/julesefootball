@@ -21,6 +21,7 @@ import {
   Target,
   Handshake,
   Trophy,
+  MessageCircle,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import Link from "next/link";
@@ -153,6 +154,17 @@ export function Header() {
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-3">
+            <a
+              href="https://wa.me/254794400365"
+              target="_blank"
+              rel="noopener noreferrer"
+              title="Official Escrow Support: 0794400365"
+              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 hover:text-emerald-200 text-xs font-semibold transition-colors"
+            >
+              <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Support: 0794400365</span>
+            </a>
+
             <Link href="/seller/create-listing">
               <Button variant="gold" size="sm" className="hidden sm:inline-flex items-center gap-1.5 font-semibold">
                 <PlusCircle className="w-4 h-4" />
@@ -437,6 +449,17 @@ export function Header() {
             >
               + Sell an Account
             </Link>
+
+            <a
+              href="https://wa.me/254794400365"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-xs font-bold"
+            >
+              <span>WhatsApp Support: 0794400365</span>
+              <MessageCircle className="w-4 h-4 text-emerald-400" />
+            </a>
           </nav>
 
           {isAuthenticated && (

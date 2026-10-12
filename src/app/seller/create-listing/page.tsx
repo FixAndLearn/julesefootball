@@ -406,7 +406,7 @@ export default function CreateListingPage() {
                 required
               />
               <div className="pt-0.5 flex items-center gap-1.5">
-                <span className="text-[11px] text-slate-400">Examples:</span>
+                <span className="text-[11px] text-slate-400">Quick set:</span>
                 <button
                   type="button"
                   onClick={() => setPrice("2500")}
@@ -430,6 +430,19 @@ export default function CreateListingPage() {
                   KES 4,500
                 </button>
               </div>
+
+              {Number(price) > 0 && (
+                <div className="mt-2 p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-800/60 text-[11px] space-y-1">
+                  <div className="flex justify-between text-slate-300">
+                    <span>Escrow Fee (0% Promo):</span>
+                    <span className="font-semibold text-emerald-400">KES 0</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-white border-t border-emerald-800/40 pt-1">
+                    <span>Your M-Pesa Payout:</span>
+                    <span className="text-emerald-300 font-mono">KES {Number(price).toLocaleString()}</span>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div>

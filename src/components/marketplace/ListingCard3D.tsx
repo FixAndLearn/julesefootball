@@ -61,7 +61,7 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
       onMouseMove={handleMouseMove}
       onMouseEnter={handleMouseEnter}
       onMouseLeave={handleMouseLeave}
-      className="perspective-1000 w-full"
+      className="perspective-1000 w-full h-full"
     >
       <Link
         href={`/listings/${listing.id}`}
@@ -72,7 +72,7 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
           transformStyle: "preserve-3d",
           transition: isHovered ? "transform 0.08s ease-out" : "transform 0.5s ease-out",
         }}
-        className={`group block bg-pitch-surface/90 border rounded-2xl overflow-hidden relative flex flex-col ${
+        className={`group block bg-pitch-surface/90 border rounded-2xl overflow-hidden relative flex flex-col h-full justify-between ${
           featured
             ? "border-amber-500/70 shadow-2xl shadow-amber-500/10"
             : "border-pitch-border hover:border-brand-500/80 shadow-xl shadow-black/40"

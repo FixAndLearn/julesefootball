@@ -303,9 +303,24 @@ export function DirectCheckoutForm({
                   className="w-full px-4 py-3 rounded-xl bg-pitch-card border border-pitch-border text-slate-100 placeholder-slate-500 text-sm font-mono focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500"
                 />
               </div>
-              <p className="text-[11px] text-slate-400 mt-1">
-                Supports local (07/01) or international (+254) formats. PIN prompt will appear for <strong>Till 1572931 (EFootballMarket)</strong>.
-              </p>
+              <div className="mt-1 flex items-center justify-between text-[11px]">
+                {phoneNumber.trim().length >= 9 ? (
+                  normalizePhoneNumber(phoneNumber).isValid ? (
+                    <span className="text-emerald-400 font-semibold flex items-center gap-1">
+                      <Check className="w-3 h-3 text-emerald-400" />
+                      Verified format: {normalizePhoneNumber(phoneNumber).international}
+                    </span>
+                  ) : (
+                    <span className="text-amber-400">
+                      Format: 07XX XXX XXX or 01XX XXX XXX
+                    </span>
+                  )
+                ) : (
+                  <span className="text-slate-400">
+                    Safaricom Till 1572931 STK Prompt
+                  </span>
+                )}
+              </div>
             </div>
 
             <div>
@@ -419,13 +434,42 @@ export function DirectCheckoutForm({
                 <span>Waiting for Safaricom confirmation...</span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setStkStatus("idle")}
-                className="text-xs text-slate-500 hover:text-slate-300 underline"
-              >
-                Change Phone Number or Retry
-              </button>
+              {/* Manual Till 1572931 Fallback Option */}
+              <div className="p-3.5 rounded-xl bg-pitch-surface border border-dashed border-amber-500/40 text-left text-xs space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="font-bold text-amber-300 flex items-center gap-1.5">
+                    <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+                    Didn't receive the STK prompt?
+                  </span>
+                  <span className="text-[10px] text-slate-400 bg-pitch-card px-2 py-0.5 rounded border border-pitch-border font-mono">
+                    Till 1572931
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-300 leading-relaxed">
+                  Pay directly: <strong>M-Pesa</strong> &rarr; <strong>Lipa Na M-Pesa</strong> &rarr; <strong>Buy Goods</strong> &rarr; Till <strong>1572931</strong> (Brian Okibo) &rarr; Amount: <strong>KES {payablePrice.toLocaleString()}</strong>.
+                </p>
+                <div className="pt-1 flex items-center justify-between text-[11px]">
+                  <span className="text-slate-400">Instant Escrow Lock</span>
+                  <a
+                    href="https://wa.me/254794400365"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-emerald-400 hover:text-emerald-300 font-semibold underline"
+                  >
+                    WhatsApp Support: 0794400365 &rarr;
+                  </a>
+                </div>
+              </div>
+
+              <div className="flex items-center justify-center gap-4">
+                <button
+                  type="button"
+                  onClick={() => setStkStatus("idle")}
+                  className="text-xs text-slate-400 hover:text-slate-200 underline"
+                >
+                  Change Phone Number or Retry STK
+                </button>
+              </div>
             </div>
           )}
         </div>
