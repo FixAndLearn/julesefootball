@@ -8,15 +8,38 @@ import {
   setTelegramWebhook,
   broadcastListingToTelegramChannel,
 } from "@/lib/notifications/telegramAlert";
+import { isUserAdmin } from "@/lib/security/adminAuth";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 
 export const dynamic = "force-dynamic";
 
 const APP_URL = process.env.NEXT_PUBLIC_APP_URL || "https://www.efootballmarket.co.ke";
 
 export async function GET() {
-  const token = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
-  const chatId = process.env.TELEGRAM_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID;
+  try {
+    const supabase = createServerSupabaseClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const adminSupabase = createAdminClient();
+    const { data: callerProfile } = await adminSupabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (!isUserAdmin(user.email, callerProfile?.role)) {
+      return NextResponse.json({ error: "Forbidden: Admin access required." }, { status: 403 });
+    }
+
+    const token = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
+    const chatId = process.env.TELEGRAM_CHAT_ID || process.env.TELEGRAM_ADMIN_CHAT_ID;
 
   const maskedToken = token ? `${token.substring(0, 6)}...${token.slice(-4)}` : null;
   const maskedChatId = chatId ? `${chatId.substring(0, 3)}***${chatId.slice(-2)}` : null;
@@ -52,10 +75,33 @@ export async function GET() {
       envLocal: "3. Set TELEGRAM_BOT_TOKEN and TELEGRAM_CHAT_ID in .env.local",
     },
   });
+  } catch (error: any) {
+    return NextResponse.json({ error: error.message }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
   try {
+    const supabase = createServerSupabaseClient();
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const adminSupabase = createAdminClient();
+    const { data: callerProfile } = await adminSupabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+
+    if (!isUserAdmin(user.email, callerProfile?.role)) {
+      return NextResponse.json({ error: "Forbidden: Admin access required." }, { status: 403 });
+    }
+
     const body = await req.json().catch(() => ({}));
     const { token, chatId, message, testType, action } = body;
 

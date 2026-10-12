@@ -80,18 +80,7 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ success: true, article }, { status: 201 });
   } catch (error: any) {
     console.error("News POST error:", error);
-    const msg = error.message || "";
-    if (msg.includes("Could not find the table") || msg.includes("news_articles")) {
-      return NextResponse.json(
-        {
-          error:
-            "Table 'public.news_articles' is not initialized in Supabase yet. Please run the SQL migration in your Supabase Dashboard SQL Editor (see /setup for the script).",
-          needsMigration: true,
-        },
-        { status: 500 }
-      );
-    }
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: "Failed to publish article. Please try again or contact administrator." }, { status: 500 });
   }
 }
 
