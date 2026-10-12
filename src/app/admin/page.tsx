@@ -1213,42 +1213,6 @@ function AdminControlCenterContent() {
       {/* TAB 4: SELLER WITHDRAWALS (M-PESA PAYOUTS) */}
       {activeTab === "withdrawals" && (
         <div className="space-y-6">
-          {/* Executive Instructions / Operations Manual */}
-          <div className="p-5 rounded-2xl bg-pitch-surface border border-pitch-border space-y-3">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-pitch-border/60 pb-3">
-              <div className="flex items-center gap-2 text-amber-400 font-bold text-sm">
-                <Banknote className="w-4 h-4" />
-                <span>Executive Till Operations &amp; Seller Payouts</span>
-              </div>
-              <span className="text-[11px] font-mono text-slate-400">
-                UnifiedPay Till: <strong className="text-white">1572931</strong>
-              </span>
-            </div>
-
-            <p className="text-xs text-slate-300 leading-relaxed">
-              When a seller requests a withdrawal, their available balance is reserved immediately. Follow this standard operating procedure:
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-4 gap-3 text-xs">
-              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
-                <span className="font-bold text-amber-400 block text-[11px]">Step 1: Check Seller &amp; Phone</span>
-                <p className="text-[11px] text-slate-400">Click &quot;Copy&quot; next to the seller&apos;s phone number to paste it into M-Pesa.</p>
-              </div>
-              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
-                <span className="font-bold text-amber-400 block text-[11px]">Step 2: Disburse Funds</span>
-                <p className="text-[11px] text-slate-400">Send the requested KES amount from your Till (1572931) to their M-Pesa line.</p>
-              </div>
-              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
-                <span className="font-bold text-emerald-400 block text-[11px]">Step 3: Mark Paid</span>
-                <p className="text-[11px] text-slate-400">Click &quot;Mark Paid / Completed&quot;. The seller receives an instant success alert.</p>
-              </div>
-              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-1">
-                <span className="font-bold text-rose-400 block text-[11px]">Alternative: Reject &amp; Refund</span>
-                <p className="text-[11px] text-slate-400">If the phone is invalid, reject with a reason to automatically restore their balance.</p>
-              </div>
-            </div>
-          </div>
-
           {/* Filters & Search */}
           <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3">
             <div className="flex items-center gap-1.5 p-1 rounded-xl bg-pitch-surface border border-pitch-border text-xs overflow-x-auto">
@@ -1534,31 +1498,6 @@ function AdminControlCenterContent() {
                 </div>
               </div>
 
-              {/* Optional On-the-Fly Inputs */}
-              {!telegramInfo?.isConfigured && (
-                <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-3">
-                  <span className="text-xs font-bold text-slate-300 block">
-                    Quick Connect (Test before saving to .env.local):
-                  </span>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                    <input
-                      type="text"
-                      value={customTgToken}
-                      onChange={(e) => setCustomTgToken(e.target.value)}
-                      placeholder="Bot Token (e.g. 123456:ABC-DEF...)"
-                      className="px-3.5 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
-                    />
-                    <input
-                      type="text"
-                      value={customTgChatId}
-                      onChange={(e) => setCustomTgChatId(e.target.value)}
-                      placeholder="Your Numeric Chat ID (e.g. 987654321)"
-                      className="px-3.5 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-100 font-mono focus:outline-none focus:border-indigo-500"
-                    />
-                  </div>
-                </div>
-              )}
-
               {testTgResult && (
                 <div
                   className={`p-3.5 rounded-xl border text-xs font-mono space-y-1 ${
@@ -1583,35 +1522,6 @@ function AdminControlCenterContent() {
                   )}
                 </div>
               )}
-
-              {/* 30-Second Quick Setup Guide */}
-              <div className="p-4 rounded-2xl bg-slate-950/80 border border-pitch-border space-y-2">
-                <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                  <ShieldCheck className="w-4 h-4 text-indigo-400" />
-                  <span>30-Second Telegram Setup for Brian Okibo</span>
-                </span>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-3 text-xs text-slate-300">
-                  <div className="p-2.5 rounded-xl bg-pitch-surface/60 border border-pitch-border/60">
-                    <div className="font-bold text-indigo-300 mb-1">1. Create Bot</div>
-                    <p className="text-[11px] text-slate-400">
-                      Open Telegram on your phone, message <strong>@BotFather</strong>, send <code>/newbot</code>, and copy your API Token.
-                    </p>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-pitch-surface/60 border border-pitch-border/60">
-                    <div className="font-bold text-indigo-300 mb-1">2. Get Your Chat ID</div>
-                    <p className="text-[11px] text-slate-400">
-                      Message <strong>@userinfobot</strong> on Telegram and copy your numeric <strong>Id</strong>.
-                    </p>
-                  </div>
-                  <div className="p-2.5 rounded-xl bg-pitch-surface/60 border border-pitch-border/60">
-                    <div className="font-bold text-indigo-300 mb-1">3. Put in .env.local</div>
-                    <p className="text-[11px] text-slate-400 font-mono text-[10px] text-indigo-300">
-                      TELEGRAM_BOT_TOKEN=&quot;...&quot;<br />
-                      TELEGRAM_CHAT_ID=&quot;...&quot;
-                    </p>
-                  </div>
-                </div>
-              </div>
             </div>
           </div>
 
@@ -1660,7 +1570,7 @@ function AdminControlCenterContent() {
                   <span>1. Test Channel Dispatch</span>
                 </span>
                 <p className="text-xs text-slate-400">
-                  Enter your channel username or numeric ID. Make sure <strong>@efootballmaket_bot</strong> is an <strong>Administrator</strong> in the channel with <em>Post Messages</em> permissions.
+                  Enter your Telegram channel username or numeric ID to broadcast squad deals.
                 </p>
 
                 <div className="space-y-2">
@@ -1715,7 +1625,7 @@ function AdminControlCenterContent() {
                   <span>2. Manually Broadcast Live Listing</span>
                 </span>
                 <p className="text-xs text-slate-400">
-                  Select any approved marketplace squad to instantly push to your community subscribers right now.
+                  Select any approved marketplace squad to push to your channel subscribers.
                 </p>
 
                 <div className="space-y-2">
@@ -1747,10 +1657,6 @@ function AdminControlCenterContent() {
                   <Megaphone className="w-3.5 h-3.5 mr-1.5" />
                   Broadcast Squad to Deals Channel Now
                 </Button>
-
-                <div className="p-2.5 rounded-xl bg-slate-950/70 border border-pitch-border text-[11px] text-slate-400">
-                  💡 <strong>Pro Tip:</strong> Re-broadcasting top squads at 8:00 PM EAT gives maximum exposure when Kenyan gamers are most active on WhatsApp &amp; Telegram.
-                </div>
               </div>
             </div>
           </div>

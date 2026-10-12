@@ -308,7 +308,7 @@ export default function CreateListingPage() {
           Create eFootball Account Listing
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Post your squad with real screenshot quality (up to 5 photos). Simple 1 or 2 examples are provided below to guide how to fill each field.
+          Post your squad with verified screenshots (up to 5 photos) for instant escrow listing.
         </p>
       </div>
 
@@ -353,45 +353,19 @@ export default function CreateListingPage() {
       <form onSubmit={handleSubmit} className="space-y-8">
         {/* Section 1: Basic Information */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
-          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
-            <span>1. Basic Listing Information</span>
-            <span className="text-xs font-normal text-amber-400 flex items-center gap-1">
-              <Sparkles className="w-3 h-3" /> 1-2 examples provided
-            </span>
+          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3">
+            1. Basic Listing Information
           </h2>
 
-          {/* Listing Title with 2 Clean Examples */}
+          {/* Listing Title */}
           <div className="space-y-2">
             <Input
               label="Listing Title"
-              placeholder="e.g. 3120 OVR Quick Counter Squad | 105 Messi + Booster Vieira | 850 Coins"
+              placeholder="e.g. 3200 OVR Quick Counter Squad | 105 Messi + Booster Vieira | 850 Coins"
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               required
             />
-
-            {/* Clean 2 Examples Box */}
-            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-1.5">
-              <span className="text-xs font-semibold text-amber-300 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" /> Examples of how to write the title:
-              </span>
-              <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                <button
-                  type="button"
-                  onClick={() => setTitle("3120 OVR Quick Counter | 105 Messi + Booster Vieira | 850 Coins")}
-                  className="text-xs px-3 py-1 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/60 transition-all text-left"
-                >
-                  <strong>Example 1:</strong> 3120 OVR Quick Counter | 105 Messi + Booster Vieira | 850 Coins
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setTitle("3150 OVR Possession Game | Epic Rummenigge + Gullit | Div 1")}
-                  className="text-xs px-3 py-1 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/60 transition-all text-left"
-                >
-                  <strong>Example 2:</strong> 3150 OVR Possession Game | Epic Rummenigge + Gullit | Div 1
-                </button>
-              </div>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
@@ -543,9 +517,8 @@ export default function CreateListingPage() {
 
         {/* Section 2: Team Strength & In-Game Resources */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
-          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
-            <span>2. Team Strength & Balances</span>
-            <span className="text-xs font-normal text-amber-400">1-2 examples per field</span>
+          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3">
+            2. Team Strength & Balances
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
@@ -751,9 +724,8 @@ export default function CreateListingPage() {
 
         {/* Section 3: Special Player Cards & Tactics */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
-          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
-            <span>3. Special Player Cards & Tactics</span>
-            <span className="text-xs font-normal text-amber-400">1-2 examples per field</span>
+          <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3">
+            3. Special Player Cards & Tactics
           </h2>
 
           <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -794,7 +766,7 @@ export default function CreateListingPage() {
             />
           </div>
 
-          {/* Key Featured Player Names with 2 Clean Examples */}
+          {/* Key Featured Player Names */}
           <div className="space-y-2">
             <Input
               label="Key Featured Player Names (Comma separated)"
@@ -802,28 +774,6 @@ export default function CreateListingPage() {
               value={keyPlayers}
               onChange={(e) => setKeyPlayers(e.target.value)}
             />
-
-            <div className="p-3 rounded-xl bg-pitch-card/70 border border-pitch-border/80 space-y-1.5">
-              <span className="text-xs font-semibold text-amber-300 flex items-center gap-1">
-                <Sparkles className="w-3.5 h-3.5" /> Examples of how to write player names:
-              </span>
-              <div className="flex flex-wrap items-center gap-2 pt-0.5">
-                <button
-                  type="button"
-                  onClick={() => setKeyPlayers("105 Big Time Messi, Booster Vieira, Epic Rummenigge")}
-                  className="text-xs px-3 py-1 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/60 transition-all text-left"
-                >
-                  <strong>Example 1:</strong> 105 Big Time Messi, Booster Vieira, Epic Rummenigge
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setKeyPlayers("Booster Gullit, Epic Cruyff, Big Time Ronaldinho")}
-                  className="text-xs px-3 py-1 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200 hover:text-amber-300 hover:border-amber-400/60 transition-all text-left"
-                >
-                  <strong>Example 2:</strong> Booster Gullit, Epic Cruyff, Big Time Ronaldinho
-                </button>
-              </div>
-            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

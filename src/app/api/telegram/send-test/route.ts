@@ -77,12 +77,6 @@ export async function GET() {
       bot: botData,
       webhook: webhookData,
       webhookUrl: `${APP_URL}/api/telegram/webhook`,
-      setupGuide: {
-        botFather: "1. Message @BotFather on Telegram -> Send /newbot -> Copy API Token",
-        userInfoBot: "2. Message @userinfobot on Telegram -> Copy your numeric Id",
-        dealsChannel: "3. Add @efootballmaket_bot as Admin to your Telegram Deals Channel",
-        envLocal: "4. Set TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID & TELEGRAM_CHANNEL_ID in .env.local",
-      },
     });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -1,26 +1,19 @@
 "use client";
 
-import { SellerVerificationFormPreserved } from "@/components/kyc/SellerVerificationFormPreserved";
 import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
   Clock,
-  ExternalLink,
   Lock,
   PlusCircle,
   Scale,
-  ShieldAlert,
   ShieldCheck,
   Sparkles,
 } from "lucide-react";
 import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense } from "react";
 
 function SellerVerificationContent() {
-  const searchParams = useSearchParams();
-  const [showPreview, setShowPreview] = useState(searchParams.get("preview") === "true");
-
   return (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
       {/* Back Link */}
@@ -108,28 +101,6 @@ function SellerVerificationContent() {
           </div>
         </div>
       </div>
-
-      {/* Admin / Preview Gating */}
-      <div className="text-center pt-2">
-        <button
-          type="button"
-          onClick={() => setShowPreview(!showPreview)}
-          className="text-[11px] text-slate-500 hover:text-slate-300 underline transition-colors"
-        >
-          {showPreview ? "Hide Preserved KYC Module" : "Technical Inspection: Preview Preserved KYC Module"}
-        </button>
-      </div>
-
-      {/* Preserved Form Preview when toggled */}
-      {showPreview && (
-        <div className="space-y-4 pt-4 border-t border-pitch-border animate-in fade-in">
-          <div className="p-3 rounded-xl bg-indigo-950/40 border border-indigo-800/60 text-indigo-300 text-xs flex items-center justify-between">
-            <span>🛡️ Preserved KYC System Preview (Code is safe and intact)</span>
-            <span className="text-[10px] uppercase font-bold px-2 py-0.5 rounded bg-indigo-900">Developer Mode</span>
-          </div>
-          <SellerVerificationFormPreserved />
-        </div>
-      )}
     </div>
   );
 }
