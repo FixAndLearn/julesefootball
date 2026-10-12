@@ -119,7 +119,7 @@ export default async function HomePage() {
               </div>
             </div>
 
-            {/* Hero Right Column (Live Desktop Deck or 3D Ball) */}
+            {/* Hero Right Column (Verified Escrow Listings Deck) */}
             <div className="lg:col-span-6 xl:col-span-7 relative flex items-center justify-center w-full">
               <HeroDesktopSpotlight listings={listings} />
             </div>
