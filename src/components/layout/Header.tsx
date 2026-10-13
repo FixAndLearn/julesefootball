@@ -84,7 +84,6 @@ export function Header() {
               >
                 Log In
               </Link>
-              <span className="text-slate-600">•</span>
               <Link
                 href="/register"
                 className="text-xs font-bold text-brand-400 hover:text-brand-300 transition-colors underline underline-offset-2"
@@ -94,7 +93,7 @@ export function Header() {
               <button
                 type="button"
                 onClick={() => setDismissedBanner(true)}
-                className="text-slate-400 hover:text-slate-200 ml-1"
+                className="text-slate-400 hover:text-slate-200 ml-1 p-0.5 rounded hover:bg-white/10 transition-colors"
                 aria-label="Dismiss banner"
               >
                 <X className="w-3.5 h-3.5" />
@@ -107,52 +106,55 @@ export function Header() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
-          <div className="flex items-center gap-8">
+          <div className="flex items-center gap-6 lg:gap-8">
             <Logo clickable={true} size="md" />
 
-            <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-slate-300">
-              <Link href="/browse" className="hover:text-white transition-colors">
+            <nav className="hidden md:flex items-center gap-1 lg:gap-1.5 text-xs lg:text-sm font-medium">
+              <Link
+                href="/browse"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 transition-colors"
+              >
                 Browse Accounts
               </Link>
               <Link
                 href="/wanted"
-                className="hover:text-amber-300 flex items-center gap-1 transition-colors font-semibold text-amber-400"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
               >
                 <Target className="w-3.5 h-3.5 text-amber-400" />
                 <span>Wanted</span>
               </Link>
               <Link
                 href="/middleman"
-                className="hover:text-emerald-300 flex items-center gap-1.5 transition-colors font-medium text-emerald-400"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
               >
-                <Handshake className="w-3.5 h-3.5" />
+                <Handshake className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Middleman</span>
               </Link>
               <Link
                 href="/news"
-                className="hover:text-amber-300 flex items-center gap-1.5 transition-colors font-semibold text-amber-400/90"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
               >
-                <Newspaper className="w-3.5 h-3.5" />
+                <Newspaper className="w-3.5 h-3.5 text-amber-400" />
                 <span>News & Alerts</span>
               </Link>
               <Link
                 href="/escrow-guarantee"
-                className="hover:text-brand-300 flex items-center gap-1 transition-colors"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
               >
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                Escrow Protection
+                <span>Escrow Protection</span>
               </Link>
             </nav>
           </div>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
             <a
               href="https://wa.me/254794400365"
               target="_blank"
               rel="noopener noreferrer"
               title="Official Escrow Support: 0794400365"
-              className="hidden lg:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 hover:text-emerald-200 text-xs font-semibold transition-colors"
+              className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 hover:text-emerald-200 text-xs font-semibold transition-colors"
             >
               <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
               <span>Support: 0794400365</span>

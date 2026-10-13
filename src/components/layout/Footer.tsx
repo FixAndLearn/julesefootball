@@ -12,19 +12,16 @@ export function Footer() {
   if (!isHomePage) {
     return (
       <footer className="w-full border-t border-pitch-border/60 bg-pitch-surface/60 backdrop-blur-sm text-slate-400 text-xs mt-auto py-4">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-x-5 gap-y-2 flex-wrap text-slate-400">
-            <Link href="/" className="font-semibold text-slate-200 hover:text-white transition-colors">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-x-6 gap-y-2 flex-wrap text-slate-400 justify-center md:justify-start">
+            <Link href="/" className="font-bold text-slate-200 hover:text-white transition-colors">
               eFootballMarket
             </Link>
             <Link href="/browse" className="hover:text-slate-200 transition-colors">
               Browse Accounts
             </Link>
-            <Link href="/news" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">
-              🚨 Alerts & News
-            </Link>
-            <Link href="/escrow-guarantee" className="hover:text-slate-200 transition-colors">
-              Escrow Protection
+            <Link href="/wanted" className="hover:text-slate-200 transition-colors">
+              Wanted
             </Link>
             <Link href="/middleman" className="hover:text-emerald-400 transition-colors">
               Middleman Escrow
@@ -32,17 +29,26 @@ export function Footer() {
             <Link href="/tournaments" className="hover:text-amber-400 transition-colors">
               Tournaments
             </Link>
+            <Link href="/escrow-guarantee" className="hover:text-slate-200 transition-colors">
+              Escrow Protection
+            </Link>
+            <Link href="/news" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">
+              Alerts & News
+            </Link>
             <Link href="/terms" className="hover:text-slate-200 transition-colors">
               Terms
             </Link>
-            <a href="tel:0794400365" className="hover:text-emerald-400 transition-colors flex items-center gap-1 text-slate-300 font-medium">
+          </div>
+
+          <div className="flex items-center gap-4 shrink-0 text-[11px] text-slate-500">
+            <a
+              href="tel:0794400365"
+              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-pitch-card border border-pitch-border text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition-colors"
+            >
               <Phone className="w-3 h-3 text-emerald-400" />
               <span>0794400365</span>
             </a>
-          </div>
-
-          <div className="text-[11px] text-slate-500">
-            © {new Date().getFullYear()} eFootballMarket Inc. All rights reserved.
+            <span>© {new Date().getFullYear()} eFootballMarket Inc.</span>
           </div>
         </div>
       </footer>
@@ -100,8 +106,8 @@ export function Footer() {
               <li><Link href="/browse?platform=ios" className="hover:text-white transition-colors">iOS Accounts</Link></li>
               <li><Link href="/browse?platform=pc_steam" className="hover:text-white transition-colors">PC / Steam</Link></li>
               <li><Link href="/browse?platform=playstation_5" className="hover:text-white transition-colors">PlayStation 5</Link></li>
-              <li><Link href="/middleman" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">🤝 Middleman Escrow</Link></li>
-              <li><Link href="/tournaments" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">🏆 eFootball Tournaments</Link></li>
+              <li><Link href="/middleman" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">Middleman Escrow</Link></li>
+              <li><Link href="/tournaments" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">Tournaments & Cups</Link></li>
             </ul>
           </div>
 
@@ -118,7 +124,7 @@ export function Footer() {
           <div>
             <h4 className="text-xs uppercase font-semibold tracking-wider text-slate-200 mb-4">Trust & Security</h4>
             <ul className="space-y-2.5 text-xs">
-              <li><Link href="/news" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">🚨 News & Scammer Alerts</Link></li>
+              <li><Link href="/news" className="text-amber-400 hover:text-amber-300 font-semibold transition-colors">News & Scammer Alerts</Link></li>
               <li><Link href="/escrow-guarantee" className="hover:text-white transition-colors">Escrow Protection Rules</Link></li>
               <li><Link href="/dispute-policy" className="hover:text-white transition-colors">Dispute Resolution Policy</Link></li>
               <li><Link href="/fraud-prevention" className="hover:text-white transition-colors">Anti-Fraud Systems</Link></li>
