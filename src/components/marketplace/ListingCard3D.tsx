@@ -18,6 +18,11 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
   const primaryImage =
     listing.images?.find((img) => img.is_primary)?.image_url || listing.images?.[0]?.image_url;
 
+  const isEliteStrength = (listing.overall_team_strength || 0) >= 3150;
+  const isCompetitiveStrength = (listing.overall_team_strength || 0) >= 3100 && !isEliteStrength;
+  const isDivisionOne = Number(listing.current_division) === 1;
+  const hasBigTime = (listing.big_time_players_count || 0) > 0;
+
   return (
     <div className="w-full h-full">
       <Link
@@ -25,11 +30,19 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
         className={`group block bg-pitch-surface/90 border rounded-2xl overflow-hidden relative flex flex-col h-full justify-between transition-all duration-300 hover:-translate-y-1.5 hover:shadow-2xl ${
           featured
             ? "border-amber-500/70 shadow-2xl shadow-amber-500/10 hover:border-amber-400"
+            : isEliteStrength
+            ? "border-amber-500/50 shadow-xl shadow-amber-500/10 hover:border-amber-400 hover:shadow-amber-500/20"
             : "border-pitch-border hover:border-brand-500/80 shadow-xl shadow-black/40 hover:shadow-brand-500/10"
         }`}
       >
         {/* Subtle CSS hover edge gradient sheen */}
-        <div className="absolute -inset-px rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 bg-gradient-to-r from-brand-500/15 via-amber-400/20 to-sky-400/15" />
+        <div
+          className={`absolute -inset-px rounded-2xl pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-300 z-10 ${
+            isEliteStrength
+              ? "bg-gradient-to-r from-amber-500/25 via-yellow-400/30 to-brand-500/20"
+              : "bg-gradient-to-r from-brand-500/15 via-amber-400/20 to-sky-400/15"
+          }`}
+        />
 
         {/* Media Header / Image */}
         <div className="relative aspect-[16/10] w-full bg-slate-900 overflow-hidden">
@@ -66,13 +79,36 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
             </div>
 
             <div className="flex items-center gap-1.5">
-              <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/90 backdrop-blur-md border border-amber-400 text-[11px] font-black text-amber-300 shadow-md shadow-amber-500/20">
-                <Zap className="w-3 h-3 text-amber-400 fill-amber-400" />
-                <span>{listing.overall_team_strength} OVR</span>
-              </div>
-              <div className="px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-[11px] font-semibold text-slate-200 shadow-md">
-                Div {listing.current_division || 1}
-              </div>
+              {isEliteStrength ? (
+                <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-amber-500/35 via-yellow-400/30 to-amber-600/35 backdrop-blur-md border border-amber-400 text-[11px] font-black text-amber-200 shadow-lg shadow-amber-500/30 ring-1 ring-amber-400/50">
+                  <Zap className="w-3 h-3 text-amber-300 fill-amber-300 animate-pulse" />
+                  <span>{listing.overall_team_strength} OVR</span>
+                  <span className="text-[9px] px-1 py-0.2 rounded bg-amber-400/30 text-amber-100 font-black uppercase tracking-wider">
+                    Elite
+                  </span>
+                </div>
+              ) : isCompetitiveStrength ? (
+                <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/90 backdrop-blur-md border border-emerald-500/70 text-[11px] font-black text-emerald-300 shadow-md shadow-emerald-500/20">
+                  <Zap className="w-3 h-3 text-emerald-400 fill-emerald-400" />
+                  <span>{listing.overall_team_strength} OVR</span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-[11px] font-bold text-slate-200 shadow-md">
+                  <Zap className="w-3 h-3 text-slate-400" />
+                  <span>{listing.overall_team_strength} OVR</span>
+                </div>
+              )}
+
+              {isDivisionOne ? (
+                <div className="flex items-center gap-1 px-2 py-0.5 rounded-full bg-gradient-to-r from-amber-950/90 to-yellow-950/80 backdrop-blur-md border border-amber-500/70 text-[11px] font-black text-amber-300 shadow-md shadow-amber-500/20">
+                  <Trophy className="w-3 h-3 text-amber-400" />
+                  <span>Div 1</span>
+                </div>
+              ) : (
+                <div className="px-2 py-0.5 rounded-full bg-black/80 backdrop-blur-md border border-white/20 text-[11px] font-semibold text-slate-200 shadow-md">
+                  Div {listing.current_division || 1}
+                </div>
+              )}
             </div>
           </div>
 
@@ -118,25 +154,75 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
               {listing.title}
             </h3>
 
+            {/* Key Players Spotlight Pills */}
+            {listing.key_players_list && listing.key_players_list.length > 0 && (
+              <div className="flex items-center gap-1 mt-2 flex-wrap">
+                {listing.key_players_list.slice(0, 3).map((player, idx) => (
+                  <span
+                    key={idx}
+                    className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-950/60 border border-amber-500/40 text-amber-200 truncate max-w-[110px]"
+                  >
+                    ★ {player}
+                  </span>
+                ))}
+                {listing.key_players_list.length > 3 && (
+                  <span className="text-[10px] font-semibold text-slate-400">
+                    +{listing.key_players_list.length - 3}
+                  </span>
+                )}
+              </div>
+            )}
+
             {/* Special Cards Highlights */}
-            <div className="grid grid-cols-3 gap-2 mt-3 p-2 rounded-xl bg-pitch-card/80 border border-pitch-border/60 text-center shadow-inner">
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-amber-400">Epics</span>
-                <span className="text-xs font-semibold text-slate-100">{listing.epic_players_count}</span>
+            {hasBigTime ? (
+              <div className="grid grid-cols-4 gap-1.5 mt-3 p-1.5 rounded-xl bg-pitch-card/90 border border-pitch-border/60 text-center shadow-inner">
+                <div className="p-1 rounded-lg bg-amber-950/30 border border-amber-500/40">
+                  <span className="block text-[9px] uppercase font-black bg-gradient-to-r from-amber-300 to-yellow-500 bg-clip-text text-transparent">
+                    Epics
+                  </span>
+                  <span className="text-xs font-black text-amber-200">{listing.epic_players_count}</span>
+                </div>
+                <div className="p-1 rounded-lg bg-purple-950/30 border border-purple-500/40">
+                  <span className="block text-[9px] uppercase font-black bg-gradient-to-r from-purple-300 to-indigo-300 bg-clip-text text-transparent">
+                    Big Time
+                  </span>
+                  <span className="text-xs font-black text-purple-200">{listing.big_time_players_count}</span>
+                </div>
+                <div className="p-1 rounded-lg bg-slate-900/60 border border-slate-700/50">
+                  <span className="block text-[9px] uppercase font-bold text-sky-400">Coins</span>
+                  <span className="text-xs font-bold text-slate-100">
+                    {formatCompactNumber(listing.coin_balance)}
+                  </span>
+                </div>
+                <div className="p-1 rounded-lg bg-slate-900/60 border border-slate-700/50">
+                  <span className="block text-[9px] uppercase font-bold text-emerald-400">GP</span>
+                  <span className="text-xs font-bold text-slate-100">
+                    {formatCompactNumber(listing.gp_balance)}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-indigo-400">Coins</span>
-                <span className="text-xs font-semibold text-slate-100">
-                  {formatCompactNumber(listing.coin_balance)}
-                </span>
+            ) : (
+              <div className="grid grid-cols-3 gap-2 mt-3 p-2 rounded-xl bg-pitch-card/90 border border-pitch-border/60 text-center shadow-inner">
+                <div className="p-1 rounded-lg bg-amber-950/30 border border-amber-500/40">
+                  <span className="block text-[10px] uppercase font-black bg-gradient-to-r from-amber-300 to-yellow-500 bg-clip-text text-transparent">
+                    Epics
+                  </span>
+                  <span className="text-xs font-black text-amber-200">{listing.epic_players_count}</span>
+                </div>
+                <div className="p-1 rounded-lg bg-slate-900/60 border border-slate-700/50">
+                  <span className="block text-[10px] uppercase font-bold text-sky-400">Coins</span>
+                  <span className="text-xs font-semibold text-slate-100">
+                    {formatCompactNumber(listing.coin_balance)}
+                  </span>
+                </div>
+                <div className="p-1 rounded-lg bg-slate-900/60 border border-slate-700/50">
+                  <span className="block text-[10px] uppercase font-bold text-emerald-400">GP</span>
+                  <span className="text-xs font-semibold text-slate-100">
+                    {formatCompactNumber(listing.gp_balance)}
+                  </span>
+                </div>
               </div>
-              <div>
-                <span className="block text-[10px] uppercase font-bold text-emerald-400">GP</span>
-                <span className="text-xs font-semibold text-slate-100">
-                  {formatCompactNumber(listing.gp_balance)}
-                </span>
-              </div>
-            </div>
+            )}
           </div>
 
           {/* Seller Info & Price Footer */}

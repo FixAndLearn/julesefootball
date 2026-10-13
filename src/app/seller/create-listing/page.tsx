@@ -473,7 +473,7 @@ export default function CreateListingPage() {
               <button
                 type="button"
                 onClick={() => {
-                  const outline = `• Squad Highlights: Top rated Booster & Epic players fully trained.\n• Resource Inventory: GP, eFootball Coins, and Contract Renewals ready.\n• Manager & Tactics: Main playstyle optimized with full team proficiency.\n• Transfer Handover: Konami ID credentials will be transferred safely via Escrow.`;
+                  const outline = `- Squad Highlights: Top rated Booster & Epic players fully trained.\n- Resource Inventory: GP, eFootball Coins, and Contract Renewals ready.\n- Manager & Tactics: Main playstyle optimized with full team proficiency.\n- Transfer Handover: Konami ID credentials will be transferred safely via Escrow.`;
                   setDescription((prev) => (prev ? `${prev}\n\n${outline}` : outline));
                 }}
                 className="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-amber-300 border border-slate-700 transition-colors inline-flex items-center gap-1 cursor-pointer shrink-0"
@@ -854,7 +854,7 @@ export default function CreateListingPage() {
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
             <span>4. Konami ID Security & Real Squad Screenshots (Up to 5)</span>
             <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
-              <ShieldCheck className="w-3.5 h-3.5" /> Real Quality • Up to 5 Images
+              <ShieldCheck className="w-3.5 h-3.5" /> Real Quality / Up to 5 Images
             </span>
           </h2>
 

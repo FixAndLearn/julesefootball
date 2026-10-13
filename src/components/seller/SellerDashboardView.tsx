@@ -168,7 +168,7 @@ export function SellerDashboardView({
                       {item.status.toUpperCase()}
                     </Badge>
                     <span className="text-xs text-slate-400">{getPlatformLabel(item.platform)}</span>
-                    <span className="text-xs text-slate-400">• OVR {item.overall_team_strength}</span>
+                    <span className="text-xs text-amber-300 font-semibold font-mono">OVR {item.overall_team_strength}</span>
                   </div>
                   <h3 className="text-sm font-semibold text-slate-200 mt-1">{item.title}</h3>
                 </div>

@@ -32,8 +32,8 @@ export function WhatsAppShareButton({ listing, className = "" }: WhatsAppShareBu
     const url = getListingUrl();
     const formattedPrice = formatCurrency(listing.price, listing.currency || "KES");
     const platformLabel = getPlatformLabel(listing.platform);
-    const epicsText = listing.epic_players_count ? `• ${listing.epic_players_count} Epic/Booster Cards` : "";
-    const playstyleText = listing.primary_playstyle ? `• Playstyle: ${getPlaystyleLabel(listing.primary_playstyle)}` : "";
+    const epicsText = listing.epic_players_count ? `⭐ ${listing.epic_players_count} Epic/Booster Cards` : "";
+    const playstyleText = listing.primary_playstyle ? `🎯 Playstyle: ${getPlaystyleLabel(listing.primary_playstyle)}` : "";
 
     return (
       `⚽ *eFootball Account For Sale on eFootballMarket* ⚽\n\n` +

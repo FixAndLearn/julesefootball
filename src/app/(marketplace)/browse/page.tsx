@@ -46,6 +46,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
   let listings: Listing[] = [];
   let totalCount = 0;
+  let hasSearchError = false;
 
   try {
     const result = await listingService.getListings(filters);
@@ -53,6 +54,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     totalCount = result.totalCount;
   } catch (error) {
     console.error("Browse page search error:", error);
+    hasSearchError = true;
   }
 
   return (
@@ -74,6 +76,14 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
 
         {/* Listings Grid with Active Filter Badges */}
         <div className="lg:col-span-3">
+          {hasSearchError && (
+            <div className="mb-4 p-3.5 rounded-xl bg-amber-950/40 border border-amber-500/40 flex items-center justify-between text-xs text-amber-200">
+              <span>Temporary database latency. Some listings may take a moment to appear.</span>
+              <Link href="/browse" className="underline font-bold text-amber-300 ml-2 shrink-0">
+                Reload
+              </Link>
+            </div>
+          )}
           {(searchParams.search || (searchParams.platform && searchParams.platform !== "all") || (searchParams.playstyle && searchParams.playstyle !== "all") || searchParams.minStrength) && (
             <div className="flex flex-wrap items-center gap-2 mb-4 p-2.5 rounded-xl bg-pitch-card/60 border border-pitch-border/60">
               <span className="text-xs text-slate-400 font-semibold">Active:</span>

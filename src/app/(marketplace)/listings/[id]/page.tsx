@@ -137,44 +137,74 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
             </div>
 
             {/* Special Player Tiers Count */}
-            <div className="p-4 rounded-xl bg-pitch-card/60 border border-pitch-border">
+            <div className="p-4 sm:p-5 rounded-2xl bg-pitch-card/70 border border-pitch-border shadow-xl">
               <h3 className="text-xs uppercase font-bold text-slate-300 tracking-wider mb-3">
                 Squad Player Composition
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 text-center">
-                <div className="p-2 rounded-lg bg-amber-950/40 border border-amber-800/40">
-                  <span className="block text-xs font-semibold text-amber-300">Epics</span>
-                  <span className="text-base font-bold text-white">{listing.epic_players_count}</span>
+                <div className="p-3 rounded-xl bg-gradient-to-b from-amber-500/20 via-yellow-600/15 to-amber-950/40 border border-amber-400/60 shadow-lg shadow-amber-500/10 transition-transform hover:scale-[1.02]">
+                  <div className="flex items-center justify-center gap-1 text-[11px] font-black uppercase text-amber-300">
+                    <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                    <span>Epics</span>
+                  </div>
+                  <span className="text-2xl font-black text-amber-100 font-mono mt-1 block">
+                    {listing.epic_players_count}
+                  </span>
                 </div>
-                <div className="p-2 rounded-lg bg-indigo-950/40 border border-indigo-800/40">
-                  <span className="block text-xs font-semibold text-indigo-300">Big Time</span>
-                  <span className="text-base font-bold text-white">{listing.big_time_players_count}</span>
+                <div className="p-3 rounded-xl bg-gradient-to-b from-purple-500/20 via-fuchsia-600/15 to-indigo-950/40 border border-purple-400/60 shadow-lg shadow-purple-500/10 transition-transform hover:scale-[1.02]">
+                  <div className="flex items-center justify-center gap-1 text-[11px] font-black uppercase text-purple-300">
+                    <Zap className="w-3 h-3 text-purple-400 fill-purple-400" />
+                    <span>Big Time</span>
+                  </div>
+                  <span className="text-2xl font-black text-purple-100 font-mono mt-1 block">
+                    {listing.big_time_players_count}
+                  </span>
                 </div>
-                <div className="p-2 rounded-lg bg-emerald-950/40 border border-emerald-800/40">
-                  <span className="block text-xs font-semibold text-emerald-300">Highlights</span>
-                  <span className="text-base font-bold text-white">{listing.highlight_players_count}</span>
+                <div className="p-3 rounded-xl bg-gradient-to-b from-emerald-500/20 via-teal-600/15 to-emerald-950/40 border border-emerald-400/60 shadow-lg shadow-emerald-500/10 transition-transform hover:scale-[1.02]">
+                  <div className="flex items-center justify-center gap-1 text-[11px] font-black uppercase text-emerald-300">
+                    <Star className="w-3 h-3 text-emerald-400" />
+                    <span>Highlights</span>
+                  </div>
+                  <span className="text-2xl font-black text-emerald-100 font-mono mt-1 block">
+                    {listing.highlight_players_count}
+                  </span>
                 </div>
-                <div className="p-2 rounded-lg bg-purple-950/40 border border-purple-800/40">
-                  <span className="block text-xs font-semibold text-purple-300">Featured</span>
-                  <span className="text-base font-bold text-white">{listing.featured_players_count}</span>
+                <div className="p-3 rounded-xl bg-gradient-to-b from-sky-500/15 via-blue-600/10 to-slate-900/40 border border-sky-400/50 transition-transform hover:scale-[1.02]">
+                  <span className="block text-[11px] font-bold uppercase text-sky-300">Featured</span>
+                  <span className="text-2xl font-black text-sky-100 font-mono mt-1 block">
+                    {listing.featured_players_count}
+                  </span>
                 </div>
-                <div className="p-2 rounded-lg bg-slate-800/60 border border-slate-700/60">
-                  <span className="block text-xs font-semibold text-slate-300">Legends</span>
-                  <span className="text-base font-bold text-white">{listing.legend_players_count}</span>
+                <div className="p-3 rounded-xl bg-gradient-to-b from-slate-700/30 to-slate-900/50 border border-slate-600/60 transition-transform hover:scale-[1.02]">
+                  <div className="flex items-center justify-center gap-1 text-[11px] font-bold uppercase text-slate-300">
+                    <Trophy className="w-3 h-3 text-slate-400" />
+                    <span>Legends</span>
+                  </div>
+                  <span className="text-2xl font-black text-slate-200 font-mono mt-1 block">
+                    {listing.legend_players_count}
+                  </span>
                 </div>
               </div>
 
               {listing.key_players_list && listing.key_players_list.length > 0 && (
-                <div className="mt-3 pt-3 border-t border-pitch-border/60">
-                  <span className="block text-[11px] text-slate-400 font-medium mb-1.5">Key Featured Cards:</span>
-                  <div className="flex flex-wrap gap-1.5">
+                <div className="mt-4 pt-4 border-t border-pitch-border/60">
+                  <div className="flex items-center justify-between mb-2">
+                    <span className="text-xs uppercase font-bold text-slate-300 tracking-wider">
+                      Key Featured Squad Cards
+                    </span>
+                    <span className="text-[11px] text-amber-400/90 font-medium">
+                      {listing.key_players_list.length} showcased
+                    </span>
+                  </div>
+                  <div className="flex flex-wrap gap-2">
                     {listing.key_players_list.map((player, idx) => (
-                      <span
+                      <div
                         key={idx}
-                        className="px-2 py-0.5 rounded-md bg-slate-800 border border-slate-700 text-xs font-medium text-amber-200"
+                        className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-gradient-to-r from-amber-950/60 via-slate-900 to-amber-950/40 border border-amber-500/50 text-xs font-bold text-amber-200 shadow-sm shadow-amber-500/10 hover:border-amber-400 transition-all"
                       >
-                        {player}
-                      </span>
+                        <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <span>{player}</span>
+                      </div>
                     ))}
                   </div>
                 </div>
