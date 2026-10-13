@@ -13,35 +13,28 @@ export function Footer() {
     return (
       <footer className="w-full border-t border-pitch-border/60 bg-pitch-surface/60 backdrop-blur-sm text-slate-400 text-xs mt-auto py-4">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="flex items-center gap-4 flex-wrap text-slate-400">
+          <div className="flex items-center gap-x-5 gap-y-2 flex-wrap text-slate-400">
             <Link href="/" className="font-semibold text-slate-200 hover:text-white transition-colors">
               eFootballMarket
             </Link>
-            <span className="text-slate-600">•</span>
             <Link href="/browse" className="hover:text-slate-200 transition-colors">
               Browse Accounts
             </Link>
-            <span className="text-slate-600">•</span>
             <Link href="/news" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">
               🚨 Alerts & News
             </Link>
-            <span className="text-slate-600">•</span>
             <Link href="/escrow-guarantee" className="hover:text-slate-200 transition-colors">
               Escrow Protection
             </Link>
-            <span className="text-slate-600">•</span>
             <Link href="/middleman" className="hover:text-emerald-400 transition-colors">
               Middleman Escrow
             </Link>
-            <span className="text-slate-600">•</span>
             <Link href="/tournaments" className="hover:text-amber-400 transition-colors">
               Tournaments
             </Link>
-            <span className="text-slate-600">•</span>
             <Link href="/terms" className="hover:text-slate-200 transition-colors">
               Terms
             </Link>
-            <span className="text-slate-600">•</span>
             <a href="tel:0794400365" className="hover:text-emerald-400 transition-colors flex items-center gap-1 text-slate-300 font-medium">
               <Phone className="w-3 h-3 text-emerald-400" />
               <span>0794400365</span>
