@@ -4,13 +4,15 @@ import { CredentialsDeliveryForm } from "@/components/escrow/CredentialsDelivery
 import { CredentialsRevealModal } from "@/components/escrow/CredentialsRevealModal";
 import { DisputeModal } from "@/components/escrow/DisputeModal";
 import { EscrowStatusStepper } from "@/components/escrow/EscrowStatusStepper";
+import { EscrowReceiptModal } from "@/components/escrow/EscrowReceiptModal";
+import { DisputeEvidenceLocker } from "@/components/escrow/DisputeEvidenceLocker";
 import { KonamiTransferChecklistModal } from "@/components/escrow/KonamiTransferChecklistModal";
 import { MpesaPaymentModal } from "@/components/payments/MpesaPaymentModal";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { EscrowState, Order, OrderStatus } from "@/types/database";
-import { AlertCircle, CheckCircle2, KeyRound, Lock, Send, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
+import { AlertCircle, CheckCircle2, FileText, KeyRound, Lock, Send, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -24,6 +26,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
   const [isRevealModalOpen, setIsRevealModalOpen] = useState(false);
   const [isDisputeModalOpen, setIsDisputeModalOpen] = useState(false);
+  const [isReceiptModalOpen, setIsReceiptModalOpen] = useState(false);
 
   const isBuyer = currentUserId === order.buyer_id;
   const isSeller = currentUserId === order.seller_id;
@@ -152,9 +155,21 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
     <div className="space-y-6">
       {/* Escrow Progress Stepper */}
       <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl">
-        <h3 className="text-xs uppercase font-bold text-slate-400 tracking-wider mb-4">
-          Transaction Lifecycle & Escrow State
-        </h3>
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-xs uppercase font-bold text-slate-400 tracking-wider">
+            Transaction Lifecycle & Escrow State
+          </h3>
+          {order.status !== "payment_pending" && order.status !== "cancelled" && (
+            <button
+              type="button"
+              onClick={() => setIsReceiptModalOpen(true)}
+              className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1.5 font-bold transition-colors cursor-pointer"
+            >
+              <FileText className="w-3.5 h-3.5 text-amber-400" />
+              <span>Official Receipt (PDF)</span>
+            </button>
+          )}
+        </div>
         <EscrowStatusStepper state={escrowState} />
       </div>
 
@@ -447,25 +462,23 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
               ? "Account access confirmed. Enjoy your new eFootball squad!"
               : `Net payout of ${formatCurrency(order.seller_net_amount, order.currency)} has been credited to your available balance.`}
           </p>
+          <div className="pt-2">
+            <Button
+              variant="gold"
+              size="sm"
+              onClick={() => setIsReceiptModalOpen(true)}
+              className="font-bold shadow-md cursor-pointer"
+            >
+              <FileText className="w-4 h-4 mr-1.5" />
+              View Official Escrow Receipt (Print / PDF)
+            </Button>
+          </div>
         </div>
       )}
 
       {/* Stage 5: Disputed */}
       {order.status === "disputed" && (
-        <div className="bg-amber-950/40 border border-amber-800/60 rounded-2xl p-6 space-y-3">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-900/60 border border-amber-700/60 flex items-center justify-center text-amber-300">
-              <ShieldAlert className="w-5 h-5" />
-            </div>
-            <div>
-              <h3 className="text-base font-bold text-amber-200">Escrow Dispute in Progress</h3>
-              <p className="text-xs text-amber-300/80">Platform support moderator is reviewing evidence.</p>
-            </div>
-          </div>
-          <p className="text-xs text-amber-200/90 leading-relaxed">
-            Funds remain locked in escrow until the dispute is resolved. You can communicate with the moderator in the order chat below.
-          </p>
-        </div>
+        <DisputeEvidenceLocker order={order} currentUserId={currentUserId} />
       )}
 
       {/* Modals */}
@@ -510,6 +523,12 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       <KonamiTransferChecklistModal
         isOpen={isChecklistModalOpen}
         onClose={() => setIsChecklistModalOpen(false)}
+      />
+
+      <EscrowReceiptModal
+        order={order}
+        isOpen={isReceiptModalOpen}
+        onClose={() => setIsReceiptModalOpen(false)}
       />
     </div>
   );

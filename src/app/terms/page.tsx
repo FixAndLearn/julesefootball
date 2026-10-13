@@ -57,13 +57,13 @@ export default function TermsOfServicePage() {
               Total Third-Party Publisher Disclaimers:
             </strong>
             <p>
-              • <strong>Konami Digital Entertainment:</strong> eFootball™, Pro Evolution Soccer, and PES are registered trademarks of Konami Digital Entertainment Inc. eFootballMarket Inc., Brian Okibo (CEO), its directors, and officers are completely independent entities and maintain NO affiliation, sponsorship, endorsement, authorization, or commercial relationship with Konami Digital Entertainment Inc.
+              <strong>1. Konami Digital Entertainment:</strong> eFootball™, Pro Evolution Soccer, and PES are registered trademarks of Konami Digital Entertainment Inc. eFootballMarket Inc., Brian Okibo (CEO), its directors, and officers are completely independent entities and maintain NO affiliation, sponsorship, endorsement, authorization, or commercial relationship with Konami Digital Entertainment Inc.
             </p>
             <p>
-              • <strong>Console & Mobile Platform Providers:</strong> Google Play, Apple App Store, Sony PlayStation Network, Microsoft Xbox Live, and Valve Steam are trademarks of their respective owners. Neither eFootballMarket Inc. nor its CEO claims any association therewith.
+              <strong>2. Console &amp; Mobile Platform Providers:</strong> Google Play, Apple App Store, Sony PlayStation Network, Microsoft Xbox Live, and Valve Steam are trademarks of their respective owners. Neither eFootballMarket Inc. nor its CEO claims any association therewith.
             </p>
             <p>
-              • <strong>Publisher Sanctions & Terms of Service:</strong> Users acknowledge that trading game credentials may conflict with third-party game publisher End User License Agreements (EULAs). The Company and its CEO bear absolute zero liability for any account bans, game suspensions, card rollbacks, or service interruptions initiated by third-party game publishers.
+              <strong>3. Publisher Sanctions &amp; Terms of Service:</strong> Users acknowledge that trading game credentials may conflict with third-party game publisher End User License Agreements (EULAs). The Company and its CEO bear absolute zero liability for any account bans, game suspensions, card rollbacks, or service interruptions initiated by third-party game publishers.
             </p>
           </div>
         </section>

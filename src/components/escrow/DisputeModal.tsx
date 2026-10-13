@@ -1,7 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { AlertTriangle, X } from "lucide-react";
+import { AlertTriangle, Camera, Upload, X } from "lucide-react";
 import { useState } from "react";
 
 export interface DisputeModalProps {
@@ -14,10 +14,31 @@ export interface DisputeModalProps {
 export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: DisputeModalProps) {
   const [reason, setReason] = useState("credentials_invalid");
   const [description, setDescription] = useState("");
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   if (!isOpen) return null;
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (!file.type.startsWith("image/")) {
+      setError("Please choose a valid screenshot image.");
+      return;
+    }
+
+    if (file.size > 10 * 1024 * 1024) {
+      setError("Image size exceeds 10MB limit.");
+      return;
+    }
+
+    setError("");
+    setSelectedFile(file);
+    setPreviewUrl(URL.createObjectURL(file));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -25,6 +46,24 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
     setError("");
 
     try {
+      let uploadedUrl: string | null = null;
+
+      // Upload screenshot if provided
+      if (selectedFile) {
+        const formData = new FormData();
+        formData.append("file", selectedFile);
+
+        const uploadRes = await fetch("/api/upload", {
+          method: "POST",
+          body: formData,
+        });
+
+        const uploadData = await uploadRes.json();
+        if (uploadRes.ok && uploadData.url) {
+          uploadedUrl = uploadData.url;
+        }
+      }
+
       const res = await fetch("/api/escrow/dispute", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -32,6 +71,7 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
           orderId,
           reason,
           description,
+          evidenceUrls: uploadedUrl ? [uploadedUrl] : [],
         }),
       });
 
@@ -93,7 +133,7 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">Detailed Explanation</label>
             <textarea
-              rows={4}
+              rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
               placeholder="Explain clearly what went wrong so platform moderators can review..."
@@ -102,8 +142,36 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
             />
           </div>
 
+          <div>
+            <label className="block text-xs font-medium text-slate-300 mb-1.5">
+              Attach Initial Proof Screenshot (Optional)
+            </label>
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleFileChange}
+              className="w-full text-xs text-slate-400 file:mr-2 file:py-1 file:px-2.5 file:rounded-lg file:border-0 file:text-xs file:font-semibold file:bg-slate-800 file:text-slate-200 hover:file:bg-slate-700"
+            />
+            {previewUrl && (
+              <div className="relative w-24 aspect-[4/3] rounded-lg overflow-hidden border border-pitch-border mt-2">
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img src={previewUrl} alt="Preview" className="w-full h-full object-cover" />
+                <button
+                  type="button"
+                  onClick={() => {
+                    setSelectedFile(null);
+                    setPreviewUrl(null);
+                  }}
+                  className="absolute top-1 right-1 p-0.5 rounded bg-black/80 text-rose-400"
+                >
+                  <X className="w-3 h-3" />
+                </button>
+              </div>
+            )}
+          </div>
+
           <Button type="submit" variant="danger" size="md" className="w-full" isLoading={loading}>
-            Submit Dispute to Moderation Queue
+            Submit Dispute with Evidence
           </Button>
         </form>
       </div>

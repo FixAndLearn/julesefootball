@@ -359,10 +359,10 @@ export async function POST(req: NextRequest) {
         `✅ <b>Bot Status:</b> Active &amp; Ready!\n` +
         `All platform transactions, payments, credentials, and disputes are pushed to this chat automatically.\n\n` +
         `<b>Available Commands:</b>\n` +
-        `• /status — Check platform &amp; escrow health\n` +
-        `• /till — Safaricom Till 1572931 instructions\n` +
-        `• /admin — Open Executive Admin Panel\n` +
-        `• /ping — Sub-second latency ping test`;
+        `⚡ /status — Check platform &amp; escrow health\n` +
+        `💳 /till — Safaricom Till 1572931 instructions\n` +
+        `🛡️ /admin — Open Executive Admin Panel\n` +
+        `📶 /ping — Sub-second latency ping test`;
 
       await sendTelegramMessage(reply, {
         chatId,

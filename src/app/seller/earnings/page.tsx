@@ -195,7 +195,7 @@ export default async function SellerEarningsPage() {
 
                     <div className="flex items-center gap-2 text-[11px] text-slate-500">
                       <span>{new Date(w.created_at).toLocaleString()}</span>
-                      <span>&bull;</span>
+                      <span>/</span>
                       {isPending && (
                         <span className="text-amber-400/90 font-medium">
                           Queued for platform Till payout (15–30 mins)

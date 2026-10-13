@@ -70,13 +70,13 @@ export default function PrivacyPolicyPage() {
           </p>
           <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2">
             <p>
-              • <strong>AES-256-GCM Encryption:</strong> Sensitive credentials provided during account delivery undergo symmetric Galois/Counter Mode authenticated encryption utilizing dynamic 16-byte initialization vectors (IVs) and cryptographic authentication tags.
+              <strong>1. AES-256-GCM Encryption:</strong> Sensitive credentials provided during account delivery undergo symmetric Galois/Counter Mode authenticated encryption utilizing dynamic 16-byte initialization vectors (IVs) and cryptographic authentication tags.
             </p>
             <p>
-              • <strong>Strict Authorization Gating:</strong> Only the authenticated buyer of a paid order possesses cryptographic authorization to trigger server-side credential decipherment.
+              <strong>2. Strict Authorization Gating:</strong> Only the authenticated buyer of a paid order possesses cryptographic authorization to trigger server-side credential decipherment.
             </p>
             <p>
-              • <strong>Archival and Scrubbing:</strong> Once the 24-hour inspection period concludes, sensitive credentials are removed from client-accessible query buffers.
+              <strong>3. Archival and Scrubbing:</strong> Once the 24-hour inspection period concludes, sensitive credentials are removed from client-accessible query buffers.
             </p>
           </div>
         </section>

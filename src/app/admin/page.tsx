@@ -28,6 +28,7 @@ import {
   Newspaper,
   PlusCircle,
   RefreshCw,
+  Scale,
   Search,
   Send,
   Share2,
@@ -53,7 +54,7 @@ function AdminControlCenterContent() {
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
 
   const tabParam = searchParams.get("tab");
-  const [activeTab, setActiveTab] = useState<"listings" | "users" | "news" | "withdrawals" | "telegram">(
+  const [activeTab, setActiveTab] = useState<"listings" | "disputes" | "users" | "news" | "withdrawals" | "telegram">(
     tabParam === "whatsapp" || tabParam === "telegram" ? "telegram" : (tabParam as any) || "listings"
   );
 
@@ -74,12 +75,19 @@ function AdminControlCenterContent() {
 
   // Data states
   const [listings, setListings] = useState<any[]>([]);
+  const [disputes, setDisputes] = useState<any[]>([]);
   const [users, setUsers] = useState<any[]>([]);
   const [articles, setArticles] = useState<NewsArticle[]>([]);
   const [withdrawals, setWithdrawals] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: "success" | "error"; message: string } | null>(null);
+
+  // Dispute Arbitration State
+  const [disputeFilter, setDisputeFilter] = useState<"all" | "open" | "resolved">("open");
+  const [resolvingDisputeId, setResolvingDisputeId] = useState<string | null>(null);
+  const [resolutionNotes, setResolutionNotes] = useState("");
+  const [adminZoomImage, setAdminZoomImage] = useState<string | null>(null);
 
   // Search filters
   const [listingSearch, setListingSearch] = useState("");
@@ -146,6 +154,13 @@ function AdminControlCenterContent() {
       if (withdrawalsRes.ok) {
         const data = await withdrawalsRes.json();
         setWithdrawals(data.withdrawals || []);
+      }
+
+      // 5. Load Disputes
+      const disputesRes = await fetch("/api/admin/disputes");
+      if (disputesRes.ok) {
+        const data = await disputesRes.json();
+        setDisputes(data.disputes || []);
       }
     } catch (err: any) {
       console.warn("Error loading admin data:", err);
@@ -473,6 +488,37 @@ function AdminControlCenterContent() {
     setTimeout(() => setCopiedPhone(null), 2000);
   };
 
+  const handleResolveDispute = async (
+    disputeId: string,
+    orderId: string,
+    action: "release_to_seller" | "refund_buyer" | "dismiss",
+    notes: string
+  ) => {
+    if (!notes || notes.trim().length < 3) {
+      alert("Please provide arbitration rationale notes before submitting a ruling.");
+      return;
+    }
+    setActionLoading(true);
+    setFeedback(null);
+    try {
+      const res = await fetch("/api/admin/disputes", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ disputeId, orderId, action, notes }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || "Failed to arbitrate dispute");
+      setFeedback({ type: "success", message: data.message || "Dispute ruling executed successfully!" });
+      setResolvingDisputeId(null);
+      setResolutionNotes("");
+      loadAdminData();
+    } catch (err: any) {
+      setFeedback({ type: "error", message: err.message || "Arbitration error" });
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
 
   if (authLoading) {
     return (
@@ -541,6 +587,13 @@ function AdminControlCenterContent() {
       w.seller?.email?.toLowerCase().includes(q) ||
       String(w.amount).includes(q)
     );
+  });
+
+  const openDisputesCount = disputes.filter((d) => d.status === "open").length;
+  const filteredDisputes = disputes.filter((d) => {
+    if (disputeFilter === "open") return d.status === "open";
+    if (disputeFilter === "resolved") return d.status !== "open";
+    return true;
   });
 
   return (
@@ -612,7 +665,7 @@ function AdminControlCenterContent() {
       )}
 
       {/* Key Metric Overview Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
         <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
           <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
             Total Accounts
@@ -624,6 +677,18 @@ function AdminControlCenterContent() {
             Total Listings
           </span>
           <p className="text-2xl font-black text-brand-400 font-display">{listings.length}</p>
+        </div>
+        <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
+          <span className="text-[11px] font-semibold text-rose-400 uppercase tracking-wider flex items-center justify-between">
+            <span>Escrow Disputes</span>
+            {openDisputesCount > 0 && (
+              <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+            )}
+          </span>
+          <p className="text-2xl font-black text-rose-400 font-display">{openDisputesCount}</p>
+          <span className="text-[10px] text-slate-400 block font-mono truncate">
+            {disputes.length} total cases
+          </span>
         </div>
         <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
           <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider flex items-center justify-between">
@@ -671,6 +736,28 @@ function AdminControlCenterContent() {
           <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
             {listings.length}
           </span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("disputes")}
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+            activeTab === "disputes"
+              ? "border-rose-400 text-rose-400 bg-pitch-surface"
+              : "border-transparent text-slate-400 hover:text-slate-200"
+          }`}
+        >
+          <Scale className="w-4 h-4 text-rose-400" />
+          <span>Escrow Disputes &amp; Arbitration</span>
+          {openDisputesCount > 0 ? (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse">
+              {openDisputesCount} open
+            </span>
+          ) : (
+            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
+              {disputes.length}
+            </span>
+          )}
         </button>
 
         <button
@@ -882,6 +969,410 @@ function AdminControlCenterContent() {
         </div>
       )}
 
+      {/* TAB: ESCROW DISPUTES & ARBITRATION EVIDENCE LOCKER */}
+      {activeTab === "disputes" && (
+        <div className="space-y-6">
+          <div className="p-5 rounded-2xl bg-pitch-surface border border-rose-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+            <div>
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[11px] font-bold mb-1">
+                <Scale className="w-3.5 h-3.5" />
+                <span>Safeguarded Escrow Arbitration Court</span>
+              </div>
+              <h2 className="text-xl font-bold text-white font-display">
+                Dispute Evidence Locker &amp; Binding Rulings
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5 max-w-2xl">
+                Inspect Konami credentials verification claims, 2FA screenshot proofs, and chat evidence. Issue binding arbitration: release escrow to seller or refund buyer balance.
+              </p>
+            </div>
+
+            {/* Filter Buttons */}
+            <div className="flex items-center gap-2 bg-pitch-card p-1 rounded-xl border border-pitch-border shrink-0">
+              <button
+                type="button"
+                onClick={() => setDisputeFilter("open")}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  disputeFilter === "open"
+                    ? "bg-rose-500 text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Needs Action ({openDisputesCount})
+              </button>
+              <button
+                type="button"
+                onClick={() => setDisputeFilter("all")}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  disputeFilter === "all"
+                    ? "bg-slate-700 text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                All ({disputes.length})
+              </button>
+              <button
+                type="button"
+                onClick={() => setDisputeFilter("resolved")}
+                className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${
+                  disputeFilter === "resolved"
+                    ? "bg-emerald-600 text-white shadow"
+                    : "text-slate-400 hover:text-white"
+                }`}
+              >
+                Resolved ({disputes.filter((d) => d.status !== "open").length})
+              </button>
+            </div>
+          </div>
+
+          {filteredDisputes.length === 0 ? (
+            <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-12 text-center space-y-3">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mx-auto">
+                <ShieldCheck className="w-6 h-6" />
+              </div>
+              <h3 className="text-base font-bold text-white">No Disputes In This View</h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+                {disputeFilter === "open"
+                  ? "All escrow orders are trading peacefully without active disputes."
+                  : "No dispute records match the selected filter."}
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-5">
+              {filteredDisputes.map((disp: any) => {
+                const order = disp.order;
+                const buyer = order?.buyer;
+                const seller = order?.seller;
+                const listing = order?.listing;
+                const isOpen = disp.status === "open";
+                const evidenceList: any[] = Array.isArray(disp.evidenceList) ? disp.evidenceList : [];
+
+                return (
+                  <div
+                    key={disp.id}
+                    className={`p-6 rounded-3xl bg-pitch-surface border transition-all shadow-xl space-y-5 ${
+                      isOpen ? "border-rose-500/40 ring-1 ring-rose-500/20" : "border-pitch-border"
+                    }`}
+                  >
+                    {/* Top Row: Case info, Order info, Status Badge */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-pitch-border/60 pb-4">
+                      <div>
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <span className="font-mono text-xs font-bold text-slate-300">
+                            Case #{disp.id.slice(0, 8).toUpperCase()}
+                          </span>
+                          <span className="text-[11px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 font-mono">
+                            Order {order?.order_number || disp.order_id.slice(0, 8)}
+                          </span>
+                          <span className="text-xs text-slate-400">
+                            {new Date(disp.created_at).toLocaleString("en-KE", {
+                              day: "numeric",
+                              month: "short",
+                              year: "numeric",
+                              hour: "2-digit",
+                              minute: "2-digit",
+                            })}
+                          </span>
+                        </div>
+                        {listing && (
+                          <p className="text-xs font-semibold text-white mt-1">
+                            Listing: {listing.title} ({listing.platform})
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="flex items-center gap-3">
+                        <div className="text-right">
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold block">
+                            In Escrow
+                          </span>
+                          <span className="text-sm font-black text-amber-400 font-mono">
+                            {formatCurrency(order?.total_amount || 0)}
+                          </span>
+                        </div>
+                        <span
+                          className={`text-xs px-3 py-1 rounded-full font-bold uppercase tracking-wider border ${
+                            isOpen
+                              ? "bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse"
+                              : disp.status === "resolved_seller_release"
+                              ? "bg-emerald-500/20 text-emerald-300 border-emerald-500/40"
+                              : disp.status === "resolved_buyer_refund"
+                              ? "bg-blue-500/20 text-blue-300 border-blue-500/40"
+                              : "bg-slate-800 text-slate-300 border-slate-700"
+                          }`}
+                        >
+                          {disp.status.replace(/_/g, " ")}
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Dispute Claims & Stated Reason */}
+                    <div className="p-4 rounded-2xl bg-rose-500/5 border border-rose-500/20 space-y-1.5">
+                      <div className="flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+                        <span className="text-xs font-bold text-rose-300">
+                          Dispute Claim: {disp.reason || "Account Credentials / Access Discrepancy"}
+                        </span>
+                      </div>
+                      <p className="text-xs text-slate-200 leading-relaxed pl-6">
+                        {disp.description || "No dispute description text provided."}
+                      </p>
+                    </div>
+
+                    {/* Counterparties Cards */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {/* Buyer */}
+                      <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-2">
+                        <span className="text-[10px] uppercase font-bold text-blue-400 tracking-wider flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>Buyer Counterparty</span>
+                        </span>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-bold text-white">
+                              {buyer?.username || "Buyer"}
+                            </p>
+                            <p className="text-[11px] font-mono text-slate-400">
+                              {formatDisplayPhone(buyer?.phone_number || "")}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {buyer?.phone_number && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyPhone(buyer.phone_number)}
+                                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px]"
+                                  title="Copy phone"
+                                >
+                                  {copiedPhone === buyer.phone_number ? (
+                                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                  ) : (
+                                    <Copy className="w-3.5 h-3.5" />
+                                  )}
+                                </button>
+                                <a
+                                  href={`https://wa.me/${formatWhatsAppPhone(buyer.phone_number)}?text=${encodeURIComponent(`Hello ${buyer.username || ""}, this is Brian Okibo (CEO & Escrow Director of eFootball Marketplace Kenya) regarding Escrow Dispute #${disp.id.slice(0, 8)} on Order ${order?.order_number || ""}.`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[11px] flex items-center gap-1"
+                                  title="Chat on WhatsApp"
+                                >
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                  <span className="text-[10px] font-bold">WhatsApp</span>
+                                </a>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+
+                      {/* Seller */}
+                      <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-2">
+                        <span className="text-[10px] uppercase font-bold text-emerald-400 tracking-wider flex items-center gap-1.5">
+                          <Users className="w-3.5 h-3.5" />
+                          <span>Seller Counterparty</span>
+                        </span>
+                        <div className="flex items-center justify-between">
+                          <div>
+                            <p className="text-xs font-bold text-white">
+                              {seller?.username || "Seller"}
+                            </p>
+                            <p className="text-[11px] font-mono text-slate-400">
+                              {formatDisplayPhone(seller?.phone_number || "")}
+                            </p>
+                          </div>
+                          <div className="flex items-center gap-1.5">
+                            {seller?.phone_number && (
+                              <>
+                                <button
+                                  type="button"
+                                  onClick={() => handleCopyPhone(seller.phone_number)}
+                                  className="p-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-[11px]"
+                                  title="Copy phone"
+                                >
+                                  {copiedPhone === seller.phone_number ? (
+                                    <Check className="w-3.5 h-3.5 text-emerald-400" />
+                                  ) : (
+                                    <Copy className="w-3.5 h-3.5" />
+                                  )}
+                                </button>
+                                <a
+                                  href={`https://wa.me/${formatWhatsAppPhone(seller.phone_number)}?text=${encodeURIComponent(`Hello ${seller.username || ""}, this is Brian Okibo (CEO & Escrow Director of eFootball Marketplace Kenya) regarding Escrow Dispute #${disp.id.slice(0, 8)} on Order ${order?.order_number || ""}.`)}`}
+                                  target="_blank"
+                                  rel="noopener noreferrer"
+                                  className="p-1.5 rounded-lg bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-400 border border-emerald-500/30 text-[11px] flex items-center gap-1"
+                                  title="Chat on WhatsApp"
+                                >
+                                  <MessageCircle className="w-3.5 h-3.5" />
+                                  <span className="text-[10px] font-bold">WhatsApp</span>
+                                </a>
+                              </>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Evidence Locker Screenshots */}
+                    <div className="space-y-2">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                          <FileText className="w-3.5 h-3.5 text-indigo-400" />
+                          <span>Submitted Proof Evidence ({evidenceList.length})</span>
+                        </span>
+                        <span className="text-[11px] text-slate-400">
+                          Click image to inspect in full-screen lightbox
+                        </span>
+                      </div>
+
+                      {evidenceList.length === 0 ? (
+                        <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border text-center text-xs text-slate-500">
+                          No screenshot evidence uploaded to the locker yet.
+                        </div>
+                      ) : (
+                        <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 gap-3">
+                          {evidenceList.map((ev: any, idx: number) => (
+                            <div
+                              key={idx}
+                              onClick={() => setAdminZoomImage(ev.url)}
+                              className="group relative rounded-xl overflow-hidden bg-slate-900 border border-pitch-border hover:border-brand-400 transition-all cursor-pointer aspect-video"
+                            >
+                              <img
+                                src={ev.url}
+                                alt={ev.note || "Dispute evidence"}
+                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                              />
+                              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent opacity-90 p-2 flex flex-col justify-end">
+                                <span
+                                  className={`text-[9px] font-bold uppercase tracking-wider px-1.5 py-0.5 rounded w-fit mb-0.5 ${
+                                    ev.role === "buyer"
+                                      ? "bg-blue-500/80 text-white"
+                                      : "bg-emerald-500/80 text-white"
+                                  }`}
+                                >
+                                  {ev.role || "Proof"}
+                                </span>
+                                {ev.note && (
+                                  <p className="text-[10px] text-slate-200 truncate font-sans">
+                                    {ev.note}
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Arbitration Decision Action Box */}
+                    {isOpen ? (
+                      <div className="p-4 rounded-2xl bg-pitch-card border border-amber-500/30 space-y-3">
+                        <div className="flex items-center justify-between">
+                          <span className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                            <Scale className="w-4 h-4 text-amber-400" />
+                            <span>Executive Escrow Ruling (Brian Okibo)</span>
+                          </span>
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            Final &amp; Binding
+                          </span>
+                        </div>
+
+                        <div className="space-y-1.5">
+                          <label className="block text-[11px] font-semibold text-slate-300">
+                            Arbitration Rationale &amp; Notes
+                          </label>
+                          <textarea
+                            value={resolvingDisputeId === disp.id ? resolutionNotes : ""}
+                            onChange={(e) => {
+                              setResolvingDisputeId(disp.id);
+                              setResolutionNotes(e.target.value);
+                            }}
+                            placeholder="Explain the verified evidence and decision (e.g. 'Seller provided authentic Konami credentials. Buyer successfully received access token. Escrow released to seller.')"
+                            rows={2}
+                            className="w-full rounded-xl bg-pitch-surface border border-pitch-border p-2.5 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-end gap-2 flex-wrap pt-1">
+                          <Button
+                            variant="secondary"
+                            size="sm"
+                            disabled={actionLoading}
+                            onClick={() =>
+                              handleResolveDispute(
+                                disp.id,
+                                disp.order_id,
+                                "dismiss",
+                                resolvingDisputeId === disp.id && resolutionNotes.trim()
+                                  ? resolutionNotes
+                                  : "Dispute dismissed following amicable agreement."
+                              )
+                            }
+                            className="text-xs"
+                          >
+                            Dismiss Dispute
+                          </Button>
+                          <Button
+                            variant="danger"
+                            size="sm"
+                            disabled={actionLoading}
+                            onClick={() =>
+                              handleResolveDispute(
+                                disp.id,
+                                disp.order_id,
+                                "refund_buyer",
+                                resolvingDisputeId === disp.id ? resolutionNotes : ""
+                              )
+                            }
+                            className="text-xs font-bold"
+                          >
+                            <UserMinus className="w-3.5 h-3.5 mr-1" />
+                            Refund Buyer (Fraud / Bad Credentials)
+                          </Button>
+                          <Button
+                            variant="primary"
+                            size="sm"
+                            disabled={actionLoading}
+                            onClick={() =>
+                              handleResolveDispute(
+                                disp.id,
+                                disp.order_id,
+                                "release_to_seller",
+                                resolvingDisputeId === disp.id ? resolutionNotes : ""
+                              )
+                            }
+                            className="text-xs font-bold bg-emerald-600 hover:bg-emerald-500 text-white"
+                          >
+                            <CheckCircle2 className="w-3.5 h-3.5 mr-1" />
+                            Release {formatCurrency(order?.total_amount || 0)} to Seller
+                          </Button>
+                        </div>
+                      </div>
+                    ) : (
+                      <div className="p-3.5 rounded-xl bg-pitch-card border border-pitch-border text-xs space-y-1">
+                        <span className="text-[10px] uppercase font-bold text-slate-400 tracking-wider block">
+                          Official Arbitration Ruling Notes
+                        </span>
+                        <p className="text-slate-200">
+                          {disp.resolution_notes && !disp.resolution_notes.startsWith("[")
+                            ? disp.resolution_notes
+                            : "Case concluded and archived."}
+                        </p>
+                        {disp.resolved_at && (
+                          <span className="text-[10px] text-slate-500 font-mono block">
+                            Resolved on {new Date(disp.resolved_at).toLocaleString()}
+                          </span>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+
       {/* TAB 2: USER MANAGEMENT & ADMIN PRIVILEGES */}
       {activeTab === "users" && (
         <div className="space-y-4">
@@ -958,7 +1449,7 @@ function AdminControlCenterContent() {
                             )}
                           </td>
                           <td className="p-3.5 text-slate-400">
-                            <span>{u.completed_sales_count || 0} sales</span> • <span>⭐ {u.seller_rating || "5.0"}</span>
+                            <span>{u.completed_sales_count || 0} sales</span> / <span>⭐ {u.seller_rating || "5.0"}</span>
                           </td>
                           <td className="p-3.5 text-right">
                             <div className="flex items-center justify-end gap-1.5">
@@ -1794,6 +2285,47 @@ function AdminControlCenterContent() {
                 Confirm Rejection &amp; Refund
               </Button>
             </div>
+          </div>
+        </div>
+      )}
+
+      {/* Lightbox Zoom Modal for Dispute Evidence Locker */}
+      {adminZoomImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/90 backdrop-blur-md flex items-center justify-center p-4 animate-in fade-in"
+          onClick={() => setAdminZoomImage(null)}
+        >
+          <div
+            className="relative max-w-4xl max-h-[90vh] flex flex-col items-center"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="w-full flex items-center justify-between pb-3 text-white">
+              <span className="text-xs font-bold text-slate-300">
+                Dispute Evidence Inspection Lightbox
+              </span>
+              <div className="flex items-center gap-3">
+                <a
+                  href={adminZoomImage}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-xs text-brand-400 hover:underline"
+                >
+                  Open Original
+                </a>
+                <button
+                  type="button"
+                  onClick={() => setAdminZoomImage(null)}
+                  className="p-1 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300"
+                >
+                  <X className="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+            <img
+              src={adminZoomImage}
+              alt="Evidence high resolution"
+              className="max-w-full max-h-[80vh] object-contain rounded-xl border border-pitch-border shadow-2xl"
+            />
           </div>
         </div>
       )}

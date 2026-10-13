@@ -93,7 +93,7 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
       <Input
         label="Konami ID Password"
         type="password"
-        placeholder="••••••••••••"
+        placeholder="Enter Konami password"
         value={konamiPassword}
         onChange={(e) => setKonamiPassword(e.target.value)}
         required

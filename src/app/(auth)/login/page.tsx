@@ -79,7 +79,7 @@ function LoginForm() {
           label="Password"
           type="password"
           autoComplete="current-password"
-          placeholder="••••••••••••"
+          placeholder="Enter your password"
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           leftIcon={<Lock className="w-4 h-4" />}
