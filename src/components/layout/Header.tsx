@@ -67,9 +67,9 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-pitch-border/80 bg-pitch/90 backdrop-blur-xl transition-all">
-      {/* Contextual Guest Guidance Ribbon */}
+      {/* Contextual Guest Guidance Ribbon (hidden on mobile to maximize viewport height) */}
       {!isAuthenticated && !loading && !dismissedBanner && (
-        <div className="bg-gradient-to-r from-brand-950/90 via-slate-900 to-amber-950/80 border-b border-pitch-border/60 px-4 py-1.5 text-xs text-slate-300">
+        <div className="hidden sm:block bg-gradient-to-r from-brand-950/90 via-slate-900 to-amber-950/80 border-b border-pitch-border/60 px-4 py-1.5 text-xs text-slate-300">
           <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
             <div className="flex items-center gap-2 overflow-hidden">
               <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
@@ -127,13 +127,6 @@ export function Header() {
               >
                 <Handshake className="w-3.5 h-3.5" />
                 <span>Middleman</span>
-              </Link>
-              <Link
-                href="/tournaments"
-                className="hover:text-amber-300 flex items-center gap-1.5 transition-colors font-medium text-amber-300"
-              >
-                <Trophy className="w-3.5 h-3.5" />
-                <span>Tournaments</span>
               </Link>
               <Link
                 href="/news"

@@ -81,26 +81,6 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
         )}
       </div>
 
-      {isOwner && (
-        <div className="mb-6 p-4 rounded-xl bg-amber-950/40 border border-amber-800/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-          <div className="flex items-center gap-2.5">
-            <span className="p-2 rounded-lg bg-amber-500/20 text-amber-400">
-              <Edit3 className="w-4 h-4" />
-            </span>
-            <div>
-              <p className="text-sm font-semibold text-slate-100">You are the seller of this listing</p>
-              <p className="text-xs text-slate-400">You can edit your squad details, price, stats, or images at any time.</p>
-            </div>
-          </div>
-          <Link href={`/seller/edit-listing/${listing.id}`}>
-            <Button variant="gold" size="sm" className="whitespace-nowrap">
-              <Edit3 className="w-3.5 h-3.5 mr-1.5" />
-              Edit This Listing
-            </Button>
-          </Link>
-        </div>
-      )}
-
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* Left Column: Gallery & In-Depth Details (2 cols) */}
         <div className="lg:col-span-2 space-y-6">
