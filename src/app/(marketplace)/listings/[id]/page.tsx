@@ -109,7 +109,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
             </div>
 
             {/* In-Game Resource Counter Badges */}
-            <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 pt-2">
+            <div className="grid grid-cols-3 gap-3 pt-2">
               <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border">
                 <span className="block text-[10px] uppercase font-bold text-amber-400">eFootball Coins</span>
                 <span className="text-lg font-bold text-slate-100 font-mono">
@@ -126,12 +126,6 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 <span className="block text-[10px] uppercase font-bold text-indigo-400">ePoints</span>
                 <span className="text-lg font-bold text-slate-100 font-mono">
                   {formatCompactNumber(listing.efootball_points)}
-                </span>
-              </div>
-              <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border">
-                <span className="block text-[10px] uppercase font-bold text-rose-400">Contract Tickets</span>
-                <span className="text-lg font-bold text-slate-100 font-mono">
-                  {listing.contract_renewal_tickets}
                 </span>
               </div>
             </div>
@@ -216,21 +210,17 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               <h3 className="text-xs uppercase font-bold text-slate-300 tracking-wider">
                 Tactical Profile & Division Standing
               </h3>
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 text-xs">
                 <div>
                   <span className="text-slate-400 block">Manager:</span>
                   <span className="font-semibold text-slate-200">{listing.manager_name || "Unassigned"}</span>
-                </div>
-                <div>
-                  <span className="text-slate-400 block">Formation:</span>
-                  <span className="font-semibold text-slate-200">{listing.formation || "4-3-3"}</span>
                 </div>
                 <div>
                   <span className="text-slate-400 block">Playstyle:</span>
                   <span className="font-semibold text-brand-300">{getPlaystyleLabel(listing.primary_playstyle)}</span>
                 </div>
                 <div>
-                  <span className="text-slate-400 block">Division:</span>
+                  <span className="text-slate-400 block">Division Standing:</span>
                   <span className="font-semibold text-emerald-400">Div {listing.current_division} (Best: Div {listing.highest_division})</span>
                 </div>
               </div>

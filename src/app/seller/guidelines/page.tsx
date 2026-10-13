@@ -54,7 +54,7 @@ export default function SellerGuidelinesPage() {
           </p>
           <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
             <li><strong>Verified Overall Team Strength (OVR):</strong> The advertised rating must match actual squad strength without reliance on temporary loan items.</li>
-            <li><strong>Actual Resource Balances:</strong> Coin, GP, and contract ticket counts must be accurate at the time of purchase.</li>
+            <li><strong>Actual Resource Balances:</strong> Coin, GP, and eFootball Points counts must be accurate at the time of purchase.</li>
             <li><strong>Clean Screenshots:</strong> Clear, unaltered screenshots of the starting XI, reserves, and Konami ID connection status must be uploaded.</li>
           </ul>
         </section>

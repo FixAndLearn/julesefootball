@@ -57,7 +57,6 @@ export default function CreateListingPage() {
   const [gpBalance, setGpBalance] = useState("");
   const [coinBalance, setCoinBalance] = useState("");
   const [efootballPoints, setEfootballPoints] = useState("");
-  const [contractTickets, setContractTickets] = useState("");
 
   // Special Player Cards & Tactics
   const [epicCount, setEpicCount] = useState("");
@@ -68,7 +67,6 @@ export default function CreateListingPage() {
   const [keyPlayers, setKeyPlayers] = useState("");
 
   const [managerName, setManagerName] = useState("");
-  const [formation, setFormation] = useState("");
   const [primaryPlaystyle, setPrimaryPlaystyle] = useState("quick_counter");
   const [currentDivision, setCurrentDivision] = useState("");
   const [highestDivision, setHighestDivision] = useState("");
@@ -251,7 +249,7 @@ export default function CreateListingPage() {
         gp_balance: gpBalance ? Number(gpBalance) : 0,
         coin_balance: coinBalance ? Number(coinBalance) : 0,
         efootball_points: efootballPoints ? Number(efootballPoints) : 0,
-        contract_renewal_tickets: contractTickets ? Number(contractTickets) : 0,
+        contract_renewal_tickets: 0,
         epic_players_count: epicCount ? Number(epicCount) : 0,
         big_time_players_count: bigTimeCount ? Number(bigTimeCount) : 0,
         highlight_players_count: highlightCount ? Number(highlightCount) : 0,
@@ -259,7 +257,7 @@ export default function CreateListingPage() {
         legend_players_count: legendCount ? Number(legendCount) : 0,
         key_players_list: playersList,
         manager_name: managerName.trim() || undefined,
-        formation: formation.trim() || undefined,
+        formation: null,
         primary_playstyle: primaryPlaystyle,
         current_division: parseDiv(currentDivision),
         highest_division: parseDiv(highestDivision),
@@ -703,15 +701,6 @@ export default function CreateListingPage() {
             </div>
 
             <Input
-              label="Contract Tickets"
-              type="number"
-              placeholder="e.g. 10"
-              value={contractTickets}
-              onChange={(e) => setContractTickets(e.target.value)}
-              helperText="Available 10-day/60-day tickets"
-            />
-
-            <Input
               label="Account Level"
               type="number"
               placeholder="e.g. 45"
@@ -800,33 +789,6 @@ export default function CreateListingPage() {
                   className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
                 >
                   G. Caputto
-                </button>
-              </div>
-            </div>
-
-            {/* Formation with 2 Clean Examples */}
-            <div className="space-y-1">
-              <Input
-                label="Formation"
-                placeholder="e.g. 4-2-2-2 or 4-3-3"
-                value={formation}
-                onChange={(e) => setFormation(e.target.value)}
-              />
-              <div className="flex items-center gap-1 text-[10px] text-slate-400">
-                <span>Examples:</span>
-                <button
-                  type="button"
-                  onClick={() => setFormation("4-2-2-2")}
-                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
-                >
-                  4-2-2-2
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setFormation("4-3-3")}
-                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
-                >
-                  4-3-3
                 </button>
               </div>
             </div>
