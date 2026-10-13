@@ -127,7 +127,10 @@ export function HeroDesktopSpotlight({ listings }: HeroDesktopSpotlightProps) {
                         <span>Division Ranked</span>
                       )}
                       {listing.coin_balance > 0 && (
-                        <span>• {listing.coin_balance.toLocaleString()} Coins</span>
+                        <>
+                          <span className="text-slate-600">/</span>
+                          <span>{listing.coin_balance.toLocaleString()} Coins</span>
+                        </>
                       )}
                     </div>
                   </div>

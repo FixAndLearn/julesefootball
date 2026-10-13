@@ -83,8 +83,10 @@ export class ListingService {
     }
 
     if (search && search.trim() !== "") {
-      const term = search.trim();
-      query = query.or(`title.ilike.%${term}%,description.ilike.%${term}%,manager_name.ilike.%${term}%`);
+      const sanitizedTerm = search.trim().replace(/[,()]/g, " ").trim();
+      if (sanitizedTerm) {
+        query = query.or(`title.ilike.%${sanitizedTerm}%,description.ilike.%${sanitizedTerm}%,manager_name.ilike.%${sanitizedTerm}%`);
+      }
     }
 
     // Sorting

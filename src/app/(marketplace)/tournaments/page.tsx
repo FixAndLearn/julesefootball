@@ -104,7 +104,7 @@ export default function TournamentsPage() {
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">
-            Play 1v1 Tournaments • Win Real M-Pesa Cash Prizes
+            Play 1v1 Tournaments & Win Real M-Pesa Cash Prizes
           </h1>
 
           <p className="text-sm text-slate-300 leading-relaxed">
@@ -132,7 +132,7 @@ export default function TournamentsPage() {
             <Trophy className="w-5 h-5 text-amber-400" />
             <span>Current Tournaments & Cups</span>
           </h2>
-          <span className="text-xs text-slate-400">Weekly Knockouts • Kenya Time (EAT)</span>
+          <span className="text-xs text-slate-400">Weekly Knockouts (Kenya Time EAT)</span>
         </div>
 
         {tournaments.length === 0 ? (

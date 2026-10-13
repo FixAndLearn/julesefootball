@@ -223,7 +223,7 @@ function MiddlemanContent() {
         <div className="relative z-10 space-y-4 max-w-2xl">
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
             <Handshake className="w-4 h-4 text-emerald-400" />
-            <span>Bring-Your-Own-Deal • Safe Middleman Service</span>
+            <span>Bring-Your-Own-Deal — Safe Middleman Service</span>
           </div>
 
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">

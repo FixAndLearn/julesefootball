@@ -44,7 +44,7 @@ export async function GET(req: NextRequest) {
 }
 
 const listingActionSchema = z.object({
-  listingId: z.string().uuid(),
+  listingId: z.string().min(1, "Listing ID required"),
   action: z.enum(["take_down", "reinstate", "delete"]),
   reason: z.string().optional(),
 });
@@ -117,7 +117,7 @@ export async function PATCH(req: NextRequest) {
     if (action === "reinstate") {
       await primaryClient
         .from("listings")
-        .update({ status: "active" })
+        .update({ status: "published" })
         .eq("id", listingId);
 
       await primaryClient.from("notifications").insert({

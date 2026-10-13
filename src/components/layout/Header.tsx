@@ -262,7 +262,7 @@ export function Header() {
                         className="flex items-center gap-2 px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-card transition-colors"
                       >
                         <CheckCircle2 className="w-4 h-4 text-sky-400" />
-                        <span>Seller Verification (Coming Soon)</span>
+                        <span>Seller Verification</span>
                       </Link>
                     </div>
 

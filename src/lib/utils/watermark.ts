@@ -67,11 +67,11 @@ export async function watermarkSquadImage(
           ctx.textBaseline = "middle";
 
           // Center watermark stamp
-          ctx.fillText(`🛡️ ${websiteUrl.toUpperCase()} • ESCROW PROTECTED`, 0, -fontSizeCenter);
+          ctx.fillText(`🛡️ ${websiteUrl.toUpperCase()} | ESCROW PROTECTED`, 0, -fontSizeCenter);
 
           ctx.font = `700 ${Math.round(fontSizeCenter * 0.65)}px system-ui, -apple-system, sans-serif`;
           ctx.fillStyle = "rgba(245, 158, 11, 0.22)"; // amber-tinted
-          ctx.fillText(`SELLER: @${sellerUsername.toUpperCase()} • NO DIRECT HANDOVERS`, 0, fontSizeCenter);
+          ctx.fillText(`SELLER: @${sellerUsername.toUpperCase()} | NO DIRECT HANDOVERS`, 0, fontSizeCenter);
 
           ctx.restore();
 
@@ -106,7 +106,7 @@ export async function watermarkSquadImage(
           ctx.fillStyle = "#F8FAFC"; // White text
           ctx.textAlign = "right";
           ctx.fillText(
-            `${websiteUrl} • Safe M-Pesa Till 1572931`,
+            `${websiteUrl} — Safe M-Pesa Till 1572931`,
             w - Math.max(12, Math.round(w * 0.02)),
             yPos + ribbonHeight / 2
           );

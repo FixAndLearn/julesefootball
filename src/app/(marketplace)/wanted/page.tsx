@@ -142,7 +142,7 @@ export default function WantedBoardPage() {
           <div className="max-w-2xl space-y-3">
             <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold">
               <Target className="w-3.5 h-3.5 text-amber-400" />
-              <span>Wanted Squads • Cash Ready in Kenya</span>
+              <span>Wanted Squads — Cash Ready in Kenya</span>
             </div>
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">
               Buyers Requesting eFootball Accounts

@@ -146,7 +146,7 @@ export class PaymentService {
       if (payment.order?.seller_id) {
         const netAmount =
           Number(payment.order.seller_net_amount) ||
-          Number(payment.order.total_amount ? Math.round(payment.order.total_amount * 0.95) : amount);
+          Number(payment.order.total_amount || amount);
 
         const { data: sellerProfile } = await this.supabase
           .from("profiles")

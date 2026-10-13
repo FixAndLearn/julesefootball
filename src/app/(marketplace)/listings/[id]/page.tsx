@@ -96,12 +96,12 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
           {/* Title & Key Attributes */}
           <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4">
             <div>
-              <div className="flex items-center gap-2 text-xs text-slate-400 mb-1">
-                <span>Account ID: {listing.id.slice(0, 8)}...</span>
-                <span>•</span>
-                <span>Region: {listing.region}</span>
-                <span>•</span>
-                <span>Version: {listing.game_version}</span>
+              <div className="flex items-center gap-2 text-xs text-slate-400 mb-1 flex-wrap">
+                <span>Account ID: <span className="font-mono text-slate-300">{listing.id.slice(0, 8)}</span></span>
+                <span className="text-slate-600">/</span>
+                <span>Region: <span className="text-slate-300">{listing.region || "Global"}</span></span>
+                <span className="text-slate-600">/</span>
+                <span>Version: <span className="text-slate-300">{listing.game_version || "eFootball 2026"}</span></span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-bold text-slate-100 font-display">
                 {listing.title}
@@ -342,11 +342,11 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                       <>
                         <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
                         <span>{Number(listing.seller.seller_rating).toFixed(1)}</span>
-                        <span>•</span>
+                        <span className="text-slate-600">/</span>
                         <span>{listing.seller.completed_sales_count} completed orders</span>
                       </>
                     ) : (
-                      <span>New Seller • 0 completed orders</span>
+                      <span>New Seller (0 completed orders)</span>
                     )}
                   </div>
                 </div>

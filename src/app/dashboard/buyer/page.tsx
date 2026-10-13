@@ -111,9 +111,9 @@ export default async function BuyerDashboardPage() {
                   </h3>
                   <div className="flex items-center gap-2 text-xs text-slate-400 mt-1">
                     <span>{order.listing?.platform ? getPlatformLabel(order.listing.platform) : "Platform"}</span>
-                    <span>•</span>
+                    <span className="text-slate-600">/</span>
                     <span>OVR {order.listing?.overall_team_strength}</span>
-                    <span>•</span>
+                    <span className="text-slate-600">/</span>
                     <span>{new Date(order.created_at).toLocaleDateString()}</span>
                   </div>
                 </div>

@@ -131,7 +131,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
                   <h4 className="text-base font-bold text-slate-100">{order.listing.title}</h4>
                   <div className="flex items-center gap-2 mt-1 text-xs text-slate-400">
                     <span>{getPlatformLabel(order.listing.platform)}</span>
-                    <span>•</span>
+                    <span className="text-slate-600">/</span>
                     <span>OVR {order.listing.overall_team_strength}</span>
                   </div>
                 </div>

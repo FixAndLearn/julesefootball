@@ -233,7 +233,7 @@ export function DirectCheckoutForm({
               {listing.title}
             </h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Manager: {listing.manager_name || "Custom"} • Playstyle: {listing.primary_playstyle?.replace("_", " ") || "Quick Counter"}
+              Manager: {listing.manager_name || "Custom"} <span className="text-slate-600">/</span> Playstyle: {listing.primary_playstyle?.replace("_", " ") || "Quick Counter"}
             </p>
           </div>
 

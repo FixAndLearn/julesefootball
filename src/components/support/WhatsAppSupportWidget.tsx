@@ -41,7 +41,7 @@ export function WhatsAppSupportWidget() {
                 <p className="text-xs font-bold text-white leading-tight">eFootball Escrow Support</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                  <span className="text-[10px] text-emerald-300 font-semibold">Online • Replies in &lt;5 mins</span>
+                  <span className="text-[10px] text-emerald-300 font-semibold">Online (Replies in &lt;5 mins)</span>
                 </div>
               </div>
             </div>
@@ -104,7 +104,7 @@ export function WhatsAppSupportWidget() {
           {/* Footer note */}
           <div className="p-2.5 bg-slate-900/90 border-t border-pitch-border/60 text-center">
             <span className="text-[10px] text-slate-400">
-              🔒 Official Escrow Hotline • Safaricom M-Pesa Integrated
+              🔒 Official Escrow Hotline — Safaricom M-Pesa Integrated
             </span>
           </div>
         </div>
