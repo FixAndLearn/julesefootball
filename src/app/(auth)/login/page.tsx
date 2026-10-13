@@ -66,6 +66,8 @@ function LoginForm() {
         <Input
           label="Email Address"
           type="email"
+          inputMode="email"
+          autoComplete="email"
           placeholder="you@domain.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -76,6 +78,7 @@ function LoginForm() {
         <Input
           label="Password"
           type="password"
+          autoComplete="current-password"
           placeholder="••••••••••••"
           value={password}
           onChange={(e) => setPassword(e.target.value)}

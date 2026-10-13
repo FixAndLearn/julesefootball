@@ -139,6 +139,7 @@ function RegisterForm() {
         <div className="grid grid-cols-2 gap-4">
           <Input
             label="First Name"
+            autoComplete="given-name"
             placeholder="e.g. John"
             value={firstName}
             onChange={(e) => setFirstName(e.target.value)}
@@ -146,6 +147,7 @@ function RegisterForm() {
           />
           <Input
             label="Last Name"
+            autoComplete="family-name"
             placeholder="e.g. Doe"
             value={lastName}
             onChange={(e) => setLastName(e.target.value)}
@@ -155,6 +157,7 @@ function RegisterForm() {
 
         <Input
           label="Username"
+          autoComplete="username"
           placeholder="e.g. pesmaster254"
           value={username}
           onChange={(e) => setUsername(e.target.value)}
@@ -165,6 +168,8 @@ function RegisterForm() {
         <Input
           label="Email Address"
           type="email"
+          inputMode="email"
+          autoComplete="email"
           placeholder="you@domain.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
@@ -174,7 +179,9 @@ function RegisterForm() {
 
         <Input
           label="Phone Number (WhatsApp & M-Pesa Escrow)"
-          type="text"
+          type="tel"
+          inputMode="tel"
+          autoComplete="tel"
           placeholder="0794400365 or +254 794 400 365"
           value={phoneNumber}
           onChange={(e) => setPhoneNumber(e.target.value)}
@@ -187,6 +194,7 @@ function RegisterForm() {
           <Input
             label="Password"
             type="password"
+            autoComplete="new-password"
             placeholder="••••••••••••"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
@@ -196,6 +204,7 @@ function RegisterForm() {
           <Input
             label="Confirm Password"
             type="password"
+            autoComplete="new-password"
             placeholder="••••••••••••"
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}

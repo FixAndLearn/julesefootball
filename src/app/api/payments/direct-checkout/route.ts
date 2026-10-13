@@ -4,6 +4,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { PaymentService } from "@/services/paymentService";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
+import { checkRateLimit, getIdempotencyResult, setIdempotencyResult } from "@/lib/security/rateLimiter";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -17,6 +18,16 @@ const directCheckoutSchema = z.object({
 
 export async function POST(req: NextRequest) {
   try {
+    const forwarded = req.headers.get("x-forwarded-for");
+    const ip = forwarded ? forwarded.split(",")[0].trim() : "127.0.0.1";
+    const rateCheck = checkRateLimit(`checkout:${ip}`, 12, 60000);
+
+    if (!rateCheck.success) {
+      return NextResponse.json(
+        { error: "Too many checkout attempts. Please wait a moment before trying again." },
+        { status: 429 }
+      );
+    }
     const json = await req.json();
     const parsed = directCheckoutSchema.safeParse(json);
 
@@ -73,6 +84,18 @@ export async function POST(req: NextRequest) {
     const normPhone = normalizePhoneNumber(phoneNumber);
     const internationalPhone = normPhone.isValid ? normPhone.international : phoneNumber;
     const cleanDigits = normPhone.digits || phoneNumber.replace(/\D/g, "");
+
+    // Financial Idempotency Check (prevents duplicate orders & double STK pushes within 45s)
+    const idempotencyKey =
+      req.headers.get("x-idempotency-key") ||
+      `direct-checkout:${listingId}:${cleanDigits}:${finalPrice}`;
+    const cachedResult = getIdempotencyResult(idempotencyKey, 45000);
+    if (cachedResult) {
+      return NextResponse.json({
+        ...cachedResult,
+        idempotent: true,
+      });
+    }
 
     let buyerId = user?.id;
 
@@ -162,7 +185,7 @@ export async function POST(req: NextRequest) {
       buyerPhone: internationalPhone,
     }).catch(() => {});
 
-    return NextResponse.json({
+    const responsePayload = {
       success: true,
       orderId: order.id,
       orderNumber: order.order_number,
@@ -171,7 +194,11 @@ export async function POST(req: NextRequest) {
       customerMessage: paymentResult.customerMessage,
       tillNumber: "1572931",
       redirectUrl: `/orders/${order.id}`,
-    });
+    };
+
+    setIdempotencyResult(idempotencyKey, responsePayload);
+
+    return NextResponse.json(responsePayload);
   } catch (error: any) {
     console.error("Direct Checkout Error:", error);
     return NextResponse.json({ error: error.message || "Failed to process checkout" }, { status: 500 });

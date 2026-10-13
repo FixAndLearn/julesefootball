@@ -61,7 +61,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
   const konamiStatus = getKonamiIdStatusInfo(listing.konami_id_status);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8 w-full">
       {/* Back button */}
       <div className="mb-6 flex items-center justify-between">
         <Link
@@ -353,6 +353,34 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               </div>
             </div>
           </div>
+        </div>
+      </div>
+
+      {/* Mobile Sticky Thumb-Zone Action Bar */}
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-pitch/95 backdrop-blur-xl border-t border-pitch-border/90 px-4 py-3 lg:hidden flex items-center justify-between gap-3 shadow-2xl">
+        <div className="min-w-0">
+          <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Total Price</p>
+          <p className="text-lg font-black font-mono text-emerald-400 truncate">
+            {formatCurrency(listing.price, listing.currency)}
+          </p>
+        </div>
+        <div className="flex items-center gap-2 shrink-0">
+          {isOwner ? (
+            <Link href={`/seller/edit-listing/${listing.id}`}>
+              <Button variant="gold" size="sm">
+                <Edit3 className="w-3.5 h-3.5 mr-1.5" />
+                Edit Listing
+              </Button>
+            </Link>
+          ) : (
+            <div className="flex items-center gap-2">
+              <MakeOfferButton listing={listing} />
+              <BuyNowButton
+                listingId={listing.id}
+                priceFormatted={formatCurrency(listing.price, listing.currency)}
+              />
+            </div>
+          )}
         </div>
       </div>
     </div>

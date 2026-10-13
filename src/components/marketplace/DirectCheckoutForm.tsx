@@ -296,6 +296,8 @@ export function DirectCheckoutForm({
               <div className="relative">
                 <input
                   type="tel"
+                  inputMode="tel"
+                  autoComplete="tel"
                   placeholder="e.g. 0794400365 or +254 794 400 365"
                   value={phoneNumber}
                   onChange={(e) => setPhoneNumber(e.target.value)}
@@ -329,6 +331,7 @@ export function DirectCheckoutForm({
               </label>
               <input
                 type="text"
+                autoComplete="name"
                 placeholder="e.g. Brian O."
                 value={buyerName}
                 onChange={(e) => setBuyerName(e.target.value)}
