@@ -20,7 +20,6 @@ import {
   Sparkles,
   Target,
   Handshake,
-  Trophy,
   MessageCircle,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
@@ -422,14 +421,6 @@ export function Header() {
               <Handshake className="w-4 h-4 text-emerald-400" />
             </Link>
 
-            <Link
-              href="/tournaments"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-300 font-semibold"
-            >
-              <span>Kenyan Tournaments & Cups</span>
-              <Trophy className="w-4 h-4 text-amber-400" />
-            </Link>
             <Link
               href="/escrow-guarantee"
               onClick={() => setMobileMenuOpen(false)}
