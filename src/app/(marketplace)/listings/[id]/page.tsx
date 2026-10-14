@@ -394,7 +394,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
             </Link>
           ) : (
             <div className="flex items-center gap-2">
-              <MakeOfferButton listing={listing} />
+              <MakeOfferButton listing={listing} size="sm" />
               <BuyNowButton
                 listingId={listing.id}
                 priceFormatted={formatCurrency(listing.price, listing.currency)}

@@ -1,13 +1,21 @@
 import { NextRequest, NextResponse } from "next/server";
-import { createAdminClient } from "@/lib/supabase/admin";
+import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
+import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ListingOffer } from "@/types/database";
 import { normalizePhoneNumber, formatWhatsAppPhone } from "@/lib/utils/phone";
 import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
+import { sendSellerOfferReceivedSms, sendBuyerOfferResponseSms } from "@/lib/notifications/smsAlert";
 
 export const dynamic = "force-dynamic";
 
-// In-memory runtime persistence
+// In-memory fallback for offline/test environments
 const MEMORY_OFFERS: ListingOffer[] = [];
+
+function getClient() {
+  const adminSupabase = createAdminClient();
+  const userSupabase = createServerSupabaseClient();
+  return hasServiceRoleKey() ? adminSupabase : userSupabase;
+}
 
 export async function GET(req: NextRequest) {
   try {
@@ -16,11 +24,16 @@ export async function GET(req: NextRequest) {
     const listingId = searchParams.get("listingId");
     const sellerId = searchParams.get("sellerId");
     const buyerPhone = searchParams.get("phone");
+    const buyerId = searchParams.get("buyerId");
 
-    // 1. Try fetching from Supabase if table exists
+    const supabase = getClient();
+
+    // 1. Fetch from Supabase
     try {
-      const supabase = createAdminClient();
-      let query = supabase.from("listing_offers").select("*, listing:listings(id, title, price, platform, overall_team_strength, manager_name)");
+      let query = supabase
+        .from("listing_offers")
+        .select("*, listing:listings(id, title, price, platform, overall_team_strength, manager_name, images:listing_images(image_url))")
+        .order("created_at", { ascending: false });
 
       if (offerId) {
         query = query.eq("id", offerId);
@@ -28,6 +41,8 @@ export async function GET(req: NextRequest) {
         query = query.eq("listing_id", listingId);
       } else if (sellerId) {
         query = query.eq("seller_id", sellerId);
+      } else if (buyerId) {
+        query = query.eq("buyer_id", buyerId);
       } else if (buyerPhone) {
         query = query.eq("buyer_phone", buyerPhone);
       }
@@ -39,8 +54,8 @@ export async function GET(req: NextRequest) {
         }
         return NextResponse.json({ offers: data });
       }
-    } catch {
-      // Fallback to in-memory
+    } catch (e) {
+      console.warn("Supabase offers query fallback:", e);
     }
 
     // 2. In-memory fallback
@@ -58,6 +73,9 @@ export async function GET(req: NextRequest) {
     }
     if (sellerId) {
       filtered = filtered.filter((o) => o.seller_id === sellerId);
+    }
+    if (buyerId) {
+      filtered = filtered.filter((o) => o.buyer_id === buyerId);
     }
     if (buyerPhone) {
       filtered = filtered.filter((o) => o.buyer_phone === buyerPhone);
@@ -95,10 +113,10 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Please enter a valid offer amount in KES." }, { status: 400 });
     }
 
-    const supabase = createAdminClient();
+    const supabase = getClient();
     const { data: listing, error: listingError } = await supabase
       .from("listings")
-      .select("id, title, price, seller_id, platform, overall_team_strength, manager_name, seller:profiles(username, phone_number)")
+      .select("id, title, price, seller_id, platform, overall_team_strength, manager_name, seller:profiles!listings_seller_id_fkey(username, phone_number)")
       .eq("id", listing_id)
       .single();
 
@@ -129,19 +147,40 @@ export async function POST(req: NextRequest) {
     const normBuyerPhone = normalizePhoneNumber(buyer_phone);
     const internationalBuyerPhone = normBuyerPhone.isValid ? normBuyerPhone.international : buyer_phone.trim();
 
-    const newOffer: ListingOffer = {
+    const nowIso = new Date().toISOString();
+
+    // 1. Clean DB payload matching exact schema columns of public.listing_offers
+    const dbPayload = {
       id: offerId,
       listing_id,
       seller_id: listing.seller_id,
-      buyer_id: buyer_id || undefined,
+      buyer_id: buyer_id || null,
       buyer_name: buyer_name.trim(),
       buyer_phone: internationalBuyerPhone,
       offered_price: offerNum,
       original_price: originalPrice,
       discount_percentage: discountPercentage,
       status: "pending",
+      note: note ? String(note).slice(0, 300) : null,
+      created_at: nowIso,
+      updated_at: nowIso,
+    };
+
+    // 2. Persist offer to Supabase
+    try {
+      const { error: insErr } = await supabase.from("listing_offers").insert(dbPayload);
+      if (insErr) {
+        console.error("Supabase listing_offers insert error:", insErr);
+      }
+    } catch (e) {
+      console.error("Supabase insert exception:", e);
+    }
+
+    const newOffer: ListingOffer = {
+      ...dbPayload,
+      buyer_id: buyer_id || undefined,
+      status: "pending",
       note: note ? String(note).slice(0, 300) : undefined,
-      created_at: new Date().toISOString(),
       listing: {
         id: listing.id,
         title: listing.title,
@@ -151,24 +190,45 @@ export async function POST(req: NextRequest) {
         manager_name: listing.manager_name,
       },
     };
-
-    // Try saving to Supabase
-    try {
-      await supabase.from("listing_offers").insert(newOffer);
-    } catch {
-      // Memory store fallback
-    }
     MEMORY_OFFERS.unshift(newOffer);
 
-    // Build pre-filled WhatsApp alert text for buyer to ping seller
-    const rawSellerPhone = (listing.seller as any)?.phone_number || "254794400365";
-    const cleanSellerPhone = formatWhatsAppPhone(rawSellerPhone) || "254794400365";
+    // 3. Automated In-App Notification to Seller
+    if (listing.seller_id) {
+      try {
+        await supabase.from("notifications").insert({
+          recipient_id: listing.seller_id,
+          type: "new_offer",
+          title: `New Price Offer: KES ${offerNum.toLocaleString()}`,
+          message: `${buyer_name.trim()} offered KES ${offerNum.toLocaleString()} (${discountPercentage}% off) for "${listing.title}". Review, accept, or counter now!`,
+          action_url: `/dashboard/seller`,
+          is_read: false,
+        });
+      } catch (notifErr) {
+        console.warn("Seller in-app notification error:", notifErr);
+      }
+    }
+
+    // 4. Automated SMS Alert to Seller
+    const rawSellerPhone = (listing.seller as any)?.phone_number;
+    if (rawSellerPhone) {
+      sendSellerOfferReceivedSms(
+        rawSellerPhone,
+        buyer_name.trim(),
+        offerNum,
+        originalPrice,
+        listing.title,
+        listing.id
+      ).catch((err) => console.warn("Seller offer SMS failed:", err));
+    }
+
+    // 5. Build optional WhatsApp link for buyer courtesy ping
+    const cleanSellerPhone = formatWhatsAppPhone(rawSellerPhone || "254794400365") || "254794400365";
     const waText = encodeURIComponent(
       `Hello! I just submitted an offer of KES ${offerNum.toLocaleString()} (${discountPercentage}% off) for your eFootball squad "${listing.title}" on eFootballMarket.\n\nSquad Link: https://www.efootballmarket.co.ke/listings/${listing.id}\nMy Name: ${buyer_name}\nMy Phone: ${internationalBuyerPhone}\nEscrow Guaranteed via Till 1572931!`
     );
     const whatsappUrl = `https://wa.me/${cleanSellerPhone}?text=${waText}`;
 
-    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    // Admin WhatsApp alert
     dispatchAdminWhatsAppAlert({
       eventType: "NEW_OFFER_SUBMITTED",
       listingTitle: listing.title,
@@ -181,7 +241,7 @@ export async function POST(req: NextRequest) {
       success: true,
       offer: newOffer,
       whatsappUrl,
-      message: "Offer submitted successfully! Seller will review your proposal.",
+      message: "Offer submitted successfully! Seller has been alerted automatically.",
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });
@@ -197,15 +257,23 @@ export async function PATCH(req: NextRequest) {
       return NextResponse.json({ error: "Offer ID and action are required" }, { status: 400 });
     }
 
-    const offerIndex = MEMORY_OFFERS.findIndex((o) => o.id === offer_id);
-    let targetOffer: ListingOffer | null = offerIndex !== -1 ? MEMORY_OFFERS[offerIndex] : null;
+    const supabase = getClient();
 
-    const supabase = createAdminClient();
+    // 1. Fetch current offer
+    let targetOffer: ListingOffer | null = null;
     try {
-      const { data } = await supabase.from("listing_offers").select("*").eq("id", offer_id).single();
+      const { data } = await supabase
+        .from("listing_offers")
+        .select("*, listing:listings(id, title, price)")
+        .eq("id", offer_id)
+        .maybeSingle();
       if (data) targetOffer = data;
     } catch {
       // Use memory
+    }
+
+    if (!targetOffer) {
+      targetOffer = MEMORY_OFFERS.find((o) => o.id === offer_id) || null;
     }
 
     if (!targetOffer) {
@@ -219,16 +287,35 @@ export async function PATCH(req: NextRequest) {
 
     if (action === "accept") {
       updatedStatus = "accepted";
-      // 12-hour expiry window for buyer to complete checkout at discounted price
+      // 12-hour expiry window for buyer to complete checkout at agreed price
       expiresAt = new Date(now.getTime() + 12 * 3600 * 1000).toISOString();
     } else if (action === "counter") {
       updatedStatus = "countered";
       finalCounter = Number(counter_price);
       if (isNaN(finalCounter) || finalCounter <= 0) {
-        return NextResponse.json({ error: "Valid counter price required" }, { status: 400 });
+        return NextResponse.json({ error: "Please enter a valid counter-offer price in KES." }, { status: 400 });
       }
     } else if (action === "decline") {
       updatedStatus = "declined";
+    }
+
+    const listingTitle = (targetOffer.listing as any)?.title || "eFootball Squad";
+    const checkoutUrl = `/pay/${targetOffer.listing_id}?offer=${targetOffer.id}`;
+
+    // 2. Persist update to Supabase
+    try {
+      await supabase
+        .from("listing_offers")
+        .update({
+          status: updatedStatus,
+          expires_at: expiresAt || null,
+          counter_price: finalCounter || null,
+          note: seller_note ? String(seller_note).slice(0, 300) : targetOffer.note || null,
+          updated_at: now.toISOString(),
+        })
+        .eq("id", offer_id);
+    } catch (e) {
+      console.error("Supabase offer update error:", e);
     }
 
     const updatedOffer: ListingOffer = {
@@ -240,31 +327,64 @@ export async function PATCH(req: NextRequest) {
       updated_at: now.toISOString(),
     };
 
+    const offerIndex = MEMORY_OFFERS.findIndex((o) => o.id === offer_id);
     if (offerIndex !== -1) {
       MEMORY_OFFERS[offerIndex] = updatedOffer;
     } else {
       MEMORY_OFFERS.push(updatedOffer);
     }
 
-    try {
-      await supabase.from("listing_offers").update(updatedOffer).eq("id", offer_id);
-    } catch {
-      // memory fallback
+    // 3. In-App Notification to Buyer (if registered account)
+    if (targetOffer.buyer_id) {
+      const notifTitle =
+        action === "accept"
+          ? "Offer Accepted! Proceed to Checkout"
+          : action === "counter"
+          ? `Seller Countered: KES ${finalCounter?.toLocaleString()}`
+          : "Offer Declined by Seller";
+
+      const notifMessage =
+        action === "accept"
+          ? `The seller accepted your offer of KES ${targetOffer.offered_price.toLocaleString()} for "${listingTitle}". Checkout window expires in 12 hours!`
+          : action === "counter"
+          ? `The seller proposed KES ${finalCounter?.toLocaleString()} for "${listingTitle}".${seller_note ? ` Note: "${seller_note}"` : ""}`
+          : `The seller declined your offer for "${listingTitle}".${seller_note ? ` Reason: "${seller_note}"` : " You can submit a revised offer."}`;
+
+      try {
+        await supabase.from("notifications").insert({
+          recipient_id: targetOffer.buyer_id,
+          type: "offer_response",
+          title: notifTitle,
+          message: notifMessage,
+          action_url: action === "accept" ? checkoutUrl : `/listings/${targetOffer.listing_id}`,
+          is_read: false,
+        });
+      } catch (e) {
+        console.warn("Buyer in-app notification error:", e);
+      }
     }
 
-    // Generate direct fast checkout link for accepted offer
-    const checkoutUrl = `/pay/${updatedOffer.listing_id}?offer=${updatedOffer.id}`;
+    // 4. Automated SMS Alert to Buyer
+    if (targetOffer.buyer_phone) {
+      sendBuyerOfferResponseSms(
+        targetOffer.buyer_phone,
+        action === "accept" ? "accepted" : action === "counter" ? "countered" : "declined",
+        action === "counter" ? (finalCounter || 0) : targetOffer.offered_price,
+        listingTitle,
+        action === "accept" ? checkoutUrl : `/listings/${targetOffer.listing_id}`
+      ).catch((err) => console.warn("Buyer offer SMS failed:", err));
+    }
 
-    // Generate WhatsApp notification to buyer
-    const cleanBuyerPhone = formatWhatsAppPhone(updatedOffer.buyer_phone);
+    // 5. WhatsApp Courtesy Notification for Buyer
+    const cleanBuyerPhone = formatWhatsAppPhone(targetOffer.buyer_phone);
     let buyerWaMessage = "";
     if (action === "accept") {
       buyerWaMessage = encodeURIComponent(
-        `Great news ${updatedOffer.buyer_name}! Your offer of KES ${updatedOffer.offered_price.toLocaleString()} for the eFootball squad was ACCEPTED by the seller on eFootballMarket!\n\nYou have 12 hours to complete checkout via M-Pesa Till 1572931:\nhttps://www.efootballmarket.co.ke${checkoutUrl}`
+        `Great news ${targetOffer.buyer_name}! Your offer of KES ${targetOffer.offered_price.toLocaleString()} for the eFootball squad was ACCEPTED by the seller on eFootballMarket!\n\nYou have 12 hours to complete checkout via M-Pesa Till 1572931:\nhttps://www.efootballmarket.co.ke${checkoutUrl}`
       );
     } else if (action === "counter") {
       buyerWaMessage = encodeURIComponent(
-        `Hello ${updatedOffer.buyer_name}, the seller reviewed your offer on eFootballMarket and countered with KES ${finalCounter?.toLocaleString()}.\nCheck details here: https://www.efootballmarket.co.ke/listings/${updatedOffer.listing_id}`
+        `Hello ${targetOffer.buyer_name}, the seller reviewed your offer on eFootballMarket and countered with KES ${finalCounter?.toLocaleString()}.\nReview & accept here: https://www.efootballmarket.co.ke/listings/${targetOffer.listing_id}`
       );
     }
 
@@ -275,7 +395,7 @@ export async function PATCH(req: NextRequest) {
       offer: updatedOffer,
       checkoutUrl,
       buyerWhatsAppUrl,
-      message: `Offer ${action}ed successfully.`,
+      message: `Offer ${action}ed successfully. Buyer has been notified.`,
     });
   } catch (err: any) {
     return NextResponse.json({ error: err.message }, { status: 500 });

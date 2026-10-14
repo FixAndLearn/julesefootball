@@ -37,6 +37,13 @@ export default async function SellerDashboardPage() {
     .eq("seller_id", user.id)
     .eq("status", "escrow_locked");
 
+  // Fetch incoming buyer price offers for this seller
+  const { data: incomingOffers } = await supabase
+    .from("listing_offers")
+    .select("*, listing:listings(id, title, price, platform, overall_team_strength, manager_name)")
+    .eq("seller_id", user.id)
+    .order("created_at", { ascending: false });
+
   const sellerProfile = {
     available_balance: Number(profile?.available_balance || 0),
     escrow_balance: Number(profile?.escrow_balance || 0),
@@ -60,6 +67,7 @@ export default async function SellerDashboardPage() {
         sellerProfile={sellerProfile}
         listings={(listings as Listing[]) || []}
         pendingOrders={(pendingOrders as Order[]) || []}
+        incomingOffers={(incomingOffers as any[]) || []}
       />
     </div>
   );

@@ -234,3 +234,41 @@ export async function sendSellerWithdrawalStatusSms(
       : `EFootballMarket: Withdrawal of KES ${amountKes.toLocaleString()} could not be processed.${failureReason ? ` Reason: ${failureReason}.` : ""} Funds refunded to your balance.`;
   return sendSmsAlert({ toPhone: sellerPhone, message });
 }
+
+/**
+ * Alert seller immediately when a buyer submits a price offer / bargain.
+ */
+export async function sendSellerOfferReceivedSms(
+  sellerPhone: string,
+  buyerName: string,
+  offeredPrice: number,
+  originalPrice: number,
+  listingTitle: string,
+  listingId: string
+): Promise<SmsDispatchResult> {
+  const shortTitle = listingTitle.length > 25 ? listingTitle.slice(0, 22) + "..." : listingTitle;
+  const message = `EFootballMarket: ${buyerName} offered KES ${offeredPrice.toLocaleString()} (was KES ${originalPrice.toLocaleString()}) for "${shortTitle}". Review, accept or counter now: ${BASE_URL}/listings/${listingId}`;
+  return sendSmsAlert({ toPhone: sellerPhone, message });
+}
+
+/**
+ * Alert buyer immediately when seller responds to an offer (accept, counter, or decline).
+ */
+export async function sendBuyerOfferResponseSms(
+  buyerPhone: string,
+  action: "accepted" | "countered" | "declined",
+  price: number,
+  listingTitle: string,
+  actionUrl: string
+): Promise<SmsDispatchResult> {
+  const shortTitle = listingTitle.length > 25 ? listingTitle.slice(0, 22) + "..." : listingTitle;
+  let message = "";
+  if (action === "accepted") {
+    message = `EFootballMarket: Great news! The seller ACCEPTED your offer of KES ${price.toLocaleString()} for "${shortTitle}". Complete checkout via Till 1572931 within 12h: ${BASE_URL}${actionUrl}`;
+  } else if (action === "countered") {
+    message = `EFootballMarket: The seller countered your offer for "${shortTitle}" with KES ${price.toLocaleString()}. Review & accept here: ${BASE_URL}${actionUrl}`;
+  } else {
+    message = `EFootballMarket: The seller could not accept your offer for "${shortTitle}". You can submit a revised offer or buy at asking price: ${BASE_URL}${actionUrl}`;
+  }
+  return sendSmsAlert({ toPhone: buyerPhone, message });
+}

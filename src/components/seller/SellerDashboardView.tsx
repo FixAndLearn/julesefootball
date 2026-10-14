@@ -7,7 +7,8 @@ import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency, getPlatformLabel } from "@/lib/utils";
-import { Listing, Order } from "@/types/database";
+import { Listing, ListingOffer, Order } from "@/types/database";
+import { SellerListingOffersPanel } from "@/components/marketplace/SellerListingOffersPanel";
 import { ArrowRight, ArrowUpRight, Edit3, PlusCircle, ShieldCheck, Star, Trophy, Wallet, Sparkles, Crown } from "lucide-react";
 import { getSellerTier } from "@/lib/utils/sellerTier";
 import Link from "next/link";
@@ -24,12 +25,14 @@ export interface SellerDashboardViewProps {
   };
   listings: Listing[];
   pendingOrders: Order[];
+  incomingOffers?: ListingOffer[];
 }
 
 export function SellerDashboardView({
   sellerProfile,
   listings,
   pendingOrders,
+  incomingOffers,
 }: SellerDashboardViewProps) {
   const router = useRouter();
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -237,6 +240,11 @@ export function SellerDashboardView({
             ))}
           </div>
         </div>
+      )}
+
+      {/* Incoming Buyer Price Offers & Bargains */}
+      {incomingOffers && incomingOffers.length > 0 && (
+        <SellerListingOffersPanel initialOffers={incomingOffers} />
       )}
 
       {/* Seller Listings */}
