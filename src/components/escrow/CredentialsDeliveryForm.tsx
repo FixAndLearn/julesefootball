@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { CheckCircle2, Lock, ShieldAlert } from "lucide-react";
+import { AlertTriangle, CheckCircle2, Lock, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 export interface CredentialsDeliveryFormProps {
@@ -15,12 +15,17 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
   const [konamiPassword, setKonamiPassword] = useState("");
   const [backupCodes, setBackupCodes] = useState("");
   const [instructions, setInstructions] = useState("");
+  const [certifyNoGoogleLink, setCertifyNoGoogleLink] = useState(false);
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState(false);
   const [error, setError] = useState("");
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!certifyNoGoogleLink) {
+      setError("You must certify that this account is NOT linked to Google Play ('Googling') before delivering.");
+      return;
+    }
     setLoading(true);
     setError("");
 
@@ -81,6 +86,17 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
         </div>
       )}
 
+      {/* Strict Anti-Googling Alert */}
+      <div className="p-3.5 rounded-xl bg-rose-500/10 border border-rose-500/40 text-xs text-rose-200 space-y-1.5">
+        <div className="flex items-center gap-1.5 font-bold text-rose-300">
+          <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+          <span>STRICT SELLER POLICY: Never Deliver a Google-Linked Account</span>
+        </div>
+        <p className="text-[11px] text-slate-300 leading-relaxed">
+          eFootball accounts linked to Google Play Games cannot be transferred cleanly and permit account pull-backs. Delivering an account with Google Play linked will trigger an instant buyer dispute, freezing of your payout, and permanent seller suspension.
+        </p>
+      </div>
+
       <Input
         label="Konami ID Email / Username"
         type="text"
@@ -116,12 +132,35 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
           rows={3}
           value={instructions}
           onChange={(e) => setInstructions(e.target.value)}
-          placeholder="e.g. Please log in on Android, unlink Google Play, and bind your own email in Konami settings."
+          placeholder="e.g. Please log in on Android/iOS, check Link Data, and bind your own email in Konami settings."
           className="w-full rounded-lg bg-pitch-card border border-pitch-border p-3 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
         />
       </div>
 
-      <Button type="submit" variant="gold" size="md" className="w-full" isLoading={loading || success}>
+      {/* Certification Checkbox */}
+      <div className="p-3.5 rounded-xl bg-pitch-card border border-pitch-border space-y-2">
+        <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 select-none">
+          <input
+            type="checkbox"
+            checked={certifyNoGoogleLink}
+            onChange={(e) => setCertifyNoGoogleLink(e.target.checked)}
+            className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
+            required
+          />
+          <span className="text-xs text-slate-200 font-medium leading-relaxed">
+            I certify under penalty of permanent ban and escrow fund forfeiture that this account is <strong>NOT linked to Google Play Games (&quot;Googling&quot;)</strong>. Handover is 100% pure Konami ID with zero Google backdoors.
+          </span>
+        </label>
+      </div>
+
+      <Button
+        type="submit"
+        variant="gold"
+        size="md"
+        className="w-full"
+        isLoading={loading || success}
+        disabled={!certifyNoGoogleLink}
+      >
         {success ? "Delivered!" : "Encrypt & Deliver to Buyer"}
       </Button>
     </form>

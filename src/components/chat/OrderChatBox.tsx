@@ -5,11 +5,13 @@ import { Button } from "@/components/ui/Button";
 import { detectProhibitedOffPlatformContent } from "@/lib/security/chatFilter";
 import { formatCurrency } from "@/lib/utils";
 import { Message, OrderStatus } from "@/types/database";
+import { KonamiTransferChecklistModal } from "@/components/escrow/KonamiTransferChecklistModal";
 import {
   AlertTriangle,
   Lock,
   Send,
   Shield,
+  ShieldCheck,
   Smartphone,
   X,
 } from "lucide-react";
@@ -48,6 +50,7 @@ export function OrderChatBox({
     category?: string;
   } | null>(null);
   const [isPaymentModalOpen, setIsPaymentModalOpen] = useState(false);
+  const [isGuideOpen, setIsGuideOpen] = useState(false);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const isPendingPayment = orderStatus === "payment_pending";
@@ -161,7 +164,7 @@ export function OrderChatBox({
   return (
     <div className="bg-pitch-surface border border-pitch-border rounded-2xl flex flex-col h-[520px] shadow-xl overflow-hidden">
       {/* Header */}
-      <div className="px-5 py-3.5 border-b border-pitch-border bg-pitch-card flex items-center justify-between">
+      <div className="px-5 py-3 border-b border-pitch-border bg-pitch-card flex items-center justify-between">
         <div className="flex items-center gap-2">
           <div
             className={`w-2.5 h-2.5 rounded-full ${
@@ -172,10 +175,37 @@ export function OrderChatBox({
             {isPendingPayment ? "Order Chat (Locked)" : "Order Secure Messaging"}
           </h3>
         </div>
-        <span className="text-[11px] text-slate-400 flex items-center gap-1">
-          <Shield className="w-3.5 h-3.5 text-emerald-400" />
-          Anti-Fraud Audited
-        </span>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => setIsGuideOpen(true)}
+            className="text-[11px] text-emerald-300 hover:text-emerald-200 flex items-center gap-1 font-bold bg-emerald-950/70 border border-emerald-800/80 px-2 py-0.5 rounded-lg transition-all"
+          >
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Handover Guide &amp; Rules</span>
+          </button>
+          <span className="text-[11px] text-slate-400 hidden sm:flex items-center gap-1">
+            <Shield className="w-3.5 h-3.5 text-emerald-400" />
+            Anti-Fraud Audited
+          </span>
+        </div>
+      </div>
+
+      {/* Permanent Anti-Googling & Handover Security Banner */}
+      <div className="px-4 py-2 bg-rose-500/10 border-b border-rose-500/25 flex items-center justify-between gap-2 text-[11px] text-rose-200">
+        <div className="flex items-center gap-1.5 truncate">
+          <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+          <span className="truncate">
+            <strong>CRITICAL RULE:</strong> Never accept an account linked to Google Play (&quot;Googling&quot;).
+          </span>
+        </div>
+        <button
+          type="button"
+          onClick={() => setIsGuideOpen(true)}
+          className="underline text-emerald-400 hover:text-emerald-300 shrink-0 font-semibold"
+        >
+          View Guide
+        </button>
       </div>
 
       {/* Message History */}
@@ -299,6 +329,13 @@ export function OrderChatBox({
                 >
                   ✅ Updated Both!
                 </button>
+                <button
+                  type="button"
+                  onClick={() => setInputContent("Please confirm that Google Play is NOT linked to this account ('Googling')")}
+                  className="whitespace-nowrap px-2 py-0.5 rounded-md bg-rose-950/60 border border-rose-800/80 text-rose-300 hover:text-white hover:border-rose-600 transition-colors"
+                >
+                  🚫 Verify No Google Link
+                </button>
               </>
             ) : (
               <>
@@ -322,6 +359,13 @@ export function OrderChatBox({
                   className="whitespace-nowrap px-2 py-0.5 rounded-md bg-pitch border border-pitch-border text-slate-300 hover:text-white hover:border-brand-500/50 transition-colors"
                 >
                   📩 Link Your Email
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setInputContent("I certify this account is 100% pure Konami ID and NOT linked to Google Play")}
+                  className="whitespace-nowrap px-2 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 hover:text-white hover:border-emerald-600 transition-colors"
+                >
+                  🛡️ Pure Konami ID (No Google)
                 </button>
               </>
             )}
@@ -373,6 +417,12 @@ export function OrderChatBox({
           }}
         />
       )}
+
+      {/* Escrow Handover Guide Modal */}
+      <KonamiTransferChecklistModal
+        isOpen={isGuideOpen}
+        onClose={() => setIsGuideOpen(false)}
+      />
     </div>
   );
 }

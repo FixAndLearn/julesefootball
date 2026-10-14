@@ -10,6 +10,7 @@ import {
   UploadCloud,
   Zap,
   AlertCircle,
+  AlertTriangle,
   Loader2,
   Image as ImageIcon,
   Save,
@@ -720,6 +721,17 @@ export default function EditListingPage() {
                 placeholder="1"
               />
             </div>
+          </div>
+
+          {/* Strict Anti-Googling Policy */}
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/40 text-xs text-rose-200 space-y-1.5">
+            <div className="flex items-center gap-2 text-rose-300 font-bold">
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>STRICT PLATFORM RULE: Accounts Linked to Google Play (&quot;Googling&quot;) Are Prohibited</span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              Every account listed for sale on this marketplace must be 100% pure Konami ID. Google Play links allow sellers to bypass passwords and recover the account, which destroys buyer protection. If your account is linked to Google Play, do not list it.
+            </p>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

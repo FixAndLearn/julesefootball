@@ -11,6 +11,7 @@ import {
   UploadCloud,
   Zap,
   AlertCircle,
+  AlertTriangle,
   Image as ImageIcon,
   Trash2,
   RefreshCw,
@@ -814,11 +815,22 @@ export default function CreateListingPage() {
         {/* Section 4: Konami ID & REAL QUALITY SQUAD SCREENSHOTS (UP TO 5 IMAGES) */}
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-6">
           <h2 className="text-base font-bold text-slate-100 font-display border-b border-pitch-border/60 pb-3 flex items-center justify-between">
-            <span>4. Konami ID Security & Real Squad Screenshots (Up to 5)</span>
+            <span>4. Konami ID Security &amp; Real Squad Screenshots (Up to 5)</span>
             <span className="text-xs font-semibold text-emerald-400 flex items-center gap-1">
               <ShieldCheck className="w-3.5 h-3.5" /> Real Quality / Up to 5 Images
             </span>
           </h2>
+
+          {/* Strict Anti-Googling Platform Policy */}
+          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/40 text-xs text-rose-200 space-y-2">
+            <div className="flex items-center gap-2 text-rose-300 font-bold">
+              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
+              <span>STRICT PLATFORM RULE: Accounts Linked to Google Play (&quot;Googling&quot;) Are Prohibited</span>
+            </div>
+            <p className="text-[11px] text-slate-300 leading-relaxed">
+              Every account listed for sale on this marketplace must be 100% pure Konami ID. Google Play links allow sellers to bypass passwords and recover the account, which destroys buyer protection. If your account is linked to Google Play, do not list it.
+            </p>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <div>

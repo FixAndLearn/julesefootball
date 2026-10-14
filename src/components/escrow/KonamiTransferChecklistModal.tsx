@@ -15,14 +15,14 @@ const CHECKLIST_STEPS: ChecklistStep[] = [
   {
     id: "step_login",
     title: "1. Log in to my.konami.net in Incognito",
-    instruction: "Open a private/incognito browser window and log in to the official Konami ID portal (my.konami.net) using the email and password delivered by the seller.",
-    criticalTip: "Ensure the URL begins with https://my.konami.net to prevent phishing clones.",
+    instruction: "Open a private/incognito browser window and log in to the official Konami ID portal (my.konami.net) using the email and password provided by the seller (via vault or chat).",
+    criticalTip: "Ensure the URL begins strictly with https://my.konami.net to prevent phishing clones.",
   },
   {
     id: "step_email",
     title: "2. Change Konami ID Email to Your Own",
-    instruction: "Navigate to Account Management -> 'View / Edit Email Address'. Enter your personal email address. Konami will send a 6-digit confirmation code to your inbox.",
-    criticalTip: "Once you enter the 6-digit OTP code, the seller permanently loses login capability through their previous email.",
+    instruction: "Navigate to Account Management -> 'View / Edit Email Address'. Enter your personal email address. Konami sends a 6-digit confirmation code to your new inbox. Ask seller for the old email OTP in chat if prompted.",
+    criticalTip: "Once you enter the 6-digit confirmation code, the seller permanently loses login capability through their previous email.",
   },
   {
     id: "step_password",
@@ -38,15 +38,15 @@ const CHECKLIST_STEPS: ChecklistStep[] = [
   },
   {
     id: "step_unlink",
-    title: "5. Unlink Google Play / Apple Game Center",
-    instruction: "In Konami ID portal, check 'Linked External Accounts'. Ensure Google Play, Apple ID, PSN, or Game Center are disconnected or unlinked.",
-    criticalTip: "This ensures the seller cannot launch the mobile game using a secondary social token.",
+    title: "5. Verify Google Play is NOT Linked (STRICT RULE)",
+    instruction: "Open eFootball Mobile on your phone -> Extras -> Support -> Link Data. Check Google Play Games. It MUST state 'Not Linked'. If Google Play is linked ('Googling'), STOP IMMEDIATELY! Never accept the account—open a dispute right away.",
+    criticalTip: "CRITICAL: In eFootball, Google Play links cannot be transferred. A Google-linked account allows the seller to pull back the account at any time. Zero Google-linked accounts are permitted.",
   },
   {
     id: "step_ingame",
     title: "6. Launch Game & Confirm Squad In-App",
     instruction: "Open eFootball Mobile on your phone -> Extras -> Support -> Data Transfer -> Transfer using Konami ID. Log in and verify all Epic Boosters, Division status, and Coin balances match the listing.",
-    criticalTip: "If any player or currency is missing, click 'Open Dispute' immediately before the 24-hour window expires.",
+    criticalTip: "If any player or currency is missing or if Google Play was linked, click 'Report Problem / Dispute' immediately before releasing funds.",
   },
 ];
 
@@ -119,6 +119,20 @@ export function KonamiTransferChecklistModal({ isOpen, onClose }: Props) {
 
         {/* Steps List */}
         <div className="p-6 overflow-y-auto space-y-4 flex-1">
+          {/* Strict Zero Google-Link Alert Box */}
+          <div className="p-4 rounded-2xl bg-rose-500/10 border-2 border-rose-500/40 text-rose-200 text-xs space-y-2">
+            <div className="flex items-center gap-2 text-rose-300 font-bold text-sm">
+              <AlertTriangle className="w-5 h-5 shrink-0 text-rose-400" />
+              <span>STRICT ESCROW RULE: NEVER ACCEPT A GOOGLE-LINKED ACCOUNT (&quot;GOOGLING&quot;)</span>
+            </div>
+            <p className="leading-relaxed text-slate-200 text-xs">
+              In eFootball Mobile, Google Play accounts cannot be transferred cleanly. If an account has ever been linked to Google Play, the previous owner can <strong>log back in and pull back the account at any time</strong> using Google sign-in, even after you change the Konami ID email and password!
+            </p>
+            <div className="p-2.5 rounded-xl bg-black/40 border border-rose-500/30 text-[11px] font-mono text-rose-300">
+              <strong>How to check in eFootball Mobile:</strong> Go to Extras &rarr; Support &rarr; Link Data &rarr; Look at &quot;Google Play Games&quot;. It MUST say <strong>&quot;Not Linked&quot;</strong>. If it says &quot;Linked&quot;, <strong>DO NOT ACCEPT IT</strong> and open a dispute immediately for a 100% refund.
+            </div>
+          </div>
+
           {CHECKLIST_STEPS.map((step) => {
             const isDone = Boolean(checkedSteps[step.id]);
             return (
@@ -208,5 +222,59 @@ export function KonamiTransferChecklistTrigger({ className = "" }: { className?:
 
       <KonamiTransferChecklistModal isOpen={open} onClose={() => setOpen(false)} />
     </>
+  );
+}
+
+/**
+ * Prominent Escrow Exchange Guide Card with trigger button
+ */
+export function EscrowHandoverGuideCard({ onOpenGuide }: { onOpenGuide: () => void }) {
+  return (
+    <div className="bg-gradient-to-r from-emerald-950/40 via-pitch-surface to-slate-900 border border-emerald-500/40 rounded-2xl p-4 sm:p-5 shadow-xl space-y-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="flex items-start gap-3">
+          <div className="w-10 h-10 rounded-xl bg-emerald-500/15 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h4 className="text-sm font-bold text-white font-display">
+                Official Escrow Exchange &amp; Handover Protocol
+              </h4>
+              <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800">
+                Available At All Stages
+              </span>
+            </div>
+            <p className="text-xs text-slate-300 mt-1 leading-relaxed">
+              New to eFootball account exchanges? Follow our verified 6-step protocol to transfer Konami ID email, password, and 2FA with zero risk.
+            </p>
+          </div>
+        </div>
+
+        <Button
+          type="button"
+          variant="outline"
+          size="sm"
+          onClick={onOpenGuide}
+          className="text-xs font-bold border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10 shrink-0"
+        >
+          <ShieldCheck className="w-3.5 h-3.5 mr-1.5 text-emerald-400" />
+          <span>Open Handover Guide</span>
+        </Button>
+      </div>
+
+      {/* Critical Anti-Googling Alert */}
+      <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/30 flex items-start gap-2.5 text-xs text-rose-200">
+        <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+        <div className="space-y-0.5">
+          <span className="font-bold text-rose-300">
+            STRICT SECURITY RULE: Never accept an account linked to Google Play (&quot;Googling&quot;)
+          </span>
+          <p className="text-[11px] text-rose-200/90 leading-relaxed">
+            Google Play links can never be transferred and allow the seller to reclaim the account at any time via Google login. When you log in, check <em>Support &rarr; Link Data</em>. If Google Play is linked, <strong>STOP IMMEDIATELY</strong> and dispute the order for a full refund.
+          </p>
+        </div>
+      </div>
+    </div>
   );
 }

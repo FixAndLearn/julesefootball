@@ -6,13 +6,13 @@ import { DisputeModal } from "@/components/escrow/DisputeModal";
 import { EscrowStatusStepper } from "@/components/escrow/EscrowStatusStepper";
 import { EscrowReceiptModal } from "@/components/escrow/EscrowReceiptModal";
 import { DisputeEvidenceLocker } from "@/components/escrow/DisputeEvidenceLocker";
-import { KonamiTransferChecklistModal } from "@/components/escrow/KonamiTransferChecklistModal";
+import { KonamiTransferChecklistModal, EscrowHandoverGuideCard } from "@/components/escrow/KonamiTransferChecklistModal";
 import { MpesaPaymentModal } from "@/components/payments/MpesaPaymentModal";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { EscrowState, Order, OrderStatus } from "@/types/database";
-import { AlertCircle, CheckCircle2, FileText, KeyRound, Lock, Send, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle2, FileText, KeyRound, Lock, Send, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -154,24 +154,37 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
   return (
     <div className="space-y-6">
       {/* Escrow Progress Stepper */}
-      <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl">
-        <div className="flex items-center justify-between mb-4">
+      <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
+        <div className="flex items-center justify-between">
           <h3 className="text-xs uppercase font-bold text-slate-400 tracking-wider">
-            Transaction Lifecycle & Escrow State
+            Transaction Lifecycle &amp; Escrow State
           </h3>
-          {order.status !== "payment_pending" && order.status !== "cancelled" && (
+          <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => setIsReceiptModalOpen(true)}
-              className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1.5 font-bold transition-colors cursor-pointer"
+              onClick={() => setIsChecklistModalOpen(true)}
+              className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-xl shadow-sm"
             >
-              <FileText className="w-3.5 h-3.5 text-amber-400" />
-              <span>Official Receipt (PDF)</span>
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>Handover Guide &amp; Rules</span>
             </button>
-          )}
+            {order.status !== "payment_pending" && order.status !== "cancelled" && (
+              <button
+                type="button"
+                onClick={() => setIsReceiptModalOpen(true)}
+                className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-pitch-card border border-pitch-border px-2.5 py-1 rounded-xl"
+              >
+                <FileText className="w-3.5 h-3.5 text-amber-400" />
+                <span>Official Receipt (PDF)</span>
+              </button>
+            )}
+          </div>
         </div>
         <EscrowStatusStepper state={escrowState} />
       </div>
+
+      {/* Universal Escrow Exchange Guide Card (Available from Beginning) */}
+      <EscrowHandoverGuideCard onOpenGuide={() => setIsChecklistModalOpen(true)} />
 
       {/* Stage 1: Payment Pending (Buyer STK Push Trigger) */}
       {order.status === "payment_pending" && (
@@ -211,26 +224,138 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
         </div>
       )}
 
-      {/* Stage 2: Escrow Locked (Seller must deliver credentials) */}
+      {/* Stage 2: Escrow Locked (Seller delivering credentials via form or chat) */}
       {order.status === "escrow_locked" && (
         <div>
           {isSeller ? (
             <CredentialsDeliveryForm orderId={order.id} onDelivered={refreshPage} />
           ) : (
-            <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-3">
+            <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4 shadow-xl">
               <div className="flex items-center gap-3">
                 <div className="w-10 h-10 rounded-xl bg-indigo-950/60 border border-indigo-800/60 flex items-center justify-center text-indigo-400">
                   <Lock className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-slate-100">Payment Secured in Escrow</h3>
+                  <h3 className="text-base font-bold text-slate-100">Payment Secured in Escrow (Funds Safely Held)</h3>
                   <p className="text-xs text-slate-400">
-                    Seller has been alerted to provide Konami ID credentials within 12 hours.
+                    Safaricom Till 1572931 custody active. Seller cannot withdraw funds until you confirm full access.
                   </p>
                 </div>
               </div>
-              <div className="p-3 rounded-xl bg-pitch-card text-xs text-slate-300">
-                Your payment of <strong>{formatCurrency(order.total_amount, order.currency)}</strong> is locked securely. The seller cannot withdraw funds until you confirm full access to the account.
+
+              <div className="p-3.5 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-1.5">
+                <span className="font-bold text-white block">Escrow Protection &amp; Handover Protocol:</span>
+                <p className="text-slate-300">
+                  The seller will deliver credentials either using the encrypted vault OR by communicating directly with you in the <strong>Order Chat</strong> to the right.
+                </p>
+              </div>
+
+              {/* Handover Verification Card (In case seller provides credentials in chat) */}
+              <div className="p-4 rounded-xl bg-pitch-card/70 border border-emerald-500/40 space-y-3">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                  <div>
+                    <h4 className="text-xs font-bold text-emerald-300 flex items-center gap-1.5">
+                      <KeyRound className="w-3.5 h-3.5" />
+                      <span>Received Credentials via Chat or Form? Verify Here:</span>
+                    </h4>
+                    <p className="text-[11px] text-slate-400 mt-0.5">
+                      You do not have to wait if the seller assists you directly in chat. Verify all 5 points before releasing funds.
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsChecklistModalOpen(true)}
+                    className="inline-flex items-center gap-1 text-xs font-semibold text-emerald-400 hover:text-emerald-300 underline underline-offset-2 shrink-0"
+                  >
+                    <ShieldCheck className="w-3.5 h-3.5" />
+                    <span>View Visual 6-Step Guide</span>
+                  </button>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-pitch-border/60 text-xs">
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepLogin}
+                      onChange={(e) => setStepLogin(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500"
+                    />
+                    <span><strong>1. Account Inspection:</strong> Logged into eFootball and confirmed squad players, OVR, and Epics match the listing.</span>
+                  </label>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepEmail}
+                      onChange={(e) => setStepEmail(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500"
+                    />
+                    <span><strong>2. Primary Email Binding:</strong> Changed registered email at <em>my.konami.net</em> to my own email and confirmed OTP code.</span>
+                  </label>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepPassword}
+                      onChange={(e) => setStepPassword(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500"
+                    />
+                    <span><strong>3. Password &amp; Security:</strong> Updated Konami ID password and security question to new private combinations.</span>
+                  </label>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 select-none">
+                    <input
+                      type="checkbox"
+                      checked={step2FA}
+                      onChange={(e) => setStep2FA(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500"
+                    />
+                    <span><strong>4. Two-Step Verification (2FA):</strong> Enabled 2-Step OTP on my own phone to block previous owner access.</span>
+                  </label>
+
+                  <label className="flex items-start gap-2.5 cursor-pointer text-slate-200 select-none">
+                    <input
+                      type="checkbox"
+                      checked={stepUnlink}
+                      onChange={(e) => setStepUnlink(e.target.checked)}
+                      className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500"
+                    />
+                    <span className="text-rose-200">
+                      <strong>5. Verified ZERO Google-Play Link (&quot;Googling&quot;):</strong> Checked in-game <em>Extras &rarr; Support &rarr; Link Data</em> and confirmed Google Play Games says <strong>&quot;Not Linked&quot;</strong>. (If linked, STOP &amp; Dispute).
+                    </span>
+                  </label>
+                </div>
+
+                {releaseError && (
+                  <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
+                    <ShieldAlert className="w-4 h-4 shrink-0" />
+                    <span>{releaseError}</span>
+                  </div>
+                )}
+
+                <div className="pt-2 flex flex-col sm:flex-row items-center gap-3">
+                  <Button
+                    variant="gold"
+                    size="md"
+                    className="w-full sm:flex-1 font-bold"
+                    onClick={handleConfirmAndRelease}
+                    isLoading={releasingFunds}
+                    disabled={!stepLogin || !stepPassword || !stepEmail || !step2FA || !stepUnlink}
+                  >
+                    <ShieldCheck className="w-4 h-4 mr-2" />
+                    Complete Handover &amp; Release Funds to Seller
+                  </Button>
+
+                  <Button
+                    variant="danger"
+                    size="sm"
+                    className="w-full sm:w-auto"
+                    onClick={() => setIsDisputeModalOpen(true)}
+                  >
+                    <ShieldAlert className="w-4 h-4 mr-1.5" />
+                    Report Problem / Dispute
+                  </Button>
+                </div>
               </div>
             </div>
           )}
@@ -369,7 +494,9 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
                       onChange={(e) => setStepUnlink(e.target.checked)}
                       className="mt-0.5 w-4 h-4 rounded border-pitch-border text-brand-500 focus:ring-brand-500/20"
                     />
-                    <span><strong>5. Unlink Social Logins:</strong> Checked <em>Linked Accounts</em> at my.konami.net and ensured Google Play / Apple ID / Game Center from seller are removed.</span>
+                    <span className="text-rose-200">
+                      <strong>5. Verified ZERO Google-Play Link (&quot;Googling&quot;):</strong> Checked in-game <em>Extras &rarr; Support &rarr; Link Data</em> and confirmed Google Play Games says <strong>&quot;Not Linked&quot;</strong>. (If linked, STOP &amp; Dispute).
+                    </span>
                   </label>
                 </div>
 
