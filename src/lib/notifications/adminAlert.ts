@@ -25,7 +25,8 @@ export type AdminEventType =
   | "NEW_OFFER_SUBMITTED"
   | "MIDDLEMAN_DEAL_CREATED"
   | "WANTED_REQUEST_POSTED"
-  | "WITHDRAWAL_REQUESTED";
+  | "WITHDRAWAL_REQUESTED"
+  | "TOURNAMENT_REGISTRATION";
 
 export interface AdminAlertPayload {
   eventType: AdminEventType;
@@ -166,6 +167,17 @@ export function formatAdminWhatsAppMessage(payload: AdminAlertPayload): string {
         payload.username ? `👤 *Seller:* @${payload.username}` : "",
         `💵 *Amount:* ${formattedAmount}`,
         payload.sellerPhone ? `📱 *M-Pesa:* ${formatDisplayPhone(payload.sellerPhone)}` : "",
+      ];
+      break;
+
+    case "TOURNAMENT_REGISTRATION":
+      header = "🏆 *NEW TOURNAMENT REGISTRATION*";
+      lines = [
+        `🎮 *Tournament:* ${payload.listingTitle || "eFootball Cup"}`,
+        payload.amount ? `💵 *Entry Fee:* ${formattedAmount}` : "💵 *Entry Fee:* Free Entry",
+        payload.buyerPhone ? `📱 *Player Phone:* ${formatDisplayPhone(payload.buyerPhone)}` : "",
+        payload.details ? `👤 *Player Info:* ${payload.details}` : "",
+        `⚡ *Action:* Add to Match Room brackets & confirm M-Pesa entry fee.`,
       ];
       break;
 

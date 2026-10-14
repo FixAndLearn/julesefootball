@@ -131,6 +131,13 @@ export function Header() {
                 <span>Middleman</span>
               </Link>
               <Link
+                href="/tournaments"
+                className="px-3 py-1.5 rounded-lg text-amber-300 hover:text-amber-200 hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors font-medium"
+              >
+                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <span>Tournaments</span>
+              </Link>
+              <Link
                 href="/news"
                 className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
               >

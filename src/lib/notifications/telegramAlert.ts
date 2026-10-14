@@ -516,6 +516,21 @@ export function formatTelegramAlertHtml(payload: AdminAlertPayload): { text: str
       }
       break;
 
+    case "TOURNAMENT_REGISTRATION":
+      header = "🏆 <b>NEW TOURNAMENT REGISTRATION</b>";
+      bodyLines = [
+        `🎮 <b>Tournament:</b> ${payload.listingTitle || "eFootball Cup"}`,
+        payload.amount ? `💵 <b>Entry Fee:</b> <b>${formattedAmount}</b>` : "💵 <b>Entry Fee:</b> <b>Free Entry</b>",
+        payload.buyerPhone ? `📱 <b>Player Phone:</b> <code>${formatDisplayPhone(payload.buyerPhone)}</code>` : "",
+        payload.details ? `👤 <b>Player Details:</b> ${payload.details}` : "",
+        `⚡ <b>Action:</b> Confirm entry fee payment to Till 1572931 & generate Match Room code.`,
+      ];
+      inlineButtons = [
+        [{ text: "🏆 View Tournament Brackets", url: `${APP_URL}/tournaments` }],
+        [{ text: "💬 Chat with Player", url: `https://wa.me/${payload.buyerPhone ? payload.buyerPhone.replace(/[^0-9]/g, "") : ""}` }],
+      ];
+      break;
+
     default:
       header = "🔔 <b>eFootballMarket Update</b>";
       bodyLines = [payload.details || payload.listingTitle || "Platform activity recorded."];
