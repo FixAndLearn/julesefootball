@@ -1221,6 +1221,24 @@ CREATE POLICY "Admins can manage news" ON public.news_articles
   );
 
 GRANT SELECT ON public.news_articles TO anon, authenticated;
-GRANT ALL ON public.news_articles TO authenticated, service_role;
+-- Ensure Supabase Realtime publication includes listings, messages, notifications, and orders
+DO $$
+BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'listings') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.listings;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'listing_images') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.listing_images;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'messages') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.messages;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'notifications') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.notifications;
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_publication_tables WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'orders') THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
+  END IF;
+END $$;
 
 NOTIFY pgrst, 'reload schema';

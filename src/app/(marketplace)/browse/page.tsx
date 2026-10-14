@@ -122,7 +122,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               </Link>
             </div>
           )}
-          <ListingGrid listings={listings} />
+          <ListingGrid listings={listings} filters={filters} />
         </div>
       </div>
     </div>

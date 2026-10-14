@@ -1,15 +1,14 @@
-import { ListingCard } from "@/components/marketplace/ListingCard";
 import { Button } from "@/components/ui/Button";
-import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency } from "@/lib/utils";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { AnalyticsService } from "@/services/analyticsService";
 import { ListingService } from "@/services/listingService";
-import { ArrowRight, Search, ShieldCheck, Trophy, Zap, Sparkles } from "lucide-react";
+import { ArrowRight, Search, ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
 import { Listing } from "@/types/database";
 
 import { HeroDesktopSpotlight } from "@/components/marketplace/HeroDesktopSpotlight";
+import { RealtimeHomeListings } from "@/components/marketplace/RealtimeHomeListings";
 import { EscrowSteps3D } from "@/components/3d/EscrowSteps3D";
 
 export const revalidate = 0; // Dynamic server-rendered for real DB metrics
@@ -166,42 +165,8 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* Featured / Fresh Published Listings */}
-      <section className="py-20 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full relative z-10">
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between mb-10 gap-4">
-          <div>
-            <div className="inline-flex items-center gap-1.5 text-xs uppercase font-bold tracking-wider text-amber-400 mb-1">
-              <Zap className="w-3.5 h-3.5 fill-amber-400" />
-              Verified Listings
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-slate-100 font-display">
-              Latest eFootball Accounts
-            </h2>
-            <p className="text-xs text-slate-400 mt-1">Click any card to inspect player stats, squad strength, and buy with instant M-Pesa escrow.</p>
-          </div>
-          <Link href="/browse" className="inline-flex items-center gap-1.5 text-sm font-semibold text-brand-400 hover:text-brand-300 transition-colors">
-            <span>Explore All Listings</span>
-            <ArrowRight className="w-4 h-4" />
-          </Link>
-        </div>
-
-        {/* Database Listings or Real Empty State */}
-        {listings.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
-        ) : (
-          <EmptyState
-            icon={Trophy}
-            title="No listings available yet"
-            description="Be the first verified seller to list an eFootball account on the platform with automated M-Pesa escrow protection."
-            actionLabel="Publish First Listing"
-            actionHref="/seller/create-listing"
-          />
-        )}
-      </section>
+      {/* Realtime Live Listings Feed */}
+      <RealtimeHomeListings initialListings={listings} />
 
       {/* Escrow Protection Stepper */}
       <EscrowSteps3D />
