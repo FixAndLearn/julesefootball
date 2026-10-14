@@ -74,9 +74,21 @@ export class PaymentService {
       .from("payments")
       .select("*, order:orders(*)")
       .eq("id", paymentId)
-      .single();
+      .maybeSingle();
 
-    if (!payment) return;
+    if (!payment) {
+      try {
+        await this.supabase.rpc("handle_mpesa_payment_success", {
+          p_checkout_request_id: paymentId,
+          p_receipt_number: receiptNumber,
+          p_amount: amount,
+          p_raw_callback: rawCallback,
+        });
+      } catch (e) {
+        console.warn("Direct RPC invocation error without payment record:", e);
+      }
+      return;
+    }
 
     if (payment.status === "completed") return;
 
@@ -240,6 +252,32 @@ export class PaymentService {
    * Checks the real-time status of a payment by its CheckoutRequestID, MerchantRequestID, or OrderID.
    */
   async getPaymentStatus(identifier?: string, orderId?: string): Promise<Payment | null> {
+    // 1. Direct check on order status if orderId is available (bypasses payment relation delays)
+    if (orderId) {
+      const { data: orderData } = await this.supabase
+        .from("orders")
+        .select("id, status, total_amount, order_number, listing_id, seller_id, buyer_id")
+        .eq("id", orderId)
+        .maybeSingle();
+
+      if (orderData && orderData.status !== "payment_pending") {
+        return {
+          id: orderId,
+          order_id: orderId,
+          amount: Number(orderData.total_amount || 0),
+          currency: "KES",
+          phone_number: "",
+          status: "completed",
+          mpesa_receipt_number: "CONFIRMED",
+          result_code: 0,
+          result_desc: "Payment verified in escrow",
+          created_at: new Date().toISOString(),
+          payment_method: "mpesa",
+          order: orderData as any,
+        } as unknown as Payment;
+      }
+    }
+
     let query = this.supabase.from("payments").select("*, order:orders(*)");
 
     if (orderId) {
@@ -255,6 +293,31 @@ export class PaymentService {
     const { data: payments, error } = await query.order("created_at", { ascending: false });
 
     if (error || !payments || payments.length === 0) {
+      // If we have an orderId, check if order is settled even without payments row
+      if (orderId) {
+        const { data: fallbackOrder } = await this.supabase
+          .from("orders")
+          .select("id, status, total_amount, order_number")
+          .eq("id", orderId)
+          .maybeSingle();
+
+        if (fallbackOrder && fallbackOrder.status !== "payment_pending") {
+          return {
+            id: orderId,
+            order_id: orderId,
+            amount: Number(fallbackOrder.total_amount || 0),
+            currency: "KES",
+            phone_number: "",
+            status: "completed",
+            mpesa_receipt_number: "CONFIRMED",
+            result_code: 0,
+            result_desc: "Payment verified in escrow",
+            created_at: new Date().toISOString(),
+            payment_method: "mpesa",
+            order: fallbackOrder as any,
+          } as unknown as Payment;
+        }
+      }
       return null;
     }
 

@@ -103,19 +103,25 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       try {
         const res = await fetch(
           `/api/payments/status?orderId=${encodeURIComponent(order.id)}&_t=${Date.now()}`,
-          { cache: "no-store" }
+          {
+            cache: "no-store",
+            headers: {
+              "Pragma": "no-cache",
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+            },
+          }
         );
         if (res.ok) {
           const data = await res.json();
           if (data.status === "completed") {
             clearInterval(interval);
-            router.refresh();
+            refreshPage();
           }
         }
       } catch (e) {
         // quiet fallback
       }
-    }, 3500);
+    }, 2500);
 
     return () => clearInterval(interval);
   }, [order.id, order.status, router]);

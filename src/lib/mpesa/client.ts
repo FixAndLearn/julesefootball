@@ -240,6 +240,7 @@ class MpesaService {
         body: JSON.stringify({
           transaction_request_id: transactionId,
         }),
+        signal: AbortSignal.timeout(3500),
       });
 
       if (!response.ok) return null;
@@ -249,16 +250,26 @@ class MpesaService {
         return null;
       }
 
-      const statusStr = String(data.TransactionStatus || "").toLowerCase();
+      const statusStr = String(data.TransactionStatus || data.status || "").toLowerCase();
       const isSuccess =
         statusStr === "completed" ||
+        statusStr === "success" ||
         data.TransactionCode === "0" ||
-        data.TransactionCode === 0;
+        data.TransactionCode === 0 ||
+        data.ResponseCode === "0" ||
+        data.ResponseCode === 0;
 
       const isFailed =
         statusStr === "failed" ||
         statusStr === "cancelled" ||
-        String(data.TransactionStatus || "") === "Cancelled";
+        String(data.TransactionStatus || "").toLowerCase() === "cancelled";
+
+      const receipt =
+        data.TransactionReceipt ||
+        data.mpesa_receipt_number ||
+        data.receiptNumber ||
+        data.ReceiptNumber ||
+        undefined;
 
       return {
         merchantRequestId:
@@ -268,10 +279,11 @@ class MpesaService {
         resultCode: isSuccess ? 0 : isFailed ? 1037 : 1032,
         resultDesc:
           data.ResultDesc ||
+          data.message ||
           (isSuccess ? "Transaction completed successfully" : data.TransactionStatus || "Pending"),
-        receiptNumber: data.TransactionReceipt || undefined,
+        receiptNumber: receipt,
         amount: data.TransactionAmount ? Number(data.TransactionAmount) : undefined,
-        phoneNumber: data.Msisdn,
+        phoneNumber: data.Msisdn || data.phoneNumber,
         transactionDate: data.TransactionDate,
         isSuccess,
       };

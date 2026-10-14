@@ -5,7 +5,7 @@ import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
 import { formatCurrency } from "@/lib/utils";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
-import { CheckCircle2, Phone, Smartphone, X, AlertCircle, Loader2, RefreshCw } from "lucide-react";
+import { CheckCircle2, Phone, Smartphone, X, AlertCircle, Loader2, RefreshCw, ShieldCheck, Zap } from "lucide-react";
 import { useState, useEffect, useRef } from "react";
 
 export interface MpesaPaymentModalProps {
@@ -32,9 +32,12 @@ export function MpesaPaymentModal({
   const [status, setStatus] = useState<"idle" | "awaiting_pin" | "completed" | "failed">("idle");
   const [errorMessage, setErrorMessage] = useState("");
   const [checkoutRequestId, setCheckoutRequestId] = useState<string | null>(null);
-  const [timerSeconds, setTimerSeconds] = useState(90);
+  const [timerSeconds, setTimerSeconds] = useState(45);
   const [isCheckingManual, setIsCheckingManual] = useState(false);
   const [manualNote, setManualNote] = useState("");
+  const [receiptCode, setReceiptCode] = useState("");
+  const [isVerifyingReceipt, setIsVerifyingReceipt] = useState(false);
+  const [receiptError, setReceiptError] = useState("");
 
   const completedRef = useRef(false);
 
@@ -44,7 +47,7 @@ export function MpesaPaymentModal({
     setStatus("completed");
     setTimeout(() => {
       onSuccess();
-    }, 1200);
+    }, 800);
   };
 
   // 1. Supabase Realtime Listener for instant payment detection
@@ -93,7 +96,7 @@ export function MpesaPaymentModal({
     }
   }, [isOpen, status, orderId]);
 
-  // 2. High-frequency Poller (every 2.5s) while awaiting PIN
+  // 2. High-frequency Poller (every 1.5s) while awaiting PIN
   useEffect(() => {
     let interval: NodeJS.Timeout;
     if (status === "awaiting_pin") {
@@ -108,7 +111,13 @@ export function MpesaPaymentModal({
             `/api/payments/status?checkoutRequestId=${encodeURIComponent(
               checkoutRequestId || ""
             )}&orderId=${encodeURIComponent(orderId)}&_t=${Date.now()}`,
-            { cache: "no-store" }
+            {
+              cache: "no-store",
+              headers: {
+                "Pragma": "no-cache",
+                "Cache-Control": "no-cache, no-store, must-revalidate",
+              },
+            }
           );
           if (res.ok) {
             const data = await res.json();
@@ -124,12 +133,12 @@ export function MpesaPaymentModal({
         } catch (err) {
           console.error("Polling error:", err);
         }
-      }, 2500);
+      }, 1500);
     }
     return () => clearInterval(interval);
   }, [status, checkoutRequestId, orderId]);
 
-  // 3. Countdown timer (runs up to 0, but polling does NOT stop at 0)
+  // 3. Countdown timer (runs down from 45s, polling continues regardless)
   useEffect(() => {
     let timer: NodeJS.Timeout;
     if (status === "awaiting_pin" && timerSeconds > 0) {
@@ -145,6 +154,7 @@ export function MpesaPaymentModal({
     setLoading(true);
     setErrorMessage("");
     setManualNote("");
+    setReceiptError("");
     completedRef.current = false;
 
     const normPhone = normalizePhoneNumber(phoneNumber.trim());
@@ -172,7 +182,7 @@ export function MpesaPaymentModal({
 
       setCheckoutRequestId(data.checkoutRequestId);
       setStatus("awaiting_pin");
-      setTimerSeconds(90);
+      setTimerSeconds(45);
     } catch (err: any) {
       setErrorMessage(err.message || "An error occurred");
     } finally {
@@ -182,37 +192,102 @@ export function MpesaPaymentModal({
 
   const handleManualCheck = async () => {
     setIsCheckingManual(true);
-    setManualNote("");
-    try {
-      const res = await fetch(
-        `/api/payments/status?checkoutRequestId=${encodeURIComponent(
-          checkoutRequestId || ""
-        )}&orderId=${encodeURIComponent(orderId)}&_t=${Date.now()}`,
-        { cache: "no-store" }
-      );
-      if (res.ok) {
-        const data = await res.json();
-        if (data.status === "completed") {
-          handleCompleteSuccess();
-          return;
-        } else if (data.status === "failed") {
-          setStatus("failed");
-          setErrorMessage(data.resultDesc || "Payment was cancelled or rejected.");
-          return;
+    setManualNote("Contacting Safaricom Till 1572931 & verifying database...");
+
+    const checkStatus = async () => {
+      try {
+        const res = await fetch(
+          `/api/payments/status?checkoutRequestId=${encodeURIComponent(
+            checkoutRequestId || ""
+          )}&orderId=${encodeURIComponent(orderId)}&forceCheck=true&_t=${Date.now()}`,
+          {
+            cache: "no-store",
+            headers: {
+              "Pragma": "no-cache",
+              "Cache-Control": "no-cache, no-store, must-revalidate",
+            },
+          }
+        );
+        if (res.ok) {
+          const data = await res.json();
+          if (data.status === "completed") {
+            handleCompleteSuccess();
+            return true;
+          } else if (data.status === "failed") {
+            setStatus("failed");
+            setErrorMessage(data.resultDesc || "Payment was cancelled or rejected.");
+            return true;
+          }
         }
+      } catch (e) {
+        console.error("Manual check error:", e);
       }
-      setManualNote("Checked Safaricom Till 1572931: Transaction is being confirmed. Please give it a few seconds...");
-    } catch (e) {
-      console.error("Manual check error:", e);
-      setManualNote("Connecting to payment network... Re-checking automatically.");
-    } finally {
+      return false;
+    };
+
+    const immediateDone = await checkStatus();
+    if (immediateDone) {
       setIsCheckingManual(false);
+      return;
+    }
+
+    // Quick 2nd pulse after 1.2 seconds in case network packet is inflight
+    setTimeout(async () => {
+      const secondDone = await checkStatus();
+      if (!secondDone) {
+        setManualNote("Safaricom Till 1572931 received request. If PIN was entered, enter your SMS receipt code below for instant confirmation.");
+      }
+      setIsCheckingManual(false);
+    }, 1200);
+  };
+
+  const handleVerifyReceipt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    const cleanCode = receiptCode.trim().toUpperCase();
+    if (!cleanCode) {
+      setReceiptError("Please enter your M-Pesa receipt code (e.g. UJD9J9UHFD).");
+      return;
+    }
+
+    if (cleanCode.length < 8) {
+      setReceiptError("M-Pesa receipt codes are at least 8-10 characters (e.g. UJD9J9UHFD).");
+      return;
+    }
+
+    setIsVerifyingReceipt(true);
+    setReceiptError("");
+
+    try {
+      const res = await fetch("/api/payments/status", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          orderId,
+          receiptNumber: cleanCode,
+          checkoutRequestId: checkoutRequestId || undefined,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data.error || "Failed to verify M-Pesa receipt.");
+      }
+
+      if (data.status === "completed") {
+        handleCompleteSuccess();
+      } else {
+        setReceiptError("Verification pending. Please wait a moment.");
+      }
+    } catch (err: any) {
+      setReceiptError(err.message || "Could not verify code. Please double check.");
+    } finally {
+      setIsVerifyingReceipt(false);
     }
   };
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm animate-in fade-in">
-      <div className="relative w-full max-w-md bg-pitch-surface border border-pitch-border rounded-2xl shadow-2xl overflow-hidden p-6">
+      <div className="relative w-full max-w-md bg-pitch-surface border border-pitch-border rounded-2xl shadow-2xl overflow-hidden p-6 max-h-[92vh] overflow-y-auto">
         <button
           type="button"
           onClick={onClose}
@@ -222,7 +297,7 @@ export function MpesaPaymentModal({
         </button>
 
         {/* Modal Header */}
-        <div className="flex items-center gap-3 mb-6">
+        <div className="flex items-center gap-3 mb-5">
           <div className="w-12 h-12 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400 shrink-0">
             <Smartphone className="w-6 h-6" />
           </div>
@@ -259,7 +334,7 @@ export function MpesaPaymentModal({
 
         {/* Awaiting PIN Handset State */}
         {status === "awaiting_pin" && (
-          <div className="text-center py-6 space-y-4">
+          <div className="text-center py-4 space-y-4">
             <div className="relative w-16 h-16 mx-auto flex items-center justify-center">
               <span className="absolute inset-0 rounded-full border-4 border-emerald-500/20 animate-ping" />
               <div className="w-16 h-16 rounded-full bg-emerald-950/80 border border-emerald-500 flex items-center justify-center text-emerald-400">
@@ -281,23 +356,23 @@ export function MpesaPaymentModal({
             ) : (
               <div className="text-xs text-amber-300 bg-amber-500/10 border border-amber-500/30 rounded-xl p-2.5 flex items-center justify-center gap-2">
                 <Loader2 className="w-3.5 h-3.5 animate-spin text-amber-400" />
-                <span>Checking Safaricom Till 1572931... Click below to confirm.</span>
+                <span>Checking Safaricom Till 1572931... Click confirm or enter receipt below.</span>
               </div>
             )}
 
             {manualNote && (
-              <div className="p-2.5 rounded-xl bg-pitch-card border border-pitch-border text-[11px] text-slate-300 flex items-center gap-2 animate-in fade-in">
-                <Loader2 className="w-3 h-3 animate-spin text-brand-400 shrink-0" />
+              <div className="p-2.5 rounded-xl bg-pitch-card border border-pitch-border text-[11px] text-slate-300 flex items-center gap-2 animate-in fade-in text-left">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-brand-400 shrink-0" />
                 <span>{manualNote}</span>
               </div>
             )}
 
-            <div className="pt-2">
+            <div className="pt-1">
               <Button
                 type="button"
                 variant="secondary"
                 size="sm"
-                className="w-full text-xs font-semibold"
+                className="w-full text-xs font-semibold py-2.5"
                 isLoading={isCheckingManual}
                 onClick={handleManualCheck}
               >
@@ -305,18 +380,61 @@ export function MpesaPaymentModal({
                 I have entered PIN — Confirm Status Now
               </Button>
             </div>
+
+            {/* Instant M-Pesa SMS Receipt Fallback (Direct unlock with code e.g. UJD9J9UHFD) */}
+            <div className="pt-3 border-t border-pitch-border/70 text-left">
+              <div className="p-3.5 rounded-xl bg-emerald-950/20 border border-emerald-500/30 space-y-2">
+                <div className="flex items-center justify-between">
+                  <span className="text-xs font-bold text-slate-200 flex items-center gap-1.5">
+                    <Zap className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                    <span>Have Your M-Pesa SMS Receipt?</span>
+                  </span>
+                  <span className="text-[10px] text-emerald-400 font-semibold bg-emerald-950 px-2 py-0.5 rounded border border-emerald-800">
+                    Instant Unlock
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400">
+                  Received the SMS from Safaricom? Enter the receipt code (e.g. <strong className="text-slate-200">UJD9J9UHFD</strong>) to immediately lock funds in escrow without waiting.
+                </p>
+                <form onSubmit={handleVerifyReceipt} className="flex items-center gap-2 pt-1">
+                  <input
+                    type="text"
+                    maxLength={12}
+                    placeholder="e.g. UJD9J9UHFD"
+                    value={receiptCode}
+                    onChange={(e) => setReceiptCode(e.target.value.toUpperCase())}
+                    className="w-full px-3 py-2 rounded-lg bg-pitch-surface border border-pitch-border text-xs text-white uppercase font-mono tracking-wider placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 transition-colors"
+                  />
+                  <Button
+                    type="submit"
+                    variant="gold"
+                    size="sm"
+                    className="text-xs shrink-0 font-bold px-3 py-2"
+                    isLoading={isVerifyingReceipt}
+                    disabled={!receiptCode.trim()}
+                  >
+                    Verify Receipt
+                  </Button>
+                </form>
+                {receiptError && (
+                  <p className="text-[11px] text-rose-400 font-medium pt-0.5 animate-in fade-in">
+                    {receiptError}
+                  </p>
+                )}
+              </div>
+            </div>
           </div>
         )}
 
         {/* Completed State */}
         {status === "completed" && (
-          <div className="text-center py-6 space-y-3">
+          <div className="text-center py-6 space-y-3 animate-in zoom-in-95">
             <div className="w-16 h-16 rounded-full bg-emerald-950/80 border border-emerald-500 text-emerald-400 mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-8 h-8" />
             </div>
             <h4 className="text-base font-bold text-slate-100">Payment Verified!</h4>
-            <p className="text-xs text-slate-400 max-w-xs mx-auto">
-              Funds are now securely locked in eFootballMarket Escrow. The seller has been alerted to provide account credentials.
+            <p className="text-xs text-slate-300 max-w-xs mx-auto">
+              Funds are securely locked in eFootballMarket Escrow. Transitioning to account handover...
             </p>
           </div>
         )}
