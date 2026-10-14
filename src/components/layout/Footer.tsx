@@ -26,6 +26,9 @@ export function Footer() {
             <Link href="/middleman" className="hover:text-emerald-400 transition-colors">
               Middleman Escrow
             </Link>
+            <Link href="/tournaments" className="hover:text-amber-400 transition-colors">
+              Tournaments
+            </Link>
             <Link href="/escrow-guarantee" className="hover:text-slate-200 transition-colors">
               Escrow Protection
             </Link>
@@ -104,6 +107,7 @@ export function Footer() {
               <li><Link href="/browse?platform=pc_steam" className="hover:text-white transition-colors">PC / Steam</Link></li>
               <li><Link href="/browse?platform=playstation_5" className="hover:text-white transition-colors">PlayStation 5</Link></li>
               <li><Link href="/middleman" className="text-emerald-400 hover:text-emerald-300 font-medium transition-colors">Middleman Escrow</Link></li>
+              <li><Link href="/tournaments" className="text-amber-400 hover:text-amber-300 font-medium transition-colors">Tournaments & Cups</Link></li>
             </ul>
           </div>
 
