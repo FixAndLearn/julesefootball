@@ -411,7 +411,7 @@ export class EscrowService {
   async openDispute(orderId: string, openedBy: string, reason: string, description: string): Promise<void> {
     const { data: order } = await this.supabase
       .from("orders")
-      .select("id, buyer_id, seller_id, order_number, status, total_amount, listing:listings(title)")
+      .select("id, buyer_id, seller_id, order_number, status, total_amount, seller_net_amount, listing:listings(title)")
       .eq("id", orderId)
       .single();
 
@@ -426,13 +426,18 @@ export class EscrowService {
       }
     }
 
+    const wasCompleted = order.status === "completed";
+    const finalDescription = wasCompleted && !description.startsWith("[POST-RELEASE DISPUTE]")
+      ? `[POST-RELEASE DISPUTE] ${description}`
+      : description;
+
     const { error: disputeError } = await this.supabase
       .from("disputes")
       .insert({
         order_id: orderId,
         opened_by: openedBy,
         reason,
-        description,
+        description: finalDescription,
         status: "open",
       });
 
@@ -450,14 +455,54 @@ export class EscrowService {
       .update({ status: "disputed", updated_at: new Date().toISOString() })
       .eq("id", orderId);
 
+    // If order was completed, freeze seller available balance into escrow balance
+    if (wasCompleted && order.seller_id) {
+      try {
+        const { data: escrow } = await this.supabase
+          .from("escrow_accounts")
+          .select("net_amount")
+          .eq("order_id", orderId)
+          .single();
+
+        const netAmount = Number(escrow?.net_amount || order.seller_net_amount || order.total_amount || 0);
+
+        const { data: sellerProf } = await this.supabase
+          .from("profiles")
+          .select("available_balance, escrow_balance")
+          .eq("id", order.seller_id)
+          .single();
+
+        if (sellerProf && netAmount > 0) {
+          const currentAvail = Number(sellerProf.available_balance || 0);
+          const currentEscrow = Number(sellerProf.escrow_balance || 0);
+          const amountToFreeze = Math.min(currentAvail, netAmount);
+
+          if (amountToFreeze > 0) {
+            await this.supabase
+              .from("profiles")
+              .update({
+                available_balance: Math.max(0, currentAvail - amountToFreeze),
+                escrow_balance: currentEscrow + amountToFreeze,
+                updated_at: new Date().toISOString(),
+              })
+              .eq("id", order.seller_id);
+          }
+        }
+      } catch (freezeErr) {
+        console.warn("Failed to freeze seller balance on post-release dispute:", freezeErr);
+      }
+    }
+
     const otherPartyId = openedBy === order.buyer_id ? order.seller_id : order.buyer_id;
     if (otherPartyId) {
       try {
         await this.supabase.from("notifications").insert({
           recipient_id: otherPartyId,
           type: "order_update",
-          title: "Escrow Dispute Opened",
-          message: `A dispute was opened for order #${order.order_number}. Funds are held securely until reviewed by a moderator.`,
+          title: wasCompleted ? "Post-Release Escrow Dispute Opened" : "Escrow Dispute Opened",
+          message: wasCompleted
+            ? `A post-release dispute was opened for order #${order.order_number}. Payout has been frozen pending moderator review.`
+            : `A dispute was opened for order #${order.order_number}. Funds are held securely until reviewed by a moderator.`,
           action_url: `/orders/${orderId}`,
           is_read: false,
         });
@@ -468,12 +513,12 @@ export class EscrowService {
 
     // Dispatch automated WhatsApp alert to CEO Brian Okibo (0794400365)
     dispatchAdminWhatsAppAlert({
-      eventType: "DISPUTE_OPENED",
+      eventType: wasCompleted ? "POST_RELEASE_DISPUTE_OPENED" : "DISPUTE_OPENED",
       orderId,
       orderNumber: order.order_number,
       listingTitle: (order as any)?.listing?.title || "eFootball Squad",
       amount: Number(order.total_amount || 0),
-      details: `${reason}: ${description}`,
+      details: `${reason}: ${finalDescription}`,
     }).catch((err) => console.error("Admin dispute alert error:", err));
   }
 }

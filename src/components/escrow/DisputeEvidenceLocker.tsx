@@ -144,6 +144,12 @@ export function DisputeEvidenceLocker({ order, currentUserId }: DisputeEvidenceL
     }
   };
 
+  const isPostRelease = Boolean(
+    dispute?.description?.includes("[POST-RELEASE DISPUTE]") ||
+    dispute?.reason === "google_linked_breach" ||
+    dispute?.reason === "account_banned_or_deducted"
+  );
+
   return (
     <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-6">
       {/* Dispute Header */}
@@ -155,8 +161,12 @@ export function DisputeEvidenceLocker({ order, currentUserId }: DisputeEvidenceL
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-base font-bold text-white">Escrow Dispute Evidence Locker</h3>
-              <span className="text-[10px] font-bold uppercase px-2 py-0.5 rounded bg-rose-950 border border-rose-800 text-rose-300">
-                Audit Active
+              <span className={`text-[10px] font-bold uppercase px-2 py-0.5 rounded border ${
+                isPostRelease
+                  ? "bg-amber-950 border-amber-700 text-amber-300"
+                  : "bg-rose-950 border-rose-800 text-rose-300"
+              }`}>
+                {isPostRelease ? "Post-Release Freeze Active" : "Audit Active"}
               </span>
             </div>
             <p className="text-xs text-slate-400 mt-0.5">
@@ -175,6 +185,19 @@ export function DisputeEvidenceLocker({ order, currentUserId }: DisputeEvidenceL
         </button>
       </div>
 
+      {/* Post-Release Dispute Notice */}
+      {isPostRelease && (
+        <div className="p-3.5 rounded-xl bg-amber-950/40 border border-amber-800/60 text-xs text-amber-200 space-y-1">
+          <div className="flex items-center gap-2 font-bold text-amber-300">
+            <ShieldAlert className="w-4 h-4 text-amber-400 shrink-0" />
+            <span>Post-Release Breach Arbitration (Seller Payout Frozen)</span>
+          </div>
+          <p className="text-[11px] text-amber-200/90 leading-relaxed">
+            This dispute was raised after order funds were initially released. The seller available balance is frozen until platform administration verifies Konami account recovery logs, Google Play link status, or game integrity records.
+          </p>
+        </div>
+      )}
+
       {/* Primary Dispute Summary */}
       {dispute && (
         <div className="p-4 rounded-xl bg-pitch-card/70 border border-pitch-border space-y-2 text-xs">
@@ -182,7 +205,11 @@ export function DisputeEvidenceLocker({ order, currentUserId }: DisputeEvidenceL
             <span>
               Dispute Reason:{" "}
               <strong className="text-amber-300 capitalize">
-                {String(dispute.reason).replace(/_/g, " ")}
+                {dispute.reason === "google_linked_breach"
+                  ? "Google Play Link Found (Anti-Googling Breach)"
+                  : dispute.reason === "account_banned_or_deducted"
+                  ? "Account Banned or Coins Deducted"
+                  : String(dispute.reason).replace(/_/g, " ")}
               </strong>
             </span>
             <span className="text-[11px]">

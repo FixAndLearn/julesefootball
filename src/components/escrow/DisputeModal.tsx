@@ -1,18 +1,27 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
-import { AlertTriangle, Camera, Upload, X } from "lucide-react";
+import { AlertTriangle, Camera, ShieldAlert, ShieldCheck, Upload, X } from "lucide-react";
 import { useState } from "react";
 
 export interface DisputeModalProps {
   orderId: string;
   isOpen: boolean;
+  isCompleted?: boolean;
   onClose: () => void;
   onDisputeSubmitted: () => void;
 }
 
-export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: DisputeModalProps) {
-  const [reason, setReason] = useState("credentials_invalid");
+export function DisputeModal({
+  orderId,
+  isOpen,
+  isCompleted = false,
+  onClose,
+  onDisputeSubmitted,
+}: DisputeModalProps) {
+  const [reason, setReason] = useState(
+    isCompleted ? "account_recovered_by_seller" : "credentials_invalid"
+  );
   const [description, setDescription] = useState("");
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
@@ -102,10 +111,28 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
             <AlertTriangle className="w-5 h-5" />
           </div>
           <div>
-            <h3 className="text-base font-bold text-slate-100">Open Escrow Dispute</h3>
-            <p className="text-xs text-slate-400">Order Funds Frozen Until Resolution</p>
+            <h3 className="text-base font-bold text-slate-100">
+              {isCompleted ? "Raise Post-Release Dispute" : "Open Escrow Dispute"}
+            </h3>
+            <p className="text-xs text-slate-400">
+              {isCompleted
+                ? "Seller Payout Frozen Pending Investigation"
+                : "Order Funds Frozen Until Resolution"}
+            </p>
           </div>
         </div>
+
+        {isCompleted && (
+          <div className="p-3 mb-4 rounded-xl bg-amber-950/40 border border-amber-800/60 text-amber-200 text-xs space-y-1">
+            <div className="flex items-center gap-1.5 font-bold text-amber-300">
+              <ShieldCheck className="w-4 h-4 shrink-0 text-amber-400" />
+              <span>Post-Release Protection Guarantee</span>
+            </div>
+            <p className="text-[11px] text-amber-200/90 leading-relaxed">
+              If the seller attempted Konami ID recovery, linked an unmentioned Google Play Games ID, or caused coin deductions, submit your claim below. The seller wallet balance is frozen and administrators will arbitrate directly.
+            </p>
+          </div>
+        )}
 
         {error && (
           <div className="p-3 mb-4 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs">
@@ -121,11 +148,13 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
               onChange={(e) => setReason(e.target.value)}
               className="w-full bg-pitch-card border border-pitch-border rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
             >
-              <option value="credentials_invalid">Credentials Invalid / Cannot Log In</option>
+              <option value="account_recovered_by_seller">Account Password Changed or Recovered by Seller</option>
+              <option value="google_linked_breach">Google Play Link Found / Anti-Googling Policy Breach</option>
+              <option value="account_banned_or_deducted">Account Banned or Coins Deducted Due to Past Seller Actions</option>
+              <option value="credentials_invalid">Credentials Stopped Working / Cannot Log In</option>
               <option value="wrong_account_details">Account Details Do Not Match Listing</option>
               <option value="missing_players_or_coins">Missing Listed Epic Players or Coins</option>
-              <option value="account_recovered_by_seller">Account Password Changed or Recovered</option>
-              <option value="seller_unresponsive">Seller Unresponsive</option>
+              <option value="seller_unresponsive">Seller Unresponsive Post-Release</option>
               <option value="other">Other Issue</option>
             </select>
           </div>
@@ -136,7 +165,11 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
               rows={3}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              placeholder="Explain clearly what went wrong so platform moderators can review..."
+              placeholder={
+                isCompleted
+                  ? "Detail how and when the account was compromised or what breach was discovered..."
+                  : "Explain clearly what went wrong so platform moderators can review..."
+              }
               className="w-full rounded-lg bg-pitch-card border border-pitch-border p-3 text-xs text-slate-100 placeholder:text-slate-500 focus:outline-none focus:border-brand-500"
               required
             />
@@ -144,7 +177,7 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
 
           <div>
             <label className="block text-xs font-medium text-slate-300 mb-1.5">
-              Attach Initial Proof Screenshot (Optional)
+              Attach Proof Screenshot (Konami error / Google Play link / In-game status)
             </label>
             <input
               type="file"
@@ -171,7 +204,7 @@ export function DisputeModal({ orderId, isOpen, onClose, onDisputeSubmitted }: D
           </div>
 
           <Button type="submit" variant="danger" size="md" className="w-full" isLoading={loading}>
-            Submit Dispute with Evidence
+            {isCompleted ? "Submit Post-Release Dispute (Freeze Payout)" : "Submit Dispute with Evidence"}
           </Button>
         </form>
       </div>

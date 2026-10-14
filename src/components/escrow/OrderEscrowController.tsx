@@ -184,6 +184,16 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
                 <span>Official Receipt (PDF)</span>
               </button>
             )}
+            {order.status !== "payment_pending" && order.status !== "cancelled" && order.status !== "disputed" && (
+              <button
+                type="button"
+                onClick={() => setIsDisputeModalOpen(true)}
+                className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-rose-950/60 border border-rose-800/80 px-2.5 py-1 rounded-xl shadow-sm"
+              >
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                <span>{order.status === "completed" ? "Post-Release Dispute" : "Raise Dispute"}</span>
+              </button>
+            )}
           </div>
         </div>
         <EscrowStatusStepper state={escrowState} />
@@ -580,7 +590,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
 
       {/* Stage 4: Order Completed */}
       {order.status === "completed" && (
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-3">
+        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
               <CheckCircle2 className="w-5 h-5" />
@@ -595,7 +605,32 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
               ? "Account access confirmed. Enjoy your new eFootball squad!"
               : `Net payout of ${formatCurrency(order.seller_net_amount, order.currency)} has been credited to your available balance.`}
           </p>
-          <div className="pt-2">
+
+          {/* Post-Release Dispute Guarantee Box */}
+          <div className="p-4 rounded-xl bg-pitch-card/80 border border-amber-500/30 space-y-3">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div>
+                <h4 className="text-xs font-bold text-amber-300 flex items-center gap-1.5">
+                  <ShieldAlert className="w-4 h-4 text-amber-400" />
+                  <span>Konami Post-Release Security Guarantee</span>
+                </h4>
+                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                  Did the seller attempt to recover the Konami ID? Was an unmentioned Google Play link found, or did the account get banned? You can raise an official post-release dispute at any time.
+                </p>
+              </div>
+              <Button
+                variant="danger"
+                size="sm"
+                onClick={() => setIsDisputeModalOpen(true)}
+                className="shrink-0 font-bold shadow-md cursor-pointer"
+              >
+                <ShieldAlert className="w-4 h-4 mr-1.5" />
+                Raise Post-Release Dispute
+              </Button>
+            </div>
+          </div>
+
+          <div className="pt-1 flex flex-wrap items-center gap-3">
             <Button
               variant="gold"
               size="sm"
@@ -646,6 +681,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       <DisputeModal
         orderId={order.id}
         isOpen={isDisputeModalOpen}
+        isCompleted={order.status === "completed"}
         onClose={() => setIsDisputeModalOpen(false)}
         onDisputeSubmitted={() => {
           setIsDisputeModalOpen(false);

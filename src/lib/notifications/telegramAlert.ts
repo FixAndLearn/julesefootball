@@ -439,6 +439,24 @@ export function formatTelegramAlertHtml(payload: AdminAlertPayload): { text: str
       }
       break;
 
+    case "POST_RELEASE_DISPUTE_OPENED":
+      header = "🚨 <b>POST-RELEASE DISPUTE OPENED (FUNDS FROZEN)</b>";
+      bodyLines = [
+        `📦 <b>Order:</b> <code>${payload.orderNumber}</code>`,
+        `🎮 <b>Squad:</b> ${payload.listingTitle}`,
+        payload.amount !== undefined ? `💵 <b>Disputed Amount:</b> <b>${formattedAmount}</b>` : "",
+        `⚠️ <b>Conflict:</b> Post-handover dispute raised by buyer after fund release.`,
+        `🔒 <b>Action Taken:</b> Seller available balance frozen. Immediate Konami account audit required.`,
+        payload.details ? `📝 <b>Details:</b> <i>"${payload.details}"</i>` : "",
+      ];
+      if (payload.orderId) {
+        inlineButtons = [
+          [{ text: "🚨 Audit & Resolve in Portal", url: `${APP_URL}/orders/${payload.orderId}` }],
+          [{ text: "🛡️ Admin Executive Panel", url: `${APP_URL}/admin?tab=withdrawals` }],
+        ];
+      }
+      break;
+
     case "NEW_OFFER_SUBMITTED":
       header = "🤝 <b>NEW BUYER COUNTER-OFFER</b>";
       bodyLines = [

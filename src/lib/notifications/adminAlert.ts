@@ -21,6 +21,7 @@ export type AdminEventType =
   | "CREDENTIALS_DELIVERED"
   | "ESCROW_RELEASED"
   | "DISPUTE_OPENED"
+  | "POST_RELEASE_DISPUTE_OPENED"
   | "NEW_OFFER_SUBMITTED"
   | "MIDDLEMAN_DEAL_CREATED"
   | "WANTED_REQUEST_POSTED"
@@ -114,6 +115,18 @@ export function formatAdminWhatsAppMessage(payload: AdminAlertPayload): string {
         `📦 *Order:* ${payload.orderNumber}`,
         `🎮 *Squad:* ${payload.listingTitle}`,
         `⚠️ *Conflict:* Buyer or seller opened dispute. Mediation needed.`,
+      ];
+      break;
+
+    case "POST_RELEASE_DISPUTE_OPENED":
+      header = "🚨 *POST-RELEASE DISPUTE OPENED (FUNDS FROZEN)*";
+      lines = [
+        `📦 *Order:* ${payload.orderNumber}`,
+        `🎮 *Squad:* ${payload.listingTitle}`,
+        payload.amount !== undefined ? `💵 *Disputed Amount:* ${formattedAmount}` : "",
+        `⚠️ *Conflict:* Post-handover dispute raised by buyer after fund release.`,
+        `🔒 *Action Taken:* Seller wallet balance frozen. Immediate Konami account audit required.`,
+        payload.details ? `📝 *Details:* ${payload.details}` : "",
       ];
       break;
 
@@ -263,7 +276,7 @@ export async function dispatchAdminWhatsAppAlert(payload: AdminAlertPayload): Pr
   }
 
   // 5. Fallback High-Priority SMS to Brian Okibo for Financial Events (Payments / Disputes / Withdrawals)
-  if (["PAYMENT_RECEIVED", "DISPUTE_OPENED", "WITHDRAWAL_REQUESTED"].includes(payload.eventType)) {
+  if (["PAYMENT_RECEIVED", "DISPUTE_OPENED", "POST_RELEASE_DISPUTE_OPENED", "WITHDRAWAL_REQUESTED"].includes(payload.eventType)) {
     try {
       const smsSummary = `[eFootballMarket] ${payload.eventType}: ${payload.orderNumber || payload.listingTitle || ""} KES ${payload.amount || ""}. Check WhatsApp/Telegram/Admin.`;
       await sendSmsAlert({

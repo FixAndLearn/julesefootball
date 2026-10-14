@@ -15,6 +15,8 @@ const disputeSchema = z.object({
     "missing_players_or_coins",
     "unauthorized_changes",
     "seller_unresponsive",
+    "google_linked_breach",
+    "account_banned_or_deducted",
     "other",
   ]),
   description: z.string().min(10, "Please provide a detailed description of the dispute"),
