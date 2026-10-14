@@ -154,6 +154,9 @@ function AdminControlCenterContent() {
       if (withdrawalsRes.ok) {
         const data = await withdrawalsRes.json();
         setWithdrawals(data.withdrawals || []);
+      } else {
+        const err = await withdrawalsRes.json().catch(() => ({}));
+        console.warn("Withdrawals fetch note:", err);
       }
 
       // 5. Load Disputes
@@ -168,6 +171,63 @@ function AdminControlCenterContent() {
       setLoading(false);
     }
   }, [isAdmin]);
+
+  const reloadWithdrawals = useCallback(async () => {
+    try {
+      const res = await fetch("/api/admin/withdrawals");
+      if (res.ok) {
+        const data = await res.json();
+        setWithdrawals(data.withdrawals || []);
+      }
+    } catch {
+      // non-blocking
+    }
+  }, []);
+
+  // Realtime withdrawal updates & polling
+  useEffect(() => {
+    if (!isAdmin) return;
+
+    // Fast 6s background poll when viewing withdrawals
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        reloadWithdrawals();
+      }
+    }, 6000);
+
+    // Supabase Realtime WebSocket listener for instant push
+    let supabaseClient: any = null;
+    let channel: any = null;
+
+    try {
+      import("@/lib/supabase/client").then(({ createClient }) => {
+        supabaseClient = createClient();
+        channel = supabaseClient
+          .channel(`admin:seller_withdrawals:${Math.random().toString(36).slice(2, 6)}`)
+          .on(
+            "postgres_changes",
+            {
+              event: "*",
+              schema: "public",
+              table: "seller_withdrawals",
+            },
+            () => {
+              reloadWithdrawals();
+            }
+          )
+          .subscribe();
+      });
+    } catch {
+      // non-blocking
+    }
+
+    return () => {
+      clearInterval(interval);
+      if (channel && supabaseClient) {
+        supabaseClient.removeChannel(channel).catch(() => {});
+      }
+    };
+  }, [isAdmin, reloadWithdrawals]);
 
   useEffect(() => {
     if (isAdmin) {
@@ -1742,15 +1802,32 @@ function AdminControlCenterContent() {
               })}
             </div>
 
-            <div className="relative min-w-[240px]">
-              <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
-              <input
-                type="text"
-                placeholder="Search phone, seller, amount..."
-                value={withdrawalSearch}
-                onChange={(e) => setWithdrawalSearch(e.target.value)}
-                className="w-full pl-9 pr-3 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
-              />
+            <div className="flex items-center gap-2 flex-wrap">
+              <div className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-[11px] font-medium text-emerald-300">
+                <span className="relative flex h-2 w-2">
+                  <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+                </span>
+                <span>Live Realtime Sync</span>
+              </div>
+              <button
+                type="button"
+                onClick={reloadWithdrawals}
+                className="p-2 rounded-xl bg-pitch-surface border border-pitch-border text-slate-400 hover:text-white hover:bg-pitch-card transition-colors"
+                title="Refresh withdrawals"
+              >
+                <RefreshCw className="w-3.5 h-3.5" />
+              </button>
+              <div className="relative min-w-[220px]">
+                <Search className="w-3.5 h-3.5 absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
+                <input
+                  type="text"
+                  placeholder="Search phone, seller, amount..."
+                  value={withdrawalSearch}
+                  onChange={(e) => setWithdrawalSearch(e.target.value)}
+                  className="w-full pl-9 pr-3 py-2 rounded-xl bg-pitch-surface border border-pitch-border text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+                />
+              </div>
             </div>
           </div>
 

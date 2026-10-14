@@ -45,4 +45,12 @@ BEGIN
   ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.orders;
   END IF;
+
+  -- 6. Realtime for seller_withdrawals (Instant admin alerts and payouts queue)
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'seller_withdrawals'
+  ) THEN
+    ALTER PUBLICATION supabase_realtime ADD TABLE public.seller_withdrawals;
+  END IF;
 END $$;

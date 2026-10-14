@@ -41,13 +41,25 @@ export async function POST(req: NextRequest) {
     const primaryClient = serviceRoleConfigured ? adminSupabase : supabase;
 
     // Fetch user profile and verify balance
-    const { data: profile, error: profileError } = await primaryClient
+    let profile = null;
+    const { data: p1 } = await primaryClient
       .from("profiles")
-      .select("available_balance, escrow_balance, is_suspended")
+      .select("username, available_balance, escrow_balance, is_suspended")
       .eq("id", user.id)
       .single();
 
-    if (profileError || !profile) {
+    if (p1) {
+      profile = p1;
+    } else {
+      const { data: p2 } = await adminSupabase
+        .from("profiles")
+        .select("username, available_balance, escrow_balance, is_suspended")
+        .eq("id", user.id)
+        .single();
+      profile = p2;
+    }
+
+    if (!profile) {
       return NextResponse.json({ error: "Seller profile not found." }, { status: 404 });
     }
 
@@ -77,7 +89,9 @@ export async function POST(req: NextRequest) {
 
     // Deduct available balance
     const newAvailBal = Math.max(0, availBal - amount);
-    const { error: deductError } = await primaryClient
+    let balanceDeducted = false;
+
+    const { error: deductErr1 } = await primaryClient
       .from("profiles")
       .update({
         available_balance: newAvailBal,
@@ -85,32 +99,85 @@ export async function POST(req: NextRequest) {
       })
       .eq("id", user.id);
 
-    if (deductError) {
-      return NextResponse.json({ error: "Failed to update available balance." }, { status: 500 });
+    if (!deductErr1) {
+      balanceDeducted = true;
+    } else {
+      const { error: deductErr2 } = await adminSupabase
+        .from("profiles")
+        .update({
+          available_balance: newAvailBal,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", user.id);
+
+      if (!deductErr2) {
+        balanceDeducted = true;
+      } else {
+        return NextResponse.json({ error: "Failed to update available balance." }, { status: 500 });
+      }
     }
 
-    // Insert withdrawal record using service-role primaryClient to bypass RLS
-    const { data: withdrawal, error: withdrawalError } = await primaryClient
+    // Insert withdrawal record using multi-tier clients
+    let withdrawal = null;
+    let withdrawalError = null;
+
+    const insertPayload = {
+      seller_id: user.id,
+      amount,
+      payout_method: "mpesa",
+      phone_number: normalizedPhone,
+      status: "pending",
+    };
+
+    // Attempt 1: primaryClient
+    const { data: w1, error: wErr1 } = await primaryClient
       .from("seller_withdrawals")
-      .insert({
-        seller_id: user.id,
-        amount,
-        payout_method: "mpesa",
-        phone_number: normalizedPhone,
-        status: "pending",
-      })
+      .insert(insertPayload)
       .select()
       .single();
 
-    if (withdrawalError) {
+    if (!wErr1 && w1) {
+      withdrawal = w1;
+    } else {
+      withdrawalError = wErr1;
+      // Attempt 2: adminSupabase
+      const { data: w2, error: wErr2 } = await adminSupabase
+        .from("seller_withdrawals")
+        .insert(insertPayload)
+        .select()
+        .single();
+
+      if (!wErr2 && w2) {
+        withdrawal = w2;
+        withdrawalError = null;
+      } else {
+        withdrawalError = wErr2 || wErr1;
+      }
+    }
+
+    if (withdrawalError || !withdrawal) {
       console.error("Withdrawal record creation error:", withdrawalError);
       // Revert balance deduction on failure
-      await primaryClient
-        .from("profiles")
-        .update({ available_balance: availBal })
-        .eq("id", user.id);
+      try {
+        await primaryClient
+          .from("profiles")
+          .update({ available_balance: availBal })
+          .eq("id", user.id);
+      } catch {
+        // try fallback
+      }
+
+      try {
+        await adminSupabase
+          .from("profiles")
+          .update({ available_balance: availBal })
+          .eq("id", user.id);
+      } catch {
+        // ignore
+      }
+
       return NextResponse.json(
-        { error: `Failed to initiate withdrawal: ${withdrawalError.message}` },
+        { error: `Failed to initiate withdrawal: ${withdrawalError?.message || "Database insert failed"}` },
         { status: 500 }
       );
     }
@@ -129,14 +196,22 @@ export async function POST(req: NextRequest) {
       console.warn("Notification error:", notifErr);
     }
 
-    // Automated WhatsApp alert to Brian Okibo (+254794400365)
+    // Automated high-priority alerts to Brian Okibo (Telegram smartphone push + WhatsApp + SMS)
+    const sellerUsername =
+      profile?.username ||
+      user.user_metadata?.username ||
+      (user.email ? user.email.split("@")[0] : "Trader");
+
     dispatchAdminWhatsAppAlert({
       eventType: "WITHDRAWAL_REQUESTED",
       orderId: withdrawal.id,
       amount,
       sellerPhone: normalizedPhone,
-      username: (profile as any)?.username || user.email,
-    }).catch(() => {});
+      username: sellerUsername,
+      userEmail: user.email || undefined,
+    }).catch((err) => {
+      console.warn("Admin alert dispatch warning:", err);
+    });
 
     return NextResponse.json({
       success: true,
@@ -163,17 +238,26 @@ export async function GET(req: NextRequest) {
     const serviceRoleConfigured = hasServiceRoleKey();
     const primaryClient = serviceRoleConfigured ? adminSupabase : supabase;
 
-    const { data: withdrawals, error } = await primaryClient
+    let withdrawals: any[] = [];
+    const { data: wData1, error: wErr1 } = await primaryClient
       .from("seller_withdrawals")
       .select("*")
       .eq("seller_id", user.id)
       .order("created_at", { ascending: false });
 
-    if (error) {
-      return NextResponse.json({ error: error.message }, { status: 500 });
+    if (!wErr1 && wData1) {
+      withdrawals = wData1;
+    } else {
+      const { data: wData2 } = await adminSupabase
+        .from("seller_withdrawals")
+        .select("*")
+        .eq("seller_id", user.id)
+        .order("created_at", { ascending: false });
+
+      withdrawals = wData2 || [];
     }
 
-    return NextResponse.json({ withdrawals: withdrawals || [] });
+    return NextResponse.json({ withdrawals });
   } catch (error: any) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
