@@ -5,8 +5,15 @@ import { ListingService } from "@/services/listingService";
 import { Listing, Platform, Playstyle } from "@/types/database";
 import { ShieldCheck, Sparkles } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from "next";
 
 export const revalidate = 0;
+
+export const metadata: Metadata = {
+  title: "Browse Verified eFootball Accounts | eFootballMarket Kenya",
+  description:
+    "Explore verified eFootball (PES) accounts in Kenya. Filter by OVR team strength, Epic cards, Coin balance, and division with automated M-Pesa escrow protection.",
+};
 
 interface BrowsePageProps {
   searchParams: {

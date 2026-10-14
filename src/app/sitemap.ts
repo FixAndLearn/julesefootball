@@ -5,7 +5,7 @@ import { createServerSupabaseClient } from "@/lib/supabase/server";
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const siteUrl =
     process.env.NEXT_PUBLIC_APP_URL ||
-    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://efootballmarket.com");
+    (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://www.efootballmarket.co.ke");
 
   const staticRoutes: MetadataRoute.Sitemap = [
     {

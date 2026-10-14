@@ -35,6 +35,7 @@ import {
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { Metadata } from "next";
 
 export const revalidate = 0;
 
@@ -42,6 +43,57 @@ interface ListingDetailPageProps {
   params: {
     id: string;
   };
+}
+
+export async function generateMetadata({ params }: ListingDetailPageProps): Promise<Metadata> {
+  try {
+    const resolvedParams = await Promise.resolve(params);
+    const supabase = createServerSupabaseClient();
+    const listingService = new ListingService(supabase);
+    const listing = await listingService.getListingById(resolvedParams.id);
+
+    if (!listing) {
+      return {
+        title: "Account Listing | eFootballMarket",
+      };
+    }
+
+    const primaryImage =
+      listing.images?.find((img) => img.is_primary)?.image_url ||
+      listing.images?.[0]?.image_url ||
+      "/og-image.svg";
+
+    const title = `${listing.title} | eFootballMarket`;
+    const description = `Buy verified ${listing.overall_team_strength} OVR eFootball account for ${formatCurrency(
+      listing.price
+    )}. Includes ${listing.epic_players_count} Epics, ${listing.coin_balance} Coins, and automated Safaricom M-Pesa escrow protection.`;
+
+    return {
+      title,
+      description,
+      openGraph: {
+        title,
+        description,
+        type: "website",
+        images: [
+          {
+            url: primaryImage,
+            alt: listing.title,
+          },
+        ],
+      },
+      twitter: {
+        card: "summary_large_image",
+        title,
+        description,
+        images: [primaryImage],
+      },
+    };
+  } catch {
+    return {
+      title: "Account Listing | eFootballMarket",
+    };
+  }
 }
 
 export default async function ListingDetailPage({ params }: ListingDetailPageProps) {

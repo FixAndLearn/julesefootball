@@ -7,7 +7,7 @@ import { WhatsAppSupportWidget } from "@/components/support/WhatsAppSupportWidge
 
 const siteUrl =
   process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://efootballmarket.com");
+  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://www.efootballmarket.co.ke");
 
 export const viewport: Viewport = {
   themeColor: "#090d16",
@@ -97,6 +97,9 @@ export const metadata: Metadata = {
     apple: "/icon.svg",
   },
   manifest: "/manifest.webmanifest",
+  verification: {
+    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "googlee8e97a3f5a54db68",
+  },
 };
 
 export default function RootLayout({

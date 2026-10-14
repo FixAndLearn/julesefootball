@@ -1,6 +1,13 @@
 import { Button } from "@/components/ui/Button";
 import { CheckCircle2, Clock, Lock, ShieldCheck, ShoppingCart, Building2, AlertTriangle } from "lucide-react";
 import Link from "next/link";
+import { Metadata } from "next";
+
+export const metadata: Metadata = {
+  title: "100% Escrow Guarantee | eFootballMarket Kenya",
+  description:
+    "Learn how eFootballMarket's automated Safaricom M-Pesa escrow vault protects your money and account transfers with a 24-hour buyer inspection window.",
+};
 
 export default function EscrowGuaranteePage() {
   return (
