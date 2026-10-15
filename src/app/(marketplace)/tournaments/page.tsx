@@ -339,7 +339,7 @@ export default function TournamentsPage() {
 
             <div className="flex flex-wrap items-center gap-5 pt-2 text-xs text-slate-300">
               <span className="flex items-center gap-1.5 font-semibold text-emerald-300">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Guaranteed M-Pesa Payouts
+                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Verified M-Pesa Payouts
               </span>
               <span className="flex items-center gap-1.5 font-semibold text-amber-300">
                 <Swords className="w-4 h-4 text-amber-400" /> Live Dynamic Knockout Brackets
@@ -832,7 +832,7 @@ export default function TournamentsPage() {
             Both players post final match screenshot in the Match Room or submit scores directly on this page.
           </div>
           <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
-            <strong className="text-amber-400 block font-bold">3. Guaranteed Payouts</strong>
+            <strong className="text-amber-400 block font-bold">3. Verified Payouts</strong>
             Winnings sent to Safaricom M-Pesa within 15 minutes of final whistle by Officer Brian Okibo (0794400365).
           </div>
         </div>

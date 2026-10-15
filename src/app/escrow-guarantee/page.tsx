@@ -4,7 +4,7 @@ import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
-  title: "100% Escrow Guarantee | eFootballMarket Kenya",
+  title: "Escrow Guarantee & Buyer Protection | eFootballMarket Kenya",
   description:
     "Learn how eFootballMarket's automated Safaricom M-Pesa escrow vault protects your money and account transfers with a 24-hour buyer inspection window.",
 };
@@ -83,7 +83,7 @@ export default function EscrowGuaranteePage() {
           </div>
           <h3 className="text-base font-bold text-slate-100">4. Dispute & Refund Arbitration</h3>
           <p className="text-xs text-slate-400 leading-relaxed">
-            If an account is inaccurate or recovered by the seller, our moderation team freezes the payout immediately and reviews the chat audit logs to issue a 100% refund.
+            If an account is inaccurate or recovered by the seller, our moderation team freezes the payout immediately and reviews the chat audit logs to issue a full refund under our dispute resolution terms.
           </p>
         </div>
       </div>

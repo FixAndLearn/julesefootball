@@ -155,10 +155,10 @@ export function EscrowReceiptModal({ order, isOpen, onClose }: EscrowReceiptModa
                 Vendor (Seller)
               </span>
               <span className="font-semibold text-slate-200 print:text-black block mt-0.5">
-                {order.seller?.username || "Verified Seller"}
+                {order.seller?.username || "Platform Seller"}
               </span>
               <span className="text-[11px] text-emerald-400 print:text-emerald-700">
-                100% Net Payout Verified
+                Net Payout Verified
               </span>
             </div>
           </div>

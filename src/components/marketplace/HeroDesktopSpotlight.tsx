@@ -33,7 +33,7 @@ export function HeroDesktopSpotlight({ listings }: HeroDesktopSpotlightProps) {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500" />
           </span>
           <span className="text-xs font-bold text-slate-200 uppercase tracking-wider">
-            Verified Escrow Listings
+            Escrow-Eligible Listings
           </span>
         </div>
         <Link
@@ -62,9 +62,9 @@ export function HeroDesktopSpotlight({ listings }: HeroDesktopSpotlightProps) {
                   {/* Top Status Strip */}
                   <div className="flex items-center justify-between mb-2.5">
                     <div className="flex items-center gap-1.5">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
                       <span className="text-[10px] font-bold text-emerald-300 uppercase tracking-wider">
-                        In Escrow
+                        Escrow Eligible
                       </span>
                     </div>
                     <span className="text-[10px] font-semibold text-slate-400 bg-pitch-card px-2 py-0.5 rounded-md border border-pitch-border">
@@ -138,7 +138,7 @@ export function HeroDesktopSpotlight({ listings }: HeroDesktopSpotlightProps) {
                   {/* Price & Instant Checkout CTA */}
                   <div className="pt-2.5 border-t border-pitch-border/60 flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] text-slate-400 block">M-Pesa Escrow</span>
+                      <span className="text-[10px] text-slate-400 block">Price (Escrow Protected)</span>
                       <span className="text-sm font-extrabold text-emerald-400">
                         {formatCurrency(listing.price)}
                       </span>
@@ -167,7 +167,7 @@ export function HeroDesktopSpotlight({ listings }: HeroDesktopSpotlightProps) {
                 <div>
                   <h4 className="text-sm font-bold text-white">Sell Your Account</h4>
                   <p className="text-xs text-slate-400 mt-1 max-w-[200px]">
-                    Direct Safaricom M-Pesa payouts with 100% escrow protection.
+                    Direct Safaricom M-Pesa payouts with escrow buyer protection.
                   </p>
                 </div>
                 <Link href="/seller/create-listing">

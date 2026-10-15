@@ -730,7 +730,7 @@ export default function EditListingPage() {
               <span>STRICT PLATFORM RULE: Accounts Linked to Google Play (&quot;Googling&quot;) Are Prohibited</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-relaxed">
-              Every account listed for sale on this marketplace must be 100% pure Konami ID. Google Play links allow sellers to bypass passwords and recover the account, which destroys buyer protection. If your account is linked to Google Play, do not list it.
+              Every account listed for sale on this marketplace must be purely Konami ID linked. Google Play links allow sellers to bypass passwords and recover the account, which destroys buyer protection. If your account is linked to Google Play, do not list it.
             </p>
           </div>
 

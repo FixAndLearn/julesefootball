@@ -32,7 +32,7 @@ export function WhatsAppFlyerModal({ listing, isOpen, onClose }: Props) {
     listing.images?.find((img) => img.is_primary)?.image_url ||
     listing.images?.[0]?.image_url;
 
-  const viralText = `🔥 *HOT eFootball Account for Sale on EFootballMarket!* 🇰🇪\n\n🎮 *Squad*: ${listing.title}\n⭐ *Team OVR*: ${listing.overall_team_strength}\n💎 *Epic / Boosters*: ${listing.epic_players_count} cards\n🏆 *Current Division*: Div ${listing.current_division}\n💰 *Price*: ${formatCurrency(listing.price, listing.currency)}\n\n🛡️ *100% Escrow Protected by Safaricom Till 1572931*\nFunds held safely until credentials are verified!\n\n🔗 *View Photos & Buy*: https://www.efootballmarket.co.ke/listings/${listing.id}`;
+  const viralText = `🔥 *HOT eFootball Account for Sale on EFootballMarket!* 🇰🇪\n\n🎮 *Squad*: ${listing.title}\n⭐ *Team OVR*: ${listing.overall_team_strength}\n💎 *Epic / Boosters*: ${listing.epic_players_count} cards\n🏆 *Current Division*: Div ${listing.current_division}\n💰 *Price*: ${formatCurrency(listing.price, listing.currency)}\n\n🛡️ *Escrow Protected by Safaricom Till 1572931*\nFunds held safely until credentials are verified!\n\n🔗 *View Photos & Buy*: https://www.efootballmarket.co.ke/listings/${listing.id}`;
 
   const drawFlyer = () => {
     const canvas = canvasRef.current;
@@ -137,7 +137,7 @@ export function WhatsAppFlyerModal({ listing, isOpen, onClose }: Props) {
       // Price Tag
       ctx.fillStyle = "#94A3B8";
       ctx.font = "700 24px system-ui, sans-serif";
-      ctx.fillText("ESCROW PRICE", 110, bottomY + 55);
+      ctx.fillText("PRICE (ESCROW PROTECTED)", 110, bottomY + 55);
 
       ctx.fillStyle = "#10B981";
       ctx.font = "900 64px system-ui, sans-serif";

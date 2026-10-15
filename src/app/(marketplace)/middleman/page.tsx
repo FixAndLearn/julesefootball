@@ -231,12 +231,12 @@ function MiddlemanContent() {
           </h1>
 
           <p className="text-sm text-slate-300 leading-relaxed">
-            Met an eFootball trader in a private WhatsApp group or on social media? Stop arguing over who sends first. Lock the money into <strong>Safaricom Till 1572931</strong>, verify the Konami ID credentials, and complete the deal with zero risk.
+            Met an eFootball trader in a private WhatsApp group or on social media? Stop arguing over who sends first. Lock the money into <strong>Safaricom Till 1572931</strong>, verify the Konami ID credentials, and complete the deal securely.
           </p>
 
           <div className="flex flex-wrap items-center gap-4 pt-2 text-xs text-slate-300">
             <span className="flex items-center gap-1.5 font-semibold text-emerald-300">
-              <ShieldCheck className="w-4 h-4 text-emerald-400" /> 100% Escrow Protected
+              <ShieldCheck className="w-4 h-4 text-emerald-400" /> Safaricom Escrow Protected
             </span>
             <span className="flex items-center gap-1.5 font-semibold text-amber-300">
               <Smartphone className="w-4 h-4 text-amber-400" /> M-Pesa Till 1572931

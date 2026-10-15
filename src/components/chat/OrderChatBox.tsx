@@ -362,7 +362,7 @@ export function OrderChatBox({
                 </button>
                 <button
                   type="button"
-                  onClick={() => setInputContent("I certify this account is 100% pure Konami ID and NOT linked to Google Play")}
+                  onClick={() => setInputContent("I certify this account is purely Konami ID linked and NOT linked to Google Play")}
                   className="whitespace-nowrap px-2 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 hover:text-white hover:border-emerald-600 transition-colors"
                 >
                   🛡️ Pure Konami ID (No Google)

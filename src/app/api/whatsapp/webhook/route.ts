@@ -67,7 +67,7 @@ export async function POST(req: NextRequest) {
     if (trimmedText === "HI" || trimmedText === "HELLO" || trimmedText === "MENU" || trimmedText === "HELP" || trimmedText === "START") {
       const menu =
         `⚽ *Welcome to eFootballMarket Kenya!*\n\n` +
-        `🛡️ 100% Escrow-Protected trading for Konami IDs, Coins & Squads.\n\n` +
+        `🛡️ Escrow-Protected trading for Konami IDs, Coins & Squads.\n\n` +
         `*Quick Commands (Reply with a number):*\n` +
         `*1* ➔ Verify M-Pesa Till 1572931\n` +
         `*2* ➔ How Escrow Protection Works\n` +
@@ -100,7 +100,7 @@ export async function POST(req: NextRequest) {
         `3️⃣ Seller delivers the Konami ID & password into our encrypted portal.\n` +
         `4️⃣ Buyer verifies players, coins, and changes the email/password.\n` +
         `5️⃣ Only when the buyer confirms satisfaction are funds released to the seller.\n\n` +
-        `_Zero scams. 100% money-back guarantee._`;
+        `_Verified trades. 24-hour buyer inspection protection._`;
 
       await sendWhatsAppMessage({ toPhone: cleanSender, message: escrowInfo });
       return NextResponse.json({ status: "replied_escrow" });
@@ -145,7 +145,7 @@ export async function POST(req: NextRequest) {
         `https://www.efootballmarket.co.ke/middleman\n` +
         `2. Buyer locks M-Pesa to Till 1572931.\n` +
         `3. Seller delivers Konami ID.\n` +
-        `4. Both parties are 100% protected. Escrow fee is only 5%.`;
+        `4. Both parties are protected under our escrow protocol. Escrow fee is only 5%.`;
 
       await sendWhatsAppMessage({ toPhone: cleanSender, message: middlemanInfo });
       return NextResponse.json({ status: "replied_middleman" });

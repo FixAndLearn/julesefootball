@@ -114,7 +114,7 @@ export default async function Image() {
               maxWidth: "1000px",
             }}
           >
-            With 100% Guaranteed M-Pesa Escrow.
+            With Safaricom M-Pesa Escrow Protection.
           </div>
           <div
             style={{
@@ -124,7 +124,7 @@ export default async function Image() {
               marginTop: "8px",
             }}
           >
-            Eliminate peer-to-peer scams. Automated Lipa Na M-Pesa STK push & 24h inspection protection.
+            Reduce peer-to-peer trading risks. Automated Lipa Na M-Pesa STK push & 24h inspection protection.
           </div>
         </div>
 
@@ -145,7 +145,7 @@ export default async function Image() {
             }}
           >
             <span style={{ color: "#10b981" }}>✓</span>
-            <span>100% Escrow Protected</span>
+            <span>Safaricom Escrow Protected</span>
           </div>
 
           <div

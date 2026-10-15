@@ -109,6 +109,25 @@ assert.strictEqual(parsedUnified.phoneNumber, "254712345678");
 assert.strictEqual(parsedUnified.checkoutRequestId, "ws_CO_07102026121400");
 console.log("✓ UnifiedPay Webhook parser PASSED.");
 
-console.log("\n==================================================");
-console.log("ALL VERIFICATION SUITE ASSERTIONS PASSED (100% OK)");
-console.log("==================================================");
+// 5. Test Credential Retention Safety Guard (Disabled by Default)
+console.log("\n[TEST 5] Testing Credential Retention Safety Guard (Disabled by Default)...");
+async function testRetentionSafety() {
+  const { CredentialRetentionService } = await import("../src/services/credentialRetentionService");
+  const dummySupabase = {} as any;
+  const retentionService = new CredentialRetentionService(dummySupabase);
+  const retentionResult = await retentionService.executeRetentionPurge();
+  assert.strictEqual(retentionResult.enabled, false, "Retention purge must be disabled by default");
+  assert.strictEqual(retentionResult.ordersPurged, 0, "No orders should be purged when disabled");
+  console.log("✓ Credential Retention Safety Guard PASSED.");
+}
+
+testRetentionSafety().then(() => {
+  console.log("\n==================================================");
+  console.log("ALL VERIFICATION SUITE ASSERTIONS PASSED (100% OK)");
+  console.log("==================================================");
+}).catch((err) => {
+  console.error("Verification failed:", err);
+  process.exit(1);
+});
+
+

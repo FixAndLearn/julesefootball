@@ -19,12 +19,12 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading Platform",
-    template: "%s | eFootballMarket",
+    default: "eFootball Community Kenya | Tournaments, News & Alerts",
+    template: "%s | eFootball Community Kenya",
   },
   description:
-    "Buy and sell verified eFootball (PES) accounts with 100% automated Safaricom M-Pesa escrow protection. Instant STK push payments, 24-hr inspection window, and zero scams.",
-  applicationName: "eFootballMarket",
+    "The central community hub for eFootball players in Kenya. Compete in local knockout tournaments, follow match brackets, and get verified game updates and scammer alerts.",
+  applicationName: "eFootball Community Kenya",
   authors: [{ name: "Brian Okibo, Chief Executive Officer (CEO)" }],
   generator: "Next.js",
   keywords: [
@@ -57,9 +57,9 @@ export const metadata: Metadata = {
     locale: "en_KE",
     url: siteUrl,
     siteName: "eFootballMarket",
-    title: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading Platform",
+    title: "eFootballMarket | Escrow Platform for eFootball Account Trading",
     description:
-      "Eliminate peer-to-peer scams. Trade high-OVR eFootball accounts safely with automated Safaricom M-Pesa escrow and 24-hr buyer inspection guarantee.",
+      "Trade high-OVR eFootball accounts with automated Safaricom M-Pesa escrow protection and 24-hour buyer inspection.",
     images: [
       {
         url: "/og-image.svg",
@@ -71,9 +71,9 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading Platform",
+    title: "eFootballMarket | Escrow Platform for eFootball Account Trading",
     description:
-      "Buy and sell high-OVR eFootball accounts safely with automated M-Pesa escrow and 24-hr buyer inspection guarantee.",
+      "Buy and sell high-OVR eFootball accounts with automated M-Pesa escrow protection and 24-hr buyer inspection.",
     images: ["/og-image.svg"],
     creator: "@eFootballMarket",
   },
@@ -112,7 +112,7 @@ export default function RootLayout({
       <head>
         <JsonLd siteUrl={siteUrl} />
       </head>
-      <body className="bg-[#090d16] text-slate-100 min-h-screen flex flex-col antialiased selection:bg-brand-500 selection:text-white relative">
+      <body className="bg-[#0B1220] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-[#22C55E] selection:text-[#0B1220] relative">
         <Header />
         <main className="flex-1 flex flex-col relative z-10">{children}</main>
         <Footer />

@@ -23,7 +23,7 @@ export async function sendBuyerPaymentSecuredWhatsApp(
     `Hello! We received your payment of *KES ${amountKes.toLocaleString()}* for:\n` +
     `🎮 *${listingTitle}*\n` +
     `📦 *Order Number:* ${orderNumber}\n\n` +
-    `🔒 *Your money is 100% safe:* Funds are locked in eFootballMarket Escrow. The seller has NOT been paid and will only receive money after you confirm access to the Konami ID.\n\n` +
+    `🔒 *Your payment is secured in escrow:* Funds are held in eFootballMarket Escrow Till 1572931. The seller has NOT been paid and will only receive money after you inspect and confirm access to the Konami ID.\n\n` +
     `👉 *Track Your Order:* ${APP_URL}/orders/${orderId}\n\n` +
     `_Need help? Reply to this message anytime._`;
 

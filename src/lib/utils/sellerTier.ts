@@ -19,19 +19,19 @@ export function getSellerTier(salesCount: number = 0, rating: number = 5.0): Sel
   if (count >= 10 && rate >= 4.5) {
     return {
       level: "master",
-      label: "Master Merchant",
-      shortLabel: "Master",
+      label: "Top Rated Trader",
+      shortLabel: "Top Rated",
       badgeClass:
         "bg-gradient-to-r from-amber-500/30 via-yellow-400/25 to-amber-600/30 border-amber-400/80 text-amber-200 shadow-lg shadow-amber-500/20 ring-1 ring-amber-400/50",
       iconType: "crown",
       salesRequiredForNext: 0,
       nextTierLabel: null,
-      description: "Elite eFootball vendor with 10+ verified escrow completions and top-rated trade record.",
+      description: "High-volume seller with 10+ completed escrow account transfers and strong buyer feedback.",
       perks: [
-        "Gold Master Merchant badge on all listings",
+        "Top Rated Trader badge on all listings",
         "Top-priority search ranking & browse visibility",
-        "Fast-track 60-second M-Pesa withdrawal processing",
-        "Direct VIP channel to Platform Director Brian Okibo",
+        "Fast-track M-Pesa withdrawal processing",
+        "Direct trade support channel",
       ],
     };
   }
@@ -40,18 +40,18 @@ export function getSellerTier(salesCount: number = 0, rating: number = 5.0): Sel
     const remaining = Math.max(0, 10 - count);
     return {
       level: "verified",
-      label: "Verified Trader",
-      shortLabel: "Verified",
+      label: "Experienced Trader",
+      shortLabel: "Experienced",
       badgeClass:
         "bg-emerald-950/90 border-emerald-500/70 text-emerald-300 shadow-md shadow-emerald-500/15",
       iconType: "shield-check",
       salesRequiredForNext: remaining,
-      nextTierLabel: "Master Merchant",
-      description: "Established Kenyan seller with 3+ successful account transfers and 100% escrow completion.",
+      nextTierLabel: "Top Rated Trader",
+      description: "Active seller with 3+ completed account transfers under platform escrow.",
       perks: [
-        "Verified Trader emerald shield on all listings",
+        "Experienced Trader shield badge on all listings",
         "Elevated browse ranking above new sellers",
-        "Access to 1-Click WhatsApp promotional flyer tools",
+        "Access to WhatsApp promotional flyer tools",
       ],
     };
   }
@@ -59,18 +59,18 @@ export function getSellerTier(salesCount: number = 0, rating: number = 5.0): Sel
   const remaining = Math.max(0, 3 - count);
   return {
     level: "rookie",
-    label: "Rookie Trader",
-    shortLabel: "Rookie",
+    label: "New Trader",
+    shortLabel: "New",
     badgeClass:
       "bg-slate-900/90 border-slate-700 text-slate-300 shadow-sm",
     iconType: "shield",
     salesRequiredForNext: remaining,
-    nextTierLabel: "Verified Trader",
-    description: "New platform seller trading under mandatory 24-hour Safaricom Till 1572931 Escrow Protection.",
+    nextTierLabel: "Experienced Trader",
+    description: "Seller trading under standard 24-hour Safaricom Till 1572931 Escrow Protection.",
     perks: [
-      "100% Escrow Protection via Till 1572931",
-      "0% platform seller fee (100% net payout)",
-      "Automatic promotion to Verified after 3 successful sales",
+      "Escrow Protection via Till 1572931",
+      "0% platform seller fee (full net payout)",
+      "Automatic promotion after 3 completed sales",
     ],
   };
 }

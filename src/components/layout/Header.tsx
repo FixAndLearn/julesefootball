@@ -66,90 +66,27 @@ export function Header() {
   };
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-pitch-border/80 bg-pitch/90 backdrop-blur-xl transition-all">
-      {/* Contextual Guest Guidance Ribbon (hidden on mobile to maximize viewport height) */}
-      {!isAuthenticated && !loading && !dismissedBanner && (
-        <div className="hidden sm:block bg-gradient-to-r from-brand-950/90 via-slate-900 to-amber-950/80 border-b border-pitch-border/60 px-4 py-1.5 text-xs text-slate-300">
-          <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
-            <div className="flex items-center gap-2 overflow-hidden">
-              <span className="flex h-2 w-2 rounded-full bg-emerald-400 animate-pulse shrink-0" />
-              <p className="truncate">
-                <span className="font-semibold text-amber-300">New Trader?</span> Create a free account or log in to buy & sell eFootball accounts with M-Pesa escrow protection.
-              </p>
-            </div>
-            <div className="flex items-center gap-3 shrink-0">
-              <Link
-                href="/login"
-                className="text-xs font-semibold text-amber-400 hover:text-amber-300 transition-colors"
-              >
-                Log In
-              </Link>
-              <Link
-                href="/register"
-                className="text-xs font-bold text-brand-400 hover:text-brand-300 transition-colors underline underline-offset-2"
-              >
-                Create Account
-              </Link>
-              <button
-                type="button"
-                onClick={() => setDismissedBanner(true)}
-                className="text-slate-400 hover:text-slate-200 ml-1 p-0.5 rounded hover:bg-white/10 transition-colors"
-                aria-label="Dismiss banner"
-              >
-                <X className="w-3.5 h-3.5" />
-              </button>
-            </div>
-          </div>
-        </div>
-      )}
-
+    <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Brand */}
           <div className="flex items-center gap-6 lg:gap-8">
             <Logo clickable={true} size="md" />
 
-            <nav className="hidden md:flex items-center gap-1 lg:gap-1.5 text-xs lg:text-sm font-medium">
-              <Link
-                href="/browse"
-                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 transition-colors"
-              >
-                Browse Accounts
-              </Link>
-              <Link
-                href="/wanted"
-                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
-              >
-                <Target className="w-3.5 h-3.5 text-amber-400" />
-                <span>Wanted</span>
-              </Link>
-              <Link
-                href="/middleman"
-                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
-              >
-                <Handshake className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Middleman</span>
-              </Link>
+            <nav className="hidden md:flex items-center gap-1.5 text-xs lg:text-sm font-medium">
               <Link
                 href="/tournaments"
-                className="px-3 py-1.5 rounded-lg text-amber-300 hover:text-amber-200 hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors font-medium"
+                className="px-3.5 py-1.5 rounded-lg text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors font-medium"
               >
-                <Trophy className="w-3.5 h-3.5 text-amber-400" />
+                <Trophy className="w-4 h-4 text-[#FBBF24]" />
                 <span>Tournaments</span>
               </Link>
               <Link
                 href="/news"
-                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
+                className="px-3.5 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors"
               >
-                <Newspaper className="w-3.5 h-3.5 text-amber-400" />
+                <Newspaper className="w-4 h-4 text-[#94A3B8]" />
                 <span>News & Alerts</span>
-              </Link>
-              <Link
-                href="/escrow-guarantee"
-                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface/80 flex items-center gap-1.5 transition-colors"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                <span>Escrow Protection</span>
               </Link>
             </nav>
           </div>
@@ -160,29 +97,12 @@ export function Header() {
               href="https://wa.me/254794400365"
               target="_blank"
               rel="noopener noreferrer"
-              title="Official Escrow Support: 0794400365"
-              className="hidden xl:inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 hover:text-emerald-200 text-xs font-semibold transition-colors"
+              title="Official Community Support: 0794400365"
+              className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-[#94A3B8] hover:text-[#F8FAFC] text-xs font-semibold transition-colors"
             >
-              <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Support: 0794400365</span>
+              <MessageCircle className="w-3.5 h-3.5 text-[#22C55E]" />
+              <span>Community: 0794400365</span>
             </a>
-
-            <Link href="/seller/create-listing">
-              <Button variant="gold" size="sm" className="hidden sm:inline-flex items-center gap-1.5 font-semibold">
-                <PlusCircle className="w-4 h-4" />
-                Sell Account
-              </Button>
-            </Link>
-
-            <Link href="/dashboard/buyer">
-              <button
-                type="button"
-                className="p-2 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface transition-colors relative"
-                aria-label="Purchases & Orders"
-              >
-                <ShoppingCart className="w-5 h-5" />
-              </button>
-            </Link>
 
             {/* Interactive Notification Bell with Live Unread Popover */}
             <NotificationBell />
@@ -287,18 +207,12 @@ export function Header() {
                 )}
               </div>
             ) : (
-              /* Guest Actions (Log In + Create Account) */
-              <div className="hidden sm:flex items-center gap-2">
+              /* Single Guest Action (Log In) */
+              <div className="hidden sm:flex items-center">
                 <Link href="/login">
-                  <Button variant="secondary" size="sm">
-                    <UserIcon className="w-4 h-4 mr-1.5" />
+                  <Button variant="secondary" size="sm" className="bg-[#111827] border-[#1F2937] text-[#F8FAFC] hover:bg-[#1F2937] text-xs font-semibold px-3.5 py-1.5 rounded-lg">
+                    <UserIcon className="w-3.5 h-3.5 mr-1.5 text-[#94A3B8]" />
                     Log In
-                  </Button>
-                </Link>
-                <Link href="/register">
-                  <Button variant="gold" size="sm" className="font-semibold shadow-md">
-                    <Sparkles className="w-3.5 h-3.5 mr-1" />
-                    Create Account
                   </Button>
                 </Link>
               </div>
@@ -308,7 +222,7 @@ export function Header() {
             <button
               type="button"
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="md:hidden p-2 rounded-lg text-slate-300 hover:text-white hover:bg-pitch-surface transition-colors"
+              className="md:hidden p-2 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] transition-colors"
               aria-label="Toggle Navigation Menu"
             >
               {mobileMenuOpen ? <X className="w-6 h-6" /> : <Menu className="w-6 h-6" />}
@@ -319,137 +233,91 @@ export function Header() {
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="md:hidden border-t border-pitch-border bg-pitch-surface/95 backdrop-blur-xl px-4 py-5 space-y-4">
+        <div className="md:hidden border-t border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-xl px-4 py-5 space-y-4">
           {/* User profile card or guest action on mobile */}
           {isAuthenticated ? (
-            <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border space-y-2">
+            <div className="p-3 rounded-xl bg-[#111827] border border-[#1F2937] space-y-2">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-amber-500 to-brand-600 text-slate-950 font-bold text-sm flex items-center justify-center">
+                <div className="w-9 h-9 rounded-lg bg-[#1F2937] border border-[#374151] text-[#F8FAFC] font-bold text-sm flex items-center justify-center">
                   {getInitials(displayName)}
                 </div>
                 <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-white truncate">{displayName}</p>
-                  <p className="text-xs text-slate-400 truncate">{user?.email}</p>
+                  <p className="text-sm font-bold text-[#F8FAFC] truncate">{displayName}</p>
+                  <p className="text-xs text-[#94A3B8] truncate">{user?.email}</p>
                 </div>
               </div>
               <div className="grid grid-cols-2 gap-2 pt-1">
                 <Link
                   href="/dashboard/buyer"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs py-1.5 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200"
+                  className="text-center text-xs py-1.5 rounded-lg bg-[#1F2937] border border-[#374151] text-[#F8FAFC]"
                 >
                   Buyer Hub
                 </Link>
                 <Link
                   href="/dashboard/seller"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs py-1.5 rounded-lg bg-pitch-surface border border-pitch-border text-slate-200"
+                  className="text-center text-xs py-1.5 rounded-lg bg-[#1F2937] border border-[#374151] text-[#F8FAFC]"
                 >
                   Seller Hub
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="p-3.5 rounded-xl bg-pitch-card border border-pitch-border space-y-3">
+            <div className="p-3.5 rounded-xl bg-[#111827] border border-[#1F2937] space-y-3">
               <div>
-                <p className="text-xs font-bold text-white">Join eFootballMarket</p>
-                <p className="text-[11px] text-slate-400 mt-0.5">
-                  Sign in or create an account to trade verified squads with M-Pesa escrow protection.
+                <p className="text-xs font-bold text-[#F8FAFC]">eFootball Community Kenya</p>
+                <p className="text-[11px] text-[#94A3B8] mt-0.5">
+                  Sign in to participate in tournaments, post match results, and track community rankings.
                 </p>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div>
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="secondary" size="sm" className="w-full text-xs">
+                  <Button variant="primary" size="sm" className="w-full bg-[#22C55E] text-[#0B1220] font-bold hover:bg-[#16a34a] text-xs">
                     Log In
-                  </Button>
-                </Link>
-                <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="gold" size="sm" className="w-full text-xs font-semibold">
-                    Create Account
                   </Button>
                 </Link>
               </div>
             </div>
           )}
 
-          <nav className="space-y-1 text-sm font-medium text-slate-300">
+          <nav className="space-y-1 text-sm font-medium text-[#94A3B8]">
             {isAdminUser && (
               <Link
                 href="/admin"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 font-bold"
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[#FBBF24] font-bold"
               >
                 <span>Admin Control Center</span>
-                <Crown className="w-4 h-4 text-amber-400" />
+                <Crown className="w-4 h-4 text-[#FBBF24]" />
               </Link>
             )}
 
             <Link
-              href="/notifications"
+              href="/tournaments"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card hover:text-white"
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC] font-semibold"
             >
-              <span>Notifications</span>
-              <Bell className="w-4 h-4 text-amber-400" />
+              <span>Tournaments & Brackets</span>
+              <Trophy className="w-4 h-4 text-[#FBBF24]" />
             </Link>
 
             <Link
               href="/news"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-400 font-semibold"
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
             >
-              <span>News & Scammer Alerts</span>
-              <Newspaper className="w-4 h-4 text-amber-400" />
+              <span>News & Community Alerts</span>
+              <Newspaper className="w-4 h-4 text-[#94A3B8]" />
             </Link>
 
             <Link
-              href="/browse"
+              href="/notifications"
               onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg hover:bg-pitch-card hover:text-white"
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] hover:text-[#F8FAFC]"
             >
-              Browse Accounts
-            </Link>
-
-            <Link
-              href="/wanted"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-300 font-semibold"
-            >
-              <span>Wanted Squads (Buyer Requests)</span>
-              <Target className="w-4 h-4 text-amber-400" />
-            </Link>
-
-
-            <Link
-              href="/middleman"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-emerald-400 font-semibold"
-            >
-              <span>Bring-Your-Own-Deal Middleman</span>
-              <Handshake className="w-4 h-4 text-emerald-400" />
-            </Link>
-
-            <Link
-              href="/tournaments"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-300 font-semibold"
-            >
-              <span>Kenyan Tournaments & Cups</span>
-              <Trophy className="w-4 h-4 text-amber-400" />
-            </Link>
-            <Link
-              href="/escrow-guarantee"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg hover:bg-pitch-card hover:text-white"
-            >
-              Escrow Protection Guarantee
-            </Link>
-            <Link
-              href="/seller/create-listing"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg hover:bg-pitch-card text-amber-400 font-semibold"
-            >
-              + Sell an Account
+              <span>Notifications</span>
+              <Bell className="w-4 h-4 text-[#94A3B8]" />
             </Link>
 
             <a
@@ -457,15 +325,15 @@ export function Header() {
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg bg-emerald-950/60 border border-emerald-800/80 text-emerald-300 text-xs font-bold"
+              className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#111827] border border-[#1F2937] text-[#F8FAFC] text-xs font-semibold"
             >
-              <span>WhatsApp Support: 0794400365</span>
-              <MessageCircle className="w-4 h-4 text-emerald-400" />
+              <span>WhatsApp Community: 0794400365</span>
+              <MessageCircle className="w-4 h-4 text-[#22C55E]" />
             </a>
           </nav>
 
           {isAuthenticated && (
-            <div className="pt-2 border-t border-pitch-border">
+            <div className="pt-2 border-t border-[#1F2937]">
               <button
                 type="button"
                 onClick={handleSignOut}

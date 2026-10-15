@@ -114,7 +114,8 @@ export class EscrowService {
       );
 
     if (deliveryError) {
-      throw new Error(`Failed to save delivery credentials: ${deliveryError.message}`);
+      console.error("Failed to save delivery credentials:", deliveryError.message);
+      throw new Error("Failed to save delivery credentials securely. Please retry.");
     }
 
     // 24-hour inspection window deadline
@@ -187,12 +188,13 @@ export class EscrowService {
   }
 
   /**
-   * Strictly decrypts credentials for the buyer or seller of this order or admin.
+   * Strictly decrypts credentials for authorized order parties or admin.
+   * Enforces status checks, lockout rules, audit logging, and retention checks.
    */
   async revealCredentials(orderId: string, requesterId: string): Promise<DecryptedCredentials> {
     const { data: order } = await this.supabase
       .from("orders")
-      .select("id, buyer_id, seller_id, status")
+      .select("id, buyer_id, seller_id, order_number, status")
       .eq("id", orderId)
       .single();
 
@@ -200,10 +202,49 @@ export class EscrowService {
       throw new Error("Order not found.");
     }
 
-    if (order.buyer_id !== requesterId && order.seller_id !== requesterId) {
-      const isAdmin = await this.checkIsAdmin(requesterId);
+    const isBuyer = order.buyer_id === requesterId;
+    const isSeller = order.seller_id === requesterId;
+    let isAdmin = false;
+
+    if (!isBuyer && !isSeller) {
+      isAdmin = await this.checkIsAdmin(requesterId);
       if (!isAdmin) {
         throw new Error("Unauthorized access to account credentials.");
+      }
+    }
+
+    // Access Control Defect Fix 1: Disallow revealing credentials for cancelled or refunded orders
+    if (order.status === "cancelled" || order.status === "refunded") {
+      throw new Error("Credentials cannot be accessed for cancelled or refunded orders.");
+    }
+
+    // Access Control Defect Fix 2: Disallow revealing credentials prior to seller delivery
+    if (order.status === "pending_payment" || order.status === "escrow_locked") {
+      throw new Error("Credentials have not been delivered for inspection yet.");
+    }
+
+    // Access Control Defect Fix 3: Lock out seller once order is completed
+    if (isSeller && order.status === "completed") {
+      throw new Error("Access expired. Order is completed and account ownership has transferred.");
+    }
+
+    // Access Control Defect Fix 4: Audit log for administrative decryption access (never logging credentials)
+    if (isAdmin && !isBuyer && !isSeller) {
+      try {
+        await this.supabase.from("audit_logs").insert({
+          actor_id: requesterId,
+          action: "ADMIN_CREDENTIAL_REVEAL",
+          resource_type: "account_deliveries",
+          resource_id: orderId,
+          changes: {
+            order_id: orderId,
+            order_number: order.order_number,
+            order_status: order.status,
+            accessed_at: new Date().toISOString(),
+          },
+        });
+      } catch (auditErr) {
+        console.error("Failed to write credential reveal audit log:", (auditErr as Error)?.message || "Unknown error");
       }
     }
 
@@ -215,6 +256,11 @@ export class EscrowService {
 
     if (error || !delivery) {
       throw new Error("Credentials have not been delivered by the seller yet.");
+    }
+
+    // Purged / Null Check: Handle cases where credentials have been purged under retention policy
+    if (!delivery.encrypted_konami_email || !delivery.encrypted_konami_password) {
+      throw new Error("Account credentials have expired and were purged from the vault.");
     }
 
     return {

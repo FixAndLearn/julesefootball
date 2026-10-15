@@ -136,7 +136,7 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
                   const text = `⚽ *[OVR ${listing.overall_team_strength}]* ${listing.title} for ${formatCurrency(
                     listing.price,
                     listing.currency
-                  )} on eFootballMarket.\n🛡️ Escrow Protected via M-Pesa: ${origin}/listings/${listing.id}`;
+                  )} on eFootballMarket.\n🛡️ Escrow-Protected Checkout via M-Pesa: ${origin}/listings/${listing.id}`;
                   window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, "_blank");
                 }}
                 className="p-1 rounded-md bg-emerald-950/90 hover:bg-emerald-700 text-emerald-300 hover:text-white border border-emerald-500/60 shadow-md transition-all active:scale-95"
@@ -238,7 +238,7 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
               <div>
                 <div className="flex items-center gap-1.5 flex-wrap">
                   <span className="text-xs font-medium text-slate-300">
-                    {listing.seller?.username || "Verified Seller"}
+                    {listing.seller?.username || "Platform Seller"}
                   </span>
                   <VerifiedSellerBadge seller={listing.seller} size="sm" showPopover={true} />
                 </div>
@@ -257,7 +257,7 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
             </div>
 
             <div className="text-right">
-              <span className="block text-[10px] text-slate-400 uppercase font-semibold">M-Pesa Escrow</span>
+              <span className="block text-[10px] text-slate-400 uppercase font-semibold">Price (Escrow Eligible)</span>
               <span className="text-base font-extrabold text-emerald-400 font-mono tracking-tight">
                 {formatCurrency(listing.price, listing.currency)}
               </span>

@@ -13,13 +13,13 @@ export default function PrivacyPolicyPage() {
       <div className="text-center space-y-3">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-semibold">
           <Lock className="w-4 h-4" />
-          <span>Institutional Privacy & Cryptographic Security</span>
+          <span>Privacy & Data Protection Policy</span>
         </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
           Privacy & Data Protection Policy
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-          Effective Date: October 2026. How eFootballMarket Inc. processes, protects, and encrypts enterprise user data.
+          Effective Date: October 2026. How eFootballMarket processes, protects, and stores user and transaction data.
         </p>
       </div>
 
@@ -31,15 +31,15 @@ export default function PrivacyPolicyPage() {
           </div>
           <div>
             <h2 className="text-base font-bold text-slate-100 font-display">
-              Data Controller Governance & Leadership
+              Data Controller Information
             </h2>
             <p className="text-xs text-emerald-400 font-medium">
-              Executive Administration under Brian Okibo, Chief Executive Officer (CEO)
+              Administration under Brian Okibo, Platform Operator
             </p>
           </div>
         </div>
         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          <strong>eFootballMarket Inc.</strong>, under the executive oversight of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>, maintains a zero-trust cryptographic data protection posture. All sensitive gaming credentials (Konami ID emails, passwords, and 2FA backup codes) are encrypted on the server before storage, ensuring zero plaintext exposure across our entire infrastructure.
+          <strong>eFootballMarket</strong> operates this platform under the administration of <strong>Brian Okibo</strong>. Sensitive game credentials (Konami ID emails, passwords, and 2FA backup codes) are encrypted on the server prior to database storage to protect access details during escrow delivery.
         </p>
       </div>
 
@@ -47,36 +47,36 @@ export default function PrivacyPolicyPage() {
         {/* Section 1 */}
         <section className="space-y-3">
           <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">1.</span> Lawful Scope of Data Collection
+            <span className="text-emerald-400">1.</span> Scope of Data Collection
           </h2>
           <p>
-            In compliance with statutory anti-money laundering and data protection mandates, we collect only data essential to fulfill escrow contracts:
+            To facilitate escrow transactions and dispute resolution in line with data minimization principles under the Kenya Data Protection Act, 2019, we collect only data necessary to fulfill escrow contracts:
           </p>
           <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
-            <li><strong>Account Identity:</strong> Legal names, usernames, and verified email addresses.</li>
-            <li><strong>Financial Mobile Records:</strong> Safaricom M-Pesa phone numbers required to initiate automated STK push billing and execute seller B2C withdrawals via Daraja API v2.</li>
-            <li><strong>Identity Verification Documents (KYC):</strong> Government-issued identity credentials submitted voluntarily by sellers to obtain commercial merchant badges.</li>
-            <li><strong>Audit & Security Telemetry:</strong> Immutable audit logs including IP addresses, browser headers, order milestones, and financial transaction references.</li>
+            <li><strong>Account Identity:</strong> Usernames, display names, and registered email addresses.</li>
+            <li><strong>Financial Mobile Records:</strong> Safaricom M-Pesa phone numbers required to initiate automated STK push billing and execute seller withdrawals via Daraja API v2.</li>
+            <li><strong>Seller Information:</strong> Listing details, squad overall strength (OVR), and platform information provided by sellers. Government identity card collection is currently inactive.</li>
+            <li><strong>Audit & Security Logs:</strong> System logs including IP addresses, timestamps, order milestones, and M-Pesa transaction reference codes.</li>
           </ul>
         </section>
 
         {/* Section 2 */}
         <section className="space-y-3">
           <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">2.</span> Authenticated Cryptographic Vault Protocol
+            <span className="text-emerald-400">2.</span> Credential Handling & Storage Security
           </h2>
           <p>
-            The Platform implements end-to-end authenticated credential protection:
+            The platform applies technical safeguards to game credentials provided during handover:
           </p>
           <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2">
             <p>
-              <strong>1. AES-256-GCM Encryption:</strong> Sensitive credentials provided during account delivery undergo symmetric Galois/Counter Mode authenticated encryption utilizing dynamic 16-byte initialization vectors (IVs) and cryptographic authentication tags.
+              <strong>1. AES-256-GCM Encryption:</strong> Sensitive credentials provided during account delivery undergo symmetric Galois/Counter Mode authenticated encryption utilizing dynamic 16-byte initialization vectors (IVs) and cryptographic authentication tags before being written to the database.
             </p>
             <p>
-              <strong>2. Strict Authorization Gating:</strong> Only the authenticated buyer of a paid order possesses cryptographic authorization to trigger server-side credential decipherment.
+              <strong>2. Access Gating:</strong> Server-side credential decryption is restricted to authorized transaction parties during the active handover window, or to platform administrators during formal dispute investigations (with administrative access logged to audit tables).
             </p>
             <p>
-              <strong>3. Archival and Scrubbing:</strong> Once the 24-hour inspection period concludes, sensitive credentials are removed from client-accessible query buffers.
+              <strong>3. Access Lockout & Storage Limits:</strong> Client access to reveal credentials is automatically locked out upon order cancellation or refund, and seller access is terminated upon order completion. When credentials are scheduled for retention purging, database columns are nullified. Please note that database-level nullification removes application access, while residual data in database transaction logs (WAL) and cloud provider backups persists until provider backup retention windows expire.
             </p>
           </div>
         </section>
@@ -84,34 +84,34 @@ export default function PrivacyPolicyPage() {
         {/* Section 3 */}
         <section className="space-y-3">
           <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">3.</span> Sub-Processors & Infrastructure Governance
+            <span className="text-emerald-400">3.</span> Sub-Processors & Infrastructure
           </h2>
           <p>
-            Data is stored and transmitted exclusively through certified institutional cloud vendors:
+            Platform data is processed through the following external service providers:
           </p>
           <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
-            <li><strong>Safaricom PLC:</strong> Telecommunications gateway for Daraja API v2 financial settlement.</li>
-            <li><strong>Supabase / PostgreSQL:</strong> SOC 2 Type II compliant cloud database provider enforcing Row Level Security (RLS) on all database tables.</li>
+            <li><strong>Safaricom PLC:</strong> Telecommunications gateway for Daraja API v2 M-Pesa payment processing.</li>
+            <li><strong>Supabase / PostgreSQL:</strong> Cloud database infrastructure enforcing Row Level Security (RLS) on database tables.</li>
           </ul>
         </section>
 
         {/* Section 4 */}
         <section className="space-y-3">
           <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">4.</span> Permanent Financial Ledger Retention
+            <span className="text-emerald-400">4.</span> Financial Records & Credential Retention
           </h2>
           <p>
-            In accordance with legal and financial regulatory standards, immutable transaction records, checkout request IDs, and M-Pesa receipt numbers are permanently retained to defend the Company and legitimate users against chargeback attempts, fraud, and legal claims.
+            In accordance with statutory accounting standards and Section 39 of the Kenya Data Protection Act, 2019, transaction ledgers, checkout request IDs, and M-Pesa receipt numbers are retained to reconcile payments and resolve financial inquiries. Ephemeral game account credentials are kept separately from financial ledgers in accordance with the principle of storage limitation under Section 30(1)(e) and the Data Protection (General) Regulations, 2021 (Regulations 19 &amp; 20).
           </p>
         </section>
 
         {/* Section 5 */}
         <section className="space-y-3">
           <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">5.</span> Data Subject Rights & Privacy Inquiries
+            <span className="text-emerald-400">5.</span> Data Subject Rights & Inquiries
           </h2>
           <p>
-            Users maintain the right to inspect personal profile data and request account deactivation. To submit formal data protection inquiries, contact the Data Governance Office overseen by <strong>Brian Okibo, Chief Executive Officer</strong> at privacy@efootballmarket.com.
+            Under the Kenya Data Protection Act, 2019, users have rights including the right to be informed, access personal data, request rectification of false or misleading data, and request erasure of personal data that is no longer necessary, subject to statutory record-retention requirements. To submit data inquiries, contact privacy@efootballmarket.com.
           </p>
         </section>
       </div>

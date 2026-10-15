@@ -51,14 +51,14 @@ function SellerVerificationContent() {
           <div>
             <h2 className="text-lg font-bold text-white">Why is KYC Scheduled for Coming Soon?</h2>
             <p className="text-xs text-slate-400 mt-0.5">
-              Strict adherence to Kenyan data protection laws and gaming regulations.
+              Information on identity verification policies and data minimization.
             </p>
           </div>
         </div>
 
         <div className="space-y-4 text-xs text-slate-300 leading-relaxed">
           <p>
-            To protect user privacy and uphold institutional compliance, government identity card uploads are queued until our formal regulatory framework certification is fully authorized. We prioritize safeguarding our community’s personal identifiable information (PII).
+            To protect user privacy and minimize collection of sensitive personal data in line with the Kenya Data Protection Act, 2019, government identity card uploads are not active. Sellers can create listings and conduct trades without submitting identity documents.
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5 pt-2">
@@ -75,7 +75,7 @@ function SellerVerificationContent() {
             <div className="p-4 rounded-2xl bg-pitch-surface/90 border border-pitch-border space-y-2">
               <div className="flex items-center gap-2 text-indigo-400 font-bold text-xs">
                 <Lock className="w-4 h-4 shrink-0" />
-                <span>100% Escrow Protected</span>
+                <span>M-Pesa Escrow Protected</span>
               </div>
               <p className="text-[11px] text-slate-400 leading-relaxed">
                 All transactions are enforced by automated Safaricom M-Pesa escrow. Payouts are locked until the buyer inspects credentials.

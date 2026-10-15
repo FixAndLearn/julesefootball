@@ -2,7 +2,7 @@
 
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
-import { AlertTriangle, CheckCircle2, Lock, ShieldAlert } from "lucide-react";
+import { AlertTriangle, AlertCircle, CheckCircle2, Lock, ShieldAlert } from "lucide-react";
 import { useState } from "react";
 
 export interface CredentialsDeliveryFormProps {
@@ -148,9 +148,27 @@ export function CredentialsDeliveryForm({ orderId, onDelivered }: CredentialsDel
             required
           />
           <span className="text-xs text-slate-200 font-medium leading-relaxed">
-            I certify under penalty of permanent ban and escrow fund forfeiture that this account is <strong>NOT linked to Google Play Games (&quot;Googling&quot;)</strong>. Handover is 100% pure Konami ID with zero Google backdoors.
+            I certify under penalty of permanent ban and escrow fund forfeiture that this account is <strong>NOT linked to Google Play Games (&quot;Googling&quot;)</strong>. Handover is purely Konami ID linked without active Google links.
           </span>
         </label>
+      </div>
+
+      {/* Konami Publisher Notice */}
+      <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/80 text-xs text-slate-300">
+        <div className="flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-[11px] leading-relaxed">
+            Konami’s current rules prohibit selling or transferring eFootball accounts and sharing account IDs or passwords. Trading may result in loss of account access or support.{" "}
+            <a
+              href="https://www.konami.com/efootball/en-us/topic/news/5174"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:text-amber-300 underline font-medium"
+            >
+              Read Konami’s official notice
+            </a>.
+          </p>
+        </div>
       </div>
 
       <Button

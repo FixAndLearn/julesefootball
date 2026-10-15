@@ -35,8 +35,8 @@ export function EscrowSteps3D() {
       num: "04",
       icon: CheckCircle2,
       title: "Inspect & Confirm",
-      description: "Take up to 24 hours to verify squad players, link your own email, and release payment when 100% satisfied.",
-      tag: "Buyer Guarantee",
+      description: "Take up to 24 hours to verify squad players, link your own email, and release payment when verified.",
+      tag: "Buyer Protection",
       glowColor: "from-sky-500 to-blue-400",
     },
   ];

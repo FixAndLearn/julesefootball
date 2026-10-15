@@ -191,7 +191,7 @@ export function ListingGallery({
               <div className="absolute bottom-3 left-4 z-20 pointer-events-none flex items-center gap-2">
                 <span className="px-2.5 py-1 rounded-md bg-black/80 backdrop-blur-md text-[10px] sm:text-[11px] text-emerald-300 border border-emerald-500/30 font-medium flex items-center gap-1 shadow-lg">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>efootballmarket.co.ke — Escrow Protected Asset</span>
+                  <span>efootballmarket.co.ke — Escrow-Eligible Listing</span>
                 </span>
               </div>
 

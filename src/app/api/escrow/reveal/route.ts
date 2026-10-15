@@ -36,6 +36,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, credentials });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 403 });
+    const safeMessage = typeof error?.message === "string" && !error.message.includes("SELECT") && !error.message.includes("INSERT")
+      ? error.message
+      : "Failed to reveal credentials.";
+    return NextResponse.json({ error: safeMessage }, { status: 403 });
   }
 }

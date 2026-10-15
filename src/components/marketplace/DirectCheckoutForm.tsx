@@ -482,13 +482,32 @@ export function DirectCheckoutForm({
       <div className="p-4 rounded-xl bg-pitch-card/60 border border-pitch-border/60 text-xs text-slate-400 space-y-2">
         <div className="flex items-center gap-2 text-slate-200 font-semibold">
           <ShieldCheck className="w-4 h-4 text-emerald-400" />
-          <span>Why this checkout is 100% scam-proof:</span>
+          <span>How our escrow checkout protects your payment:</span>
         </div>
         <ul className="space-y-1 text-[11px] text-slate-400 pl-6 list-disc">
           <li>The seller DOES NOT receive your money until you confirm Konami ID access.</li>
           <li>If credentials do not work, you can open an instant dispute for a full refund.</li>
           <li>Executive oversight by Brian Okibo, CEO (Helpline: 0794400365).</li>
         </ul>
+      </div>
+
+      {/* Konami Publisher Notice */}
+      <div className="p-3.5 rounded-xl bg-slate-900/80 border border-slate-700/80 text-xs text-slate-300">
+        <div className="flex items-start gap-2">
+          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-[11px] leading-relaxed">
+            Konami’s current rules prohibit selling or transferring eFootball accounts and sharing account IDs or passwords. Trading may result in loss of account access or support.{" "}
+            <a
+              href="https://www.konami.com/efootball/en-us/topic/news/5174"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:text-amber-300 underline font-medium inline-flex items-center gap-1"
+            >
+              Read Konami’s official notice
+              <ExternalLink className="w-3 h-3 inline" />
+            </a>.
+          </p>
+        </div>
       </div>
     </div>
   );

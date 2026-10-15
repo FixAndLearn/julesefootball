@@ -106,7 +106,7 @@ export function VerifiedSellerBadge({
 
             <div className="flex items-center gap-1.5 text-slate-200">
               <Phone className="w-3.5 h-3.5 text-indigo-400 shrink-0" />
-              <span><strong>M-Pesa Verified:</strong> Safaricom KYC validated</span>
+              <span><strong>M-Pesa Registered:</strong> Safaricom mobile phone registered</span>
             </div>
           </div>
 

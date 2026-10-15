@@ -29,7 +29,11 @@ export async function POST(req: NextRequest) {
     const parsed = deliverSchema.safeParse(json);
 
     if (!parsed.success) {
-      return NextResponse.json({ error: "Invalid delivery data", details: parsed.error.format() }, { status: 400 });
+      const sanitizedIssues = parsed.error.issues.map((issue) => ({
+        field: issue.path.join("."),
+        message: issue.message,
+      }));
+      return NextResponse.json({ error: "Invalid delivery data", details: sanitizedIssues }, { status: 400 });
     }
 
     const ip = req.headers.get("x-forwarded-for") || req.ip || undefined;
@@ -46,6 +50,9 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({ success: true, message: "Credentials encrypted and delivered successfully." });
   } catch (error: any) {
-    return NextResponse.json({ error: error.message }, { status: 400 });
+    const safeMessage = typeof error?.message === "string" && !error.message.includes("SELECT") && !error.message.includes("INSERT")
+      ? error.message
+      : "Failed to process delivery credentials.";
+    return NextResponse.json({ error: safeMessage }, { status: 400 });
   }
 }

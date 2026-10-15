@@ -84,7 +84,7 @@ export function KonamiTransferChecklistModal({ isOpen, onClose }: Props) {
                 Konami ID Account Transfer Checklist
               </h3>
               <p className="text-xs text-slate-400">
-                Follow these 6 steps in order to lock 100% permanent ownership before releasing escrow.
+                Follow these 6 steps in order to verify and secure account access before releasing escrow.
               </p>
             </div>
           </div>
@@ -105,7 +105,7 @@ export function KonamiTransferChecklistModal({ isOpen, onClose }: Props) {
             </span>
             {progressPercent === 100 && (
               <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 text-[10px] font-bold border border-emerald-500/40">
-                100% Fully Secured!
+                Checklist Complete!
               </span>
             )}
           </div>
@@ -129,7 +129,26 @@ export function KonamiTransferChecklistModal({ isOpen, onClose }: Props) {
               In eFootball Mobile, Google Play accounts cannot be transferred cleanly. If an account has ever been linked to Google Play, the previous owner can <strong>log back in and pull back the account at any time</strong> using Google sign-in, even after you change the Konami ID email and password!
             </p>
             <div className="p-2.5 rounded-xl bg-black/40 border border-rose-500/30 text-[11px] font-mono text-rose-300">
-              <strong>How to check in eFootball Mobile:</strong> Go to Extras &rarr; Support &rarr; Link Data &rarr; Look at &quot;Google Play Games&quot;. It MUST say <strong>&quot;Not Linked&quot;</strong>. If it says &quot;Linked&quot;, <strong>DO NOT ACCEPT IT</strong> and open a dispute immediately for a 100% refund.
+              <strong>How to check in eFootball Mobile:</strong> Go to Extras &rarr; Support &rarr; Link Data &rarr; Look at &quot;Google Play Games&quot;. It MUST say <strong>&quot;Not Linked&quot;</strong>. If it says &quot;Linked&quot;, <strong>DO NOT ACCEPT IT</strong> and open a dispute immediately for escrow refund investigation.
+            </div>
+          </div>
+
+          {/* Konami Publisher Notice */}
+          <div className="p-3.5 rounded-2xl bg-slate-900/90 border border-slate-700/80 text-xs text-slate-300">
+            <div className="flex items-start gap-2.5">
+              <AlertTriangle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+              <p className="text-[11px] leading-relaxed">
+                Konami’s current rules prohibit selling or transferring eFootball accounts and sharing account IDs or passwords. Trading may result in loss of account access or support.{" "}
+                <a
+                  href="https://www.konami.com/efootball/en-us/topic/news/5174"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-amber-400 hover:text-amber-300 underline font-medium inline-flex items-center gap-1"
+                >
+                  Read Konami’s official notice
+                  <ExternalLink className="w-3 h-3 inline" />
+                </a>.
+              </p>
             </div>
           </div>
 
@@ -246,7 +265,7 @@ export function EscrowHandoverGuideCard({ onOpenGuide }: { onOpenGuide: () => vo
               </span>
             </div>
             <p className="text-xs text-slate-300 mt-1 leading-relaxed">
-              New to eFootball account exchanges? Follow our verified 6-step protocol to transfer Konami ID email, password, and 2FA with zero risk.
+              New to eFootball account exchanges? Follow our verified 6-step protocol to inspect and secure Konami ID email, password, and 2FA before completing your trade.
             </p>
           </div>
         </div>

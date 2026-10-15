@@ -311,6 +311,24 @@ export default function CreateListingPage() {
         </p>
       </div>
 
+      {/* Konami Publisher Rules Notice */}
+      <div className="mb-6 p-4 rounded-2xl bg-slate-900/80 border border-slate-700/80 text-xs text-slate-300">
+        <div className="flex items-start gap-2.5">
+          <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+          <p className="text-xs leading-relaxed">
+            Konami’s current rules prohibit selling or transferring eFootball accounts and sharing account IDs or passwords. Trading may result in loss of account access or support.{" "}
+            <a
+              href="https://www.konami.com/efootball/en-us/topic/news/5174"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-amber-400 hover:text-amber-300 underline font-medium"
+            >
+              Read Konami’s official notice
+            </a>.
+          </p>
+        </div>
+      </div>
+
       {/* Contextual Auth Guidance for Guests */}
       {!isAuthenticated && !authLoading && (
         <div className="mb-6 p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
@@ -828,7 +846,7 @@ export default function CreateListingPage() {
               <span>STRICT PLATFORM RULE: Accounts Linked to Google Play (&quot;Googling&quot;) Are Prohibited</span>
             </div>
             <p className="text-[11px] text-slate-300 leading-relaxed">
-              Every account listed for sale on this marketplace must be 100% pure Konami ID. Google Play links allow sellers to bypass passwords and recover the account, which destroys buyer protection. If your account is linked to Google Play, do not list it.
+              Every account listed for sale on this marketplace must be purely Konami ID linked. Google Play links allow sellers to bypass passwords and recover the account, which destroys buyer protection. If your account is linked to Google Play, do not list it.
             </p>
           </div>
 
@@ -886,7 +904,7 @@ export default function CreateListingPage() {
                       onChange={(e) => setAutoWatermark(e.target.checked)}
                       className="w-3.5 h-3.5 rounded border-emerald-500 text-emerald-500 focus:ring-emerald-500/30"
                     />
-                    <span>🛡️ Auto-Stamp Escrow Watermark (Stops Scammers & Image Theft)</span>
+                    <span>🛡️ Auto-Stamp Escrow Watermark (Protects Screenshots & Prevents Image Theft)</span>
                   </label>
                 </div>
               </div>

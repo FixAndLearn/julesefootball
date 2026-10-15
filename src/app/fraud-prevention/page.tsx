@@ -19,7 +19,7 @@ export default function FraudPreventionPage() {
           Anti-Fraud & Cyber Security Policy
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-          How eFootballMarket Inc. eradicates fraudulent payments, phishing, and post-settlement account recoveries.
+          How eFootballMarket combats fraudulent payments, phishing, and post-settlement account recoveries.
         </p>
       </div>
 
@@ -39,7 +39,7 @@ export default function FraudPreventionPage() {
           </div>
         </div>
         <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          The fraud prevention framework of <strong>eFootballMarket Inc.</strong> was architected under the direction of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>. The system eliminates common gaming marketplace fraud by cryptographically verifying Safaricom Daraja M-Pesa callbacks and enforcing strict legal consequences for post-sale account retrieval.
+          The fraud prevention framework of <strong>eFootballMarket</strong> was architected under the direction of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>. The system mitigates common gaming marketplace fraud by cryptographically verifying Safaricom Daraja M-Pesa callbacks and enforcing strict legal consequences for post-sale account retrieval.
         </p>
       </div>
 
@@ -47,7 +47,7 @@ export default function FraudPreventionPage() {
         {/* Section 1 */}
         <section className="space-y-3">
           <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-rose-400">1.</span> Eradication of Spoofed Payment Scams
+            <span className="text-rose-400">1.</span> Prevention of Spoofed Payment Scams
           </h2>
           <p>
             In unmonitored gaming communities, fraudsters frequently fabricate fake M-Pesa SMS texts or alter screenshot receipts.

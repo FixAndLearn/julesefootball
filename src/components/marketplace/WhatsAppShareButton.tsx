@@ -42,7 +42,7 @@ export function WhatsAppShareButton({ listing, className = "" }: WhatsAppShareBu
       `📱 *Platform:* ${platformLabel}\n` +
       `${epicsText ? `${epicsText}\n` : ""}` +
       `${playstyleText ? `${playstyleText}\n` : ""}` +
-      `🛡️ *100% Non-Custodial Escrow Protection via M-Pesa (No Scams)*\n\n` +
+      `🛡️ *Escrow-Protected Checkout via Safaricom M-Pesa Till 1572931 (24-Hour Inspection Window)*\n\n` +
       `👉 Inspect Squad or Buy Now:\n` +
       `${url}`
     );

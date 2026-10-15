@@ -5,6 +5,26 @@ const IV_LENGTH = 16;
 const TAG_LENGTH = 16;
 
 /**
+ * Cryptographic Utilities for Game Account Credentials Vault
+ *
+ * ARCHITECTURAL CONTEXT:
+ * 1. AES-256-GCM Authenticated Encryption:
+ *    Encrypts sensitive game credentials before storage in `account_deliveries`.
+ *    A fresh random 16-byte IV is generated for every encryption operation.
+ *
+ * 2. Shared Key Model & Cryptographic Erasure Limits:
+ *    The 32-byte key is derived from the shared environment variable `CREDENTIAL_ENCRYPTION_KEY`.
+ *    Because this key is shared across all delivery records, per-record cryptographic erasure
+ *    (crypto-shredding) is NOT possible simply by destroying the key, as doing so would invalidate
+ *    decryption for all other active orders.
+ *
+ * 3. Database Deletion Limits:
+ *    Nullifying database columns or deleting rows removes active references, but under PostgreSQL MVCC,
+ *    Write-Ahead Logging (WAL), and provider backup snapshots, residual data may persist until vacuumed,
+ *    reused, and until historical backup retention windows naturally expire.
+ */
+
+/**
  * Derives a 32-byte key from CREDENTIAL_ENCRYPTION_KEY or a fallback for testing.
  */
 function getEncryptionKey(): Buffer {
@@ -59,8 +79,9 @@ export function decryptCredential(encryptedBase64: string): string {
     decrypted += decipher.final("utf8");
 
     return decrypted;
-  } catch (error) {
-    console.error("Failed to decrypt credential payload:", error);
+  } catch {
+    // Avoid logging raw errors or input payloads to prevent secret leakage
+    console.error("Failed to decrypt credential payload: authentication tag mismatch or malformed payload.");
     throw new Error("Decryption failed. Credential payload was tampered with or key is invalid.");
   }
 }

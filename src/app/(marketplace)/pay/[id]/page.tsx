@@ -23,7 +23,7 @@ export async function generateMetadata({ params }: DirectPayPageProps): Promise<
 
   return {
     title: `Instant M-Pesa Checkout: ${listing.title} | eFootballMarket`,
-    description: `Pay KES ${listing.price.toLocaleString()} securely via Till 1572931 escrow for ${listing.title}. 100% scam-proof Konami ID transfer.`,
+    description: `Pay KES ${listing.price.toLocaleString()} securely via Till 1572931 escrow for ${listing.title}. Escrow-protected Konami ID transfer with 24-hour inspection.`,
   };
 }
 
