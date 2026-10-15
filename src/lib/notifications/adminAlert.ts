@@ -26,7 +26,8 @@ export type AdminEventType =
   | "MIDDLEMAN_DEAL_CREATED"
   | "WANTED_REQUEST_POSTED"
   | "WITHDRAWAL_REQUESTED"
-  | "TOURNAMENT_REGISTRATION";
+  | "TOURNAMENT_REGISTRATION"
+  | "TOURNAMENT_WINNER_CROWNED";
 
 export interface AdminAlertPayload {
   eventType: AdminEventType;
@@ -178,6 +179,17 @@ export function formatAdminWhatsAppMessage(payload: AdminAlertPayload): string {
         payload.buyerPhone ? `📱 *Player Phone:* ${formatDisplayPhone(payload.buyerPhone)}` : "",
         payload.details ? `👤 *Player Info:* ${payload.details}` : "",
         `⚡ *Action:* Add to Match Room brackets & confirm M-Pesa entry fee.`,
+      ];
+      break;
+
+    case "TOURNAMENT_WINNER_CROWNED":
+      header = "🏆 *TOURNAMENT CHAMPION CROWNED!*";
+      lines = [
+        `🎮 *Tournament:* ${payload.listingTitle || "eFootball Tournament"}`,
+        payload.username ? `🥇 *Champion:* ${payload.username}` : "",
+        payload.amount !== undefined ? `💰 *1st Place Prize:* ${formattedAmount}` : "",
+        payload.details ? `📝 *Details:* ${payload.details}` : "",
+        `📲 *Action:* Disburse prize money via Safaricom Till 1572931 / M-Pesa.`,
       ];
       break;
 

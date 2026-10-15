@@ -376,3 +376,66 @@ export interface ListingOffer {
   };
 }
 
+export type TournamentStatus = 'registration_open' | 'in_progress' | 'completed' | 'cancelled';
+export type TournamentPlatform = 'all' | 'android' | 'ios' | 'crossplay' | 'console_pc';
+
+export interface TournamentMatch {
+  id: string;
+  tournament_id: string;
+  round: string; // 'Round of 16' | 'Quarter-Finals' | 'Semi-Finals' | 'Grand Final'
+  match_number: number;
+  player1_name: string;
+  player2_name: string;
+  player1_friend_id?: string | null;
+  player2_friend_id?: string | null;
+  player1_user_id?: string | null;
+  player2_user_id?: string | null;
+  score1?: number | null;
+  score2?: number | null;
+  winner_name?: string | null;
+  winner_user_id?: string | null;
+  is_completed: boolean;
+  match_code?: string | null;
+  next_match_id?: string | null;
+  next_match_slot?: number | null;
+  created_at: string;
+  updated_at?: string;
+}
+
+export interface TournamentParticipant {
+  id: string;
+  tournament_id: string;
+  user_id?: string | null;
+  gamer_tag: string;
+  friend_id: string;
+  phone_number: string;
+  payment_status: 'pending' | 'paid' | 'exempt';
+  seed?: number | null;
+  created_at: string;
+}
+
+export interface Tournament {
+  id: string;
+  title: string;
+  subtitle?: string | null;
+  description?: string | null;
+  platform: TournamentPlatform;
+  prize_pool_kes: number;
+  first_place_kes: number;
+  second_place_kes: number;
+  entry_fee_kes: number;
+  format: string;
+  max_players: number;
+  registered_count: number;
+  start_date: string;
+  status: TournamentStatus;
+  winner_name?: string | null;
+  winner_user_id?: string | null;
+  winner_gamer_tag?: string | null;
+  created_by?: string | null;
+  created_at: string;
+  updated_at?: string;
+  matches?: TournamentMatch[];
+  participants?: TournamentParticipant[];
+}
+

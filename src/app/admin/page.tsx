@@ -36,6 +36,7 @@ import {
   ShieldAlert,
   ShieldCheck,
   Trash2,
+  Trophy,
   UserCheck,
   UserMinus,
   UserPlus,
@@ -898,6 +899,17 @@ function AdminControlCenterContent() {
               : "Setup Bot"}
           </span>
         </button>
+
+        <Link
+          href="/tournaments"
+          className="px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 border-transparent text-amber-400 hover:text-amber-300 hover:bg-pitch-surface flex items-center gap-2 shrink-0"
+        >
+          <Trophy className="w-4 h-4 text-amber-400" />
+          <span>Tournaments & Brackets</span>
+          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">
+            Host Cups
+          </span>
+        </Link>
       </div>
 
       {/* TAB 1: LISTING MODERATION (BRING DOWN / BAN POSTS) */}
