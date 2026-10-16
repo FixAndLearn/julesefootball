@@ -142,15 +142,24 @@ export default function NewsFeedPage() {
           </div>
         </div>
 
-        <a
-          href="https://wa.me/254794400365?text=Hello%20Brian%20Okibo%2C%20I%20want%20to%20report%20a%20scammer%20or%20suspicious%20trader."
-          target="_blank"
-          rel="noopener noreferrer"
-          className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-xs transition-all shadow-md"
-        >
-          <MessageCircle className="w-4 h-4 fill-[#0B1220]" />
-          <span>Report via WhatsApp</span>
-        </a>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link
+            href="/scammer-check"
+            className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-rose-600/90 hover:bg-rose-500 text-white font-bold text-xs transition-all shadow-md"
+          >
+            <ShieldAlert className="w-4 h-4" />
+            <span>Check Scammer DB</span>
+          </Link>
+          <a
+            href="https://wa.me/254794400365?text=Hello%20Brian%20Okibo%2C%20I%20want%20to%20report%20a%20scammer%20or%20suspicious%20trader."
+            target="_blank"
+            rel="noopener noreferrer"
+            className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-xs transition-all shadow-md"
+          >
+            <MessageCircle className="w-4 h-4 fill-[#0B1220]" />
+            <span>Report via WhatsApp</span>
+          </a>
+        </div>
       </div>
 
       {/* Search & Categories Bar */}

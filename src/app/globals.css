@@ -132,6 +132,21 @@ body {
   animation: spin3dSlow 20s linear infinite;
 }
 
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: inline-flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
 .holographic-gradient {
   background: linear-gradient(
     135deg,

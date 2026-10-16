@@ -7,6 +7,8 @@ import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
 import { WhatsAppSupportWidget } from "@/components/support/WhatsAppSupportWidget";
+import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
+import { LanguageProvider } from "@/context/LanguageContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -42,12 +44,15 @@ export const metadata: Metadata = {
   authors: [{ name: "Brian Okibo, Chief Executive Officer (CEO)" }],
   generator: "Next.js",
   keywords: [
+    "buy eFootball account Kenya",
+    "sell eFootball squad M-Pesa",
+    "eFootball escrow Kenya",
+    "verified Konami ID accounts",
     "eFootball accounts",
     "eFootball market Kenya",
     "buy eFootball account",
     "sell PES account",
     "eFootball mobile accounts",
-    "eFootball escrow Kenya",
     "M-Pesa gaming account",
     "Konami ID accounts",
     "eFootball 2026 accounts",
@@ -55,6 +60,7 @@ export const metadata: Metadata = {
     "Epic booster player account",
     "buy PES mobile account M-Pesa",
     "eFootball accounts Nairobi",
+    "scammer blacklist Kenya eFootball",
   ],
   creator: "Brian Okibo",
   publisher: "eFootballMarket",
@@ -71,23 +77,23 @@ export const metadata: Metadata = {
     locale: "en_KE",
     url: siteUrl,
     siteName: "eFootballMarket",
-    title: "eFootballMarket | Escrow Platform for eFootball Account Trading",
+    title: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading & Community Hub",
     description:
-      "Trade high-OVR eFootball accounts with automated Safaricom M-Pesa escrow protection and 24-hour buyer inspection.",
+      "M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. Buy and sell verified eFootball squads safely with M-Pesa Escrow (Till 1572931) and 24h buyer protection.",
     images: [
       {
         url: "/og-image.svg",
         width: 1200,
         height: 630,
-        alt: "eFootballMarket - Secure Account Escrow Platform",
+        alt: "eFootballMarket - Kenya's #1 Secure eFootball Account Trading Hub",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "eFootballMarket | Escrow Platform for eFootball Account Trading",
+    title: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading & Community Hub",
     description:
-      "Buy and sell high-OVR eFootball accounts with automated M-Pesa escrow protection and 24-hr buyer inspection.",
+      "M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. Buy and sell verified eFootball squads safely with M-Pesa Escrow.",
     images: ["/og-image.svg"],
     creator: "@eFootballMarket",
   },
@@ -182,12 +188,15 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className="bg-[#0B1220] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-[#22C55E] selection:text-[#0B1220] relative font-sans">
-        <Header />
-        <main className="flex-1 flex flex-col relative z-10">{children}</main>
-        <Footer />
-        <CookieConsentBanner />
-        <WhatsAppSupportWidget />
+      <body className="bg-[#0B1220] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-[#22C55E] selection:text-[#0B1220] relative font-sans pb-16 md:pb-0">
+        <LanguageProvider>
+          <Header />
+          <main className="flex-1 flex flex-col relative z-10">{children}</main>
+          <Footer />
+          <MobileBottomNav />
+          <CookieConsentBanner />
+          <WhatsAppSupportWidget />
+        </LanguageProvider>
       </body>
     </html>
   );

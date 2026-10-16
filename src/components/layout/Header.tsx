@@ -29,6 +29,9 @@ import {
   Plus,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
+import { LiveActivityMarquee } from "@/components/layout/LiveActivityMarquee";
+import { useLanguage, Language } from "@/context/LanguageContext";
+import { Globe, Flame, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
@@ -36,11 +39,14 @@ import { useState, useRef, useEffect } from "react";
 export function Header() {
   const router = useRouter();
   const { user, profile, loading, signOut, isAuthenticated, displayName } = useAuth();
+  const { language, setLanguage, t } = useLanguage();
   const isAdminUser = isUserAdmin(user?.email, profile?.role);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -55,6 +61,9 @@ export function Header() {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
+      }
+      if (langRef.current && !langRef.current.contains(event.target as Node)) {
+        setLangDropdownOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -80,7 +89,10 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
-      {/* Persistent Global Authority Trust Ribbon */}
+      {/* 1. Top Live Activity Marquee Ticker */}
+      <LiveActivityMarquee />
+
+      {/* 2. Persistent Global Authority Trust Ribbon */}
       <div className="bg-[#090D16] border-b border-[#1F2937]/80 py-1.5 px-3 sm:px-4 text-[11px]">
         <div className="max-w-7xl mx-auto flex items-center justify-between text-[#94A3B8] gap-3">
           <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar whitespace-nowrap">
@@ -126,41 +138,34 @@ export function Header() {
                 href="/browse"
                 className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] transition-colors"
               >
-                Browse Accounts
+                {t.browseSquads}
               </Link>
               <Link
-                href="/wanted"
-                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors"
+                href="/#friday-drops"
+                className="px-3 py-1.5 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-[#111827] flex items-center gap-1.5 transition-colors font-bold"
               >
-                <Target className="w-3.5 h-3.5 text-[#FBBF24]" />
-                <span>Wanted</span>
+                <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <span>{t.fridayDrops}</span>
               </Link>
               <Link
-                href="/middleman"
-                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors"
+                href="/escrow-guarantee"
+                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] transition-colors"
               >
-                <Handshake className="w-3.5 h-3.5 text-[#22C55E]" />
-                <span>Middleman</span>
+                {t.escrowGuide}
               </Link>
               <Link
-                href="/tournaments"
-                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors"
+                href="/scammer-check"
+                className="px-3 py-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-[#111827] flex items-center gap-1.5 transition-colors font-semibold"
               >
-                <Trophy className="w-3.5 h-3.5 text-[#FBBF24]" />
-                <span>Tournaments</span>
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                <span>{t.scammerCheck}</span>
               </Link>
               <Link
                 href="/news"
                 className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors"
               >
                 <Newspaper className="w-3.5 h-3.5 text-[#94A3B8]" />
-                <span>News & Alerts</span>
-              </Link>
-              <Link
-                href="/escrow-guarantee"
-                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] transition-colors"
-              >
-                Escrow Rules
+                <span>{t.communityBulletin}</span>
               </Link>
             </nav>
 
@@ -169,7 +174,7 @@ export function Header() {
               <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
               <input
                 type="text"
-                placeholder="Search accounts / OVR..."
+                placeholder="Search meta players (e.g. Messi, Vieira)..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-8 pr-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#22C55E] w-48 transition-all focus:w-60"
@@ -179,15 +184,75 @@ export function Header() {
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* Sell Account CTA */}
+            {/* Language Switcher Dropdown */}
+            <div className="relative" ref={langRef}>
+              <button
+                type="button"
+                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#111827] border border-[#1F2937] hover:border-slate-600 text-xs text-slate-300 hover:text-white transition-colors"
+                title="Change language / Badilisha lugha"
+              >
+                <Globe className="w-3.5 h-3.5 text-[#22C55E]" />
+                <span className="font-bold uppercase tracking-wider text-[11px]">
+                  {language === "en" ? "EN" : language === "sw" ? "SW" : "KAM"}
+                </span>
+                <ChevronDown className="w-3 h-3 text-slate-500" />
+              </button>
+
+              {langDropdownOpen && (
+                <div className="absolute right-0 mt-1.5 w-36 rounded-xl bg-[#111827] border border-[#1F2937] shadow-xl py-1 z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLanguage("en");
+                      setLangDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1F2937] transition-colors ${
+                      language === "en" ? "text-[#22C55E] font-bold" : "text-slate-300"
+                    }`}
+                  >
+                    <span>English</span>
+                    {language === "en" && <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLanguage("sw");
+                      setLangDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1F2937] transition-colors ${
+                      language === "sw" ? "text-[#22C55E] font-bold" : "text-slate-300"
+                    }`}
+                  >
+                    <span>Kiswahili</span>
+                    {language === "sw" && <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setLanguage("kam");
+                      setLangDropdownOpen(false);
+                    }}
+                    className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1F2937] transition-colors ${
+                      language === "kam" ? "text-[#22C55E] font-bold" : "text-slate-300"
+                    }`}
+                  >
+                    <span>Kikamba</span>
+                    {language === "kam" && <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />}
+                  </button>
+                </div>
+              )}
+            </div>
+
+            {/* Prominent Sell Account CTA */}
             <Link href="/seller/create-listing" className="hidden sm:inline-flex">
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-xs px-3.5 py-1.5 rounded-lg shadow-sm flex items-center gap-1"
+                className="bg-gradient-to-r from-[#22C55E] to-emerald-400 hover:from-emerald-500 hover:to-emerald-400 text-[#0B1220] font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-950/40 flex items-center gap-1.5 active:scale-95 transition-all"
               >
-                <Plus className="w-3.5 h-3.5 stroke-[2.5]" />
-                <span>Sell Account</span>
+                <Plus className="w-4 h-4 stroke-[3]" />
+                <span>{t.sellAccount}</span>
               </Button>
             </Link>
 
@@ -413,22 +478,73 @@ export function Header() {
               </Link>
             )}
 
+            {/* Mobile Language Selector */}
+            <div className="p-2.5 rounded-xl bg-[#111827] border border-[#1F2937] flex items-center justify-between">
+              <span className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+                <Globe className="w-4 h-4 text-[#22C55E]" />
+                <span>Language:</span>
+              </span>
+              <div className="flex items-center gap-1">
+                {(["en", "sw", "kam"] as Language[]).map((l) => (
+                  <button
+                    key={l}
+                    type="button"
+                    onClick={() => setLanguage(l)}
+                    className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase transition-colors ${
+                      language === l
+                        ? "bg-[#22C55E] text-[#0B1220]"
+                        : "bg-slate-800 text-slate-300 hover:text-white"
+                    }`}
+                  >
+                    {l}
+                  </button>
+                ))}
+              </div>
+            </div>
+
             <Link
               href="/browse"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
             >
-              <span>Browse Accounts</span>
+              <span>{t.browseSquads}</span>
               <Sparkles className="w-4 h-4 text-[#FBBF24]" />
             </Link>
 
             <Link
-              href="/wanted"
+              href="/#friday-drops"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold"
+            >
+              <span>{t.fridayDrops}</span>
+              <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
+            </Link>
+
+            <Link
+              href="/scammer-check"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold"
+            >
+              <span>{t.scammerCheck}</span>
+              <ShieldAlert className="w-4 h-4 text-rose-400" />
+            </Link>
+
+            <Link
+              href="/escrow-guarantee"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
             >
-              <span>Wanted Squads (Buyer Requests)</span>
-              <Target className="w-4 h-4 text-[#FBBF24]" />
+              <span>{t.escrowGuide}</span>
+              <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
+            </Link>
+
+            <Link
+              href="/news"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
+            >
+              <span>{t.communityBulletin}</span>
+              <Newspaper className="w-4 h-4 text-[#94A3B8]" />
             </Link>
 
             <Link
@@ -450,29 +566,21 @@ export function Header() {
             </Link>
 
             <Link
-              href="/news"
+              href="/wanted"
               onClick={() => setMobileMenuOpen(false)}
               className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
             >
-              <span>News & Scammer Alerts</span>
-              <Newspaper className="w-4 h-4 text-[#94A3B8]" />
-            </Link>
-
-            <Link
-              href="/escrow-guarantee"
-              onClick={() => setMobileMenuOpen(false)}
-              className="block px-3 py-2 rounded-lg hover:bg-[#111827] text-[#94A3B8] hover:text-[#F8FAFC]"
-            >
-              Escrow Protection Rules
+              <span>Wanted Squads (Buyer Requests)</span>
+              <Target className="w-4 h-4 text-[#FBBF24]" />
             </Link>
 
             <Link
               href="/seller/create-listing"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#22C55E]/10 border border-[#22C55E]/30 text-[#22C55E] font-bold"
+              className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#22C55E] to-emerald-400 text-[#0B1220] font-black text-xs shadow-lg shadow-emerald-950/40"
             >
-              <span>+ Sell an Account</span>
-              <PlusCircle className="w-4 h-4 text-[#22C55E]" />
+              <span>{t.sellAccount}</span>
+              <PlusCircle className="w-4 h-4 stroke-[3]" />
             </Link>
 
             <Link

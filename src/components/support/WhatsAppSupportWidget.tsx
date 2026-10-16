@@ -27,7 +27,7 @@ export function WhatsAppSupportWidget() {
   };
 
   return (
-    <div className="fixed bottom-5 right-5 z-40 select-none">
+    <div className="fixed bottom-20 md:bottom-5 right-4 sm:right-6 z-40 select-none">
       {/* Floating Chat Modal */}
       {isOpen && (
         <div className="absolute bottom-16 right-0 w-[320px] sm:w-[360px] rounded-3xl bg-pitch-surface/95 border border-pitch-border shadow-2xl backdrop-blur-xl overflow-hidden animate-in fade-in slide-in-from-bottom-3 flex flex-col">
@@ -114,14 +114,14 @@ export function WhatsAppSupportWidget() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-2xl shadow-emerald-950/80 border border-emerald-400/50 hover:scale-105 transition-all duration-200 group"
+        className="flex items-center gap-2 px-3.5 py-2.5 sm:px-4 sm:py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-2xl shadow-emerald-950/80 border border-emerald-400/50 hover:scale-105 transition-all duration-200 group active:scale-95"
       >
         <span className="relative flex h-2.5 w-2.5">
           <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
           <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300" />
         </span>
         <MessageCircle className="w-4 h-4 fill-white group-hover:rotate-6 transition-transform" />
-        <span className="hidden sm:inline">WhatsApp Escrow Support</span>
+        <span className="text-[11px] sm:text-xs">💬 Need Help / Verify a Trade</span>
       </button>
     </div>
   );
