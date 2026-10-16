@@ -88,6 +88,101 @@ export default function EscrowGuaranteePage() {
         </div>
       </div>
 
+      {/* 24-Hour Inspection Lifecycle Timeline */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl space-y-6">
+        <div>
+          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-1">
+            <Clock className="w-3.5 h-3.5" />
+            <span>Inspection Lifecycle Roadmap</span>
+          </div>
+          <h2 className="text-xl font-bold text-white font-display">
+            The 24-Hour Verification Timeline
+          </h2>
+          <p className="text-xs text-slate-400">
+            From M-Pesa STK push to final seller payout, every minute is protected.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-4 gap-4 text-xs">
+          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
+            <span className="font-mono font-bold text-emerald-400 text-sm block">00:00</span>
+            <strong className="text-white block font-semibold">Payment Locked</strong>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              Buyer completes STK push to Safaricom Till 1572931. Funds are locked into neutral escrow.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
+            <span className="font-mono font-bold text-amber-400 text-sm block">&lt; 12:00</span>
+            <strong className="text-white block font-semibold">Credentials Sent</strong>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              Seller deposits login details into the AES-256 encrypted vault for buyer decryption.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
+            <span className="font-mono font-bold text-indigo-400 text-sm block">12:00 – 24:00</span>
+            <strong className="text-white block font-semibold">Account Inspection</strong>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              Buyer logs in on mobile, verifies OVR & players, changes registered email, and enables 2FA.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
+            <span className="font-mono font-bold text-emerald-400 text-sm block">24:00</span>
+            <strong className="text-white block font-semibold">Instant Disbursement</strong>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              Buyer confirms delivery or 24 hours elapse without dispute; funds disburse to seller M-Pesa.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* Transparent Institutional Fee Structure */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl space-y-6">
+        <div>
+          <h2 className="text-xl font-bold text-white font-display">
+            Transparent Escrow Fee Schedule
+          </h2>
+          <p className="text-xs text-slate-400">
+            No hidden surcharges. All fees are transparently displayed before transaction confirmation.
+          </p>
+        </div>
+
+        <div className="overflow-x-auto">
+          <table className="w-full text-xs text-left border-collapse">
+            <thead>
+              <tr className="border-b border-pitch-border text-slate-400 uppercase tracking-wider font-semibold">
+                <th className="py-3 px-4">Service</th>
+                <th className="py-3 px-4">Buyer Fee</th>
+                <th className="py-3 px-4">Seller Fee</th>
+                <th className="py-3 px-4">Processing Time</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-pitch-border/60 text-slate-300">
+              <tr>
+                <td className="py-3 px-4 font-semibold text-white">Marketplace Listing Purchase</td>
+                <td className="py-3 px-4 text-[#22C55E] font-bold">0% (Free)</td>
+                <td className="py-3 px-4">5% (Deducted from payout)</td>
+                <td className="py-3 px-4 font-mono">Instant STK Push</td>
+              </tr>
+              <tr>
+                <td className="py-3 px-4 font-semibold text-white">Bring-Your-Own-Deal Middleman</td>
+                <td className="py-3 px-4 text-[#22C55E] font-bold">0% (Free)</td>
+                <td className="py-3 px-4">5% (Min KES 100)</td>
+                <td className="py-3 px-4 font-mono">Instant STK Push</td>
+              </tr>
+              <tr>
+                <td className="py-3 px-4 font-semibold text-white">Dispute Investigation & Arbitration</td>
+                <td className="py-3 px-4 text-[#22C55E] font-bold">0% (Free)</td>
+                <td className="py-3 px-4 text-[#22C55E] font-bold">0% (Free)</td>
+                <td className="py-3 px-4 font-mono">&lt; 4 Hours</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+
       {/* Rules list */}
       <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-8 space-y-6">
         <h2 className="text-lg font-bold text-slate-100 font-display">
@@ -108,10 +203,15 @@ export default function EscrowGuaranteePage() {
           </li>
         </ul>
 
-        <div className="pt-4 flex justify-center">
+        <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
           <Link href="/browse">
-            <Button variant="gold" size="lg">
+            <Button variant="primary" size="lg" className="bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-black text-sm">
               Explore Escrow-Secured Accounts
+            </Button>
+          </Link>
+          <Link href="/calculator">
+            <Button variant="gold" size="lg" className="font-bold text-sm">
+              Squad Valuation Calculator &rarr;
             </Button>
           </Link>
         </div>
