@@ -137,6 +137,19 @@ export function Footer() {
               <li><Link href="/fraud-prevention" className="hover:text-white transition-colors">Anti-Fraud Systems</Link></li>
               <li><Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link></li>
               <li><Link href="/privacy" className="hover:text-white transition-colors">Privacy & Data Policy</Link></li>
+              <li>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (typeof window !== "undefined") {
+                      window.dispatchEvent(new Event("open-cookie-settings"));
+                    }
+                  }}
+                  className="hover:text-white transition-colors text-left text-slate-400 hover:underline"
+                >
+                  Cookie Preferences & Consent
+                </button>
+              </li>
             </ul>
           </div>
 
