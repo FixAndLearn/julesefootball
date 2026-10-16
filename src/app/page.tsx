@@ -83,9 +83,15 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             {/* Left Column: Authority Copy, Search & Primary Actions */}
             <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111827] border border-slate-700/80 text-xs font-semibold shadow-inner">
-                <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
-                <span className="text-slate-300">Certified Escrow Protection Standard</span>
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-800/80 text-emerald-300 text-xs font-semibold shadow-inner">
+                  <ShieldCheck className="w-3.5 h-3.5 text-[#22C55E]" />
+                  <span>Safaricom Till 1572931 Escrow</span>
+                </div>
+                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#111827] border border-slate-700/80 text-xs text-slate-300">
+                  <BadgeCheck className="w-3.5 h-3.5 text-amber-400" />
+                  <span>Audited by Brian Okibo, Lead Escrow Officer</span>
+                </div>
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black font-display tracking-tight text-[#F8FAFC] leading-[1.12]">
@@ -366,10 +372,126 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
+      {/* 4. THE 4-STAGE ESCROW LIFECYCLE (Healthline-style clinical verification protocol) */}
+      <section className="py-14 md:py-20 bg-[#0D1527] border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="text-center max-w-3xl mx-auto mb-12">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-800/80 text-emerald-300 text-xs font-semibold mb-3">
+              <ShieldCheck className="w-3.5 h-3.5 text-[#22C55E]" />
+              <span>Safaricom M-Pesa Till 1572931 Standard</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white font-display tracking-tight">
+              How Your Money & Account Are Protected
+            </h2>
+            <p className="text-sm text-slate-300 mt-2 leading-relaxed">
+              Every shilling is locked in Kenya&apos;s verified Safaricom escrow till. The seller is never paid until you inspect the squad on your device.
+            </p>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {/* Step 1 */}
+            <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between shadow-xl relative group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[#22C55E] flex items-center justify-center font-mono font-black text-sm">
+                    01
+                  </span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2 py-0.5 rounded-full">
+                    Safaricom STK Push
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-[#22C55E] transition-colors">
+                  Deposit to Till 1572931
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Enter your M-Pesa number. An instant PIN prompt appears on your phone. Money is locked securely in Escrow Till 1572931. The seller is notified immediately.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center gap-1.5 text-[11px] text-slate-400">
+                <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />
+                <span>Zero prepayment risk</span>
+              </div>
+            </div>
+
+            {/* Step 2 */}
+            <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between shadow-xl relative group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="w-8 h-8 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center font-mono font-black text-sm">
+                    02
+                  </span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-indigo-400 bg-indigo-950/60 border border-indigo-800/60 px-2 py-0.5 rounded-full">
+                    AES-256 Vault
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-indigo-300 transition-colors">
+                  Encrypted Handshake
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  The seller submits the Konami ID and login password into our encrypted portal. Credentials are transmitted exclusively to you with an audit trail.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center gap-1.5 text-[11px] text-slate-400">
+                <Lock className="w-3.5 h-3.5 text-indigo-400" />
+                <span>Encrypted transfer</span>
+              </div>
+            </div>
+
+            {/* Step 3 */}
+            <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between shadow-xl relative group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center font-mono font-black text-sm">
+                    03
+                  </span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-amber-400 bg-amber-950/60 border border-amber-800/60 px-2 py-0.5 rounded-full">
+                    Mandatory 24h
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-amber-300 transition-colors">
+                  24h Hands-On Inspection
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Log in on your phone. Verify the squad OVR, Epics, coins, and GP. Link your personal email address and turn on two-step verification (2FA).
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center gap-1.5 text-[11px] text-slate-400">
+                <Clock className="w-3.5 h-3.5 text-amber-400" />
+                <span>Full inspection window</span>
+              </div>
+            </div>
+
+            {/* Step 4 */}
+            <div className="p-6 rounded-3xl bg-[#111827] border border-slate-800 hover:border-slate-700 transition-all flex flex-col justify-between shadow-xl relative group">
+              <div className="space-y-4">
+                <div className="flex items-center justify-between">
+                  <span className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[#22C55E] flex items-center justify-center font-mono font-black text-sm">
+                    04
+                  </span>
+                  <span className="text-[10px] uppercase font-bold tracking-wider text-emerald-400 bg-emerald-950/60 border border-emerald-800/60 px-2 py-0.5 rounded-full">
+                    Automated Release
+                  </span>
+                </div>
+                <h3 className="text-base font-bold text-white group-hover:text-[#22C55E] transition-colors">
+                  Disburse or 100% Refund
+                </h3>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  Click &apos;Approve&apos; once satisfied to release the seller&apos;s payout. If anything was misrepresented or credentials fail, receive a prompt full refund.
+                </p>
+              </div>
+              <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center gap-1.5 text-[11px] text-slate-400">
+                <ShieldCheck className="w-3.5 h-3.5 text-[#22C55E]" />
+                <span>Executive dispute backing</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* 5. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
       <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
             <div>
               <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-1">
                 <Sparkles className="w-3.5 h-3.5" />
@@ -388,6 +510,46 @@ export default async function HomePage() {
             >
               <span>View All Listings ({metrics.activeListingsCount})</span>
               <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          {/* Instant Category Filter Pills */}
+          <div className="flex flex-wrap items-center gap-2 mb-8">
+            <Link
+              href="/browse"
+              className="px-3.5 py-1.5 rounded-xl bg-[#22C55E]/15 border border-[#22C55E]/40 text-[#22C55E] text-xs font-bold transition-colors"
+            >
+              All Verified Squads ({metrics.activeListingsCount})
+            </Link>
+            <Link
+              href="/browse?platform=android"
+              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 text-xs font-medium transition-colors"
+            >
+              Android Mobile
+            </Link>
+            <Link
+              href="/browse?platform=ios"
+              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 text-xs font-medium transition-colors"
+            >
+              iOS / iPhone
+            </Link>
+            <Link
+              href="/browse?minStrength=3200"
+              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-amber-500/30 text-amber-300 hover:border-amber-400 text-xs font-bold transition-colors"
+            >
+              ★ 3200+ OVR Elite
+            </Link>
+            <Link
+              href="/browse?playstyle=quick_counter"
+              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 text-xs font-medium transition-colors"
+            >
+              Quick Counter
+            </Link>
+            <Link
+              href="/browse?playstyle=possession"
+              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 text-xs font-medium transition-colors"
+            >
+              Possession Game
             </Link>
           </div>
 

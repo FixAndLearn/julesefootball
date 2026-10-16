@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Script from "next/script";
+import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
 import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
@@ -7,9 +8,20 @@ import { JsonLd } from "@/components/seo/JsonLd";
 import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
 import { WhatsAppSupportWidget } from "@/components/support/WhatsAppSupportWidget";
 
+const inter = Inter({
+  subsets: ["latin"],
+  variable: "--font-inter",
+  display: "swap",
+});
+
+const outfit = Outfit({
+  subsets: ["latin"],
+  variable: "--font-outfit",
+  display: "swap",
+});
+
 const siteUrl =
-  process.env.NEXT_PUBLIC_APP_URL ||
-  (process.env.VERCEL_URL ? `https://${process.env.VERCEL_URL}` : "https://www.efootballmarket.co.ke");
+  process.env.NEXT_PUBLIC_APP_URL || "https://www.efootballmarket.co.ke";
 
 export const viewport: Viewport = {
   themeColor: "#090d16",
@@ -113,7 +125,7 @@ export default function RootLayout({
   const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
 
   return (
-    <html lang="en" className="dark">
+    <html lang="en" className={`dark ${inter.variable} ${outfit.variable}`}>
       <head>
         <JsonLd siteUrl={siteUrl} />
 
@@ -170,7 +182,7 @@ export default function RootLayout({
           />
         )}
       </head>
-      <body className="bg-[#0B1220] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-[#22C55E] selection:text-[#0B1220] relative">
+      <body className="bg-[#0B1220] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-[#22C55E] selection:text-[#0B1220] relative font-sans">
         <Header />
         <main className="flex-1 flex flex-col relative z-10">{children}</main>
         <Footer />
