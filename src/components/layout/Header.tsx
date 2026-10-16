@@ -194,7 +194,7 @@ export function Header() {
               >
                 <Globe className="w-3.5 h-3.5 text-[#22C55E]" />
                 <span className="font-bold uppercase tracking-wider text-[11px]">
-                  {language === "en" ? "EN" : language === "sw" ? "SW" : "KAM"}
+                  {language === "en" ? "EN" : "SW"}
                 </span>
                 <ChevronDown className="w-3 h-3 text-slate-500" />
               </button>
@@ -226,19 +226,6 @@ export function Header() {
                   >
                     <span>Kiswahili</span>
                     {language === "sw" && <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLanguage("kam");
-                      setLangDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1F2937] transition-colors ${
-                      language === "kam" ? "text-[#22C55E] font-bold" : "text-slate-300"
-                    }`}
-                  >
-                    <span>Kikamba</span>
-                    {language === "kam" && <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />}
                   </button>
                 </div>
               )}
@@ -485,7 +472,7 @@ export function Header() {
                 <span>Language:</span>
               </span>
               <div className="flex items-center gap-1">
-                {(["en", "sw", "kam"] as Language[]).map((l) => (
+                {(["en", "sw"] as Language[]).map((l) => (
                   <button
                     key={l}
                     type="button"

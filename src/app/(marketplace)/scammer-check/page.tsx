@@ -1,6 +1,7 @@
 import React from "react";
 import { Metadata } from "next";
 import { ScammerLookupTool } from "@/components/scammer/ScammerLookupTool";
+import { AdBanner } from "@/components/common/AdBanner";
 import { ShieldAlert, AlertTriangle, ShieldCheck, Lock, Phone, MessageCircle, ArrowRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
 
@@ -97,6 +98,9 @@ export default function ScammerCheckPage() {
           </div>
         </div>
       </div>
+
+      {/* Sponsored Ad Unit */}
+      <AdBanner slot="scammer_check_bottom" format="horizontal" />
 
       {/* Community Report Callout */}
       <div className="rounded-3xl bg-gradient-to-r from-rose-950/70 via-[#111827] to-slate-900 border border-rose-500/40 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">

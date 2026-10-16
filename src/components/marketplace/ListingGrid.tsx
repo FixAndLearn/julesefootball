@@ -6,6 +6,7 @@ import { Listing } from "@/types/database";
 import { SearchX, Zap, Sparkles, ArrowRight, RotateCcw, X } from "lucide-react";
 import { Button } from "@/components/ui/Button";
 import { ListingCard } from "./ListingCard";
+import { AdBanner } from "@/components/common/AdBanner";
 import { useRealtimeListings } from "@/hooks/useRealtimeListings";
 import { formatCurrency } from "@/lib/utils";
 
@@ -199,13 +200,18 @@ export function ListingGrid({ listings: initialListings, filters, isLoading = fa
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 2xl:grid-cols-4 gap-6">
-          {listings.map((listing) => (
-            <div
-              key={listing.id}
-              className="transition-all duration-300 animate-in fade-in zoom-in-95"
-            >
-              <ListingCard listing={listing} />
-            </div>
+          {listings.map((listing, index) => (
+            <React.Fragment key={listing.id}>
+              <div className="transition-all duration-300 animate-in fade-in zoom-in-95">
+                <ListingCard listing={listing} />
+              </div>
+              {/* Native In-Feed Ad Unit at 6th card */}
+              {index === 5 && listings.length > 6 && (
+                <div className="col-span-full my-2">
+                  <AdBanner slot="browse_in_feed_grid" format="in-feed" />
+                </div>
+              )}
+            </React.Fragment>
           ))}
         </div>
       )}

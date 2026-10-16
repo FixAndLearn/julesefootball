@@ -131,6 +131,7 @@ export function Footer() {
             <ul className="space-y-2.5 text-xs text-[#94A3B8]">
               <li><Link href="/tournaments" className="hover:text-white transition-colors">Tournaments & Brackets</Link></li>
               <li><Link href="/news" className="hover:text-white transition-colors">News & Game Updates</Link></li>
+              <li><Link href="/scammer-check" className="text-rose-400 hover:text-rose-300 font-bold transition-colors">🚨 Live Scammer Blacklist Tool</Link></li>
               <li><Link href="/news?category=scammer_alert" className="text-rose-400 hover:text-rose-300 font-medium transition-colors">Scammer Alerts & Warnings</Link></li>
               <li><Link href="/escrow-guarantee" className="hover:text-white transition-colors">Escrow Protection Rules</Link></li>
               <li><Link href="/dispute-policy" className="hover:text-white transition-colors">Dispute Resolution Policy</Link></li>

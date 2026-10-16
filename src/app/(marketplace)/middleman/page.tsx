@@ -9,6 +9,7 @@ import { formatCurrency } from "@/lib/utils";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { MiddlemanDeal } from "@/app/api/middleman/route";
 import { HowToEscrowJsonLd } from "@/components/seo/JsonLd";
+import { AdBanner } from "@/components/common/AdBanner";
 import {
   Handshake,
   ShieldCheck,
@@ -816,6 +817,9 @@ function MiddlemanContent() {
           )}
         </div>
       )}
+
+      {/* AdSense / Escrow Sponsored Unit */}
+      <AdBanner slot="middleman_deal_bottom" format="horizontal" />
     </div>
   );
 }

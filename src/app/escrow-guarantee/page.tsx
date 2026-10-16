@@ -1,5 +1,6 @@
 import { Button } from "@/components/ui/Button";
 import { CheckCircle2, Clock, Lock, ShieldCheck, ShoppingCart, Building2, AlertTriangle } from "lucide-react";
+import { AdBanner } from "@/components/common/AdBanner";
 import Link from "next/link";
 import { Metadata } from "next";
 
@@ -211,6 +212,9 @@ export default function EscrowGuaranteePage() {
           </Link>
         </div>
       </div>
+
+      {/* AdSense Certified Unit */}
+      <AdBanner slot="escrow_guarantee_bottom" format="horizontal" />
     </div>
   );
 }

@@ -2,7 +2,7 @@
 
 import React, { createContext, useContext, useState, useEffect } from "react";
 
-export type Language = "en" | "sw" | "kam";
+export type Language = "en" | "sw";
 
 export interface Translations {
   browseSquads: string;
@@ -74,29 +74,6 @@ const TRANSLATIONS: Record<Language, Translations> = {
     scammerSearchPlaceholder: "Weka nambari ya simu (07... / +254...) au jina...",
     checkNumber: "Kagua Orodha ya Matapeli",
   },
-  kam: {
-    browseSquads: "Sisya Makoti",
-    fridayDrops: "Mawatho ma Wakatano 🔥",
-    escrowGuide: "Mwiao ya Escrow",
-    scammerCheck: "Sisya Ang'ei 🚨",
-    communityBulletin: "Uvoo wa Ngwatanio",
-    sellAccount: "+ Thaasya Akaunti",
-    heroHeadline: "Kikundi Kye Uima Kenya Kithooa Akaunti sya eFootball Nzao",
-    heroSubheadline:
-      "M-PESA NATIVE • 100% ESCROW NDUVYA • ENTHOOI MEEITHIWA NZOO. Vai ung'ei. Vai muthina. No mupira tu.",
-    browseVerifiedSquads: "Sisya Makoti Meelilwe",
-    listSquadFree: "Ika Kikoti Kyaku Nthei",
-    escrowGuaranteePill: "100% Nzukio ya Mbesa Yaku Wambula Kyau",
-    manualVerificationPill: "Kwianisya Konami ID Kwikaa Mbu",
-    instantMpesaPill: "Kukwatw&apos;a M-Pesa Mituki Weanithya",
-    adminDisputePill: "Usuvyo wa Manyanya Masani Onthe",
-    inspectSquad: "Sisya Nthini ya Kikoti",
-    escrowProtected: "Ni Nziisye na Escrow",
-    collectiveStrength: "Vinya wa Kikoti",
-    buySafelyMpesa: "Thooa Nzao na M-Pesa Escrow",
-    scammerSearchPlaceholder: "Andika nambari ya simu kana yina ya ng'ei...",
-    checkNumber: "Sisya Kana Ni Ng'ei",
-  },
 };
 
 interface LanguageContextType {
@@ -117,7 +94,7 @@ export function LanguageProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     try {
       const saved = localStorage.getItem("efootball_lang") as Language;
-      if (saved && (saved === "en" || saved === "sw" || saved === "kam")) {
+      if (saved && (saved === "en" || saved === "sw")) {
         setLanguageState(saved);
       }
     } catch {
