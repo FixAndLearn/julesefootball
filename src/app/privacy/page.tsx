@@ -1,124 +1,89 @@
-import { Lock, ShieldCheck, Database, KeyRound, Building2, EyeOff } from "lucide-react";
+import { Lock, ShieldCheck, Database, Building2 } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Privacy & Data Protection Policy | eFootballMarket",
-  description: "Enterprise Data Handling Standards, Cryptographic Vault Protocol, and Governance of eFootballMarket Inc.",
+  title: "Privacy & Data Protection Policy | eFootball Community Kenya",
+  description: "Official Privacy and Data Protection policy in accordance with the Kenya Data Protection Act, 2019.",
 };
 
 export default function PrivacyPolicyPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-10">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-10 bg-[#0B1220] text-[#F8FAFC]">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-semibold">
-          <Lock className="w-4 h-4" />
-          <span>Privacy & Data Protection Policy</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111827] border border-[#1F2937] text-[#22C55E] text-xs font-semibold">
+          <Lock className="w-4 h-4 text-[#22C55E]" />
+          <span>Privacy & Data Protection</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#F8FAFC] font-display tracking-tight">
           Privacy & Data Protection Policy
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-          Effective Date: October 2026. How eFootballMarket processes, protects, and stores user and transaction data.
+        <p className="text-xs sm:text-sm text-[#94A3B8] max-w-2xl mx-auto leading-relaxed">
+          Effective Date: October 2026. How eFootball Community Kenya processes, protects, and handles personal data in accordance with the Kenya Data Protection Act, 2019.
         </p>
       </div>
 
-      {/* Corporate Controller Notice */}
-      <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl space-y-3">
+      {/* Controller Notice */}
+      <div className="p-6 rounded-3xl bg-[#111827] border border-[#1F2937] shadow-md space-y-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
+          <div className="w-10 h-10 rounded-xl bg-[#1F2937] border border-[#374151] flex items-center justify-center text-[#FBBF24]">
             <Building2 className="w-5 h-5" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-100 font-display">
+            <h2 className="text-base font-bold text-[#F8FAFC] font-display">
               Data Controller Information
             </h2>
-            <p className="text-xs text-emerald-400 font-medium">
-              Administration under Brian Okibo, Platform Operator
+            <p className="text-xs text-[#94A3B8]">
+              Administration directed by Brian Okibo
             </p>
           </div>
         </div>
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          <strong>eFootballMarket</strong> operates this platform under the administration of <strong>Brian Okibo</strong>. Sensitive game credentials (Konami ID emails, passwords, and 2FA backup codes) are encrypted on the server prior to database storage to protect access details during escrow delivery.
+        <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+          <strong>eFootball Community Kenya</strong> operates under data minimization principles in line with the Kenya Data Protection Act, 2019. We process only information necessary to coordinate tournaments, verify match results, and administer community services.
         </p>
       </div>
 
-      <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-8 shadow-xl space-y-8 text-slate-300 text-sm leading-relaxed">
+      <div className="bg-[#111827] border border-[#1F2937] rounded-3xl p-6 sm:p-10 shadow-lg space-y-8 text-[#94A3B8] text-sm leading-relaxed">
         {/* Section 1 */}
         <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">1.</span> Scope of Data Collection
+          <h2 className="text-base sm:text-lg font-bold text-[#F8FAFC] font-display flex items-center gap-2">
+            <span className="text-[#22C55E]">1.</span> Scope of Data Collection
           </h2>
           <p>
-            To facilitate escrow transactions and dispute resolution in line with data minimization principles under the Kenya Data Protection Act, 2019, we collect only data necessary to fulfill escrow contracts:
+            To facilitate tournament participation and community integrity, we collect only necessary data:
           </p>
           <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
-            <li><strong>Account Identity:</strong> Usernames, display names, and registered email addresses.</li>
-            <li><strong>Financial Mobile Records:</strong> Safaricom M-Pesa phone numbers required to initiate automated STK push billing and execute seller withdrawals via Daraja API v2.</li>
-            <li><strong>Seller Information:</strong> Listing details, squad overall strength (OVR), and platform information provided by sellers. Government identity card collection is currently inactive.</li>
-            <li><strong>Audit & Security Logs:</strong> System logs including IP addresses, timestamps, order milestones, and M-Pesa transaction reference codes.</li>
+            <li><strong>Member Profile:</strong> Usernames, gamer tags, and registered email addresses.</li>
+            <li><strong>Tournament Coordination:</strong> In-game Friend IDs and phone numbers for official WhatsApp match room communication.</li>
+            <li><strong>Match Logs:</strong> Scores, timestamps, tournament brackets, and round progression data.</li>
+            <li><strong>System Logs:</strong> Timestamps and security audit logs to protect our website against malicious traffic.</li>
           </ul>
         </section>
 
         {/* Section 2 */}
         <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">2.</span> Credential Handling & Storage Security
+          <h2 className="text-base sm:text-lg font-bold text-[#F8FAFC] font-display flex items-center gap-2">
+            <span className="text-[#22C55E]">2.</span> Security & Storage Limitation
           </h2>
           <p>
-            The platform applies technical safeguards to game credentials provided during handover:
+            In accordance with Section 30(1)(e) of the Kenya Data Protection Act, 2019, personal data is retained only for the duration required to deliver tournament services and support player inquiries. Technical safeguards including encrypted transport protocols (HTTPS/TLS) are enforced across the platform.
           </p>
-          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2">
-            <p>
-              <strong>1. AES-256-GCM Encryption:</strong> Sensitive credentials provided during account delivery undergo symmetric Galois/Counter Mode authenticated encryption utilizing dynamic 16-byte initialization vectors (IVs) and cryptographic authentication tags before being written to the database.
-            </p>
-            <p>
-              <strong>2. Access Gating:</strong> Server-side credential decryption is restricted to authorized transaction parties during the active handover window, or to platform administrators during formal dispute investigations (with administrative access logged to audit tables).
-            </p>
-            <p>
-              <strong>3. Access Lockout & Storage Limits:</strong> Client access to reveal credentials is automatically locked out upon order cancellation or refund, and seller access is terminated upon order completion. When credentials are scheduled for retention purging, database columns are nullified. Please note that database-level nullification removes application access, while residual data in database transaction logs (WAL) and cloud provider backups persists until provider backup retention windows expire.
-            </p>
-          </div>
         </section>
 
         {/* Section 3 */}
         <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">3.</span> Sub-Processors & Infrastructure
+          <h2 className="text-base sm:text-lg font-bold text-[#F8FAFC] font-display flex items-center gap-2">
+            <span className="text-[#22C55E]">3.</span> User Rights Under Kenya Law
           </h2>
           <p>
-            Platform data is processed through the following external service providers:
-          </p>
-          <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
-            <li><strong>Safaricom PLC:</strong> Telecommunications gateway for Daraja API v2 M-Pesa payment processing.</li>
-            <li><strong>Supabase / PostgreSQL:</strong> Cloud database infrastructure enforcing Row Level Security (RLS) on database tables.</li>
-          </ul>
-        </section>
-
-        {/* Section 4 */}
-        <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">4.</span> Financial Records & Credential Retention
-          </h2>
-          <p>
-            In accordance with statutory accounting standards and Section 39 of the Kenya Data Protection Act, 2019, transaction ledgers, checkout request IDs, and M-Pesa receipt numbers are retained to reconcile payments and resolve financial inquiries. Ephemeral game account credentials are kept separately from financial ledgers in accordance with the principle of storage limitation under Section 30(1)(e) and the Data Protection (General) Regulations, 2021 (Regulations 19 &amp; 20).
-          </p>
-        </section>
-
-        {/* Section 5 */}
-        <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">5.</span> Data Subject Rights & Inquiries
-          </h2>
-          <p>
-            Under the Kenya Data Protection Act, 2019, users have rights including the right to be informed, access personal data, request rectification of false or misleading data, and request erasure of personal data that is no longer necessary, subject to statutory record-retention requirements. To submit data inquiries, contact privacy@efootballmarket.com.
+            Under the Kenya Data Protection Act, 2019, you have the right to be informed about how your data is used, request access to your stored personal information, and request correction or deletion of outdated data. To submit a data request, reach out to community administration on WhatsApp at <strong>+254 794 400 365</strong>.
           </p>
         </section>
       </div>
 
       <div className="flex justify-center pt-4">
-        <Link href="/terms" className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold underline">
-          Read Terms of Service & Escrow Agreement →
+        <Link href="/terms" className="text-xs text-[#22C55E] hover:underline font-bold">
+          View Community Terms of Service →
         </Link>
       </div>
     </div>

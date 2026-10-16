@@ -319,33 +319,31 @@ export default function TournamentsPage() {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-10">
       {/* Hero Header */}
-      <div className="relative rounded-3xl bg-gradient-to-r from-amber-950/70 via-pitch-card to-slate-900 border border-amber-500/40 p-6 sm:p-10 shadow-2xl overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
-
+      <div className="relative rounded-3xl bg-[#111827] border border-[#1F2937] p-6 sm:p-10 shadow-xl overflow-hidden">
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold">
-              <Trophy className="w-4 h-4 text-amber-400" />
+            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-[#1F2937] border border-[#374151] text-[#FBBF24] text-xs font-bold">
+              <Trophy className="w-4 h-4 text-[#FBBF24]" />
               <span>eFootball Kenya Competitive League & Real Cups</span>
             </div>
 
-            <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">
-              Host & Play 1v1 Tournaments for Real M-Pesa Cash Prizes
+            <h1 className="text-3xl sm:text-4xl font-extrabold text-[#F8FAFC] font-display tracking-tight">
+              1v1 Tournaments & Live Knockout Brackets
             </h1>
 
-            <p className="text-sm text-slate-300 leading-relaxed">
-              Real brackets, genuine competitive players, and verified Konami Match Rooms. Register with your in-game Friend ID, play knockout matches, submit your scores, and crowned champions receive M-Pesa payouts via Safaricom Till <strong>1572931</strong> escrow!
+            <p className="text-sm text-[#94A3B8] leading-relaxed">
+              Real brackets, genuine competitive players, and verified Konami Match Rooms. Register with your in-game Friend ID, play knockout matches, submit your scores, and crowned champions climb the community leaderboard!
             </p>
 
-            <div className="flex flex-wrap items-center gap-5 pt-2 text-xs text-slate-300">
-              <span className="flex items-center gap-1.5 font-semibold text-emerald-300">
-                <ShieldCheck className="w-4 h-4 text-emerald-400" /> Verified M-Pesa Payouts
+            <div className="flex flex-wrap items-center gap-5 pt-2 text-xs text-[#94A3B8]">
+              <span className="flex items-center gap-1.5 font-semibold text-[#22C55E]">
+                <ShieldCheck className="w-4 h-4 text-[#22C55E]" /> Verified Match Scoring
               </span>
-              <span className="flex items-center gap-1.5 font-semibold text-amber-300">
-                <Swords className="w-4 h-4 text-amber-400" /> Live Dynamic Knockout Brackets
+              <span className="flex items-center gap-1.5 font-semibold text-[#FBBF24]">
+                <Swords className="w-4 h-4 text-[#FBBF24]" /> Live Knockout Brackets
               </span>
-              <span className="flex items-center gap-1.5 font-semibold text-indigo-300">
-                <Award className="w-4 h-4 text-indigo-400" /> Admin Officer: Brian Okibo (0794400365)
+              <span className="flex items-center gap-1.5 font-semibold text-[#94A3B8]">
+                <Award className="w-4 h-4 text-[#94A3B8]" /> Admin Officer: Brian Okibo (0794400365)
               </span>
             </div>
           </div>
@@ -389,19 +387,19 @@ export default function TournamentsPage() {
           </div>
         ) : tournaments.length === 0 ? (
           /* Uniform Clean Empty State - Zero Demo Data */
-          <div className="text-center py-16 bg-pitch-surface border border-pitch-border rounded-3xl p-8 space-y-4 shadow-xl">
-            <Trophy className="w-14 h-14 text-slate-600 mx-auto stroke-[1.5]" />
-            <h3 className="text-lg font-bold text-white">No Active Tournaments Scheduled</h3>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
+          <div className="text-center py-16 bg-[#111827] border border-[#1F2937] rounded-3xl p-8 space-y-4 shadow-xl">
+            <Trophy className="w-14 h-14 text-[#94A3B8] mx-auto stroke-[1.5] opacity-50" />
+            <h3 className="text-lg font-bold text-[#F8FAFC]">No Active Tournaments Scheduled</h3>
+            <p className="text-xs text-[#94A3B8] max-w-md mx-auto leading-relaxed">
               There are currently no scheduled tournaments. When Brian Okibo or tournament organizers host a new cup, it will appear here with live brackets and player registration.
             </p>
             {isAdmin ? (
               <div className="pt-2">
                 <Button
-                  variant="gold"
+                  variant="primary"
                   size="md"
                   onClick={() => setIsHostOpen(true)}
-                  className="font-bold inline-flex items-center gap-2"
+                  className="bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-xs inline-flex items-center gap-2 rounded-xl"
                 >
                   <PlusCircle className="w-4 h-4" />
                   <span>Host the First Tournament</span>
@@ -412,7 +410,7 @@ export default function TournamentsPage() {
                 href="https://wa.me/254794400365?text=Hello%20Brian%20Okibo%2C%20I%20am%20interested%20in%20participating%20in%20an%20eFootball%20tournament!"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-xs transition-all shadow-md min-h-[44px]"
               >
                 <MessageCircle className="w-4 h-4" />
                 <span>Request a Tournament on WhatsApp</span>
@@ -429,10 +427,10 @@ export default function TournamentsPage() {
               return (
                 <div
                   key={t.id}
-                  className={`bg-pitch-surface border rounded-3xl p-6 flex flex-col justify-between shadow-2xl transition-all duration-300 ${
+                  className={`bg-[#111827] border rounded-3xl p-6 flex flex-col justify-between shadow-xl transition-all duration-300 ${
                     isSelected
-                      ? "border-amber-500 shadow-amber-500/10 ring-1 ring-amber-500/50"
-                      : "border-pitch-border hover:border-slate-600"
+                      ? "border-[#FBBF24] ring-1 ring-[#FBBF24]/50"
+                      : "border-[#1F2937] hover:border-slate-600"
                   }`}
                 >
                   <div className="space-y-4">
@@ -464,14 +462,14 @@ export default function TournamentsPage() {
                     </div>
 
                     {/* Prize Pool Breakdown */}
-                    <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-2">
+                    <div className="p-4 rounded-2xl bg-[#1F2937] border border-[#374151] space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400 font-semibold">Total Prize Pool</span>
-                        <span className="text-lg font-extrabold text-amber-300 font-display">
+                        <span className="text-xs text-[#94A3B8] font-semibold">Total Prize Pool</span>
+                        <span className="text-lg font-extrabold text-[#FBBF24] font-display">
                           {formatCurrency(t.prize_pool_kes, "KES")}
                         </span>
                       </div>
-                      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-pitch-border/60 text-[11px] text-slate-300">
+                      <div className="grid grid-cols-2 gap-2 pt-1 border-t border-[#374151] text-[11px] text-[#F8FAFC]">
                         <div>🥇 1st: <strong>{formatCurrency(t.first_place_kes, "KES")}</strong></div>
                         <div>🥈 2nd: <strong>{formatCurrency(t.second_place_kes, "KES")}</strong></div>
                       </div>
@@ -506,13 +504,13 @@ export default function TournamentsPage() {
                   </div>
 
                   {/* Card Actions */}
-                  <div className="mt-6 pt-4 border-t border-pitch-border/60 space-y-2">
+                  <div className="mt-6 pt-4 border-t border-[#1F2937] space-y-2">
                     <div className="flex items-center gap-2">
                       {t.status === "registration_open" && (
                         <Button
-                          variant="gold"
+                          variant="primary"
                           size="md"
-                          className="flex-1 font-bold text-xs"
+                          className="flex-1 bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-xs min-h-[40px] rounded-xl shadow-sm"
                           disabled={isFull}
                           onClick={() => {
                             setSelectedTourney(t);
@@ -526,9 +524,13 @@ export default function TournamentsPage() {
                       )}
 
                       <Button
-                        variant={isSelected ? "gold" : "secondary"}
+                        variant="secondary"
                         size="md"
-                        className="flex-1 text-xs font-semibold"
+                        className={`flex-1 text-xs font-semibold min-h-[40px] rounded-xl ${
+                          isSelected
+                            ? "bg-[#FBBF24] text-[#0B1220] font-bold"
+                            : "bg-[#1F2937] border border-[#374151] text-[#F8FAFC] hover:bg-[#374151]"
+                        }`}
                         onClick={() => setSelectedTourney(t)}
                       >
                         {isSelected ? "Viewing Bracket" : "View Bracket"}
@@ -570,12 +572,12 @@ export default function TournamentsPage() {
 
       {/* Selected Tournament Live Bracket & Match Room Center */}
       {selectedTourney && (
-        <div className="bg-pitch-surface border border-pitch-border rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
+        <div className="bg-[#111827] border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
           {/* Header & Controls */}
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-pitch-border pb-5">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800 pb-5">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-xs uppercase font-bold text-amber-400 tracking-wider">
+                <span className="text-xs uppercase font-bold text-[#FBBF24] tracking-wider">
                   Live Knockout Bracket & Score Center
                 </span>
                 <Badge
@@ -585,14 +587,14 @@ export default function TournamentsPage() {
                   {selectedTourney.status.replace("_", " ").toUpperCase()}
                 </Badge>
               </div>
-              <h3 className="text-2xl font-bold text-white font-display mt-1">
+              <h3 className="text-2xl font-bold text-[#F8FAFC] font-display mt-1">
                 {selectedTourney.title}
               </h3>
             </div>
 
             <div className="flex flex-wrap items-center gap-3">
-              <span className="text-xs text-slate-300 font-semibold bg-pitch-card px-3 py-1.5 rounded-xl border border-pitch-border">
-                Prize Pool: <strong className="text-emerald-400">{formatCurrency(selectedTourney.prize_pool_kes, "KES")}</strong>
+              <span className="text-xs text-slate-300 font-semibold bg-[#1F2937] px-3 py-1.5 rounded-xl border border-slate-800">
+                Prize Pool: <strong className="text-[#22C55E]">{formatCurrency(selectedTourney.prize_pool_kes, "KES")}</strong>
               </span>
 
               {isAdmin && (
@@ -628,7 +630,7 @@ export default function TournamentsPage() {
                       {selectedTourney.winner_name}
                     </h4>
                     <p className="text-xs font-bold text-black/80 mt-1">
-                      Awarded 1st Place Cash Prize of {formatCurrency(selectedTourney.first_place_kes, "KES")} via M-Pesa Escrow Till 1572931!
+                      Awarded 1st Place Championship Prize of {formatCurrency(selectedTourney.first_place_kes, "KES")}!
                     </p>
                   </div>
                 </div>
@@ -639,10 +641,10 @@ export default function TournamentsPage() {
                   )}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="px-5 py-3 rounded-xl bg-black text-white hover:bg-slate-900 font-bold text-xs shadow-lg transition-all flex items-center gap-2 shrink-0"
+                  className="px-5 py-3 rounded-xl bg-black text-white hover:bg-slate-900 font-bold text-xs shadow-lg transition-all flex items-center gap-2 shrink-0 min-h-[44px]"
                 >
                   <MessageCircle className="w-4 h-4" />
-                  <span>Verify Payout Receipt</span>
+                  <span>Join Player Chat</span>
                 </a>
               </div>
             </div>
@@ -674,10 +676,10 @@ export default function TournamentsPage() {
                               return (
                                 <div
                                   key={m.id}
-                                  className={`p-4 rounded-2xl bg-pitch-card border space-y-2 text-xs shadow-md transition-all ${
+                                  className={`p-4 rounded-2xl bg-[#1F2937] border space-y-2 text-xs shadow-md transition-all ${
                                     m.is_completed
                                       ? "border-emerald-500/40 ring-1 ring-emerald-500/20"
-                                      : "border-pitch-border hover:border-slate-600"
+                                      : "border-[#374151] hover:border-slate-500"
                                   }`}
                                 >
                                   {/* Match Number & Status */}
@@ -764,7 +766,7 @@ export default function TournamentsPage() {
             </div>
           ) : (
             /* Brackets not generated yet */
-            <div className="p-8 rounded-2xl bg-pitch-card border border-pitch-border text-center space-y-4">
+            <div className="p-8 rounded-2xl bg-[#1F2937] border border-slate-800 text-center space-y-4">
               <Swords className="w-10 h-10 text-slate-500 mx-auto" />
               <h4 className="text-base font-bold text-white">Knockout Brackets Pending Formation</h4>
               <p className="text-xs text-slate-400 max-w-md mx-auto">
@@ -786,9 +788,9 @@ export default function TournamentsPage() {
           )}
 
           {/* Registered Participants Roster */}
-          <div className="border-t border-pitch-border pt-6 space-y-3">
+          <div className="border-t border-slate-800 pt-6 space-y-3">
             <h4 className="text-sm font-bold text-white flex items-center gap-2">
-              <Users className="w-4 h-4 text-amber-400" />
+              <Users className="w-4 h-4 text-[#FBBF24]" />
               <span>Registered Gamers ({selectedTourney.participants?.length || 0} / {selectedTourney.max_players})</span>
             </h4>
 
@@ -799,13 +801,13 @@ export default function TournamentsPage() {
                 {selectedTourney.participants.map((p, idx) => (
                   <div
                     key={p.id || idx}
-                    className="p-2.5 rounded-xl bg-pitch-card border border-pitch-border text-xs flex items-center justify-between"
+                    className="p-2.5 rounded-xl bg-[#1F2937] border border-slate-800 text-xs flex items-center justify-between"
                   >
                     <div className="truncate">
                       <strong className="text-white block truncate">{p.gamer_tag}</strong>
                       <span className="text-[10px] text-slate-400">ID: {p.friend_id}</span>
                     </div>
-                    <span className="text-[10px] font-mono text-emerald-400 font-bold ml-1">
+                    <span className="text-[10px] font-mono text-[#22C55E] font-bold ml-1">
                       #{idx + 1}
                     </span>
                   </div>
@@ -817,22 +819,22 @@ export default function TournamentsPage() {
       )}
 
       {/* Official Fair Play Rules */}
-      <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
+      <div className="bg-[#111827] border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
         <h3 className="text-lg font-bold text-white flex items-center gap-2">
-          <ShieldCheck className="w-5 h-5 text-emerald-400" />
+          <ShieldCheck className="w-5 h-5 text-[#22C55E]" />
           <span>eFootball Kenya Fair Play Protocol & Rules</span>
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-300 pt-1">
-          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
-            <strong className="text-amber-400 block font-bold">1. Match Settings</strong>
+          <div className="p-4 rounded-xl bg-[#1F2937] border border-slate-800 space-y-1.5">
+            <strong className="text-[#FBBF24] block font-bold">1. Match Settings</strong>
             Standard 10-minute match length, Extra Time enabled, PK shootout enabled. No network tampering.
           </div>
-          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
-            <strong className="text-amber-400 block font-bold">2. Score Verification</strong>
+          <div className="p-4 rounded-xl bg-[#1F2937] border border-slate-800 space-y-1.5">
+            <strong className="text-[#FBBF24] block font-bold">2. Score Verification</strong>
             Both players post final match screenshot in the Match Room or submit scores directly on this page.
           </div>
-          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
-            <strong className="text-amber-400 block font-bold">3. Verified Payouts</strong>
+          <div className="p-4 rounded-xl bg-[#1F2937] border border-slate-800 space-y-1.5">
+            <strong className="text-[#FBBF24] block font-bold">3. Verified Payouts</strong>
             Winnings sent to Safaricom M-Pesa within 15 minutes of final whistle by Officer Brian Okibo (0794400365).
           </div>
         </div>
@@ -841,10 +843,10 @@ export default function TournamentsPage() {
       {/* MODAL 1: Registration Modal */}
       {isRegisterOpen && selectedTourney && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-md bg-pitch-surface border border-pitch-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-pitch-border bg-pitch-card/60 flex items-center justify-between">
+          <div className="w-full max-w-md bg-[#111827] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-slate-800 bg-[#1F2937]/60 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-[#FBBF24] flex items-center justify-center">
                   <Trophy className="w-5 h-5" />
                 </div>
                 <div>
@@ -915,16 +917,16 @@ export default function TournamentsPage() {
                     required
                   />
 
-                  <div className="p-3.5 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-1">
+                  <div className="p-3.5 rounded-xl bg-[#1F2937] border border-slate-800 text-xs text-slate-300 space-y-1">
                     <div className="flex items-center justify-between">
                       <span>Entry Fee:</span>
-                      <strong className="text-emerald-400">
+                      <strong className="text-[#22C55E]">
                         {selectedTourney.entry_fee_kes === 0 ? "FREE" : `KES ${selectedTourney.entry_fee_kes}`}
                       </strong>
                     </div>
                     <div className="flex items-center justify-between">
                       <span>Safaricom Till Number:</span>
-                      <strong className="text-amber-400">1572931 (EFootballMarket)</strong>
+                      <strong className="text-[#FBBF24]">1572931 (EFootballMarket)</strong>
                     </div>
                   </div>
 
@@ -949,10 +951,10 @@ export default function TournamentsPage() {
       {/* MODAL 2: Admin Host Tournament Modal */}
       {isHostOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-lg bg-pitch-surface border border-pitch-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-pitch-border bg-pitch-card/60 flex items-center justify-between">
+          <div className="w-full max-w-lg bg-[#111827] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-slate-800 bg-[#1F2937]/60 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-[#FBBF24] flex items-center justify-center">
                   <Crown className="w-5 h-5" />
                 </div>
                 <div>
@@ -997,7 +999,7 @@ export default function TournamentsPage() {
                     Platform
                   </label>
                   <select
-                    className="w-full px-3.5 py-2 rounded-xl bg-pitch-card border border-pitch-border text-white text-xs focus:outline-none focus:border-amber-500"
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#1F2937] border border-slate-800 text-white text-xs focus:outline-none focus:border-[#22C55E]"
                     value={hostPlatform}
                     onChange={(e: any) => setHostPlatform(e.target.value)}
                   >
@@ -1013,7 +1015,7 @@ export default function TournamentsPage() {
                     Max Players
                   </label>
                   <select
-                    className="w-full px-3.5 py-2 rounded-xl bg-pitch-card border border-pitch-border text-white text-xs focus:outline-none focus:border-amber-500"
+                    className="w-full px-3.5 py-2 rounded-xl bg-[#1F2937] border border-slate-800 text-white text-xs focus:outline-none focus:border-[#22C55E]"
                     value={hostMaxPlayers}
                     onChange={(e) => setHostMaxPlayers(e.target.value)}
                   >
@@ -1092,10 +1094,10 @@ export default function TournamentsPage() {
       {/* MODAL 3: Submit / Post Match Score */}
       {isScoreOpen && selectedMatch && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-md bg-pitch-surface border border-pitch-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-pitch-border bg-pitch-card/60 flex items-center justify-between">
+          <div className="w-full max-w-md bg-[#111827] border border-slate-800 rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
+            <div className="p-6 border-b border-slate-800 bg-[#1F2937]/60 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
+                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-[#FBBF24] flex items-center justify-center">
                   <Swords className="w-5 h-5" />
                 </div>
                 <div>
@@ -1119,7 +1121,7 @@ export default function TournamentsPage() {
                 </div>
               )}
 
-              <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-4">
+              <div className="p-4 rounded-2xl bg-[#1F2937] border border-slate-800 space-y-4">
                 <div className="flex items-center justify-between gap-3">
                   <span className="text-xs font-bold text-white flex-1 truncate">
                     {selectedMatch.player1_name}
@@ -1130,7 +1132,7 @@ export default function TournamentsPage() {
                     max="99"
                     value={score1}
                     onChange={(e) => setScore1(e.target.value)}
-                    className="w-16 px-3 py-2 text-center text-lg font-bold font-mono rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-amber-500"
+                    className="w-16 px-3 py-2 text-center text-lg font-bold font-mono rounded-xl bg-[#111827] border border-slate-700 text-white focus:outline-none focus:border-[#22C55E]"
                     required
                   />
                 </div>
@@ -1145,7 +1147,7 @@ export default function TournamentsPage() {
                     max="99"
                     value={score2}
                     onChange={(e) => setScore2(e.target.value)}
-                    className="w-16 px-3 py-2 text-center text-lg font-bold font-mono rounded-xl bg-slate-800 border border-slate-700 text-white focus:outline-none focus:border-amber-500"
+                    className="w-16 px-3 py-2 text-center text-lg font-bold font-mono rounded-xl bg-[#111827] border border-slate-700 text-white focus:outline-none focus:border-[#22C55E]"
                     required
                   />
                 </div>

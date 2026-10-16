@@ -12,14 +12,14 @@ export function WhatsAppSupportWidget() {
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER || "254794400365";
 
   const topics = [
-    { label: "M-Pesa STK Push / Payment Issue", query: "Hello eFootballMarket Support, I need help with an M-Pesa STK push or payment verification." },
-    { label: "Escrow Release & Konami ID Help", query: "Hello eFootballMarket Support, I have a question regarding Konami ID credentials and escrow release." },
-    { label: "Verify a Seller / Report an Issue", query: "Hello eFootballMarket Support, I want to verify a seller's credibility or report an issue." },
-    { label: "Talk to Brian Okibo (CEO)", query: "Hello eFootballMarket, I would like to speak to executive support regarding an order." },
+    { label: "Tournament Registration & Fixtures", query: "Hello eFootball Kenya Support, I need help with tournament registration or match schedules." },
+    { label: "Match Dispute & Score Verification", query: "Hello eFootball Kenya Support, I have a score conflict or match screenshot to submit." },
+    { label: "Report Scammer / Fair Play Violation", query: "Hello eFootball Kenya Support, I want to report suspicious player activity or an imposter." },
+    { label: "Talk to Brian Okibo (Desk Lead)", query: "Hello eFootball Kenya, I would like to speak to community lead Brian Okibo." },
   ];
 
   const handleLaunchWhatsApp = (text?: string) => {
-    const messageToSend = text || customMessage || topics.find((t) => t.label === selectedTopic)?.query || "Hello eFootballMarket Support!";
+    const messageToSend = text || customMessage || topics.find((t) => t.label === selectedTopic)?.query || "Hello eFootball Kenya Support!";
     const encoded = encodeURIComponent(messageToSend);
     const url = `https://wa.me/${whatsappNumber}?text=${encoded}`;
     window.open(url, "_blank", "noopener,noreferrer");
@@ -30,17 +30,17 @@ export function WhatsAppSupportWidget() {
     <div className="fixed bottom-5 right-5 z-40 select-none">
       {/* Floating Chat Modal */}
       {isOpen && (
-        <div className="absolute bottom-16 right-0 w-[320px] sm:w-[360px] rounded-3xl bg-pitch-surface/95 border border-pitch-border shadow-2xl backdrop-blur-xl overflow-hidden animate-in fade-in slide-in-from-bottom-3 flex flex-col">
+        <div className="absolute bottom-16 right-0 w-[320px] sm:w-[360px] rounded-3xl bg-[#111827] border border-slate-800 shadow-2xl backdrop-blur-xl overflow-hidden animate-in fade-in slide-in-from-bottom-3 flex flex-col">
           {/* Header */}
-          <div className="p-4 bg-gradient-to-r from-emerald-950 via-pitch-card to-slate-900 border-b border-pitch-border/60 flex items-center justify-between">
+          <div className="p-4 bg-[#1F2937] border-b border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2.5">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400">
+              <div className="w-9 h-9 rounded-xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-[#22C55E]">
                 <ShieldCheck className="w-5 h-5" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white leading-tight">eFootball Escrow Support</p>
+                <p className="text-xs font-bold text-[#F8FAFC] leading-tight">eFootball Community Desk</p>
                 <div className="flex items-center gap-1.5 mt-0.5">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                  <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-pulse" />
                   <span className="text-[10px] text-emerald-300 font-semibold">Online (Replies in &lt;5 mins)</span>
                 </div>
               </div>
@@ -57,7 +57,7 @@ export function WhatsAppSupportWidget() {
           {/* Body */}
           <div className="p-4 space-y-3 text-xs">
             <p className="text-slate-300 leading-relaxed text-[11px]">
-              Need direct assistance with an M-Pesa transaction or Konami ID transfer? Our verified support team is available on WhatsApp.
+              Need direct assistance with tournament brackets, dispute resolution, or fair play safety? The community helpdesk is available on WhatsApp.
             </p>
 
             <div className="space-y-1.5">
@@ -69,12 +69,12 @@ export function WhatsAppSupportWidget() {
                   key={item.label}
                   type="button"
                   onClick={() => handleLaunchWhatsApp(item.query)}
-                  className="w-full text-left p-2.5 rounded-xl bg-pitch-card border border-pitch-border hover:border-emerald-500/60 hover:bg-slate-800/80 transition-all flex items-center justify-between group"
+                  className="w-full text-left p-2.5 rounded-xl bg-[#1F2937] border border-slate-800 hover:border-[#22C55E]/60 hover:bg-slate-800/80 transition-all flex items-center justify-between group"
                 >
                   <span className="text-slate-200 group-hover:text-emerald-300 transition-colors font-medium text-xs">
                     {item.label}
                   </span>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-emerald-400 transition-transform group-hover:translate-x-0.5" />
+                  <ChevronRight className="w-3.5 h-3.5 text-slate-500 group-hover:text-[#22C55E] transition-transform group-hover:translate-x-0.5" />
                 </button>
               ))}
             </div>
@@ -88,12 +88,12 @@ export function WhatsAppSupportWidget() {
                   value={customMessage}
                   onChange={(e) => setCustomMessage(e.target.value)}
                   onKeyDown={(e) => e.key === "Enter" && handleLaunchWhatsApp()}
-                  className="w-full bg-slate-900 border border-pitch-border rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 pr-9 focus:outline-none focus:border-emerald-400"
+                  className="w-full bg-[#0B1220] border border-slate-800 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 pr-9 focus:outline-none focus:border-[#22C55E]"
                 />
                 <button
                   type="button"
                   onClick={() => handleLaunchWhatsApp()}
-                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 text-emerald-400 hover:text-emerald-300 transition-colors"
+                  className="absolute right-1.5 top-1/2 -translate-y-1/2 p-1.5 text-[#22C55E] hover:text-emerald-300 transition-colors"
                 >
                   <Send className="w-3.5 h-3.5" />
                 </button>
@@ -102,9 +102,9 @@ export function WhatsAppSupportWidget() {
           </div>
 
           {/* Footer note */}
-          <div className="p-2.5 bg-slate-900/90 border-t border-pitch-border/60 text-center">
+          <div className="p-2.5 bg-[#0B1220] border-t border-slate-800 text-center">
             <span className="text-[10px] text-slate-400">
-              🔒 Official Escrow Hotline — Safaricom M-Pesa Integrated
+              🔒 Official Community Line: 0794400365 • Nairobi, Kenya
             </span>
           </div>
         </div>
@@ -114,14 +114,14 @@ export function WhatsAppSupportWidget() {
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs shadow-2xl shadow-emerald-950/80 border border-emerald-400/50 hover:scale-105 transition-all duration-200 group"
+        className="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-[#22C55E] hover:bg-emerald-600 text-slate-950 font-bold text-xs shadow-2xl shadow-black/80 border border-emerald-400/50 hover:scale-105 transition-all duration-200 group"
       >
         <span className="relative flex h-2.5 w-2.5">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
-          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-300" />
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-slate-950 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-slate-900" />
         </span>
-        <MessageCircle className="w-4 h-4 fill-white group-hover:rotate-6 transition-transform" />
-        <span className="hidden sm:inline">WhatsApp Escrow Support</span>
+        <MessageCircle className="w-4 h-4 fill-current group-hover:rotate-6 transition-transform" />
+        <span className="hidden sm:inline">WhatsApp Community Support</span>
       </button>
     </div>
   );

@@ -249,17 +249,17 @@ function NotificationsContent() {
   });
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8 bg-[#0B1220] text-[#F8FAFC]">
       {/* Header Banner */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-pitch-border/60 pb-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-[#1F2937] pb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-semibold mb-2">
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[#111827] border border-[#1F2937] text-[#22C55E] text-xs font-semibold mb-2">
             <Bell className="w-3.5 h-3.5" />
-            <span>Activity & Escrow Alerts</span>
+            <span>Community & Activity Alerts</span>
           </div>
-          <h1 className="text-3xl font-bold text-white font-display">Notifications Center</h1>
-          <p className="text-sm text-slate-400 mt-1">
-            Real-time alerts for M-Pesa escrow transfers, buyer/seller messages, and security bulletins.
+          <h1 className="text-3xl font-extrabold text-[#F8FAFC] font-display">Notifications Center</h1>
+          <p className="text-sm text-[#94A3B8] mt-1">
+            Real-time alerts for tournaments, match schedules, community messages, and security bulletins.
           </p>
         </div>
 
@@ -270,7 +270,7 @@ function NotificationsContent() {
             size="sm"
             onClick={fetchNotifications}
             disabled={loading}
-            className="text-xs"
+            className="text-xs bg-[#111827] border border-[#1F2937] text-[#F8FAFC] hover:bg-[#1F2937]"
           >
             <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loading ? "animate-spin" : ""}`} />
             Refresh
@@ -278,11 +278,11 @@ function NotificationsContent() {
 
           {unreadCount > 0 && (
             <Button
-              variant="gold"
+              variant="primary"
               size="sm"
               onClick={handleMarkAllRead}
               disabled={actionLoading}
-              className="text-xs font-semibold shadow-md"
+              className="text-xs font-bold bg-[#22C55E] text-[#0B1220] hover:bg-[#16a34a] shadow-sm"
             >
               <CheckCheck className="w-3.5 h-3.5 mr-1.5" />
               Mark all read ({unreadCount})
@@ -295,7 +295,7 @@ function NotificationsContent() {
               size="sm"
               onClick={handleClearRead}
               disabled={actionLoading}
-              className="text-xs text-slate-400 hover:text-slate-200"
+              className="text-xs text-[#94A3B8] hover:text-[#F8FAFC] border-[#1F2937]"
             >
               <Trash2 className="w-3.5 h-3.5 mr-1.5" />
               Clear read
@@ -306,28 +306,28 @@ function NotificationsContent() {
 
       {/* Guest Guidance Banner if unauthenticated */}
       {!isAuthenticated && !authLoading && (
-        <div className="p-5 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-xl">
+        <div className="p-5 rounded-2xl bg-[#111827] border border-[#1F2937] flex flex-col sm:flex-row sm:items-center justify-between gap-4 shadow-lg">
           <div className="flex items-start gap-3">
-            <div className="w-10 h-10 rounded-xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 shrink-0 mt-0.5">
-              <ShieldCheck className="w-5 h-5" />
+            <div className="w-10 h-10 rounded-xl bg-[#1F2937] border border-[#374151] flex items-center justify-center text-[#FBBF24] shrink-0 mt-0.5">
+              <ShieldCheck className="w-5 h-5 text-[#22C55E]" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-amber-200">
-                Log in to View Your Personalized Account Notifications
+              <h3 className="text-sm font-bold text-[#F8FAFC]">
+                Log in to View Your Personalized Community Alerts
               </h3>
-              <p className="text-xs text-slate-300 mt-0.5">
-                Sign in to track real-time M-Pesa escrow confirmations, buyer messages, and order deliveries.
+              <p className="text-xs text-[#94A3B8] mt-0.5">
+                Sign in to track tournament bracket match codes, organizer announcements, and direct notices.
               </p>
             </div>
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <Link href="/login?redirect=/notifications">
-              <Button variant="secondary" size="sm">
+              <Button variant="secondary" size="sm" className="bg-[#1F2937] border border-[#374151] text-[#F8FAFC] text-xs">
                 Log In
               </Button>
             </Link>
             <Link href="/register?redirect=/notifications">
-              <Button variant="gold" size="sm" className="font-semibold shadow-md">
+              <Button variant="primary" size="sm" className="bg-[#22C55E] text-[#0B1220] font-bold text-xs hover:bg-[#16a34a]">
                 Create Account
               </Button>
             </Link>
@@ -336,15 +336,15 @@ function NotificationsContent() {
       )}
 
       {/* Quick Filter Tabs */}
-      <div className="flex items-center justify-between border-b border-pitch-border/80 pb-3 gap-2 overflow-x-auto">
+      <div className="flex items-center justify-between border-b border-[#1F2937] pb-3 gap-2 overflow-x-auto">
         <div className="flex items-center gap-1.5">
           <button
             type="button"
             onClick={() => setActiveTab("all")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               activeTab === "all"
-                ? "bg-brand-600 text-white shadow-md shadow-brand-900/50"
-                : "bg-pitch-surface text-slate-400 hover:text-slate-200 hover:bg-pitch-card"
+                ? "bg-[#22C55E] text-[#0B1220] font-bold"
+                : "bg-[#111827] text-[#94A3B8] border border-[#1F2937] hover:text-white hover:bg-[#1F2937]"
             }`}
           >
             All ({notifications.length})
@@ -354,13 +354,13 @@ function NotificationsContent() {
             onClick={() => setActiveTab("unread")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all flex items-center gap-1.5 ${
               activeTab === "unread"
-                ? "bg-brand-600 text-white shadow-md shadow-brand-900/50"
-                : "bg-pitch-surface text-slate-400 hover:text-slate-200 hover:bg-pitch-card"
+                ? "bg-[#22C55E] text-[#0B1220] font-bold"
+                : "bg-[#111827] text-[#94A3B8] border border-[#1F2937] hover:text-white hover:bg-[#1F2937]"
             }`}
           >
             <span>Unread</span>
             {unreadCount > 0 && (
-              <span className="px-1.5 py-0.2 rounded-full bg-amber-400 text-slate-950 font-bold text-[10px]">
+              <span className="px-1.5 py-0.2 rounded-full bg-[#FBBF24] text-[#0B1220] font-bold text-[10px]">
                 {unreadCount}
               </span>
             )}
@@ -370,8 +370,8 @@ function NotificationsContent() {
             onClick={() => setActiveTab("messages")}
             className={`px-3 py-1.5 rounded-xl text-xs font-semibold transition-all ${
               activeTab === "messages"
-                ? "bg-brand-600 text-white shadow-md shadow-brand-900/50"
-                : "bg-pitch-surface text-slate-400 hover:text-slate-200 hover:bg-pitch-card"
+                ? "bg-[#22C55E] text-[#0B1220] font-bold"
+                : "bg-[#111827] text-[#94A3B8] border border-[#1F2937] hover:text-white hover:bg-[#1F2937]"
             }`}
           >
             Messages

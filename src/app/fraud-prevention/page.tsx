@@ -1,113 +1,114 @@
-import { AlertCircle, Ban, Lock, ShieldAlert, ShieldCheck, Building2, Zap } from "lucide-react";
+import { Building2, ExternalLink, MessageCircle, Phone, ShieldAlert, ShieldCheck, Trophy } from "lucide-react";
 import Link from "next/link";
 
 export const metadata = {
-  title: "Anti-Fraud & Cyber Security Governance | eFootballMarket",
-  description: "Enterprise security architecture, cybercrime mitigation, and fraud enforcement standards of eFootballMarket Inc.",
+  title: "Fair Play & Anti-Fraud Safety Guide | eFootball Community Kenya",
+  description: "Community player guidelines, scam awareness, and security recommendations for eFootball players in Kenya.",
 };
 
 export default function FraudPreventionPage() {
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-10">
+    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-10 bg-[#0B1220] text-[#F8FAFC]">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/80 border border-rose-800/80 text-rose-400 text-xs font-semibold">
-          <ShieldAlert className="w-4 h-4" />
-          <span>Institutional Fraud Mitigation Standard</span>
+        <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#111827] border border-[#1F2937] text-xs font-semibold text-[#22C55E]">
+          <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
+          <span>Community Safety Standard</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
-          Anti-Fraud & Cyber Security Policy
+        <h1 className="text-3xl sm:text-4xl font-extrabold text-[#F8FAFC] font-display tracking-tight">
+          Fair Play & Anti-Fraud Safety Guide
         </h1>
-        <p className="text-xs sm:text-sm text-slate-400 max-w-2xl mx-auto">
-          How eFootballMarket combats fraudulent payments, phishing, and post-settlement account recoveries.
+        <p className="text-xs sm:text-sm text-[#94A3B8] max-w-2xl mx-auto leading-relaxed">
+          How to protect yourself against payment spoofing, impersonator fraud, and unauthorized credential sharing in Kenya.
         </p>
       </div>
 
-      {/* Corporate Governance Notice */}
-      <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl space-y-3">
+      {/* Administration Contact Banner */}
+      <div className="p-6 rounded-2xl bg-[#111827] border border-[#1F2937] shadow-md space-y-3">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-rose-950/60 border border-rose-800/60 flex items-center justify-center text-rose-400">
-            <Building2 className="w-5 h-5" />
+          <div className="w-10 h-10 rounded-xl bg-[#1F2937] border border-[#374151] flex items-center justify-center text-[#FBBF24]">
+            <Building2 className="w-5 h-5 text-[#FBBF24]" />
           </div>
           <div>
-            <h2 className="text-base font-bold text-slate-100 font-display">
-              Anti-Fraud Infrastructure Directed by Brian Okibo, CEO
+            <h2 className="text-base font-bold text-[#F8FAFC] font-display">
+              Official Administration Hotline: 0794400365
             </h2>
-            <p className="text-xs text-rose-400 font-medium">
-              Enterprise Risk Governance & Mobile Banking Integrity
+            <p className="text-xs text-[#94A3B8]">
+              Directed by Brian Okibo, Community Director
             </p>
           </div>
         </div>
-        <p className="text-xs sm:text-sm text-slate-300 leading-relaxed">
-          The fraud prevention framework of <strong>eFootballMarket</strong> was architected under the direction of <strong>Brian Okibo, Chief Executive Officer (CEO)</strong>. The system mitigates common gaming marketplace fraud by cryptographically verifying Safaricom Daraja M-Pesa callbacks and enforcing strict legal consequences for post-sale account retrieval.
+        <p className="text-xs sm:text-sm text-[#94A3B8] leading-relaxed">
+          In unmonitored WhatsApp or Facebook gaming groups, players frequently encounter impersonators pretending to be tournament admins or escrow agents. Always verify communications through our official telephone hotline (<strong>0794400365</strong>) or official website channels.
         </p>
       </div>
 
-      <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-8 shadow-xl space-y-8 text-slate-300 text-sm leading-relaxed">
+      {/* Main Guidelines Cards */}
+      <div className="bg-[#111827] border border-[#1F2937] rounded-3xl p-6 sm:p-10 shadow-lg space-y-8 text-[#94A3B8] text-sm leading-relaxed">
         {/* Section 1 */}
         <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-rose-400">1.</span> Prevention of Spoofed Payment Scams
+          <h2 className="text-base sm:text-lg font-bold text-[#F8FAFC] font-display flex items-center gap-2">
+            <span className="text-[#22C55E]">1.</span> Recognizing Fake M-Pesa SMS & Screenshot Scams
           </h2>
           <p>
-            In unmonitored gaming communities, fraudsters frequently fabricate fake M-Pesa SMS texts or alter screenshot receipts.
+            The most common fraud across online gaming communities in Kenya involves fabricated SMS messages resembling Safaricom Lipa Na M-Pesa notifications or altered screenshot images.
           </p>
-          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2">
-            <strong className="text-emerald-400 block font-semibold">Our Cryptographic Defense:</strong>
-            <p>
-              eFootballMarket never validates payments through human inspection of customer screenshots. Transactions are verified exclusively through authenticated server-to-server HTTPS webhooks originating directly from Safaricom PLC infrastructure. Escrow state locks only after validation of exact shilling amounts and merchant reference IDs.
+          <div className="p-4 rounded-xl bg-[#1F2937] border border-[#374151] text-xs text-[#F8FAFC] space-y-2">
+            <strong className="text-[#22C55E] block font-semibold">Verification Rule:</strong>
+            <p className="text-[#94A3B8]">
+              Never rely on customer-provided screenshots as proof of payment. For tournament entries or friendly matches, check your official M-Pesa statement or Safaricom App balance directly before confirming match schedules.
             </p>
           </div>
         </section>
 
         {/* Section 2 */}
         <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-rose-400">2.</span> Post-Delivery Recovery Defined as Cybercrime
+          <h2 className="text-base sm:text-lg font-bold text-[#F8FAFC] font-display flex items-center gap-2">
+            <span className="text-[#22C55E]">2.</span> Impersonation & Fake Group Warning
           </h2>
           <p>
-            Reclaiming a gaming account after receiving escrow payout constitutes unlawful computer interference and criminal fraud:
+            Fraudsters frequently copy administrator names, profile pictures, and group logos to message players privately with unverified offers or counterfeit tournament registration links.
           </p>
           <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
-            <li><strong>Mandatory Cooperation with Law Enforcement:</strong> eFootballMarket Inc. cooperates proactively with national cybercrime investigators, providing verified KYC identities, IP access histories, and telecommunication records of rogue sellers.</li>
-            <li><strong>Permanent Blacklist & Forfeiture:</strong> Fraudulent actors face permanent banning across all company platforms, and any undistributed balance is seized as restitution for affected parties.</li>
+            <li><strong>Official WhatsApp Number:</strong> The only authorized administrator number is <strong>+254 794 400 365</strong>.</li>
+            <li><strong>No Unsolicited DMs:</strong> Community staff will never message you asking for your password, email OTP, or private two-factor backup codes.</li>
           </ul>
         </section>
 
         {/* Section 3 */}
         <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-rose-400">3.</span> Automated Telemetry & Anomaly Filtering
+          <h2 className="text-base sm:text-lg font-bold text-[#F8FAFC] font-display flex items-center gap-2">
+            <span className="text-[#22C55E]">3.</span> Konami Official Terms Advisory
           </h2>
           <p>
-            The Platform continuously monitors for suspicious account activity:
+            We encourage all players to understand the official publisher rules governing eFootball accounts:
           </p>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
-            <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border">
-              <span className="text-slate-100 font-semibold block mb-0.5">Velocity Monitoring</span>
-              <span className="text-slate-400">Automated restrictions on rapid batch purchases or suspicious spikes in account listings.</span>
-            </div>
-            <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border">
-              <span className="text-slate-100 font-semibold block mb-0.5">Scam URL & Keyword Scrubbing</span>
-              <span className="text-slate-400">Real-time filtering of off-platform contact attempts and phishing links.</span>
-            </div>
+          <div className="p-4 rounded-xl bg-[#1F2937] border border-[#374151] text-xs text-[#94A3B8] space-y-2">
+            <p>
+              According to <a href="https://www.konami.com/efootball/en-us/topic/news/5174" target="_blank" rel="noopener noreferrer" className="text-[#22C55E] hover:underline font-semibold inline-flex items-center gap-0.5">Konami’s official terms <ExternalLink className="w-3 h-3 ml-0.5" /></a>, loaning, selling, or transferring accounts and sharing passwords are prohibited. Doing so carries risk of account suspension or permanent termination by the publisher.
+            </p>
           </div>
         </section>
 
         {/* Section 4 */}
         <section className="space-y-3">
-          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-rose-400">4.</span> Reporting Suspicious Activity
+          <h2 className="text-base sm:text-lg font-bold text-[#F8FAFC] font-display flex items-center gap-2">
+            <span className="text-[#22C55E]">4.</span> Reporting Community Scammers
           </h2>
           <p>
-            To report suspected fraud or intellectual property infringement, contact the Fraud Investigation Bureau supervised by <strong>Brian Okibo, CEO</strong> at security@efootballmarket.com.
+            If you encounter an impersonator or scammer operating in a local group, report their phone number and evidence directly to our administration team on WhatsApp at <strong>+254 794 400 365</strong> so a public warning bulletin can be issued.
           </p>
         </section>
       </div>
 
-      <div className="flex justify-center pt-4">
-        <Link href="/terms" className="text-xs text-rose-400 hover:text-rose-300 font-semibold underline">
-          Read Terms of Service & Escrow Agreement →
+      {/* Action Footer */}
+      <div className="flex flex-wrap items-center justify-center gap-4 pt-4 text-xs">
+        <Link href="/news?category=scammer_alert" className="text-[#22C55E] hover:underline font-bold">
+          View Recent Scammer Alerts →
+        </Link>
+        <span className="text-[#1F2937]">|</span>
+        <Link href="/terms" className="text-[#94A3B8] hover:text-[#F8FAFC] font-semibold">
+          Community Terms of Service →
         </Link>
       </div>
     </div>
