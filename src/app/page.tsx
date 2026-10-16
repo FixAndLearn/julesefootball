@@ -76,42 +76,7 @@ export default async function HomePage() {
 
   return (
     <div className="relative min-h-screen bg-[#0B1220] text-[#F8FAFC]">
-      {/* 1. TOP INSTITUTIONAL TRUST RIBBON (Healthline-style authority bar) */}
-      <div className="bg-[#090D16] border-b border-slate-800/80 py-2.5 px-4 text-xs">
-        <div className="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2 text-slate-300">
-          <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3">
-            <span className="inline-flex items-center gap-1.5 text-emerald-400 font-semibold">
-              <BadgeCheck className="w-4 h-4 text-[#22C55E]" />
-              <span>Verified eFootball Escrow: Safaricom Till 1572931</span>
-            </span>
-            <span className="hidden md:inline text-slate-600">•</span>
-            <span className="hidden md:inline-flex items-center gap-1 text-slate-300">
-              <Clock className="w-3.5 h-3.5 text-amber-400" />
-              <span>Mandatory 24-Hour Buyer Inspection Window</span>
-            </span>
-            <span className="hidden lg:inline text-slate-600">•</span>
-            <span className="hidden lg:inline text-slate-400">
-              Kenya Data Protection Act (2019) Compliant
-            </span>
-          </div>
-
-          <div className="flex items-center gap-4 text-[11px] font-medium">
-            <a
-              href="https://wa.me/254794400365"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#22C55E] hover:underline flex items-center gap-1"
-            >
-              <Phone className="w-3 h-3" />
-              <span>Helpline: 0794400365</span>
-            </a>
-            <span className="text-slate-600">•</span>
-            <span className="text-slate-400">Currency: KES (M-Pesa)</span>
-          </div>
-        </div>
-      </div>
-
-      {/* 2. HERO SECTION (Authoritative, clean, high-converting split layout) */}
+      {/* 1. HERO SECTION (Authoritative, clean, high-converting split layout) */}
       <section className="relative overflow-hidden pt-8 pb-14 md:pt-12 md:pb-20 border-b border-slate-800 bg-gradient-to-b from-[#0B1220] via-[#0D1527] to-[#0B1220]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">

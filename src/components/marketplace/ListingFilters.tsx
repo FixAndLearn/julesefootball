@@ -164,7 +164,12 @@ export function ListingFilters() {
         </select>
       </div>
 
-      <Button variant="primary" size="sm" className="w-full" onClick={applyFilters}>
+      <Button
+        variant="primary"
+        size="md"
+        className="w-full min-h-[48px] bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-sm shadow-md"
+        onClick={applyFilters}
+      >
         Apply Filters
       </Button>
     </div>

@@ -5,14 +5,18 @@ import { Button } from "@/components/ui/Button";
 import { useAuth } from "@/hooks/useAuth";
 import { isUserAdmin } from "@/lib/security/adminAuth";
 import {
+  BadgeCheck,
   Bell,
   CheckCircle2,
   ChevronDown,
+  Clock,
   Crown,
   LogOut,
   Menu,
   Newspaper,
+  Phone,
   PlusCircle,
+  Search,
   ShieldCheck,
   ShoppingCart,
   User as UserIcon,
@@ -35,7 +39,16 @@ export function Header() {
   const isAdminUser = isUserAdmin(user?.email, profile?.role);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
+
+  const handleSearchSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (searchQuery.trim()) {
+      router.push(`/browse?search=${encodeURIComponent(searchQuery.trim())}`);
+      setMobileMenuOpen(false);
+    }
+  };
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -67,6 +80,41 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
+      {/* Persistent Global Authority Trust Ribbon */}
+      <div className="bg-[#090D16] border-b border-[#1F2937]/80 py-1.5 px-4 text-[11px] hidden md:block">
+        <div className="max-w-7xl mx-auto flex items-center justify-between text-[#94A3B8]">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center gap-1.5 text-[#22C55E] font-semibold">
+              <BadgeCheck className="w-3.5 h-3.5 text-[#22C55E]" />
+              <span>Verified Escrow: Safaricom Till 1572931</span>
+            </span>
+            <span className="text-slate-600">•</span>
+            <span className="inline-flex items-center gap-1 text-slate-300">
+              <Clock className="w-3.5 h-3.5 text-[#FBBF24]" />
+              <span>Mandatory 24-Hour Buyer Inspection Window</span>
+            </span>
+            <span className="text-slate-600 hidden lg:inline">•</span>
+            <span className="hidden lg:inline text-slate-400">
+              Kenya Data Protection Act (2019) Compliant
+            </span>
+          </div>
+
+          <div className="flex items-center gap-4 text-[11px] font-medium">
+            <a
+              href="https://wa.me/254794400365"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#22C55E] hover:underline flex items-center gap-1"
+            >
+              <Phone className="w-3 h-3" />
+              <span>Helpline: 0794400365</span>
+            </a>
+            <span className="text-slate-600">•</span>
+            <span className="text-slate-400">Currency: KES (M-Pesa)</span>
+          </div>
+        </div>
+      </div>
+
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16">
           {/* Logo & Desktop Nav */}
@@ -115,6 +163,18 @@ export function Header() {
                 Escrow Rules
               </Link>
             </nav>
+
+            {/* Desktop Quick Search Input */}
+            <form onSubmit={handleSearchSubmit} className="hidden 2xl:flex items-center relative ml-1">
+              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
+              <input
+                type="text"
+                placeholder="Search accounts / OVR..."
+                value={searchQuery}
+                onChange={(e) => setSearchQuery(e.target.value)}
+                className="pl-8 pr-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#22C55E] w-48 transition-all focus:w-60"
+              />
+            </form>
           </div>
 
           {/* Right Action Buttons */}
@@ -328,6 +388,18 @@ export function Header() {
               </div>
             </div>
           )}
+
+          {/* Mobile Instant Search Bar */}
+          <form onSubmit={handleSearchSubmit} className="relative">
+            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
+            <input
+              type="text"
+              placeholder="Search squads (e.g. 3150 OVR, Epics)..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#111827] border border-[#1F2937] text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#22C55E]"
+            />
+          </form>
 
           <nav className="space-y-1 text-sm font-medium text-[#94A3B8]">
             {isAdminUser && (

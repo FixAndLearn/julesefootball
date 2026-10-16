@@ -6,10 +6,10 @@ import { usePathname } from "next/navigation";
 
 export function Footer() {
   const pathname = usePathname();
-  const isHomePage = pathname === "/";
+  const isMinimalFlow = pathname.startsWith("/pay/");
 
-  // Compact footer for non-home pages (orders, dashboards, chat, browse, etc.)
-  if (!isHomePage) {
+  // Minimal footer only for focused checkout flow
+  if (isMinimalFlow) {
     return (
       <footer className="w-full border-t border-[#1F2937] bg-[#0B1220] text-[#94A3B8] text-xs mt-auto py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
