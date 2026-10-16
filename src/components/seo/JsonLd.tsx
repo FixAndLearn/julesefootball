@@ -95,3 +95,138 @@ export function JsonLd({ siteUrl = "https://www.efootballmarket.co.ke" }: { site
     </>
   );
 }
+
+export function ProductJsonLd({
+  listing,
+  siteUrl = "https://www.efootballmarket.co.ke",
+}: {
+  listing: any;
+  siteUrl?: string;
+}) {
+  const primaryImage =
+    listing.images?.find((img: any) => img.is_primary)?.image_url ||
+    listing.images?.[0]?.image_url ||
+    `${siteUrl}/icon.svg`;
+
+  const productSchema = {
+    "@context": "https://schema.org",
+    "@type": "Product",
+    name: listing.title,
+    description: listing.description || `${listing.overall_team_strength} OVR eFootball Mobile Account with verified Konami ID.`,
+    image: [primaryImage],
+    brand: {
+      "@type": "Brand",
+      name: "eFootball",
+    },
+    offers: {
+      "@type": "Offer",
+      url: `${siteUrl}/listings/${listing.id}`,
+      priceCurrency: listing.currency || "KES",
+      price: listing.price,
+      priceValidUntil: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+      itemCondition: "https://schema.org/UsedCondition",
+      availability: listing.status === "published" ? "https://schema.org/InStock" : "https://schema.org/OutOfStock",
+      seller: {
+        "@type": "Organization",
+        name: "eFootballMarket Kenya Escrow Vault",
+      },
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(productSchema) }}
+    />
+  );
+}
+
+export function NewsArticleJsonLd({
+  article,
+  siteUrl = "https://www.efootballmarket.co.ke",
+}: {
+  article: any;
+  siteUrl?: string;
+}) {
+  const articleSchema = {
+    "@context": "https://schema.org",
+    "@type": "NewsArticle",
+    headline: article.title,
+    description: article.summary,
+    image: article.cover_image_url ? [article.cover_image_url] : [`${siteUrl}/icon.svg`],
+    datePublished: article.created_at,
+    dateModified: article.updated_at || article.created_at,
+    author: {
+      "@type": "Person",
+      name: article.author_name || "Brian Okibo",
+      jobTitle: "Security & Escrow Officer",
+      url: siteUrl,
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "eFootballMarket Kenya",
+      logo: {
+        "@type": "ImageObject",
+        url: `${siteUrl}/icon.svg`,
+      },
+    },
+    mainEntityOfPage: {
+      "@type": "WebPage",
+      "@id": `${siteUrl}/news/${article.slug}`,
+    },
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(articleSchema) }}
+    />
+  );
+}
+
+export function HowToEscrowJsonLd({
+  siteUrl = "https://www.efootballmarket.co.ke",
+}: {
+  siteUrl?: string;
+}) {
+  const howToSchema = {
+    "@context": "https://schema.org",
+    "@type": "HowTo",
+    name: "How to Safely Buy and Transfer eFootball Accounts via M-Pesa Escrow in Kenya",
+    description: "Step-by-step verified escrow procedure for eFootball peer-to-peer account transfers with Safaricom Till 1572931 and 24-hour buyer inspection protection.",
+    totalTime: "PT30M",
+    step: [
+      {
+        "@type": "HowToStep",
+        position: 1,
+        name: "Deposit Funds to Escrow Till 1572931",
+        text: "Buyer sends agreed payment to Safaricom Buy Goods Till 1572931 (EFootballMarket). Funds are locked into neutral escrow holding.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 2,
+        name: "Encrypted Credential Transfer",
+        text: "Seller provides Konami ID login and linked email details through the secure escrow platform.",
+      },
+      {
+        "@type": "HowToStep",
+        position: 3,
+        name: "24-Hour Buyer Inspection Window",
+        text: "Buyer logs into eFootball Mobile, inspects OVR strength, player cards, and changes the registered email and two-factor authentication (2FA).",
+      },
+      {
+        "@type": "HowToStep",
+        position: 4,
+        name: "Payout Disbursement",
+        text: "Buyer marks the order as fulfilled or 24 hours elapse with no dispute, releasing funds to the seller's M-Pesa account instantly.",
+      },
+    ],
+  };
+
+  return (
+    <script
+      type="application/ld+json"
+      dangerouslySetInnerHTML={{ __html: JSON.stringify(howToSchema) }}
+    />
+  );
+}

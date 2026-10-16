@@ -1,6 +1,7 @@
 "use client";
 
 import { Button } from "@/components/ui/Button";
+import { AdBanner } from "@/components/common/AdBanner";
 import { useAuth } from "@/hooks/useAuth";
 import { isUserAdmin } from "@/lib/security/adminAuth";
 import { NewsArticle, NewsCategory } from "@/types/database";
@@ -11,6 +12,7 @@ import {
   Calendar,
   Eye,
   Flame,
+  MessageCircle,
   Newspaper,
   PenSquare,
   Search,
@@ -122,6 +124,33 @@ export default function NewsFeedPage() {
             </Button>
           </Link>
         )}
+      </div>
+
+      {/* Security Advisory & Hotline Bar */}
+      <div className="p-4 rounded-2xl bg-[#111827] border border-amber-500/30 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-amber-500/15 border border-amber-500/30 flex items-center justify-center text-[#FBBF24] shrink-0">
+            <ShieldAlert className="w-5 h-5" />
+          </div>
+          <div>
+            <h4 className="text-xs font-bold text-white uppercase tracking-wider">
+              Encountered a Suspicious Seller or Phishing Link?
+            </h4>
+            <p className="text-[11px] text-[#94A3B8]">
+              Report directly to Officer Brian Okibo (+254 794 400 365) for immediate blacklist publishing and escrow intervention.
+            </p>
+          </div>
+        </div>
+
+        <a
+          href="https://wa.me/254794400365?text=Hello%20Brian%20Okibo%2C%20I%20want%20to%20report%20a%20scammer%20or%20suspicious%20trader."
+          target="_blank"
+          rel="noopener noreferrer"
+          className="shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-xl bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-xs transition-all shadow-md"
+        >
+          <MessageCircle className="w-4 h-4 fill-[#0B1220]" />
+          <span>Report via WhatsApp</span>
+        </a>
       </div>
 
       {/* Search & Categories Bar */}
@@ -283,6 +312,9 @@ export default function NewsFeedPage() {
           </p>
         </div>
       )}
+
+      {/* Certified Partner Ad Slot */}
+      <AdBanner slot="news_feed_bottom" format="horizontal" />
     </div>
   );
 }

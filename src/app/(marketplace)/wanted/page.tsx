@@ -4,6 +4,7 @@ import React, { useState, useEffect } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { AdBanner } from "@/components/common/AdBanner";
 import { formatCurrency, getPlatformLabel, getPlaystyleLabel } from "@/lib/utils";
 import { formatWhatsAppPhone, normalizePhoneNumber } from "@/lib/utils/phone";
 import { Platform, Playstyle, WantedRequest } from "@/types/database";
@@ -329,6 +330,9 @@ export default function WantedBoardPage() {
           </Button>
         </Link>
       </div>
+
+      {/* Certified Partner Ad Slot */}
+      <AdBanner slot="wanted_bottom" format="horizontal" />
 
       {/* Post Wanted Request Modal */}
       {isModalOpen && (

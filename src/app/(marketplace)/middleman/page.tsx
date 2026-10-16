@@ -8,6 +8,7 @@ import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { MiddlemanDeal } from "@/app/api/middleman/route";
+import { HowToEscrowJsonLd } from "@/components/seo/JsonLd";
 import {
   Handshake,
   ShieldCheck,
@@ -215,9 +216,11 @@ function MiddlemanContent() {
   };
 
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
+      <HowToEscrowJsonLd />
+
       {/* Header */}
-      <div className="relative rounded-3xl bg-gradient-to-r from-emerald-950/60 via-pitch-card to-slate-900 border border-emerald-500/40 p-6 sm:p-10 mb-8 shadow-2xl overflow-hidden">
+      <div className="relative rounded-3xl bg-gradient-to-r from-emerald-950/60 via-pitch-card to-slate-900 border border-emerald-500/40 p-6 sm:p-10 shadow-2xl overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 space-y-4 max-w-2xl">
@@ -245,6 +248,61 @@ function MiddlemanContent() {
               <UserCheck className="w-4 h-4 text-indigo-400" /> Officer: Brian Okibo (+254 794 400 365)
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* 4-Step Institutional Workflow Roadmap */}
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <div className="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="w-7 h-7 rounded-xl bg-emerald-500/20 text-emerald-300 flex items-center justify-center text-xs font-bold border border-emerald-500/40">
+              1
+            </span>
+            <span className="text-[10px] uppercase font-bold text-[#94A3B8]">Agreement</span>
+          </div>
+          <h4 className="text-xs font-bold text-white">Create Contract</h4>
+          <p className="text-[11px] text-[#94A3B8] leading-normal">
+            Enter trade title, price, and WhatsApp numbers. Unique contract code is generated.
+          </p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="w-7 h-7 rounded-xl bg-[#22C55E]/20 text-[#22C55E] flex items-center justify-center text-xs font-bold border border-[#22C55E]/40">
+              2
+            </span>
+            <span className="text-[10px] uppercase font-bold text-[#94A3B8]">M-Pesa Vault</span>
+          </div>
+          <h4 className="text-xs font-bold text-white">Buyer Pays Till 1572931</h4>
+          <p className="text-[11px] text-[#94A3B8] leading-normal">
+            Buyer pays Safaricom Till 1572931. Officer Brian Okibo locks funds into neutral holding.
+          </p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="w-7 h-7 rounded-xl bg-amber-500/20 text-amber-300 flex items-center justify-center text-xs font-bold border border-amber-500/40">
+              3
+            </span>
+            <span className="text-[10px] uppercase font-bold text-[#94A3B8]">Handover</span>
+          </div>
+          <h4 className="text-xs font-bold text-white">24h Inspection</h4>
+          <p className="text-[11px] text-[#94A3B8] leading-normal">
+            Seller submits Konami ID. Buyer logs in, tests squad, changes email & activates 2FA.
+          </p>
+        </div>
+
+        <div className="p-4 rounded-2xl bg-[#111827] border border-[#1F2937] space-y-2">
+          <div className="flex items-center justify-between">
+            <span className="w-7 h-7 rounded-xl bg-indigo-500/20 text-indigo-300 flex items-center justify-center text-xs font-bold border border-indigo-500/40">
+              4
+            </span>
+            <span className="text-[10px] uppercase font-bold text-[#94A3B8]">Settlement</span>
+          </div>
+          <h4 className="text-xs font-bold text-white">Payout Released</h4>
+          <p className="text-[11px] text-[#94A3B8] leading-normal">
+            Buyer approves delivery or 24 hours lapse. Seller receives direct M-Pesa payout.
+          </p>
         </div>
       </div>
 

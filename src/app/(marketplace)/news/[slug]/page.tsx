@@ -6,12 +6,15 @@ import {
   AlertTriangle,
   ArrowLeft,
   Calendar,
+  Clock,
   Eye,
   Lock,
+  MessageCircle,
   Share2,
   ShieldCheck,
   User,
 } from "lucide-react";
+import { NewsArticleJsonLd } from "@/components/seo/JsonLd";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -78,21 +81,38 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
   }
 
   const isScammerAlert = article.category === "scammer_alert";
+  const readMinutes = Math.max(1, Math.ceil((article.content || "").split(/\s+/).length / 180));
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
-      {/* Back to Bulletins */}
-      <Link
-        href="/news"
-        className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
-      >
-        <ArrowLeft className="w-4 h-4" />
-        <span>Back to News & Alerts</span>
-      </Link>
+      <NewsArticleJsonLd article={article} />
+
+      {/* Navigation & WhatsApp Alert Bar */}
+      <div className="flex items-center justify-between gap-4">
+        <Link
+          href="/news"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-white transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to News & Alerts</span>
+        </Link>
+
+        <a
+          href={`https://api.whatsapp.com/send?text=${encodeURIComponent(
+            `📢 *${article.title}*\nRead verified eFootball advisory on eFootballMarket: https://www.efootballmarket.co.ke/news/${article.slug}`
+          )}`}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-950/80 hover:bg-emerald-900 border border-emerald-500/40 text-emerald-300 text-xs font-semibold transition-all shadow-sm"
+        >
+          <MessageCircle className="w-3.5 h-3.5 fill-emerald-300" />
+          <span>Share Alert on WhatsApp</span>
+        </a>
+      </div>
 
       {/* Article Header */}
       <div className="space-y-4 border-b border-pitch-border/80 pb-6">
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2.5">
           <span
             className={`px-3 py-1 rounded-full text-xs font-extrabold uppercase tracking-wider border ${
               isScammerAlert
@@ -113,6 +133,11 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
           </span>
 
           <span className="text-xs text-slate-400 flex items-center gap-1">
+            <Clock className="w-3.5 h-3.5" />
+            {readMinutes} min read
+          </span>
+
+          <span className="text-xs text-slate-400 flex items-center gap-1">
             <Eye className="w-3.5 h-3.5" />
             {article.views_count} views
           </span>
@@ -122,13 +147,21 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
           {article.title}
         </h1>
 
-        <div className="flex items-center gap-3 pt-2 text-xs text-slate-400">
-          <div className="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-200">
-            <User className="w-4 h-4" />
+        {/* Healthline-style Fact Check & Editorial Attribution */}
+        <div className="flex flex-wrap items-center justify-between gap-4 pt-2">
+          <div className="flex items-center gap-3 text-xs text-slate-400">
+            <div className="w-9 h-9 rounded-full bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-slate-200">
+              <User className="w-4 h-4" />
+            </div>
+            <div>
+              <p className="font-bold text-slate-200">{article.author_name || "Brian Okibo"}</p>
+              <p className="text-[11px] text-slate-400">Security Desk & Lead Escrow Officer</p>
+            </div>
           </div>
-          <div>
-            <p className="font-semibold text-slate-200">{article.author_name}</p>
-            <p className="text-[11px] text-slate-500">eFootballMarket Verified Editorial</p>
+
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/60 border border-emerald-500/30 text-emerald-300 text-xs font-medium">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+            <span>Fact-Checked & Escrow Verified</span>
           </div>
         </div>
       </div>
@@ -154,7 +187,7 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
               Active Security Alert: Beware of Off-Platform Infiltration
             </h3>
             <p className="text-xs text-rose-300/90 leading-relaxed">
-              All eFootball trading must proceed exclusively through our automated M-Pesa STK Push escrow. Never accept requests to chat on WhatsApp or Telegram.
+              All eFootball trading must proceed exclusively through our automated M-Pesa STK Push escrow (Till 1572931). Never transfer credentials before payment lock confirmation.
             </p>
           </div>
         </div>
@@ -174,10 +207,10 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
             </div>
             <div>
               <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                eFootballMarket Escrow Guarantee
+                eFootballMarket Escrow Guarantee • Till 1572931
               </h4>
               <p className="text-[11px] text-slate-400">
-                Automated Lipa Na M-Pesa escrow protection on all account transactions.
+                Automated Lipa Na M-Pesa escrow protection with 24-hour inspection on all transactions.
               </p>
             </div>
           </div>

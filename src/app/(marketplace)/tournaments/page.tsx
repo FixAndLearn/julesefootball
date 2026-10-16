@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
+import { AdBanner } from "@/components/common/AdBanner";
 import { useAuth } from "@/hooks/useAuth";
 import { isSuperAdminEmail, isUserAdmin } from "@/lib/security/adminAuth";
 import { createClient } from "@/lib/supabase/client";
@@ -837,6 +838,9 @@ export default function TournamentsPage() {
           </div>
         </div>
       </div>
+
+      {/* Certified Partner Ad Slot */}
+      <AdBanner slot="tournaments_bottom" format="horizontal" />
 
       {/* MODAL 1: Registration Modal */}
       {isRegisterOpen && selectedTourney && (

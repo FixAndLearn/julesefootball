@@ -12,6 +12,7 @@ import { FlyerTriggerButton } from "@/components/seller/FlyerTriggerButton";
 import { MakeOfferButton } from "@/components/marketplace/MakeOfferButton";
 import { FastBuyLinkButton } from "@/components/marketplace/FastBuyLinkButton";
 import { SellerListingOffersPanel } from "@/components/marketplace/SellerListingOffersPanel";
+import { ProductJsonLd } from "@/components/seo/JsonLd";
 import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
@@ -114,6 +115,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8 w-full">
+      <ProductJsonLd listing={listing} />
       {/* Back button */}
       <div className="mb-6 flex items-center justify-between">
         <Link
