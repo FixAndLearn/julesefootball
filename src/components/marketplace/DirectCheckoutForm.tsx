@@ -20,8 +20,10 @@ import {
   Loader2,
   Clock,
   Tag,
+  Flame,
 } from "lucide-react";
 import Link from "next/link";
+import { isListingOnFlashSale } from "@/lib/utils/flashSale";
 
 interface DirectCheckoutFormProps {
   listing: Listing;
@@ -132,8 +134,61 @@ export function DirectCheckoutForm({
     };
   }, [stkStatus, checkoutRequestId, createdOrderId, router]);
 
-  const payablePrice = activeOffer?.offered_price || Number(listing.price);
-  const isDiscounted = activeOffer && activeOffer.status === "accepted";
+  const isFlashDrop = isListingOnFlashSale(listing);
+  const isOwner = currentUserId && currentUserId === listing.seller_id;
+  const isAvailable = listing.status === "published";
+
+  // Mutually exclusive commerce rule: during Flash Drops, bargaining is withdrawn; price is locked to flash price.
+  const payablePrice = (!isFlashDrop && activeOffer?.offered_price) || Number(listing.price);
+  const isDiscounted = !isFlashDrop && activeOffer && activeOffer.status === "accepted";
+
+  // 1. Guardrail: Seller cannot purchase their own listing
+  if (isOwner) {
+    return (
+      <div className="w-full max-w-xl mx-auto p-8 rounded-3xl bg-[#111827] border border-slate-800 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
+          <Lock className="w-6 h-6 text-amber-400" />
+        </div>
+        <h2 className="text-xl font-bold text-white font-display">You Own This Listing</h2>
+        <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+          Sellers cannot initiate M-Pesa STK push payments or buy their own listed eFootball accounts.
+        </p>
+        <div className="pt-2">
+          <Link href={`/seller/edit-listing/${listing.id}`}>
+            <Button variant="gold" size="md">
+              Edit in Seller Hub
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
+
+  // 2. Guardrail: Account is already locked in escrow or sold
+  if (!isAvailable) {
+    return (
+      <div className="w-full max-w-xl mx-auto p-8 rounded-3xl bg-[#111827] border border-slate-800 text-center space-y-4">
+        <div className="w-12 h-12 rounded-2xl bg-slate-800 border border-slate-700 text-amber-400 flex items-center justify-center mx-auto">
+          <Lock className="w-6 h-6 text-amber-400" />
+        </div>
+        <h2 className="text-xl font-bold text-white font-display">
+          {listing.status === "sold" ? "Account Sold & Delivered" : "Account Under Active Escrow Lock"}
+        </h2>
+        <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+          {listing.status === "sold"
+            ? "This eFootball squad has already been purchased and transferred to a verified buyer."
+            : "Another trader has deposited funds into Till 1572931 and is currently completing the 24-hour verification inspection."}
+        </p>
+        <div className="pt-2">
+          <Link href="/browse">
+            <Button variant="secondary" size="md">
+              Browse Available Squads &rarr;
+            </Button>
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   const handleTriggerPayment = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -155,7 +210,7 @@ export function DirectCheckoutForm({
           listingId: listing.id,
           phoneNumber: norm.digits,
           buyerName: buyerName || "eFootball Trader",
-          offerId: activeOffer?.id,
+          offerId: isFlashDrop ? undefined : activeOffer?.id,
         }),
       });
 
@@ -200,6 +255,21 @@ export function DirectCheckoutForm({
           Funds are locked in escrow and released to the seller only after you test and bind Konami ID credentials.
         </p>
       </div>
+
+      {/* Friday Flash Drop Banner */}
+      {isFlashDrop && (
+        <div className="p-4 rounded-2xl bg-gradient-to-r from-amber-950/60 via-rose-950/40 to-amber-950/60 border border-amber-500/50 flex items-start gap-3 shadow-lg">
+          <Flame className="w-5 h-5 text-amber-400 fill-amber-400 shrink-0 mt-0.5 animate-pulse" />
+          <div className="space-y-0.5 text-xs">
+            <span className="font-bold text-amber-300 block text-sm">
+              ⚡ Friday Flash Drop Checkout
+            </span>
+            <p className="text-slate-300">
+              This squad is locked at the promotional flash price of <strong>{formatCurrency(payablePrice, listing.currency)}</strong>. Further bargaining is withdrawn during flash sales.
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* Accepted Offer Banner */}
       {isDiscounted && (

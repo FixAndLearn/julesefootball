@@ -38,7 +38,9 @@ import {
   MessageCircle,
   Building2,
   Sparkles,
+  Flame,
 } from "lucide-react";
+import { isListingOnFlashSale, getFlashSalePricing } from "@/lib/utils/flashSale";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -439,6 +441,41 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                   You own this listing. Buyers see the Buy Now and Make Offer buttons.
                 </p>
               </div>
+            ) : listing.status !== "published" ? (
+              <div className="p-4 rounded-2xl bg-slate-900 border border-slate-800 text-center space-y-2">
+                <div className="w-10 h-10 rounded-xl bg-slate-800 text-amber-400 flex items-center justify-center mx-auto">
+                  <Lock className="w-5 h-5 text-amber-400" />
+                </div>
+                <h4 className="text-sm font-bold text-white">
+                  {listing.status === "sold" ? "Account Sold & Delivered" : "Locked in Active Escrow"}
+                </h4>
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {listing.status === "sold"
+                    ? "This squad was successfully delivered to a verified buyer."
+                    : "A buyer has deposited funds into Till 1572931 and 24-hour verification is in progress."}
+                </p>
+                <Link href="/browse" className="inline-block pt-1">
+                  <Button variant="secondary" size="sm" className="text-xs">
+                    Browse Other Verified Squads &rarr;
+                  </Button>
+                </Link>
+              </div>
+            ) : isListingOnFlashSale(listing) ? (
+              <div className="space-y-3">
+                <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center gap-2.5 shadow-md">
+                  <Flame className="w-5 h-5 text-amber-400 fill-amber-400 animate-pulse shrink-0" />
+                  <div>
+                    <span className="font-bold text-white block">Friday Flash Drop Price Locked</span>
+                    <span className="text-[11px] text-amber-200/90 leading-tight block mt-0.5">
+                      Bargaining is withdrawn. Price is locked at maximum flash drop discount for immediate checkout.
+                    </span>
+                  </div>
+                </div>
+                <BuyNowButton
+                  listingId={listing.id}
+                  priceFormatted={formatCurrency(listing.price, listing.currency)}
+                />
+              </div>
             ) : (
               <div className="space-y-2.5">
                 <BuyNowButton
@@ -449,8 +486,8 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               </div>
             )}
 
-            {/* Account Swap + Cash Offer Box */}
-            {listing.allows_swap && (
+            {/* Account Swap + Cash Offer Box (Withdrawn during Flash Sales, Escrow Locks & For Owner) */}
+            {listing.allows_swap && !isOwner && !isListingOnFlashSale(listing) && listing.status === "published" && (
               <div className="p-3.5 rounded-xl bg-emerald-950/40 border border-emerald-500/40 space-y-2 mt-2">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-emerald-300">
                   <ArrowRightLeft className="w-3.5 h-3.5 text-emerald-400" />
@@ -586,6 +623,15 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 Edit Listing
               </Button>
             </Link>
+          ) : listing.status !== "published" ? (
+            <span className="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-400">
+              {listing.status === "sold" ? "Sold" : "In Escrow"}
+            </span>
+          ) : isListingOnFlashSale(listing) ? (
+            <BuyNowButton
+              listingId={listing.id}
+              priceFormatted={formatCurrency(listing.price, listing.currency)}
+            />
           ) : (
             <div className="flex items-center gap-2">
               <MakeOfferButton listing={listing} size="sm" />

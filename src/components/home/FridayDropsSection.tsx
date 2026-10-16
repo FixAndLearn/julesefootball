@@ -234,16 +234,16 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
                         </div>
 
                         {/* Pricing: Crossed out original + Flash price */}
-                        <div className="pt-2 border-t border-slate-800/80 flex items-baseline justify-between">
-                          <div>
-                            <span className="text-[11px] text-slate-500 line-through mr-2">
+                        <div className="pt-2 border-t border-slate-800/80 flex items-center justify-between gap-2 flex-wrap">
+                          <div className="flex items-baseline gap-2 flex-wrap">
+                            <span className="text-[11px] text-slate-500 line-through">
                               {formatCurrency(originalPrice, item.currency)}
                             </span>
                             <span className="text-lg font-black text-emerald-400 font-mono">
                               {formatCurrency(item.price, item.currency)}
                             </span>
                           </div>
-                          <span className="text-[10px] text-slate-400 uppercase font-semibold">
+                          <span className="text-[10px] text-slate-400 uppercase font-semibold shrink-0">
                             Till 1572931
                           </span>
                         </div>
@@ -255,8 +255,8 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
                           type="button"
                           className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-black text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 min-h-[44px]"
                         >
-                          <Flame className="w-3.5 h-3.5 fill-slate-950" />
-                          <span>Claim Flash Drop</span>
+                          <Flame className="w-3.5 h-3.5 fill-slate-950 shrink-0" />
+                          <span className="truncate">Claim Flash Drop (M-Pesa Escrow)</span>
                         </button>
                       </Link>
                     </div>

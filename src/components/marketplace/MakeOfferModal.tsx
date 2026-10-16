@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/Button";
 import { Listing } from "@/types/database";
 import { formatCurrency } from "@/lib/utils";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
+import { isListingOnFlashSale } from "@/lib/utils/flashSale";
 import {
   Handshake,
   Tag,
@@ -90,6 +91,11 @@ export function MakeOfferModal({
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
+
+    if (isListingOnFlashSale(listing)) {
+      setError("This account is currently on Friday Flash Drop at a fixed promotional discount. Bargaining is withdrawn during flash sales.");
+      return;
+    }
 
     if (!numericOffer || numericOffer < minAllowed) {
       setError(`Minimum allowed offer is KES ${minAllowed.toLocaleString()} (50% of asking price).`);

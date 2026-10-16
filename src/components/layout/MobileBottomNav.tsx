@@ -10,8 +10,8 @@ export function MobileBottomNav() {
   const pathname = usePathname();
   const { t } = useLanguage();
 
-  // Hide on pay/checkout routes for distraction-free payment
-  if (pathname.startsWith("/pay/")) {
+  // Hide on pay/checkout and listing detail routes to prevent overlapping sticky bottom actions
+  if (pathname.startsWith("/pay/") || pathname.startsWith("/listings/")) {
     return null;
   }
 
