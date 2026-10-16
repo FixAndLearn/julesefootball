@@ -21,17 +21,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-[#22C55E] text-slate-950 font-semibold hover:bg-emerald-400 focus:ring-[#22C55E] shadow-lg shadow-emerald-950/40",
+        "bg-brand-600 text-white hover:bg-brand-500 focus:ring-brand-500 shadow-lg shadow-brand-600/30",
       secondary:
-        "bg-[#1F2937] text-[#F8FAFC] hover:bg-slate-700 border border-slate-700 focus:ring-slate-400",
+        "bg-pitch-surface text-slate-100 hover:bg-slate-700 border border-pitch-border focus:ring-slate-400",
       outline:
-        "border border-slate-700 text-slate-200 hover:bg-slate-800/80 hover:text-white focus:ring-slate-500",
+        "border border-slate-600 text-slate-200 hover:bg-slate-800/60 hover:text-white focus:ring-slate-500",
       ghost:
         "text-slate-300 hover:bg-slate-800 hover:text-white focus:ring-slate-600",
       danger:
         "bg-rose-600 text-white hover:bg-rose-500 focus:ring-rose-500 shadow-lg shadow-rose-600/30",
       gold:
-        "bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 font-semibold hover:from-amber-300 hover:to-amber-400 focus:ring-amber-400 shadow-lg shadow-amber-500/20",
+        "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-semibold hover:from-amber-400 hover:to-amber-500 focus:ring-amber-400 shadow-lg shadow-amber-500/20",
     };
 
     return (
