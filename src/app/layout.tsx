@@ -19,12 +19,12 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "eFootball Community Kenya | Tournaments, News & Alerts",
-    template: "%s | eFootball Community Kenya",
+    default: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading & Community Hub",
+    template: "%s | eFootballMarket",
   },
   description:
-    "The central community hub for eFootball players in Kenya. Compete in local knockout tournaments, follow match brackets, and get verified game updates and scammer alerts.",
-  applicationName: "eFootball Community Kenya",
+    "Buy and sell verified eFootball accounts with automated Safaricom M-Pesa escrow protection (Till 1572931). Compete in Kenyan tournaments, follow live brackets, and trade safely with a 24-hr buyer inspection window.",
+  applicationName: "eFootballMarket",
   authors: [{ name: "Brian Okibo, Chief Executive Officer (CEO)" }],
   generator: "Next.js",
   keywords: [
