@@ -8,7 +8,6 @@ import { TournamentService } from "@/services/tournamentService";
 import { Listing, NewsArticle, Tournament } from "@/types/database";
 import { AdBanner } from "@/components/common/AdBanner";
 import { HomeFaqAccordion } from "@/components/home/HomeFaqAccordion";
-import { SquadValuationCalculator } from "@/components/calculator/SquadValuationCalculator";
 import { ListingCard3D } from "@/components/marketplace/ListingCard3D";
 import {
   ArrowRight,
@@ -31,7 +30,6 @@ import {
   Building2,
   FileText,
   BadgeCheck,
-  Calculator,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -368,27 +366,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. REAL-TIME SQUAD VALUATION ENGINE (StockX/Fintech Tier Tool) */}
-      <section className="py-14 md:py-20 bg-gradient-to-b from-[#0F172A] via-[#0B1220] to-[#0B1220] border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
-          <div className="text-center max-w-3xl mx-auto space-y-3">
-            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
-              <Calculator className="w-4 h-4 text-amber-400" />
-              <span>Algorithmic Account Valuation Engine</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display tracking-tight">
-              Know Your Account’s Real Market Value in KES
-            </h2>
-            <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">
-              Calculate fair market value based on Team OVR, Epic Boosters, Division rank, and coin balance before you buy or sell. Benchmarked against real Safaricom M-Pesa escrow settlements.
-            </p>
-          </div>
-
-          <SquadValuationCalculator />
-        </div>
-      </section>
-
-      {/* 5. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
+      {/* 4. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
       <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">

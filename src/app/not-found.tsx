@@ -1,5 +1,5 @@
 import { Button } from "@/components/ui/Button";
-import { SearchX, Sparkles, Calculator, Search, Phone, ArrowRight } from "lucide-react";
+import { SearchX, Sparkles, Search, Phone, ArrowRight } from "lucide-react";
 import Link from "next/link";
 
 export default function NotFound() {
@@ -42,16 +42,15 @@ export default function NotFound() {
             Browse Live Accounts
           </Button>
         </Link>
-        <Link href="/calculator">
-          <Button variant="secondary" size="md" className="bg-[#111827] border border-slate-700 text-amber-300 font-bold text-xs">
-            <Calculator className="w-3.5 h-3.5 mr-1.5" />
-            Squad Calculator
-          </Button>
-        </Link>
         <Link href="/wanted">
           <Button variant="secondary" size="md" className="bg-[#111827] border border-slate-700 text-slate-200 text-xs">
             <Sparkles className="w-3.5 h-3.5 mr-1.5 text-amber-400" />
             Wanted Board
+          </Button>
+        </Link>
+        <Link href="/">
+          <Button variant="outline" size="md" className="border-slate-700 text-slate-300 text-xs">
+            Return Home
           </Button>
         </Link>
       </div>

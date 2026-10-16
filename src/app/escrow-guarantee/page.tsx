@@ -203,15 +203,10 @@ export default function EscrowGuaranteePage() {
           </li>
         </ul>
 
-        <div className="pt-4 flex flex-wrap items-center justify-center gap-4">
+        <div className="pt-4 flex justify-center">
           <Link href="/browse">
             <Button variant="primary" size="lg" className="bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-black text-sm">
               Explore Escrow-Secured Accounts
-            </Button>
-          </Link>
-          <Link href="/calculator">
-            <Button variant="gold" size="lg" className="font-bold text-sm">
-              Squad Valuation Calculator &rarr;
             </Button>
           </Link>
         </div>

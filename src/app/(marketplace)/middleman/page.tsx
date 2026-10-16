@@ -129,14 +129,15 @@ function MiddlemanContent() {
   const totalPayable = numAmount + escrowFee;
 
   const appBaseUrl = typeof window !== "undefined" ? window.location.origin : "https://www.efootballmarket.co.ke";
-  const effectiveGenTitle = genTitle || dealTitle || "eFootball Squad";
-  const effectiveGenAmount = genAmount || dealAmount || "1500";
-  const generatedInviteUrl = `${appBaseUrl}/middleman?title=${encodeURIComponent(effectiveGenTitle)}&amount=${encodeURIComponent(effectiveGenAmount)}${genSellerPhone ? `&seller=${encodeURIComponent(genSellerPhone)}` : ""}${genBuyerPhone ? `&buyer=${encodeURIComponent(genBuyerPhone)}` : ""}`;
+  const effectiveGenTitle = genTitle || dealTitle || "";
+  const effectiveGenAmount = genAmount || dealAmount || "";
+  const displayAmount = effectiveGenAmount ? `KES ${Number(effectiveGenAmount).toLocaleString()}` : "Agreed Price";
+  const generatedInviteUrl = `${appBaseUrl}/middleman?title=${encodeURIComponent(effectiveGenTitle || "eFootball Deal")}${effectiveGenAmount ? `&amount=${encodeURIComponent(effectiveGenAmount)}` : ""}${genSellerPhone ? `&seller=${encodeURIComponent(genSellerPhone)}` : ""}${genBuyerPhone ? `&buyer=${encodeURIComponent(genBuyerPhone)}` : ""}`;
 
   const generatedWhatsAppGroupMessage =
     `🔒 *OFFICIAL ESCROW TRADE CONTRACT*\n\n` +
-    `🎮 *Squad / Item:* ${effectiveGenTitle}\n` +
-    `💰 *Agreed Price:* KES ${Number(effectiveGenAmount).toLocaleString()}\n` +
+    `🎮 *Squad / Item:* ${effectiveGenTitle || "eFootball Account"}\n` +
+    `💰 *Agreed Price:* ${displayAmount}\n` +
     `🛡️ *Escrow Vault:* Safaricom Till 1572931 (EFootballMarket)\n` +
     `👤 *Escrow Officer:* Brian Okibo (+254 794 400 365)\n\n` +
     `⚠️ *Protection Policy:* Funds remain locked until the buyer inspects squad players, coins, and changes Konami ID credentials.\n\n` +

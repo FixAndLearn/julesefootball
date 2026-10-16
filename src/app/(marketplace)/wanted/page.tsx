@@ -38,7 +38,7 @@ export default function WantedBoardPage() {
   const [buyerPhone, setBuyerPhone] = useState("");
   const [reqTitle, setReqTitle] = useState("");
   const [reqDescription, setReqDescription] = useState("");
-  const [reqMinOvr, setReqMinOvr] = useState("3200");
+  const [reqMinOvr, setReqMinOvr] = useState("");
   const [reqPlatform, setReqPlatform] = useState<Platform>("android");
   const [reqPlaystyle, setReqPlaystyle] = useState<Playstyle>("quick_counter");
   const [reqBudget, setReqBudget] = useState("");
@@ -429,7 +429,7 @@ export default function WantedBoardPage() {
                     <Input
                       label="Min OVR Rating"
                       type="number"
-                      placeholder="3200"
+                      placeholder="e.g. 3150"
                       value={reqMinOvr}
                       onChange={(e) => setReqMinOvr(e.target.value)}
                     />

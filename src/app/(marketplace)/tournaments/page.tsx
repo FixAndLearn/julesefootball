@@ -62,13 +62,13 @@ export default function TournamentsPage() {
   const [hostTitle, setHostTitle] = useState("");
   const [hostSubtitle, setHostSubtitle] = useState("");
   const [hostPlatform, setHostPlatform] = useState<"all" | "android" | "ios" | "crossplay" | "console_pc">("crossplay");
-  const [hostPrizePool, setHostPrizePool] = useState("5000");
-  const [hostFirstPlace, setHostFirstPlace] = useState("3500");
-  const [hostSecondPlace, setHostSecondPlace] = useState("1500");
-  const [hostEntryFee, setHostEntryFee] = useState("150");
+  const [hostPrizePool, setHostPrizePool] = useState("");
+  const [hostFirstPlace, setHostFirstPlace] = useState("");
+  const [hostSecondPlace, setHostSecondPlace] = useState("");
+  const [hostEntryFee, setHostEntryFee] = useState("");
   const [hostFormat, setHostFormat] = useState("Single Knockout 1v1 (10-Minute Extra Time & PKs)");
   const [hostMaxPlayers, setHostMaxPlayers] = useState("8");
-  const [hostStartDate, setHostStartDate] = useState("This Saturday, 8:00 PM EAT");
+  const [hostStartDate, setHostStartDate] = useState("");
   const [submittingHost, setSubmittingHost] = useState(false);
   const [hostError, setHostError] = useState("");
 
