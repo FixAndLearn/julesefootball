@@ -81,6 +81,13 @@ export function Header() {
                 Browse Accounts
               </Link>
               <Link
+                href="/cards"
+                className="px-3 py-1.5 rounded-lg text-[#00F0FF] hover:text-white hover:bg-[#00F0FF]/15 flex items-center gap-1.5 transition-colors font-bold shadow-sm"
+              >
+                <Sparkles className="w-3.5 h-3.5 text-[#00F0FF]" />
+                <span>Card Creator</span>
+              </Link>
+              <Link
                 href="/wanted"
                 className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors"
               >
@@ -348,6 +355,15 @@ export function Header() {
             >
               <span>Browse Accounts</span>
               <Sparkles className="w-4 h-4 text-[#FBBF24]" />
+            </Link>
+
+            <Link
+              href="/cards"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#00F0FF]/10 border border-[#00F0FF]/30 text-[#00F0FF] font-bold"
+            >
+              <span>Custom Cards & Formations</span>
+              <Sparkles className="w-4 h-4 text-[#00F0FF]" />
             </Link>
 
             <Link
