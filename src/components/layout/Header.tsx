@@ -27,6 +27,7 @@ import {
   Trophy,
   MessageCircle,
   Plus,
+  Calculator,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import Link from "next/link";
@@ -155,6 +156,13 @@ export function Header() {
               >
                 <Newspaper className="w-3.5 h-3.5 text-[#94A3B8]" />
                 <span>News & Alerts</span>
+              </Link>
+              <Link
+                href="/calculator"
+                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors"
+              >
+                <Calculator className="w-3.5 h-3.5 text-amber-400" />
+                <span>Valuation</span>
               </Link>
               <Link
                 href="/escrow-guarantee"
@@ -438,6 +446,15 @@ export function Header() {
             >
               <span>Bring-Your-Own-Deal Middleman</span>
               <Handshake className="w-4 h-4 text-[#22C55E]" />
+            </Link>
+
+            <Link
+              href="/calculator"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
+            >
+              <span>Squad Valuation Calculator</span>
+              <Calculator className="w-4 h-4 text-amber-400" />
             </Link>
 
             <Link

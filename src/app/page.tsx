@@ -8,6 +8,8 @@ import { TournamentService } from "@/services/tournamentService";
 import { Listing, NewsArticle, Tournament } from "@/types/database";
 import { AdBanner } from "@/components/common/AdBanner";
 import { HomeFaqAccordion } from "@/components/home/HomeFaqAccordion";
+import { SquadValuationCalculator } from "@/components/calculator/SquadValuationCalculator";
+import { ListingCard3D } from "@/components/marketplace/ListingCard3D";
 import {
   ArrowRight,
   ExternalLink,
@@ -29,6 +31,7 @@ import {
   Building2,
   FileText,
   BadgeCheck,
+  Calculator,
 } from "lucide-react";
 import Link from "next/link";
 
@@ -286,6 +289,38 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* 2. REAL-TIME ESCROW TELEMETRY MARQUEE */}
+      <div className="bg-[#090D16] border-b border-slate-800 py-3 overflow-hidden">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex items-center justify-between gap-6 text-xs overflow-x-auto no-scrollbar whitespace-nowrap">
+            <div className="flex items-center gap-2 text-slate-300 shrink-0">
+              <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-ping" />
+              <span className="font-mono font-bold text-[#22C55E]">LIPA NA M-PESA TILL 1572931</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">Escrow Vault Active</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300 shrink-0">
+              <Clock className="w-3.5 h-3.5 text-[#FBBF24]" />
+              <span className="font-semibold text-white">24H Mandatory Buyer Inspection</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">Zero Prepayment Risk</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300 shrink-0">
+              <Lock className="w-3.5 h-3.5 text-indigo-400" />
+              <span className="font-semibold text-white">AES-256 Vault Transfer</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">Instant Konami 2FA Link</span>
+            </div>
+            <div className="flex items-center gap-2 text-slate-300 shrink-0">
+              <BadgeCheck className="w-3.5 h-3.5 text-[#22C55E]" />
+              <span className="font-semibold text-white">Kenya DPA (2019) Compliant</span>
+              <span className="text-slate-600">|</span>
+              <span className="text-slate-400">Gov. Regulated Standard</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
       {/* 3. CORE INSTITUTIONAL TRUST PILLARS (Healthline-style clean 4-card ribbon) */}
       <section className="py-10 bg-[#0F172A] border-b border-slate-800">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -333,7 +368,27 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 4. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
+      {/* 4. REAL-TIME SQUAD VALUATION ENGINE (StockX/Fintech Tier Tool) */}
+      <section className="py-14 md:py-20 bg-gradient-to-b from-[#0F172A] via-[#0B1220] to-[#0B1220] border-b border-slate-800">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
+          <div className="text-center max-w-3xl mx-auto space-y-3">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-bold">
+              <Calculator className="w-4 h-4 text-amber-400" />
+              <span>Algorithmic Account Valuation Engine</span>
+            </div>
+            <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display tracking-tight">
+              Know Your Account’s Real Market Value in KES
+            </h2>
+            <p className="text-xs sm:text-sm md:text-base text-slate-300 leading-relaxed">
+              Calculate fair market value based on Team OVR, Epic Boosters, Division rank, and coin balance before you buy or sell. Benchmarked against real Safaricom M-Pesa escrow settlements.
+            </p>
+          </div>
+
+          <SquadValuationCalculator />
+        </div>
+      </section>
+
+      {/* 5. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
       <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
@@ -375,61 +430,9 @@ export default async function HomePage() {
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
               {listings.map((item) => (
-                <div
-                  key={item.id}
-                  className="rounded-3xl bg-[#111827] border border-slate-800 hover:border-slate-600 p-5 flex flex-col justify-between shadow-xl transition-all group"
-                >
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between gap-2">
-                      <span className="text-[10px] font-mono uppercase px-2.5 py-1 rounded-md bg-slate-800 text-slate-300 font-bold">
-                        {item.platform?.replace("_", " ") || "Mobile"}
-                      </span>
-                      {item.overall_team_strength && (
-                        <span className="text-xs font-mono font-bold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-md">
-                          {item.overall_team_strength} OVR
-                        </span>
-                      )}
-                    </div>
-
-                    <h3 className="text-sm font-bold text-white group-hover:text-[#22C55E] transition-colors line-clamp-2">
-                      {item.title}
-                    </h3>
-
-                    {item.key_players_list && item.key_players_list.length > 0 && (
-                      <div className="flex flex-wrap gap-1">
-                        {item.key_players_list.slice(0, 3).map((player: string, idx: number) => (
-                          <span
-                            key={idx}
-                            className="text-[10px] px-2 py-0.5 rounded bg-slate-800/80 text-slate-300 font-medium"
-                          >
-                            {player}
-                          </span>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-
-                  <div className="pt-4 mt-4 border-t border-slate-800 flex items-center justify-between">
-                    <div>
-                      <span className="text-[10px] text-slate-400 block">Lipa Na M-Pesa</span>
-                      <strong className="text-base font-extrabold text-white font-mono">
-                        {formatCurrency(item.price, "KES")}
-                      </strong>
-                    </div>
-
-                    <Link href={`/listings/${item.id}`}>
-                      <Button
-                        variant="secondary"
-                        size="sm"
-                        className="bg-slate-800 hover:bg-[#22C55E] hover:text-[#0B1220] text-xs font-bold transition-all"
-                      >
-                        Inspect
-                      </Button>
-                    </Link>
-                  </div>
-                </div>
+                <ListingCard3D key={item.id} listing={item} />
               ))}
             </div>
           )}

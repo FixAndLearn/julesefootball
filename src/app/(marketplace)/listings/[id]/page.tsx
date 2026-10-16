@@ -4,6 +4,7 @@ import { formatCompactNumber, formatCurrency, getKonamiIdStatusInfo, getPlatform
 import { formatWhatsAppPhone } from "@/lib/utils/phone";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { ListingService } from "@/services/listingService";
+import { Listing } from "@/types/database";
 import { BuyNowButton } from "@/components/marketplace/BuyNowButton";
 import { ListingGallery } from "@/components/marketplace/ListingGallery";
 import { WhatsAppShareButton } from "@/components/marketplace/WhatsAppShareButton";
@@ -12,10 +13,13 @@ import { FlyerTriggerButton } from "@/components/seller/FlyerTriggerButton";
 import { MakeOfferButton } from "@/components/marketplace/MakeOfferButton";
 import { FastBuyLinkButton } from "@/components/marketplace/FastBuyLinkButton";
 import { SellerListingOffersPanel } from "@/components/marketplace/SellerListingOffersPanel";
-import { ProductJsonLd } from "@/components/seo/JsonLd";
+import { ProductJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
+import { ListingCard3D } from "@/components/marketplace/ListingCard3D";
+import { AdBanner } from "@/components/common/AdBanner";
 import { Button } from "@/components/ui/Button";
 import {
   ArrowLeft,
+  ArrowRight,
   CheckCircle2,
   Clock,
   Coins,
@@ -32,6 +36,8 @@ import {
   Zap,
   ArrowRightLeft,
   MessageCircle,
+  Building2,
+  Sparkles,
 } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -110,29 +116,65 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
     notFound();
   }
 
+  // Fetch real related listings from the database (zero demo data)
+  let relatedListings: Listing[] = [];
+  try {
+    const relatedResult = await listingService.getListings({
+      platform: listing.platform,
+      limit: 6,
+    });
+    relatedListings = (relatedResult.listings || []).filter((l) => l.id !== listing.id).slice(0, 3);
+  } catch (err) {
+    console.error("Error fetching related listings:", err);
+  }
+
   const isOwner = Boolean(user && listing.seller_id === user.id);
   const konamiStatus = getKonamiIdStatusInfo(listing.konami_id_status);
 
+  const breadcrumbItems = [
+    { name: "Home", url: "/" },
+    { name: "Browse Squads", url: "/browse" },
+    { name: listing.title, url: `/listings/${listing.id}` },
+  ];
+
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8 w-full">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8 w-full space-y-8">
       <ProductJsonLd listing={listing} />
-      {/* Back button */}
-      <div className="mb-6 flex items-center justify-between">
-        <Link
-          href="/browse"
-          className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors"
-        >
-          <ArrowLeft className="w-4 h-4" />
-          <span>Back to Marketplace</span>
-        </Link>
-        {isOwner && (
-          <Link href={`/seller/edit-listing/${listing.id}`}>
-            <Button variant="gold" size="sm">
-              <Edit3 className="w-3.5 h-3.5 mr-1.5" />
-              Edit Listing
-            </Button>
+      <BreadcrumbJsonLd items={breadcrumbItems} />
+
+      {/* Semantic Breadcrumbs & Navigation Bar */}
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-pitch-border/60">
+        <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-400 flex-wrap">
+          <Link href="/" className="hover:text-slate-200 transition-colors">
+            Home
           </Link>
-        )}
+          <span>/</span>
+          <Link href="/browse" className="hover:text-slate-200 transition-colors">
+            Browse Squads
+          </Link>
+          <span>/</span>
+          <span className="text-slate-200 font-semibold truncate max-w-[240px] sm:max-w-md">
+            {listing.title}
+          </span>
+        </nav>
+
+        <div className="flex items-center gap-3">
+          <Link
+            href="/browse"
+            className="inline-flex items-center gap-1.5 text-xs font-medium text-slate-400 hover:text-slate-200 transition-colors"
+          >
+            <ArrowLeft className="w-4 h-4" />
+            <span>Back to Browse</span>
+          </Link>
+          {isOwner && (
+            <Link href={`/seller/edit-listing/${listing.id}`}>
+              <Button variant="gold" size="sm">
+                <Edit3 className="w-3.5 h-3.5 mr-1.5" />
+                Edit Listing
+              </Button>
+            </Link>
+          )}
+        </div>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
@@ -287,6 +329,69 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 {listing.description}
               </p>
             </div>
+
+            {/* Buyer Inspection & Konami ID Security Protocol */}
+            <div className="pt-4 border-t border-pitch-border/60 space-y-4">
+              <div className="flex items-center gap-2">
+                <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
+                <h3 className="text-sm font-bold text-white uppercase tracking-wider font-display">
+                  24-Hour Inspection & Account Security Protocol
+                </h3>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+                <div className="p-3.5 rounded-xl bg-pitch-card/60 border border-pitch-border space-y-1.5">
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-[#22C55E]/20 text-[#22C55E] flex items-center justify-center text-[10px] font-black">1</span>
+                    Verify Roster & Strength
+                  </span>
+                  <p className="text-slate-400 text-[11px] leading-relaxed">
+                    Log in and confirm all {listing.overall_team_strength} OVR players, Epic cards, coins, and GP match this listing description exactly.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-pitch-card/60 border border-pitch-border space-y-1.5">
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-[#22C55E]/20 text-[#22C55E] flex items-center justify-center text-[10px] font-black">2</span>
+                    Rebind Registered Email
+                  </span>
+                  <p className="text-slate-400 text-[11px] leading-relaxed">
+                    Navigate to my.konami.net, change the registered email to your own, and confirm the verification link sent by Konami.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-pitch-card/60 border border-pitch-border space-y-1.5">
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-[#22C55E]/20 text-[#22C55E] flex items-center justify-center text-[10px] font-black">3</span>
+                    Activate 2-Step Verification
+                  </span>
+                  <p className="text-slate-400 text-[11px] leading-relaxed">
+                    Turn on Two-Factor Authentication via Google Authenticator or SMS to lock out any previous devices permanently.
+                  </p>
+                </div>
+
+                <div className="p-3.5 rounded-xl bg-pitch-card/60 border border-pitch-border space-y-1.5">
+                  <span className="font-bold text-white flex items-center gap-1.5">
+                    <span className="w-4 h-4 rounded-full bg-[#22C55E]/20 text-[#22C55E] flex items-center justify-center text-[10px] font-black">4</span>
+                    Release Funds or Dispute
+                  </span>
+                  <p className="text-slate-400 text-[11px] leading-relaxed">
+                    Confirm delivery in your order dashboard or tap Open Dispute before the 24-hour timer expires to halt payout.
+                  </p>
+                </div>
+              </div>
+
+              {/* Authority Escrow Seal */}
+              <div className="p-3.5 rounded-xl bg-[#090D16] border border-[#1F2937] flex items-center justify-between text-xs text-slate-400">
+                <div className="flex items-center gap-2">
+                  <Building2 className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span>Escrow Cleared via Till 1572931 • Governed by Brian Okibo, CEO</span>
+                </div>
+                <Link href="/escrow-guarantee" className="text-[#22C55E] hover:underline font-semibold shrink-0">
+                  Read Escrow Terms &rarr;
+                </Link>
+              </div>
+            </div>
           </div>
         </div>
 
@@ -429,6 +534,41 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
           </div>
         </div>
       </div>
+
+      {/* Google-Compliant In-Content AdSense Slot */}
+      <div className="pt-2">
+        <AdBanner slot="listing_detail_bottom" format="horizontal" />
+      </div>
+
+      {/* Similar Verified Squads Section (Zero Demo Data) */}
+      {relatedListings.length > 0 && (
+        <section className="pt-6 border-t border-pitch-border/60 space-y-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-1">
+                <Sparkles className="w-3.5 h-3.5" />
+                <span>Marketplace Recommendations</span>
+              </div>
+              <h2 className="text-xl sm:text-2xl font-bold text-white font-display">
+                Similar Verified Accounts
+              </h2>
+            </div>
+            <Link
+              href="/browse"
+              className="inline-flex items-center gap-1 text-xs font-bold text-[#22C55E] hover:underline"
+            >
+              <span>View All Squads</span>
+              <ArrowRight className="w-3.5 h-3.5" />
+            </Link>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            {relatedListings.map((relListing) => (
+              <ListingCard3D key={relListing.id} listing={relListing} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* Mobile Sticky Thumb-Zone Action Bar */}
       <div className="fixed bottom-0 left-0 right-0 z-40 bg-pitch/95 backdrop-blur-xl border-t border-pitch-border/90 px-4 py-3 lg:hidden flex items-center justify-between gap-3 shadow-2xl">
