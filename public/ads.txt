@@ -1,0 +1,2 @@
+# Google AdSense Authorized Digital Sellers (ads.txt) for eFootballMarket
+google.com, pub-5924764989915276, DIRECT, f08c47fec0942fa0

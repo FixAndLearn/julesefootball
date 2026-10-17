@@ -25,7 +25,7 @@ export function AdBanner({
   ctaUrl = "/escrow-guarantee",
 }: AdBannerProps) {
   const [adsenseEnabled, setAdsenseEnabled] = useState(false);
-  const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  const adsenseClientId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-5924764989915276";
 
   useEffect(() => {
     if (adsenseClientId && typeof window !== "undefined") {

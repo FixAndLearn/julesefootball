@@ -128,7 +128,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   const gaId = process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID;
-  const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID;
+  const adsenseId = process.env.NEXT_PUBLIC_ADSENSE_CLIENT_ID || "ca-pub-5924764989915276";
 
   return (
     <html lang="en" className={`dark ${inter.variable} ${outfit.variable}`}>
@@ -178,15 +178,12 @@ export default function RootLayout({
           </>
         )}
 
-        {/* Google AdSense Script */}
-        {adsenseId && (
-          <Script
-            async
-            strategy="lazyOnload"
-            crossOrigin="anonymous"
-            src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
-          />
-        )}
+        {/* Google AdSense Official Publisher Script (ca-pub-5924764989915276) */}
+        <script
+          async
+          src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
+          crossOrigin="anonymous"
+        />
       </head>
       <body className="bg-[#0B1220] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-[#22C55E] selection:text-[#0B1220] relative font-sans pb-16 md:pb-0">
         <LanguageProvider>
