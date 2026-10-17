@@ -128,75 +128,65 @@ export function Header() {
       </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16">
+        <div className="flex items-center justify-between h-16 gap-3">
           {/* Logo & Desktop Nav */}
-          <div className="flex items-center gap-4 lg:gap-6">
+          <div className="flex items-center gap-4 xl:gap-8 min-w-0">
             <Logo clickable={true} size="md" />
 
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-1.5 text-xs lg:text-sm font-medium">
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-xs xl:text-sm font-medium">
               <Link
                 href="/browse"
-                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] transition-colors"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors whitespace-nowrap shrink-0"
               >
                 {t.browseSquads}
               </Link>
               <Link
                 href="/#friday-drops"
-                className="px-3 py-1.5 rounded-lg text-amber-400 hover:text-amber-300 hover:bg-[#111827] flex items-center gap-1.5 transition-colors font-bold"
+                className="px-3 py-1.5 rounded-lg text-amber-300 hover:text-amber-200 hover:bg-amber-500/10 flex items-center gap-1.5 transition-colors font-medium whitespace-nowrap shrink-0"
               >
-                <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
+                <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
                 <span>{t.fridayDrops}</span>
+                <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 border border-amber-500/30 text-[9px] font-mono font-bold text-amber-300">
+                  DROP
+                </span>
               </Link>
               <Link
                 href="/escrow-guarantee"
-                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] transition-colors"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors whitespace-nowrap shrink-0"
               >
                 {t.escrowGuide}
               </Link>
               <Link
                 href="/scammer-check"
-                className="px-3 py-1.5 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-[#111827] flex items-center gap-1.5 transition-colors font-semibold"
+                className="px-3 py-1.5 rounded-lg text-rose-300/90 hover:text-rose-200 hover:bg-rose-500/10 flex items-center gap-1.5 transition-colors font-medium whitespace-nowrap shrink-0"
               >
-                <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                 <span>{t.scammerCheck}</span>
               </Link>
               <Link
                 href="/news"
-                className="px-3 py-1.5 rounded-lg text-[#94A3B8] hover:text-[#F8FAFC] hover:bg-[#111827] flex items-center gap-1.5 transition-colors"
+                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors whitespace-nowrap shrink-0"
               >
-                <Newspaper className="w-3.5 h-3.5 text-[#94A3B8]" />
-                <span>{t.communityBulletin}</span>
+                {t.communityBulletin}
               </Link>
             </nav>
-
-            {/* Desktop Quick Search Input */}
-            <form onSubmit={handleSearchSubmit} className="hidden 2xl:flex items-center relative ml-1">
-              <Search className="w-3.5 h-3.5 text-slate-400 absolute left-2.5 pointer-events-none" />
-              <input
-                type="text"
-                placeholder="Search meta players (e.g. Messi, Vieira)..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-8 pr-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#22C55E] w-48 transition-all focus:w-60"
-              />
-            </form>
           </div>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2 sm:gap-3">
+          <div className="flex items-center gap-2 xl:gap-3 shrink-0">
             {/* Language Switcher Dropdown */}
-            <div className="relative" ref={langRef}>
+            <div className="relative shrink-0" ref={langRef}>
               <button
                 type="button"
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#111827] border border-[#1F2937] hover:border-slate-600 text-xs text-slate-300 hover:text-white transition-colors"
+                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors whitespace-nowrap shrink-0"
                 title="Change language / Badilisha lugha"
               >
-                <Globe className="w-3.5 h-3.5 text-[#22C55E]" />
-                <span className="font-bold uppercase tracking-wider text-[11px]">
+                <Globe className="w-3.5 h-3.5 text-[#22C55E] shrink-0" />
+                <span className="font-bold uppercase tracking-wider text-[11px] whitespace-nowrap">
                   {language === "en" ? "EN" : "SW"}
                 </span>
-                <ChevronDown className="w-3 h-3 text-slate-500" />
+                <ChevronDown className="w-3 h-3 text-slate-500 shrink-0" />
               </button>
 
               {langDropdownOpen && (
@@ -232,51 +222,40 @@ export function Header() {
             </div>
 
             {/* Prominent Sell Account CTA */}
-            <Link href="/seller/create-listing" className="hidden sm:inline-flex">
+            <Link href="/seller/create-listing" className="hidden sm:inline-flex shrink-0">
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-gradient-to-r from-[#22C55E] to-emerald-400 hover:from-emerald-500 hover:to-emerald-400 text-[#0B1220] font-black text-xs px-4 py-2 rounded-xl shadow-lg shadow-emerald-950/40 flex items-center gap-1.5 active:scale-95 transition-all"
+                className="bg-gradient-to-r from-[#22C55E] to-emerald-400 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 whitespace-nowrap active:scale-95 transition-all"
               >
-                <Plus className="w-4 h-4 stroke-[3]" />
-                <span>{t.sellAccount}</span>
+                <Plus className="w-3.5 h-3.5 stroke-[3] shrink-0" />
+                <span className="whitespace-nowrap">{t.sellAccount}</span>
               </Button>
             </Link>
-
-            <a
-              href="https://wa.me/254794400365"
-              target="_blank"
-              rel="noopener noreferrer"
-              title="Official Community Support: 0794400365"
-              className="hidden xl:inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#111827] border border-[#1F2937] text-[#94A3B8] hover:text-[#F8FAFC] text-xs font-semibold transition-colors"
-            >
-              <MessageCircle className="w-3.5 h-3.5 text-[#22C55E]" />
-              <span>0794400365</span>
-            </a>
 
             {/* Interactive Notification Bell */}
             <NotificationBell />
 
-            <div className="h-6 w-px bg-[#1F2937] mx-1 hidden sm:block" />
+            <div className="h-5 w-px bg-slate-800 mx-0.5 hidden sm:block shrink-0" />
 
             {/* Authenticated User Profile Menu OR Guest Actions */}
             {loading ? (
-              <div className="h-9 w-24 bg-[#111827] animate-pulse rounded-lg hidden sm:block" />
+              <div className="h-9 w-24 bg-[#111827] animate-pulse rounded-lg hidden sm:block shrink-0" />
             ) : isAuthenticated ? (
               /* Logged In User Dropdown */
-              <div className="relative" ref={dropdownRef}>
+              <div className="relative shrink-0" ref={dropdownRef}>
                 <button
                   type="button"
                   onClick={() => setDropdownOpen(!dropdownOpen)}
-                  className="flex items-center gap-2 p-1.5 rounded-xl bg-[#111827] border border-[#1F2937] hover:border-[#FBBF24]/60 hover:bg-[#1F2937] transition-all"
+                  className="flex items-center gap-2 p-1.5 pr-2.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 hover:bg-slate-800/80 transition-all whitespace-nowrap"
                 >
-                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#FBBF24] to-[#22C55E] text-[#0B1220] font-bold text-xs flex items-center justify-center shrink-0">
+                  <div className="w-7 h-7 rounded-lg bg-gradient-to-tr from-[#FBBF24] to-[#22C55E] text-slate-950 font-bold text-xs flex items-center justify-center shrink-0">
                     {getInitials(displayName)}
                   </div>
-                  <span className="text-xs font-bold text-[#F8FAFC] max-w-[110px] truncate hidden sm:inline-block">
+                  <span className="text-xs font-semibold text-slate-200 max-w-[100px] xl:max-w-[140px] truncate hidden sm:inline-block whitespace-nowrap">
                     {displayName}
                   </span>
-                  <ChevronDown className="w-3.5 h-3.5 text-[#94A3B8] hidden sm:block" />
+                  <ChevronDown className="w-3 h-3 text-slate-500 hidden sm:block shrink-0" />
                 </button>
 
                 {/* Dropdown Menu */}

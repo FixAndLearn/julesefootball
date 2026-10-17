@@ -30,11 +30,11 @@ export interface Translations {
 const TRANSLATIONS: Record<Language, Translations> = {
   en: {
     browseSquads: "Browse Squads",
-    fridayDrops: "Friday Drops 🔥",
-    escrowGuide: "Escrow Guide",
-    scammerCheck: "Scammer Check 🚨",
-    communityBulletin: "Community Bulletin",
-    sellAccount: "+ Sell Account",
+    fridayDrops: "Friday Drops",
+    escrowGuide: "Escrow Protocol",
+    scammerCheck: "Scammer Check",
+    communityBulletin: "Market Bulletin",
+    sellAccount: "Sell Account",
     heroHeadline: "Kenya's #1 Secure eFootball Account Trading & Community Hub",
     heroSubheadline:
       "M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. No scams. No stress. Just football.",
@@ -53,11 +53,11 @@ const TRANSLATIONS: Record<Language, Translations> = {
   },
   sw: {
     browseSquads: "Tazama Vikosi",
-    fridayDrops: "Matoleo ya Ijumaa 🔥",
+    fridayDrops: "Matoleo ya Ijumaa",
     escrowGuide: "Mwongozo wa Escrow",
-    scammerCheck: "Kagua Matapeli 🚨",
-    communityBulletin: "Taarifa za Jamii",
-    sellAccount: "+ Uza Kikosi",
+    scammerCheck: "Kagua Matapeli",
+    communityBulletin: "Taarifa za Soko",
+    sellAccount: "Uza Kikosi",
     heroHeadline: "Soko Nambari 1 Kenya la Akaunti za eFootball Salama",
     heroSubheadline:
       "M-PESA NATIVE • 100% ULINZI WA ESCROW • WAUZAJI WALIOTHIBITISHWA. Hakuna utapeli. Hakuna hofu. Ni soka tu.",
