@@ -20,6 +20,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState, useCallback } from "react";
+import { createClient } from "@/lib/supabase/client";
 
 function formatRelativeTime(dateString: string): string {
   try {
@@ -89,9 +90,38 @@ export function NotificationBell() {
   useEffect(() => {
     fetchNotifications();
 
-    // Auto-refresh notifications every 12 seconds
-    const interval = setInterval(fetchNotifications, 12000);
-    return () => clearInterval(interval);
+    let channel: any = null;
+    let supabase: any = null;
+
+    try {
+      supabase = createClient();
+      channel = supabase
+        .channel(`notifications-live-${Math.random().toString(36).slice(2, 7)}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "notifications",
+          },
+          () => {
+            fetchNotifications();
+          }
+        )
+        .subscribe();
+    } catch (e) {
+      console.warn("Realtime notifications note:", e);
+    }
+
+    // Auto-refresh fallback every 10 seconds
+    const interval = setInterval(fetchNotifications, 10000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel && supabase) {
+        supabase.removeChannel(channel).catch(() => {});
+      }
+    };
   }, [fetchNotifications]);
 
   // Click outside to close

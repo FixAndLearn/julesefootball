@@ -46,7 +46,7 @@ export function RealtimeHomeListings({ initialListings }: RealtimeHomeListingsPr
                 <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                 <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
               </span>
-              <span>Live Feed • Realtime Updates</span>
+              <span>Live Feed | Realtime Updates</span>
             </div>
           </div>
 
@@ -85,7 +85,7 @@ export function RealtimeHomeListings({ initialListings }: RealtimeHomeListingsPr
                 {newListingAlert.title}
               </p>
               <p className="text-xs font-semibold text-emerald-400">
-                {formatCurrency(newListingAlert.price)} • {newListingAlert.overall_team_strength} OVR
+                {formatCurrency(newListingAlert.price)} | {newListingAlert.overall_team_strength} OVR
               </p>
             </div>
           </div>

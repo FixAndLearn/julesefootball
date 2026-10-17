@@ -15,6 +15,7 @@ import {
   Smartphone,
   X,
 } from "lucide-react";
+import { createClient } from "@/lib/supabase/client";
 import { useState, useEffect, useRef, useCallback } from "react";
 
 export interface OrderChatBoxProps {
@@ -84,8 +85,46 @@ export function OrderChatBox({
     }
   }, [conversationId]);
 
+  // Instant Supabase Realtime subscription for sub-second chat updates
   useEffect(() => {
-    const interval = setInterval(pollMessages, 3000);
+    let supabase: any = null;
+    let channel: any = null;
+
+    try {
+      supabase = createClient();
+      channel = supabase
+        .channel(`chat-live-${conversationId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "messages",
+            filter: `conversation_id=eq.${conversationId}`,
+          },
+          (payload: any) => {
+            if (payload.new) {
+              setMessages((prev) => {
+                if (prev.some((m) => m.id === payload.new.id)) return prev;
+                return [...prev, payload.new as Message];
+              });
+            }
+          }
+        )
+        .subscribe();
+    } catch (e) {
+      console.warn("Realtime chat subscription note:", e);
+    }
+
+    return () => {
+      if (channel && supabase) {
+        supabase.removeChannel(channel).catch(() => {});
+      }
+    };
+  }, [conversationId]);
+
+  useEffect(() => {
+    const interval = setInterval(pollMessages, 3500);
     return () => clearInterval(interval);
   }, [pollMessages]);
 

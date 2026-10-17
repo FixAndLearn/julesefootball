@@ -7,6 +7,7 @@ import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
 import { WhatsAppSupportWidget } from "@/components/support/WhatsAppSupportWidget";
+import { AiAssistantWidget } from "@/components/ai/AiAssistantWidget";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -79,7 +80,7 @@ export const metadata: Metadata = {
     siteName: "eFootballMarket",
     title: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading & Community Hub",
     description:
-      "M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. Buy and sell verified eFootball squads safely with M-Pesa Escrow (Till 1572931) and 24h buyer protection.",
+      "M-PESA NATIVE | 100% ESCROW PROTECTED | VERIFIED SELLERS. Buy and sell verified eFootball squads safely with M-Pesa Escrow (Till 1572931) and 24h buyer protection.",
     images: [
       {
         url: "/og-image.svg",
@@ -93,7 +94,7 @@ export const metadata: Metadata = {
     card: "summary_large_image",
     title: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading & Community Hub",
     description:
-      "M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. Buy and sell verified eFootball squads safely with M-Pesa Escrow.",
+      "M-PESA NATIVE | 100% ESCROW PROTECTED | VERIFIED SELLERS. Buy and sell verified eFootball squads safely with M-Pesa Escrow.",
     images: ["/og-image.svg"],
     creator: "@eFootballMarket",
   },
@@ -193,6 +194,7 @@ export default function RootLayout({
           <MobileBottomNav />
           <CookieConsentBanner />
           <WhatsAppSupportWidget />
+          <AiAssistantWidget />
         </LanguageProvider>
       </body>
     </html>

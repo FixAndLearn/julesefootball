@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { createClient } from "@/lib/supabase/client";
 import { ListingOffer } from "@/types/database";
 import { formatCurrency } from "@/lib/utils";
 import { Button } from "@/components/ui/Button";
@@ -71,9 +72,42 @@ export function SellerListingOffersPanel({
   };
 
   useEffect(() => {
-    if (!initialOffers) {
-      fetchOffers();
+    fetchOffers();
+
+    let channel: any = null;
+    let supabase: any = null;
+
+    try {
+      supabase = createClient();
+      const filter = listingId ? `listing_id=eq.${listingId}` : undefined;
+      channel = supabase
+        .channel(`offers-live-${listingId || sellerId || "all"}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "*",
+            schema: "public",
+            table: "listing_offers",
+            filter,
+          },
+          () => {
+            fetchOffers();
+          }
+        )
+        .subscribe();
+    } catch (e) {
+      console.warn("Realtime offers subscription note:", e);
     }
+
+    // Auto-sync polling every 6 seconds as resilient fallback
+    const interval = setInterval(fetchOffers, 6000);
+
+    return () => {
+      clearInterval(interval);
+      if (channel && supabase) {
+        supabase.removeChannel(channel).catch(() => {});
+      }
+    };
   }, [listingId, sellerId]);
 
   const handleAction = async (

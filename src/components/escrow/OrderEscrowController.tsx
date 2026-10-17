@@ -30,7 +30,11 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
 
   const isBuyer = currentUserId === order.buyer_id;
   const isSeller = currentUserId === order.seller_id;
-  const escrowState = (order.escrow?.escrow_state || "pending") as EscrowState;
+
+  const [currentStatus, setCurrentStatus] = useState<OrderStatus | string>(order.status);
+  const [currentEscrowState, setCurrentEscrowState] = useState<EscrowState>(
+    (order.escrow?.escrow_state || "pending") as EscrowState
+  );
 
   const [stepLogin, setStepLogin] = useState(false);
   const [stepPassword, setStepPassword] = useState(false);
@@ -40,6 +44,17 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
   const [isChecklistModalOpen, setIsChecklistModalOpen] = useState(false);
   const [releasingFunds, setReleasingFunds] = useState(false);
   const [releaseError, setReleaseError] = useState("");
+
+  // Sync prop changes
+  useEffect(() => {
+    setCurrentStatus(order.status);
+  }, [order.status]);
+
+  useEffect(() => {
+    if (order.escrow?.escrow_state) {
+      setCurrentEscrowState(order.escrow.escrow_state as EscrowState);
+    }
+  }, [order.escrow?.escrow_state]);
 
   // Real-time synchronization for order state across buyers & sellers
   useEffect(() => {
@@ -56,7 +71,8 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
             filter: `id=eq.${order.id}`,
           },
           (payload: any) => {
-            if (payload.new && payload.new.status !== order.status) {
+            if (payload.new && payload.new.status) {
+              setCurrentStatus(payload.new.status);
               router.refresh();
             }
           }
@@ -69,7 +85,10 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
             table: "escrow_accounts",
             filter: `order_id=eq.${order.id}`,
           },
-          () => {
+          (payload: any) => {
+            if (payload.new && payload.new.escrow_state) {
+              setCurrentEscrowState(payload.new.escrow_state as EscrowState);
+            }
             router.refresh();
           }
         )
@@ -82,6 +101,8 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
             filter: `order_id=eq.${order.id}`,
           },
           () => {
+            setCurrentStatus((prev) => (prev === "escrow_locked" ? "seller_delivered" : prev));
+            setCurrentEscrowState((prev) => (prev === "waiting_for_seller" ? "seller_delivered" : prev));
             router.refresh();
           }
         )
@@ -93,11 +114,11 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
     } catch (e) {
       console.warn("Realtime order channel error:", e);
     }
-  }, [order.id, order.status, router]);
+  }, [order.id, router]);
 
-  // If order is payment_pending, poll gently every 4s to catch payments automatically
+  // If order is payment_pending, poll gently every 2s to catch payments automatically
   useEffect(() => {
-    if (order.status !== "payment_pending") return;
+    if (currentStatus !== "payment_pending") return;
 
     const interval = setInterval(async () => {
       try {
@@ -115,22 +136,21 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
           const data = await res.json();
           if (data.status === "completed") {
             clearInterval(interval);
-            refreshPage();
+            setCurrentStatus("escrow_locked");
+            setCurrentEscrowState("payment_received");
+            router.refresh();
           }
         }
       } catch (e) {
         // quiet fallback
       }
-    }, 2500);
+    }, 2000);
 
     return () => clearInterval(interval);
-  }, [order.id, order.status, router]);
+  }, [order.id, currentStatus, router]);
 
   const refreshPage = () => {
     router.refresh();
-    setTimeout(() => {
-      window.location.reload();
-    }, 400);
   };
 
   const handleConfirmAndRelease = async () => {
@@ -174,7 +194,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
               <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
               <span>Handover Guide &amp; Rules</span>
             </button>
-            {order.status !== "payment_pending" && order.status !== "cancelled" && (
+            {currentStatus !== "payment_pending" && currentStatus !== "cancelled" && (
               <button
                 type="button"
                 onClick={() => setIsReceiptModalOpen(true)}
@@ -184,26 +204,26 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
                 <span>Official Receipt (PDF)</span>
               </button>
             )}
-            {order.status !== "payment_pending" && order.status !== "cancelled" && order.status !== "disputed" && (
+            {currentStatus !== "payment_pending" && currentStatus !== "cancelled" && currentStatus !== "disputed" && (
               <button
                 type="button"
                 onClick={() => setIsDisputeModalOpen(true)}
                 className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-rose-950/60 border border-rose-800/80 px-2.5 py-1 rounded-xl shadow-sm"
               >
                 <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-                <span>{order.status === "completed" ? "Post-Release Dispute" : "Raise Dispute"}</span>
+                <span>{currentStatus === "completed" ? "Post-Release Dispute" : "Raise Dispute"}</span>
               </button>
             )}
           </div>
         </div>
-        <EscrowStatusStepper state={escrowState} />
+        <EscrowStatusStepper state={currentEscrowState} />
       </div>
 
       {/* Universal Escrow Exchange Guide Card (Available from Beginning) */}
       <EscrowHandoverGuideCard onOpenGuide={() => setIsChecklistModalOpen(true)} />
 
       {/* Stage 1: Payment Pending (Buyer STK Push Trigger) */}
-      {order.status === "payment_pending" && (
+      {currentStatus === "payment_pending" && (
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
@@ -241,7 +261,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       )}
 
       {/* Stage 2: Escrow Locked (Seller delivering credentials via form or chat) */}
-      {order.status === "escrow_locked" && (
+      {currentStatus === "escrow_locked" && (
         <div>
           {isSeller ? (
             <CredentialsDeliveryForm orderId={order.id} onDelivered={refreshPage} />
@@ -379,7 +399,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       )}
 
       {/* Stage 3: Seller Delivered (Buyer Reviewing & 2-Way Code Transfer Window) */}
-      {order.status === "seller_delivered" && (
+      {currentStatus === "seller_delivered" && (
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-5">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-3">
@@ -589,7 +609,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       )}
 
       {/* Stage 4: Order Completed */}
-      {order.status === "completed" && (
+      {currentStatus === "completed" && (
         <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
@@ -645,7 +665,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       )}
 
       {/* Stage 5: Disputed */}
-      {order.status === "disputed" && (
+      {currentStatus === "disputed" && (
         <DisputeEvidenceLocker order={order} currentUserId={currentUserId} />
       )}
 
@@ -681,7 +701,7 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
       <DisputeModal
         orderId={order.id}
         isOpen={isDisputeModalOpen}
-        isCompleted={order.status === "completed"}
+        isCompleted={currentStatus === "completed"}
         onClose={() => setIsDisputeModalOpen(false)}
         onDisputeSubmitted={() => {
           setIsDisputeModalOpen(false);
