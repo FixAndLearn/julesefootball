@@ -92,6 +92,7 @@ export default function PrivacyPolicyPage() {
           <ul className="list-disc list-inside space-y-1.5 text-xs sm:text-sm pl-2">
             <li><strong>Safaricom PLC:</strong> Telecommunications gateway for Daraja API v2 M-Pesa payment processing.</li>
             <li><strong>Supabase / PostgreSQL:</strong> Cloud database infrastructure enforcing Row Level Security (RLS) on database tables.</li>
+            <li><strong>Google LLC (Google AdSense & Google Analytics 4):</strong> Advertising delivery and telemetry operating strictly under Google Consent Mode v2 in compliance with the Kenya Data Protection Act, 2019.</li>
           </ul>
         </section>
 
@@ -105,13 +106,37 @@ export default function PrivacyPolicyPage() {
           </p>
         </section>
 
-        {/* Section 5 */}
+        {/* Section 5: Google AdSense & Third-Party Advertising Policy (Mandatory AdSense Compliance) */}
         <section className="space-y-3">
           <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
-            <span className="text-emerald-400">5.</span> Data Subject Rights & Inquiries
+            <span className="text-emerald-400">5.</span> Google AdSense, Cookies &amp; Third-Party Advertising
           </h2>
           <p>
-            Under the Kenya Data Protection Act, 2019, users have rights including the right to be informed, access personal data, request rectification of false or misleading data, and request erasure of personal data that is no longer necessary, subject to statutory record-retention requirements. To submit data inquiries, contact privacy@efootballmarket.com.
+            eFootballMarket displays advertisements served by Google AdSense (Google LLC) to support free platform operations and community trading tools. In compliance with Google Publisher Policies, we disclose the following advertising data practices:
+          </p>
+          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2.5">
+            <p>
+              <strong>1. Third-Party Advertising Cookies:</strong> Third-party vendors, including Google, use cookies, web beacons, and unique device identifiers to serve advertisements based on a user&apos;s prior visits to this website or other websites on the Internet.
+            </p>
+            <p>
+              <strong>2. Personalized Advertising:</strong> Google&apos;s use of advertising cookies enables it and its certified ad partners to serve relevant advertisements to users based on their navigation history across eFootballMarket and other websites.
+            </p>
+            <p>
+              <strong>3. How to Opt Out of Personalized Ads:</strong> Users may opt out of personalized advertising by visiting <a href="https://www.google.com/settings/ads" target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline font-semibold">Google Ads Settings</a>. Alternatively, users can opt out of third-party vendors&apos; use of cookies for personalized advertising by visiting <a href="https://www.aboutads.info/choices/" target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline font-semibold">www.aboutads.info/choices</a> or the <a href="https://optout.networkadvertising.org/" target="_blank" rel="noopener noreferrer" className="text-emerald-400 underline font-semibold">Network Advertising Initiative Consumer Opt-Out</a>.
+            </p>
+            <p>
+              <strong>4. Google Consent Mode v2:</strong> In adherence to Kenya Data Protection Act (2019) and global privacy directives, advertising cookies and analytics tags are governed by user consent. You can modify your consent settings anytime by tapping <strong>&quot;Cookie Preferences &amp; Consent&quot;</strong> in our website footer.
+            </p>
+          </div>
+        </section>
+
+        {/* Section 6 */}
+        <section className="space-y-3">
+          <h2 className="text-base sm:text-lg font-bold text-white font-display flex items-center gap-2">
+            <span className="text-emerald-400">6.</span> Data Subject Rights &amp; Inquiries
+          </h2>
+          <p>
+            Under the Kenya Data Protection Act, 2019, users have rights including the right to be informed, access personal data, request rectification of false or misleading data, and request erasure of personal data that is no longer necessary, subject to statutory record-retention requirements. To submit data inquiries, contact privacy@efootballmarket.co.ke or WhatsApp +254 794 400 365.
           </p>
         </section>
       </div>

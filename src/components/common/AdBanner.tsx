@@ -46,8 +46,10 @@ export function AdBanner({
     });
   };
 
-  // 1. Google AdSense Certified Unit
-  if (adsenseClientId && adsenseEnabled) {
+  // 1. Google AdSense Certified Unit (renders when numeric AdSense unit ID is configured)
+  const isNumericSlot = Boolean(slot && /^\d+$/.test(slot));
+
+  if (adsenseClientId && adsenseEnabled && isNumericSlot) {
     return (
       <div className={`w-full text-center overflow-hidden my-4 ${className}`}>
         <span className="block text-[9px] font-mono uppercase tracking-widest text-slate-500 mb-1.5">

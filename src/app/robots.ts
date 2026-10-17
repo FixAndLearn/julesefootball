@@ -25,6 +25,14 @@ export default function robots(): MetadataRoute.Robots {
           "/orders/",
         ],
       },
+      {
+        userAgent: "Mediapartners-Google",
+        allow: "/",
+        disallow: [
+          "/admin",
+          "/api/",
+        ],
+      },
     ],
     sitemap: `${siteUrl}/sitemap.xml`,
   };
