@@ -3,11 +3,12 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
+import { Lock, Mail, Phone, ShieldCheck, User, AlertCircle, KeyRound, CheckCircle2 } from "lucide-react";
+import { OtpCodeInput } from "@/components/auth/OtpCodeInput";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
-import { Lock, Mail, Phone, ShieldCheck, User, AlertCircle } from "lucide-react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Suspense, useState } from "react";
+import { Suspense, useState, useEffect } from "react";
 
 function RegisterForm() {
   const router = useRouter();
@@ -25,6 +26,20 @@ function RegisterForm() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [emailConfirmationSent, setEmailConfirmationSent] = useState(false);
+
+  const [code, setCode] = useState("");
+  const [verifying, setVerifying] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(45);
+  const [resending, setResending] = useState(false);
+  const [resendMessage, setResendMessage] = useState("");
+
+  useEffect(() => {
+    if (!emailConfirmationSent || resendCooldown <= 0) return;
+    const timer = setInterval(() => {
+      setResendCooldown((prev) => Math.max(0, prev - 1));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, [emailConfirmationSent, resendCooldown]);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -140,6 +155,83 @@ function RegisterForm() {
     }
   };
 
+  const handleVerifyCode = async (codeToVerify?: string) => {
+    const token = (codeToVerify || code).trim();
+    if (token.length !== 6) {
+      setError("Please enter the complete 6-digit verification code.");
+      return;
+    }
+
+    setVerifying(true);
+    setError("");
+
+    try {
+      const supabase = createClient();
+      let { data, error: verifyErr } = await supabase.auth.verifyOtp({
+        email,
+        token,
+        type: "signup",
+      });
+
+      if (verifyErr) {
+        // Fallback to email OTP type
+        const fallback = await supabase.auth.verifyOtp({
+          email,
+          token,
+          type: "email",
+        });
+        data = fallback.data;
+        verifyErr = fallback.error;
+      }
+
+      if (verifyErr) {
+        throw new Error(verifyErr.message || "Invalid or expired 6-digit code. Please try again.");
+      }
+
+      if (data?.session) {
+        router.push(redirect);
+        router.refresh();
+      } else {
+        await supabase.auth.signInWithPassword({ email, password });
+        router.push(redirect);
+        router.refresh();
+      }
+    } catch (err: any) {
+      setError(err.message || "Code verification failed. Please check the code and try again.");
+    } finally {
+      setVerifying(false);
+    }
+  };
+
+  const handleResendCode = async () => {
+    if (resendCooldown > 0 || resending) return;
+    setResending(true);
+    setError("");
+    setResendMessage("");
+
+    try {
+      const supabase = createClient();
+      const { error: resendErr } = await supabase.auth.resend({
+        type: "signup",
+        email,
+        options: {
+          emailRedirectTo: "https://www.efootballmarket.co.ke/auth/callback",
+        },
+      });
+
+      if (resendErr) {
+        throw new Error(resendErr.message);
+      }
+
+      setResendMessage("A new 6-digit code has been dispatched to your email!");
+      setResendCooldown(45);
+    } catch (err: any) {
+      setError(err.message || "Failed to resend code.");
+    } finally {
+      setResending(false);
+    }
+  };
+
   const handleOpenEmailApp = () => {
     if (typeof window === "undefined") return;
     const ua = navigator.userAgent || "";
@@ -147,10 +239,8 @@ function RegisterForm() {
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
     if (isAndroid) {
-      // Launch default native Android email app directly without web login prompt
       window.location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.APP_EMAIL;end";
     } else if (isIOS) {
-      // iOS Mail / Gmail scheme
       window.location.href = "message://";
       setTimeout(() => {
         window.location.href = "https://mail.google.com";
@@ -160,77 +250,98 @@ function RegisterForm() {
     }
   };
 
-  const handleInstantSignIn = async () => {
-    setLoading(true);
-    try {
-      const supabase = createClient();
-      const { data, error: loginErr } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (data?.session) {
-        router.push(redirect);
-        router.refresh();
-        return;
-      }
-
-      router.push(`/login?redirect=${encodeURIComponent(redirect)}&email=${encodeURIComponent(email)}`);
-    } catch {
-      router.push(`/login?redirect=${encodeURIComponent(redirect)}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   if (emailConfirmationSent) {
     return (
-      <div className="w-full max-w-lg bg-pitch-surface border border-pitch-border rounded-2xl p-8 shadow-2xl space-y-6 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 mx-auto">
-          <Mail className="w-8 h-8" />
+      <div className="w-full max-w-md bg-pitch-surface border border-pitch-border rounded-2xl p-6 sm:p-8 shadow-2xl space-y-6 text-center animate-in fade-in">
+        <div className="w-14 h-14 rounded-2xl bg-amber-500/20 border border-amber-500/40 flex items-center justify-center text-amber-400 mx-auto shadow-inner">
+          <KeyRound className="w-7 h-7" />
         </div>
-        <div>
-          <h2 className="text-2xl font-bold text-white font-display">Account Registered!</h2>
-          <p className="text-sm text-slate-300 mt-2">
-            Verification link sent to <strong className="text-white font-semibold">{email}</strong>.
-          </p>
-          <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-            Tap the button below to launch your email app, or sign in directly if your account is verified.
+        <div className="space-y-1.5">
+          <h2 className="text-2xl font-bold text-white font-display">Enter 6-Digit Code</h2>
+          <p className="text-xs text-slate-300 leading-relaxed">
+            Enter the 6-digit verification code sent to <strong className="text-amber-400 font-mono font-semibold">{email}</strong>.
           </p>
         </div>
 
-        <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2 text-left">
-          <span className="font-bold text-amber-300 block">Fast Setup:</span>
-          <p>1. Open your mail app and tap the confirmation link.</p>
-          <p>2. Or tap &quot;Log In to Dashboard&quot; below to enter immediately.</p>
+        {error && (
+          <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2 text-left">
+            <AlertCircle className="w-4 h-4 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
+
+        {resendMessage && (
+          <div className="p-3 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2 text-left">
+            <CheckCircle2 className="w-4 h-4 shrink-0" />
+            <span>{resendMessage}</span>
+          </div>
+        )}
+
+        {/* 6-Digit OTP Box Input */}
+        <div className="py-2">
+          <OtpCodeInput
+            value={code}
+            onChange={(val) => {
+              setCode(val);
+              setError("");
+            }}
+            onComplete={handleVerifyCode}
+            disabled={verifying}
+            autoFocus={true}
+          />
         </div>
 
-        <div className="flex flex-col gap-3 pt-2">
-          <div className="flex flex-col sm:flex-row items-center gap-3">
+        <Button
+          type="button"
+          variant="gold"
+          size="lg"
+          onClick={() => handleVerifyCode()}
+          isLoading={verifying}
+          disabled={code.length !== 6 || verifying}
+          className="w-full font-bold shadow-lg"
+        >
+          Verify Code &amp; Start Trading
+        </Button>
+
+        {/* Resend & App Launcher Controls */}
+        <div className="flex flex-col gap-3 pt-2 text-xs border-t border-pitch-border/60">
+          <div className="flex items-center justify-between text-slate-400">
+            <span>Didn&apos;t get the code?</span>
+            <button
+              type="button"
+              onClick={handleResendCode}
+              disabled={resendCooldown > 0 || resending}
+              className="text-amber-400 hover:text-amber-300 font-semibold disabled:text-slate-600 disabled:cursor-not-allowed transition-colors"
+            >
+              {resending
+                ? "Sending..."
+                : resendCooldown > 0
+                ? `Resend in ${resendCooldown}s`
+                : "Resend Code"}
+            </button>
+          </div>
+
+          <div className="flex items-center justify-between pt-1">
             <button
               type="button"
               onClick={handleOpenEmailApp}
-              className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-md text-center flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+              className="text-slate-400 hover:text-white flex items-center gap-1.5 transition-colors"
             >
-              <Mail className="w-4 h-4" />
-              <span>Open Email App</span>
+              <Mail className="w-3.5 h-3.5" />
+              <span>Launch Mail App</span>
             </button>
             <button
               type="button"
-              onClick={handleInstantSignIn}
-              disabled={loading}
-              className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-md text-center flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
+              onClick={() => {
+                setEmailConfirmationSent(false);
+                setCode("");
+                setError("");
+              }}
+              className="text-slate-400 hover:text-white transition-colors"
             >
-              <ShieldCheck className="w-4 h-4" />
-              <span>Log In to Dashboard</span>
+              Edit Details
             </button>
           </div>
-          <Link
-            href={`/login?redirect=${encodeURIComponent(redirect)}`}
-            className="text-center text-xs text-slate-400 hover:text-slate-200 transition-colors pt-1"
-          >
-            Prefer regular sign-in? Go to Login page →
-          </Link>
         </div>
       </div>
     );
