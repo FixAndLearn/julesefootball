@@ -26,7 +26,7 @@ const PROMOTIONAL_TICKER_ITEMS: TickerItem[] = [
     id: "promo-escrow",
     badge: "🛡️ TILL 1572931 ESCROW",
     badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-    text: "Never send money directly on WhatsApp • Funds stay locked in Till 1572931 until you test the Konami login",
+    text: "Never send money directly on WhatsApp | Funds stay locked in Till 1572931 until you test the Konami login",
     link: "/escrow-guarantee",
   },
   {
@@ -100,7 +100,7 @@ export function LiveActivityMarquee() {
             id: `real-${newListing.id}`,
             badge: "⚡ NEW SQUAD DROPPED",
             badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-            text: `${newListing.title} (${newListing.overall_team_strength} OVR) listed for KSh ${Number(newListing.price).toLocaleString()} • Till 1572931 Protected`,
+            text: `${newListing.title} (${newListing.overall_team_strength} OVR) listed for KSh ${Number(newListing.price).toLocaleString()} | Till 1572931 Protected`,
             link: `/listings/${newListing.id}`,
           };
           setItems((prev) => [newItem, ...prev.slice(0, 10)]);
@@ -143,7 +143,7 @@ export function LiveActivityMarquee() {
                   {item.badge}
                 </span>
                 <span className="text-slate-300 font-medium">{item.text}</span>
-                <span className="text-slate-700 mx-2">•</span>
+                <span className="text-slate-800 mx-2">|</span>
               </Link>
             ))}
           </div>

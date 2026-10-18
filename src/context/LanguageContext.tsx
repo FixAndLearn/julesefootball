@@ -37,7 +37,7 @@ const TRANSLATIONS: Record<Language, Translations> = {
     sellAccount: "Sell Account",
     heroHeadline: "Kenya's #1 Secure eFootball Account Trading & Community Hub",
     heroSubheadline:
-      "M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. No scams. No stress. Just football.",
+      "M-PESA NATIVE | 100% ESCROW PROTECTED | VERIFIED SELLERS. No scams. No stress. Just football.",
     browseVerifiedSquads: "Browse Verified Squads",
     listSquadFree: "List Your Squad for Free",
     escrowGuaranteePill: "100% Money-Back Escrow Guarantee",
@@ -60,7 +60,7 @@ const TRANSLATIONS: Record<Language, Translations> = {
     sellAccount: "Uza Kikosi",
     heroHeadline: "Soko Nambari 1 Kenya la Akaunti za eFootball Salama",
     heroSubheadline:
-      "M-PESA NATIVE • 100% ULINZI WA ESCROW • WAUZAJI WALIOTHIBITISHWA. Hakuna utapeli. Hakuna hofu. Ni soka tu.",
+      "M-PESA NATIVE | 100% ULINZI WA ESCROW | WAUZAJI WALIOTHIBITISHWA. Hakuna utapeli. Hakuna hofu. Ni soka tu.",
     browseVerifiedSquads: "Tazama Vikosi Vilivyothibitishwa",
     listSquadFree: "Weka Kikosi Chako Bure",
     escrowGuaranteePill: "100% Hakikisho la Kurudishiwa Pesa",

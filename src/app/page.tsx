@@ -101,7 +101,7 @@ export default async function HomePage() {
               </h1>
 
               <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-sans font-medium">
-                M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. No scams. No stress. Just football.
+                M-PESA NATIVE | 100% ESCROW PROTECTED | VERIFIED SELLERS. No scams. No stress. Just football.
               </p>
 
               {/* Instant Search Bar */}

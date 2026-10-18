@@ -99,7 +99,7 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
                 <span>FRIDAY DROPS FLASH SALE (UP TO 50% OFF)</span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display tracking-tight">
-                Elite Squad Drops • Every Friday EAT
+                Elite Squad Drops | Every Friday EAT
               </h2>
               <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
                 Hand-curated, verified high-OVR accounts discounted exclusively for 24 hours. Full Safaricom M-Pesa Till 1572931 escrow guarantee applies.

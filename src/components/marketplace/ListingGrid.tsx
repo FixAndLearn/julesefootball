@@ -61,7 +61,7 @@ export function ListingGrid({ listings: initialListings, filters, isLoading = fa
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
           </span>
-          <span>Live Feed • Realtime Updates</span>
+          <span>Live Feed | Realtime Updates</span>
         </div>
         <span className="text-xs text-slate-400 font-medium">
           Showing <strong className="text-slate-200">{listings.length}</strong> active squad{listings.length === 1 ? "" : "s"}
@@ -86,7 +86,7 @@ export function ListingGrid({ listings: initialListings, filters, isLoading = fa
                 {newListingAlert.title}
               </p>
               <p className="text-xs font-semibold text-emerald-400">
-                {formatCurrency(newListingAlert.price)} • {newListingAlert.overall_team_strength} OVR
+                {formatCurrency(newListingAlert.price)} | {newListingAlert.overall_team_strength} OVR
               </p>
             </div>
           </div>

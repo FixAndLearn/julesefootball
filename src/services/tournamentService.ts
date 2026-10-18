@@ -111,7 +111,7 @@ export class TournamentService {
     const tourneyPayload: Tournament = {
       id: newId,
       title: params.title.trim(),
-      subtitle: params.subtitle?.trim() || `${params.max_players}-Player 1v1 Single Knockout • M-Pesa Escrow Payout`,
+      subtitle: params.subtitle?.trim() || `${params.max_players}-Player 1v1 Single Knockout | M-Pesa Escrow Payout`,
       description: params.description?.trim() || "",
       platform: params.platform,
       prize_pool_kes: params.prize_pool_kes,

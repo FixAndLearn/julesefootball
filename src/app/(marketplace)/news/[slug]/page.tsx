@@ -207,7 +207,7 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
             </div>
             <div>
               <h4 className="text-xs font-bold text-white uppercase tracking-wider">
-                eFootballMarket Escrow Guarantee • Till 1572931
+                eFootballMarket Escrow Guarantee | Till 1572931
               </h4>
               <p className="text-[11px] text-slate-400">
                 Automated Lipa Na M-Pesa escrow protection with 24-hour inspection on all transactions.

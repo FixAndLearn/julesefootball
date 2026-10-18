@@ -387,7 +387,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
               <div className="p-3.5 rounded-xl bg-[#090D16] border border-[#1F2937] flex items-center justify-between text-xs text-slate-400">
                 <div className="flex items-center gap-2">
                   <Building2 className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span>Escrow Cleared via Till 1572931 • Governed by Brian Okibo, CEO</span>
+                  <span>Escrow Cleared via Till 1572931 | Governed by Brian Okibo, CEO</span>
                 </div>
                 <Link href="/escrow-guarantee" className="text-[#22C55E] hover:underline font-semibold shrink-0">
                   Read Escrow Terms &rarr;

@@ -100,12 +100,12 @@ export function Header() {
               <BadgeCheck className="w-3.5 h-3.5 text-[#22C55E]" />
               <span>Safaricom Till 1572931</span>
             </span>
-            <span className="text-slate-600 shrink-0">•</span>
+            <span className="text-slate-700 shrink-0">|</span>
             <span className="inline-flex items-center gap-1 text-slate-300 shrink-0">
               <Clock className="w-3.5 h-3.5 text-[#FBBF24]" />
               <span>24H Buyer Inspection</span>
             </span>
-            <span className="text-slate-600 hidden lg:inline shrink-0">•</span>
+            <span className="text-slate-700 hidden lg:inline shrink-0">|</span>
             <span className="hidden lg:inline text-slate-400 shrink-0">
               Kenya DPA (2019) Compliant
             </span>
@@ -121,7 +121,7 @@ export function Header() {
               <Phone className="w-3 h-3" />
               <span>0794400365</span>
             </a>
-            <span className="text-slate-600 hidden sm:inline">•</span>
+            <span className="text-slate-700 hidden sm:inline">|</span>
             <span className="text-slate-400 hidden sm:inline">KES (M-Pesa)</span>
           </div>
         </div>
@@ -174,8 +174,8 @@ export function Header() {
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2 xl:gap-3 shrink-0">
-            {/* Language Switcher Dropdown */}
-            <div className="relative shrink-0" ref={langRef}>
+            {/* Language Switcher Dropdown (Desktop / Tablet - Mobile has dedicated drawer toggle) */}
+            <div className="relative shrink-0 hidden sm:block" ref={langRef}>
               <button
                 type="button"
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}

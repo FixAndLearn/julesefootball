@@ -21,7 +21,7 @@ export async function GET() {
       type: "real_listing",
       badge: "🔥 LIVE SQUAD",
       badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-      text: `${listing.title} • ${listing.overall_team_strength} OVR • KSh ${Number(listing.price).toLocaleString()} via Till 1572931`,
+      text: `${listing.title} | ${listing.overall_team_strength} OVR | KSh ${Number(listing.price).toLocaleString()} via Till 1572931`,
       link: `/listings/${listing.id}`,
       icon: "drops" as const,
     }));
@@ -43,7 +43,7 @@ export async function GET() {
         type: "promo",
         badge: "🛡️ TILL 1572931 ESCROW",
         badgeColor: "bg-emerald-500/20 text-emerald-300 border-emerald-500/40",
-        text: "Never send money directly on WhatsApp • Funds stay in Till 1572931 until you test the Konami login",
+        text: "Never send money directly on WhatsApp | Funds stay in Till 1572931 until you test the Konami login",
         link: "/escrow-guarantee",
         icon: "escrow" as const,
       },

@@ -323,7 +323,7 @@ export function SquadInspectorModal({ listing, isOpen, onClose }: SquadInspector
                 {formatCurrency(listing.price, listing.currency)}
               </span>
               <span className="text-[11px] text-slate-400">
-                • 24h Buyer Inspection
+                | 24h Buyer Inspection
               </span>
             </div>
           </div>

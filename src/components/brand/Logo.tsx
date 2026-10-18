@@ -15,23 +15,23 @@ export function Logo({
   clickable = false,
 }: LogoProps) {
   const iconDimensions = {
-    sm: "w-8 h-8",
-    md: "w-10 h-10",
-    lg: "w-12 h-12",
-    xl: "w-16 h-16",
+    sm: "w-7 h-7 sm:w-8 sm:h-8",
+    md: "w-8 h-8 sm:w-10 sm:h-10",
+    lg: "w-10 h-10 sm:w-12 sm:h-12",
+    xl: "w-12 h-12 sm:w-16 sm:h-16",
   }[size];
 
   const titleSizes = {
-    sm: "text-base",
-    md: "text-lg",
-    lg: "text-xl",
-    xl: "text-2xl",
+    sm: "text-sm sm:text-base",
+    md: "text-[15px] sm:text-lg",
+    lg: "text-lg sm:text-xl",
+    xl: "text-xl sm:text-2xl",
   }[size];
 
   const subtitleSizes = {
-    sm: "text-[9px]",
-    md: "text-[10px]",
-    lg: "text-xs",
+    sm: "text-[7.5px] sm:text-[9px]",
+    md: "text-[8px] sm:text-[10px]",
+    lg: "text-[10px] sm:text-xs",
     xl: "text-xs",
   }[size];
 
@@ -110,14 +110,14 @@ export function Logo({
   );
 
   const Content = (
-    <div className={`inline-flex items-center gap-3 select-none ${className}`}>
+    <div className={`inline-flex items-center gap-2 sm:gap-2.5 select-none min-w-0 ${className}`}>
       {LogoIcon}
       {showText && (
-        <div className="flex flex-col leading-none">
-          <span className={`font-display font-black tracking-tight text-white ${titleSizes}`}>
+        <div className="flex flex-col leading-none min-w-0">
+          <span className={`font-display font-black tracking-tight text-white whitespace-nowrap ${titleSizes}`}>
             eFootball<span className="text-amber-400">Market</span>
           </span>
-          <span className={`uppercase tracking-widest text-emerald-400 font-bold mt-1 ${subtitleSizes}`}>
+          <span className={`uppercase tracking-widest text-emerald-400 font-bold mt-0.5 whitespace-nowrap ${subtitleSizes}`}>
             Escrow Protected
           </span>
         </div>

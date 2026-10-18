@@ -164,7 +164,7 @@ export function EscrowStepsVisualizer() {
                   <ul className="space-y-1.5 pt-2 border-t border-slate-800/80 text-[10px] text-slate-300">
                     {step.details.map((d, dIdx) => (
                       <li key={dIdx} className="flex items-start gap-1.5">
-                        <span className="text-[#22C55E] shrink-0 font-bold">•</span>
+                        <CheckCircle2 className="w-3 h-3 text-[#22C55E] shrink-0 mt-0.5" />
                         <span>{d}</span>
                       </li>
                     ))}

@@ -180,37 +180,37 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
   return (
     <div className="space-y-6">
       {/* Escrow Progress Stepper */}
-      <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
-        <div className="flex items-center justify-between">
+      <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-4 sm:p-6 shadow-xl space-y-4 overflow-hidden">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <h3 className="text-xs uppercase font-bold text-slate-400 tracking-wider">
             Transaction Lifecycle &amp; Escrow State
           </h3>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => setIsChecklistModalOpen(true)}
-              className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1 rounded-xl shadow-sm"
+              className="text-xs text-emerald-400 hover:text-emerald-300 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-1.5 rounded-xl shadow-xs"
             >
-              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
               <span>Handover Guide &amp; Rules</span>
             </button>
             {currentStatus !== "payment_pending" && currentStatus !== "cancelled" && (
               <button
                 type="button"
                 onClick={() => setIsReceiptModalOpen(true)}
-                className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-pitch-card border border-pitch-border px-2.5 py-1 rounded-xl"
+                className="text-xs text-amber-300 hover:text-amber-200 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-pitch-card border border-pitch-border px-2.5 py-1.5 rounded-xl"
               >
-                <FileText className="w-3.5 h-3.5 text-amber-400" />
-                <span>Official Receipt (PDF)</span>
+                <FileText className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>Official Receipt</span>
               </button>
             )}
             {currentStatus !== "payment_pending" && currentStatus !== "cancelled" && currentStatus !== "disputed" && (
               <button
                 type="button"
                 onClick={() => setIsDisputeModalOpen(true)}
-                className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-rose-950/60 border border-rose-800/80 px-2.5 py-1 rounded-xl shadow-sm"
+                className="text-xs text-rose-400 hover:text-rose-300 flex items-center gap-1.5 font-bold transition-colors cursor-pointer bg-rose-950/60 border border-rose-800/80 px-2.5 py-1.5 rounded-xl shadow-xs"
               >
-                <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+                <ShieldAlert className="w-3.5 h-3.5 text-rose-400 shrink-0" />
                 <span>{currentStatus === "completed" ? "Post-Release Dispute" : "Raise Dispute"}</span>
               </button>
             )}

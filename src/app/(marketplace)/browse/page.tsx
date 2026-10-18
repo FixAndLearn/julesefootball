@@ -108,7 +108,7 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
             Browse eFootball Accounts
           </h1>
           <p className="text-xs sm:text-sm text-[#94A3B8] mt-0.5">
-            Showing <span className="text-[#F8FAFC] font-semibold">{totalCount}</span> verified live listings • Inspected before payout
+            Showing <span className="text-[#F8FAFC] font-semibold">{totalCount}</span> verified live listings | Inspected before payout
           </p>
         </div>
 

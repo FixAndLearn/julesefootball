@@ -165,7 +165,7 @@ export function AdBanner({
                   Till 1572931
                 </span>
                 <span className="text-[10px] text-slate-400 hidden md:inline">
-                  • 24H Inspection Guarantee
+                  | 24H Inspection Guarantee
                 </span>
               </div>
               <p className="text-xs text-slate-300 mt-1">

@@ -73,7 +73,7 @@ export function EscrowStatusStepper({ state }: EscrowStatusStepperProps) {
           return (
             <div key={step.id} className="relative z-10 flex flex-col items-center group">
               <div
-                className={`w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-md ${
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all shadow-md ${
                   isDone
                     ? "bg-emerald-500 text-slate-950"
                     : isCurrent
@@ -82,16 +82,16 @@ export function EscrowStatusStepper({ state }: EscrowStatusStepperProps) {
                 }`}
               >
                 {isDone ? (
-                  <CheckCircle2 className="w-4 h-4 stroke-[2.5]" />
+                  <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 stroke-[2.5]" />
                 ) : isCurrent ? (
-                  <Clock className="w-4 h-4 animate-spin text-white" />
+                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 animate-spin text-white" />
                 ) : (
                   index + 1
                 )}
               </div>
               <span
-                className={`mt-2 text-[11px] font-medium tracking-tight text-center ${
-                  isDone || isCurrent ? "text-slate-200" : "text-slate-500"
+                className={`mt-1.5 text-[9.5px] sm:text-[11px] font-medium tracking-tight text-center leading-tight max-w-[58px] sm:max-w-none ${
+                  isDone || isCurrent ? "text-slate-200 font-semibold" : "text-slate-500"
                 }`}
               >
                 {step.label}

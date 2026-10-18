@@ -380,7 +380,7 @@ export default function TournamentsPage() {
               Official Tournaments & Cups
             </h2>
           </div>
-          <span className="text-xs text-slate-400">Weekly Knockouts • Kenya Time (EAT)</span>
+          <span className="text-xs text-slate-400">Weekly Knockouts | Kenya Time (EAT)</span>
         </div>
 
         {loading ? (
@@ -990,7 +990,7 @@ export default function TournamentsPage() {
 
               <Input
                 label="Subtitle / Short Description"
-                placeholder="e.g. 8-Player Single Knockout • 10-Minute Extra Time & Penalties"
+                placeholder="e.g. 8-Player Single Knockout | 10-Minute Extra Time & Penalties"
                 value={hostSubtitle}
                 onChange={(e) => setHostSubtitle(e.target.value)}
               />
@@ -1104,7 +1104,7 @@ export default function TournamentsPage() {
                 </div>
                 <div>
                   <h3 className="text-base font-bold text-white">Post Match Score</h3>
-                  <p className="text-xs text-slate-400">{selectedMatch.round} • Match #{selectedMatch.match_number}</p>
+                  <p className="text-xs text-slate-400">{selectedMatch.round} | Match #{selectedMatch.match_number}</p>
                 </div>
               </div>
               <button

@@ -122,7 +122,7 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
 
           {/* Account Overview Summary */}
           {order.listing && (
-            <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
+            <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-4 sm:p-6 shadow-xl space-y-4">
               <h3 className="text-xs uppercase font-bold text-slate-400 tracking-wider">
                 Target Account Overview
               </h3>
