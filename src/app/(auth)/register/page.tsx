@@ -113,8 +113,19 @@ function RegisterForm() {
         }
       }
 
-      // If Supabase requires email confirmation before signing in
+      // If Supabase requires email confirmation, attempt immediate auto-login in case auto-confirm is active
       if (authData.user && !authData.session) {
+        const { data: directLogin } = await supabase.auth.signInWithPassword({
+          email,
+          password,
+        });
+
+        if (directLogin?.session) {
+          router.push(redirect);
+          router.refresh();
+          return;
+        }
+
         setEmailConfirmationSent(true);
         setLoading(false);
         return;
@@ -129,25 +140,46 @@ function RegisterForm() {
     }
   };
 
-  const handleOpenGmailApp = () => {
+  const handleOpenEmailApp = () => {
     if (typeof window === "undefined") return;
     const ua = navigator.userAgent || "";
     const isAndroid = /Android/i.test(ua);
     const isIOS = /iPhone|iPad|iPod/i.test(ua);
 
     if (isAndroid) {
-      window.location.href =
-        "intent://#Intent;package=com.google.android.gm;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;S.browser_fallback_url=https%3A%2F%2Fmail.google.com;end";
+      // Launch default native Android email app directly without web login prompt
+      window.location.href = "intent:#Intent;action=android.intent.action.MAIN;category=android.intent.category.APP_EMAIL;end";
     } else if (isIOS) {
-      const start = Date.now();
-      window.location.href = "googlegmail://";
+      // iOS Mail / Gmail scheme
+      window.location.href = "message://";
       setTimeout(() => {
-        if (Date.now() - start < 1500) {
-          window.location.href = "https://mail.google.com";
-        }
-      }, 800);
+        window.location.href = "https://mail.google.com";
+      }, 1000);
     } else {
       window.open("https://mail.google.com", "_blank", "noopener,noreferrer");
+    }
+  };
+
+  const handleInstantSignIn = async () => {
+    setLoading(true);
+    try {
+      const supabase = createClient();
+      const { data, error: loginErr } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (data?.session) {
+        router.push(redirect);
+        router.refresh();
+        return;
+      }
+
+      router.push(`/login?redirect=${encodeURIComponent(redirect)}&email=${encodeURIComponent(email)}`);
+    } catch {
+      router.push(`/login?redirect=${encodeURIComponent(redirect)}`);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -158,36 +190,46 @@ function RegisterForm() {
           <Mail className="w-8 h-8" />
         </div>
         <div>
-          <h2 className="text-2xl font-bold text-white font-display">Check Your Gmail</h2>
+          <h2 className="text-2xl font-bold text-white font-display">Account Registered!</h2>
           <p className="text-sm text-slate-300 mt-2">
-            We sent a verification link to <strong className="text-white font-semibold">{email}</strong>.
+            Verification link sent to <strong className="text-white font-semibold">{email}</strong>.
           </p>
           <p className="text-xs text-slate-400 mt-2 leading-relaxed">
-            Please open your Gmail and tap the confirmation button to activate your account and start trading immediately on eFootballMarket.
+            Tap the button below to launch your email app, or sign in directly if your account is verified.
           </p>
         </div>
 
         <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2 text-left">
-          <span className="font-bold text-amber-300 block">Next Steps:</span>
-          <p>1. Open the email from eFootballMarket.</p>
-          <p>2. Tap the confirmation link.</p>
-          <p>3. You will be automatically authenticated and redirected to your dashboard.</p>
+          <span className="font-bold text-amber-300 block">Fast Setup:</span>
+          <p>1. Open your mail app and tap the confirmation link.</p>
+          <p>2. Or tap &quot;Log In to Dashboard&quot; below to enter immediately.</p>
         </div>
 
-        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-          <button
-            type="button"
-            onClick={handleOpenGmailApp}
-            className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-md text-center flex items-center justify-center gap-2 cursor-pointer active:scale-95"
-          >
-            <Mail className="w-4 h-4" />
-            <span>Take me to Gmail</span>
-          </button>
+        <div className="flex flex-col gap-3 pt-2">
+          <div className="flex flex-col sm:flex-row items-center gap-3">
+            <button
+              type="button"
+              onClick={handleOpenEmailApp}
+              className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-md text-center flex items-center justify-center gap-2 cursor-pointer active:scale-95"
+            >
+              <Mail className="w-4 h-4" />
+              <span>Open Email App</span>
+            </button>
+            <button
+              type="button"
+              onClick={handleInstantSignIn}
+              disabled={loading}
+              className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-md text-center flex items-center justify-center gap-2 cursor-pointer active:scale-95 disabled:opacity-50"
+            >
+              <ShieldCheck className="w-4 h-4" />
+              <span>Log In to Dashboard</span>
+            </button>
+          </div>
           <Link
             href={`/login?redirect=${encodeURIComponent(redirect)}`}
-            className="w-full sm:w-auto py-3 px-4 rounded-xl bg-pitch-card hover:bg-slate-800 border border-pitch-border text-slate-300 text-xs font-semibold text-center transition-all"
+            className="text-center text-xs text-slate-400 hover:text-slate-200 transition-colors pt-1"
           >
-            Go to Login
+            Prefer regular sign-in? Go to Login page →
           </Link>
         </div>
       </div>
