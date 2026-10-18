@@ -22,17 +22,17 @@ export function Logo({
   }[size];
 
   const titleSizes = {
-    sm: "text-sm sm:text-base",
-    md: "text-[15px] sm:text-lg",
-    lg: "text-lg sm:text-xl",
-    xl: "text-xl sm:text-2xl",
+    sm: "text-xs sm:text-sm",
+    md: "text-sm sm:text-base lg:text-lg",
+    lg: "text-base sm:text-lg lg:text-xl",
+    xl: "text-lg sm:text-xl lg:text-2xl",
   }[size];
 
   const subtitleSizes = {
-    sm: "text-[7.5px] sm:text-[9px]",
-    md: "text-[8px] sm:text-[10px]",
-    lg: "text-[10px] sm:text-xs",
-    xl: "text-xs",
+    sm: "text-[7px] sm:text-[8px]",
+    md: "text-[8px] sm:text-[9.5px]",
+    lg: "text-[9px] sm:text-[11px]",
+    xl: "text-[10px] sm:text-xs",
   }[size];
 
   const LogoIcon = (
@@ -113,11 +113,11 @@ export function Logo({
     <div className={`inline-flex items-center gap-2 sm:gap-2.5 select-none min-w-0 ${className}`}>
       {LogoIcon}
       {showText && (
-        <div className="flex flex-col leading-none min-w-0">
-          <span className={`font-display font-black tracking-tight text-white whitespace-nowrap ${titleSizes}`}>
+        <div className="flex flex-col justify-center min-w-0">
+          <span className={`font-display font-black tracking-tight text-white whitespace-nowrap leading-tight ${titleSizes}`}>
             eFootball<span className="text-amber-400">Market</span>
           </span>
-          <span className={`uppercase tracking-widest text-emerald-400 font-bold mt-0.5 whitespace-nowrap ${subtitleSizes}`}>
+          <span className={`uppercase tracking-wider text-emerald-400 font-bold leading-none mt-0.5 whitespace-nowrap ${subtitleSizes}`}>
             Escrow Protected
           </span>
         </div>

@@ -120,6 +120,8 @@ export const metadata: Metadata = {
       { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
       { url: "/icon-96.png", sizes: "96x96", type: "image/png" },
       { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/logo.png", sizes: "512x512", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
     ],
     shortcut: "/favicon.ico",
@@ -148,6 +150,14 @@ export default function RootLayout({
     <html lang="en" className={`dark ${inter.variable} ${outfit.variable}`}>
       <head>
         <JsonLd siteUrl={siteUrl} />
+
+        {/* High-Resolution Favicons & Official Google Search Crest */}
+        <link rel="icon" type="image/png" sizes="512x512" href="/icon-512.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/icon-96.png" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+        <link rel="image_src" href="/logo.png" />
 
         {/* Google Consent Mode v2 Default (Must execute before any Google tags) */}
         <Script
