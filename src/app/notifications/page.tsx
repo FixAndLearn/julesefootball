@@ -112,21 +112,24 @@ function getNotificationBadge(type: string) {
 
 function getActionLabel(item: Notification) {
   if (item.type.includes("message")) {
-    return "Open Chat Conversation";
+    return "Open Chat";
   }
   if (item.type === "scammer_alert" || item.type.includes("news")) {
-    return "Read Full News Bulletin";
+    return "Read Alert";
   }
-  if (item.type.includes("order") || item.type.includes("escrow") || item.type.includes("funds")) {
-    return "Go to Order & Escrow";
+  if (item.type.includes("order") || item.type.includes("escrow") || item.type.includes("funds") || item.type === "payment_received") {
+    return "Go to Escrow";
   }
   if (item.action_url?.includes("/browse")) {
-    return "Browse Verified Accounts";
+    return "Browse Accounts";
   }
   if (item.action_url?.includes("/dashboard")) {
-    return "Open Dashboard";
+    return "Dashboard";
   }
-  return "View Destination";
+  if (item.action_url?.includes("/earnings")) {
+    return "Earnings";
+  }
+  return item.action_url ? "View Page" : "Read";
 }
 
 function NotificationsContent() {
@@ -156,11 +159,22 @@ function NotificationsContent() {
   }, []);
 
   const handleOpenNotification = useCallback((item: Notification) => {
-    setReadingNotification(item);
     if (!item.is_read) {
       markNotificationRead(item.id);
     }
-  }, [markNotificationRead]);
+
+    if (item.action_url) {
+      let dest = item.action_url;
+      if (dest.startsWith("/seller/orders/")) {
+        dest = dest.replace("/seller/orders/", "/orders/");
+      } else if (dest === "/seller/orders" || dest === "/seller") {
+        dest = "/dashboard/seller";
+      }
+      router.push(dest);
+    } else {
+      setReadingNotification(item);
+    }
+  }, [markNotificationRead, router]);
 
   const fetchNotifications = useCallback(async () => {
     setLoading(true);
@@ -473,7 +487,7 @@ function NotificationsContent() {
                     }}
                     className="text-xs font-semibold shadow-sm"
                   >
-                    <span>Read</span>
+                    <span>{getActionLabel(item)}</span>
                     <ArrowRight className="w-3 h-3 ml-1" />
                   </Button>
 

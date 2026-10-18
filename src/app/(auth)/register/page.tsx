@@ -132,6 +132,28 @@ function RegisterForm() {
     }
   };
 
+  const handleOpenGmailApp = () => {
+    if (typeof window === "undefined") return;
+    const ua = navigator.userAgent || "";
+    const isAndroid = /Android/i.test(ua);
+    const isIOS = /iPhone|iPad|iPod/i.test(ua);
+
+    if (isAndroid) {
+      window.location.href =
+        "intent://#Intent;package=com.google.android.gm;action=android.intent.action.MAIN;category=android.intent.category.LAUNCHER;S.browser_fallback_url=https%3A%2F%2Fmail.google.com;end";
+    } else if (isIOS) {
+      const start = Date.now();
+      window.location.href = "googlegmail://";
+      setTimeout(() => {
+        if (Date.now() - start < 1500) {
+          window.location.href = "https://mail.google.com";
+        }
+      }, 800);
+    } else {
+      window.open("https://mail.google.com", "_blank", "noopener,noreferrer");
+    }
+  };
+
   if (emailConfirmationSent) {
     return (
       <div className="w-full max-w-lg bg-pitch-surface border border-pitch-border rounded-2xl p-8 shadow-2xl space-y-6 text-center">
@@ -156,14 +178,14 @@ function RegisterForm() {
         </div>
 
         <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
-          <a
-            href="https://mail.google.com"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-md text-center"
+          <button
+            type="button"
+            onClick={handleOpenGmailApp}
+            className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-md text-center flex items-center justify-center gap-2 cursor-pointer active:scale-95"
           >
-            Open Gmail App / Web
-          </a>
+            <Mail className="w-4 h-4" />
+            <span>Take me to Gmail</span>
+          </button>
           <Link
             href={`/login?redirect=${encodeURIComponent(redirect)}`}
             className="w-full sm:w-auto py-3 px-4 rounded-xl bg-pitch-card hover:bg-slate-800 border border-pitch-border text-slate-300 text-xs font-semibold text-center transition-all"

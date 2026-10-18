@@ -146,11 +146,11 @@ export function NotificationBell() {
     }
   };
 
-  const handleNotificationClick = async (id: string) => {
+  const handleNotificationClick = async (item: Notification) => {
     try {
       // Optimistic update
       setNotifications((prev) =>
-        prev.map((n) => (n.id === id ? { ...n, is_read: true } : n))
+        prev.map((n) => (n.id === item.id ? { ...n, is_read: true } : n))
       );
       setUnreadCount((prev) => Math.max(0, prev - 1));
 
@@ -158,12 +158,22 @@ export function NotificationBell() {
       fetch("/api/notifications", {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id }),
+        body: JSON.stringify({ id: item.id }),
       }).catch(console.warn);
 
       setIsOpen(false);
-      // Opens the notification center page directly to read this notification
-      router.push(`/notifications?id=${id}`);
+
+      if (item.action_url) {
+        let dest = item.action_url;
+        if (dest.startsWith("/seller/orders/")) {
+          dest = dest.replace("/seller/orders/", "/orders/");
+        } else if (dest === "/seller/orders" || dest === "/seller") {
+          dest = "/dashboard/seller";
+        }
+        router.push(dest);
+      } else {
+        router.push(`/notifications?id=${item.id}`);
+      }
     } catch (err) {
       console.warn("Failed to process notification click:", err);
     }
@@ -244,7 +254,7 @@ export function NotificationBell() {
               previewList.map((item) => (
                 <div
                   key={item.id}
-                  onClick={() => handleNotificationClick(item.id)}
+                  onClick={() => handleNotificationClick(item)}
                   className={`p-3.5 hover:bg-pitch-card transition-colors cursor-pointer flex items-start gap-3 ${
                     !item.is_read ? "bg-amber-500/[0.04]" : ""
                   }`}
