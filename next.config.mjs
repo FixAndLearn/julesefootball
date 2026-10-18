@@ -26,6 +26,28 @@ const nextConfig = {
       ],
     },
   ],
+  redirects: async () => [
+    {
+      source: '/seller/orders/:id',
+      destination: '/orders/:id',
+      permanent: true,
+    },
+    {
+      source: '/seller/orders',
+      destination: '/dashboard/seller',
+      permanent: true,
+    },
+    {
+      source: '/seller/dashboard',
+      destination: '/dashboard/seller',
+      permanent: true,
+    },
+    {
+      source: '/seller',
+      destination: '/dashboard/seller',
+      permanent: true,
+    },
+  ],
 };
 
 export default nextConfig;

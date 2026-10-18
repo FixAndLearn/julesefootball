@@ -6,6 +6,7 @@ import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { MessageService } from "@/services/messageService";
 import { OrderService } from "@/services/orderService";
+import { isSuperAdminEmail } from "@/lib/security/adminAuth";
 import { ArrowLeft, Clock, ShieldCheck, User, MessageCircle } from "lucide-react";
 import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
@@ -39,8 +40,10 @@ export default async function OrderDetailPage({ params }: OrderPageProps) {
     notFound();
   }
 
-  // Ensure user is buyer or seller
-  if (order.buyer_id !== user.id && order.seller_id !== user.id) {
+  const isAdmin = isSuperAdminEmail(user.email);
+
+  // Ensure user is buyer, seller, or super admin
+  if (order.buyer_id !== user.id && order.seller_id !== user.id && !isAdmin) {
     redirect("/dashboard/buyer");
   }
 

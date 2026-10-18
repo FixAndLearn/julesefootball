@@ -88,8 +88,12 @@ export class OrderService {
   /**
    * Retrieves full order details with joined listing, escrow, buyer, and seller.
    */
-  async getOrderById(orderId: string): Promise<Order | null> {
-    const { data, error } = await this.supabase
+  async getOrderById(identifier: string): Promise<Order | null> {
+    if (!identifier) return null;
+
+    const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(identifier);
+
+    let query = this.supabase
       .from("orders")
       .select(`
         *,
@@ -97,16 +101,22 @@ export class OrderService {
         buyer:profiles!orders_buyer_id_fkey(*),
         seller:profiles!orders_seller_id_fkey(*),
         escrow:escrow_accounts(*)
-      `)
-      .eq("id", orderId)
-      .single();
+      `);
 
-    if (error) {
-      if (error.code === "PGRST116") return null;
-      throw new Error(`Failed to retrieve order: ${error.message}`);
+    if (isUuid) {
+      query = query.eq("id", identifier);
+    } else {
+      query = query.eq("order_number", identifier);
     }
 
-    return data as unknown as Order;
+    const { data, error } = await query.maybeSingle();
+
+    if (error) {
+      console.warn("Order retrieval warning:", error.message);
+      return null;
+    }
+
+    return (data as unknown as Order) || null;
   }
 
   /**

@@ -585,8 +585,13 @@ function NotificationsContent() {
                   size="md"
                   onClick={() => {
                     const dest = readingNotification.action_url!;
+                    const normalizedDest = dest.startsWith("/seller/orders/")
+                      ? dest.replace("/seller/orders/", "/orders/")
+                      : dest === "/seller/orders" || dest === "/seller"
+                      ? "/dashboard/seller"
+                      : dest;
                     setReadingNotification(null);
-                    router.push(dest);
+                    router.push(normalizedDest);
                   }}
                   className="w-full sm:w-auto text-xs font-bold shadow-lg flex items-center justify-center gap-1.5"
                 >

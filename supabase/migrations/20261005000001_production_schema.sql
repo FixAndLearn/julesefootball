@@ -631,7 +631,7 @@ BEGIN
     'payment_received',
     'Payment Secured in Escrow!',
     'The buyer paid KES ' || p_amount || '. Please deliver the account credentials promptly.',
-    '/seller/orders/' || v_order.id
+    '/orders/' || v_order.id
   );
 
   -- 6. Audit log

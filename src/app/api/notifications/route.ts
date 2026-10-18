@@ -34,11 +34,16 @@ export async function GET(req: NextRequest) {
     }
 
     let items = (notifications || []).map((n) => {
+      let url = n.action_url;
       // Heal legacy placeholder urls that point to rules instead of dashboard
-      if (n.action_url === "/escrow-guarantee") {
-        return { ...n, action_url: "/dashboard/buyer" };
+      if (url === "/escrow-guarantee") {
+        url = "/dashboard/buyer";
+      } else if (url && url.startsWith("/seller/orders/")) {
+        url = url.replace("/seller/orders/", "/orders/");
+      } else if (url === "/seller/orders" || url === "/seller") {
+        url = "/dashboard/seller";
       }
-      return n;
+      return { ...n, action_url: url };
     });
 
     const unreadCount = items.filter((n) => !n.is_read).length;
