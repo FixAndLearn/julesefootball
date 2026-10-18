@@ -17,6 +17,11 @@ import {
   Save,
   ArrowRight,
   Users,
+  Copy,
+  Check,
+  MessageCircle,
+  Send,
+  Sparkles,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -24,6 +29,8 @@ import { Suspense, useEffect, useState } from "react";
 
 function ProfileContent() {
   const router = useRouter();
+  const [activeTab, setActiveTab] = useState<"details" | "email" | "security" | "invites">("details");
+  const [copiedLink, setCopiedLink] = useState(false);
   const [loadingUser, setLoadingUser] = useState(true);
   const [savingProfile, setSavingProfile] = useState(false);
   const [updatingEmail, setUpdatingEmail] = useState(false);
@@ -281,13 +288,72 @@ function ProfileContent() {
         </div>
       </div>
 
-      {/* Grid: Personal Info & Contact */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* Card 1: Personal Details */}
-        <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-5">
+      {/* Interactive Profile Navigation Tabs */}
+      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar pb-1 border-b border-pitch-border/80">
+        <button
+          type="button"
+          onClick={() => setActiveTab("details")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+            activeTab === "details"
+              ? "bg-pitch-surface text-brand-400 border border-brand-500/40 shadow-sm"
+              : "text-slate-400 hover:text-white hover:bg-slate-900/60"
+          }`}
+        >
+          <User className="w-4 h-4" />
+          <span>Personal Details</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("email")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+            activeTab === "email"
+              ? "bg-pitch-surface text-amber-400 border border-amber-500/40 shadow-sm"
+              : "text-slate-400 hover:text-white hover:bg-slate-900/60"
+          }`}
+        >
+          <Mail className="w-4 h-4" />
+          <span>Email Address</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("security")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+            activeTab === "security"
+              ? "bg-pitch-surface text-rose-400 border border-rose-500/40 shadow-sm"
+              : "text-slate-400 hover:text-white hover:bg-slate-900/60"
+          }`}
+        >
+          <Lock className="w-4 h-4" />
+          <span>Password &amp; Security</span>
+        </button>
+
+        <button
+          type="button"
+          onClick={() => setActiveTab("invites")}
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs font-bold transition-all whitespace-nowrap shrink-0 ${
+            activeTab === "invites"
+              ? "bg-pitch-surface text-emerald-400 border border-emerald-500/40 shadow-sm"
+              : "text-slate-400 hover:text-white hover:bg-slate-900/60"
+          }`}
+        >
+          <Users className="w-4 h-4" />
+          <span>Referrals &amp; Invites</span>
+        </button>
+      </div>
+
+      {/* Tab 1: Personal Details */}
+      {activeTab === "details" && (
+        <div className="p-6 sm:p-8 rounded-2xl bg-pitch-surface border border-pitch-border space-y-5 animate-in fade-in">
           <div className="flex items-center gap-2.5 border-b border-pitch-border/60 pb-3">
             <User className="w-5 h-5 text-brand-400" />
-            <h2 className="text-base font-bold text-white font-display">Personal Details</h2>
+            <div>
+              <h2 className="text-base font-bold text-white font-display">Personal Details</h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Update your display name, username, and Safaricom M-Pesa payout phone number.
+              </p>
+            </div>
           </div>
 
           {profileError && (
@@ -304,8 +370,8 @@ function ProfileContent() {
             </div>
           )}
 
-          <form onSubmit={handleSaveProfile} className="space-y-4">
-            <div className="grid grid-cols-2 gap-3">
+          <form onSubmit={handleSaveProfile} className="space-y-4 max-w-xl">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
               <Input
                 label="First Name"
                 placeholder="John"
@@ -341,45 +407,52 @@ function ProfileContent() {
               helperText="Used for automated Lipa Na M-Pesa escrow transfers"
             />
 
-            <Button type="submit" variant="primary" size="md" className="w-full font-bold" isLoading={savingProfile}>
+            <Button type="submit" variant="primary" size="md" className="font-bold" isLoading={savingProfile}>
               <Save className="w-4 h-4 mr-2" />
               Save Details
             </Button>
           </form>
         </div>
+      )}
 
-        {/* Card 2: Email Management (Gmail) */}
-        <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-5">
+      {/* Tab 2: Email Management */}
+      {activeTab === "email" && (
+        <div className="p-6 sm:p-8 rounded-2xl bg-pitch-surface border border-pitch-border space-y-5 animate-in fade-in">
           <div className="flex items-center gap-2.5 border-b border-pitch-border/60 pb-3">
             <Mail className="w-5 h-5 text-amber-400" />
-            <h2 className="text-base font-bold text-white font-display">Email Address</h2>
+            <div>
+              <h2 className="text-base font-bold text-white font-display">Email Address Management</h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Manage your confirmed email address for escrow security receipts and notifications.
+              </p>
+            </div>
           </div>
 
-          <div className="p-3.5 rounded-xl bg-pitch-card border border-pitch-border/80">
-            <span className="text-[11px] text-slate-400 block">Current Active Email:</span>
-            <div className="flex items-center gap-2 mt-1">
+          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border/80 max-w-xl">
+            <span className="text-[11px] text-slate-400 block font-semibold uppercase tracking-wider">Current Active Email:</span>
+            <div className="flex items-center gap-2 mt-1.5">
               <strong className="text-white text-sm font-mono truncate">{currentEmail}</strong>
-              <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-1.5 py-0.5 rounded font-bold shrink-0">
+              <span className="text-[10px] bg-emerald-500/20 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded font-bold shrink-0">
                 Verified
               </span>
             </div>
           </div>
 
           {emailError && (
-            <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2 max-w-xl">
               <AlertCircle className="w-4 h-4 shrink-0" />
               <span>{emailError}</span>
             </div>
           )}
 
           {emailSuccess && (
-            <div className="p-3 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2">
+            <div className="p-3 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2 max-w-xl">
               <CheckCircle2 className="w-4 h-4 shrink-0" />
               <span>{emailSuccess}</span>
             </div>
           )}
 
-          <form onSubmit={handleUpdateEmail} className="space-y-4">
+          <form onSubmit={handleUpdateEmail} className="space-y-4 max-w-xl">
             <Input
               label="New Email Address"
               type="email"
@@ -387,91 +460,143 @@ function ProfileContent() {
               placeholder="newaddress@domain.com"
               value={newEmail}
               onChange={(e) => setNewEmail(e.target.value)}
-              helperText="A confirmation code will be dispatched to this new address"
+              helperText="A confirmation code will be dispatched to this new address before the change takes effect"
               required
             />
 
-            <Button type="submit" variant="secondary" size="md" className="w-full font-bold" isLoading={updatingEmail}>
+            <Button type="submit" variant="secondary" size="md" className="font-bold" isLoading={updatingEmail}>
               <Mail className="w-4 h-4 mr-2" />
               Update Email Address
             </Button>
           </form>
         </div>
-      </div>
+      )}
 
-      {/* Card 3: Password & Security Safeguards */}
-      <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-5">
-        <div className="flex items-center gap-2.5 border-b border-pitch-border/60 pb-3">
-          <Lock className="w-5 h-5 text-rose-400" />
-          <h2 className="text-base font-bold text-white font-display">Change Password</h2>
+      {/* Tab 3: Password & Security */}
+      {activeTab === "security" && (
+        <div className="p-6 sm:p-8 rounded-2xl bg-pitch-surface border border-pitch-border space-y-5 animate-in fade-in">
+          <div className="flex items-center gap-2.5 border-b border-pitch-border/60 pb-3">
+            <Lock className="w-5 h-5 text-rose-400" />
+            <div>
+              <h2 className="text-base font-bold text-white font-display">Change Password</h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                If you suspect unauthorized access or feel your password might be compromised, update it immediately.
+              </p>
+            </div>
+          </div>
+
+          {passwordError && (
+            <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2 max-w-xl">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{passwordError}</span>
+            </div>
+          )}
+
+          {passwordSuccess && (
+            <div className="p-3 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2 max-w-xl">
+              <CheckCircle2 className="w-4 h-4 shrink-0" />
+              <span>{passwordSuccess}</span>
+            </div>
+          )}
+
+          <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-xl">
+            <Input
+              label="New Password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="At least 8 characters"
+              value={newPassword}
+              onChange={(e) => setNewPassword(e.target.value)}
+              leftIcon={<Lock className="w-4 h-4" />}
+              required
+            />
+
+            <Input
+              label="Confirm New Password"
+              type="password"
+              autoComplete="new-password"
+              placeholder="Repeat new password"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              leftIcon={<Lock className="w-4 h-4" />}
+              required
+            />
+
+            <Button type="submit" variant="primary" size="md" className="font-bold" isLoading={updatingPassword}>
+              <KeyRound className="w-4 h-4 mr-2" />
+              Update Password
+            </Button>
+          </form>
         </div>
+      )}
 
-        <p className="text-xs text-slate-400 leading-relaxed">
-          If you suspect unauthorized access or feel your password might be compromised, update it immediately. Updating your password will protect your account and all active escrow transactions.
-        </p>
-
-        {passwordError && (
-          <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0" />
-            <span>{passwordError}</span>
+      {/* Tab 4: Referrals & Invites */}
+      {activeTab === "invites" && (
+        <div className="p-6 sm:p-8 rounded-2xl bg-pitch-surface border border-pitch-border space-y-5 animate-in fade-in">
+          <div className="flex items-center gap-2.5 border-b border-pitch-border/60 pb-3">
+            <Users className="w-5 h-5 text-emerald-400" />
+            <div>
+              <h2 className="text-base font-bold text-white font-display">Invite Friends &amp; Traders</h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Share your personal invitation code to help gaming friends trade safely with Safaricom Till 1572931 escrow.
+              </p>
+            </div>
           </div>
-        )}
 
-        {passwordSuccess && (
-          <div className="p-3 rounded-lg bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-xs flex items-center gap-2">
-            <CheckCircle2 className="w-4 h-4 shrink-0" />
-            <span>{passwordSuccess}</span>
+          <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border/80 space-y-3 max-w-xl">
+            <label className="text-xs font-semibold text-slate-200 block">
+              Your Referral Link:
+            </label>
+            <div className="flex items-center gap-2">
+              <input
+                type="text"
+                readOnly
+                value={`https://www.efootballmarket.co.ke/register?ref=${encodeURIComponent(username || "you")}`}
+                className="flex-1 bg-slate-900 border border-pitch-border rounded-xl px-3 py-2 text-xs text-slate-200 font-mono select-all focus:outline-none"
+              />
+              <Button
+                type="button"
+                variant="secondary"
+                size="sm"
+                onClick={() => {
+                  navigator.clipboard.writeText(`https://www.efootballmarket.co.ke/register?ref=${encodeURIComponent(username || "you")}`);
+                  setCopiedLink(true);
+                  setTimeout(() => setCopiedLink(false), 2000);
+                }}
+                className="bg-slate-800 border-pitch-border text-slate-200 hover:text-white px-3 py-2 text-xs shrink-0 flex items-center gap-1.5"
+              >
+                {copiedLink ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                <span>{copiedLink ? "Copied!" : "Copy Link"}</span>
+              </Button>
+            </div>
+
+            <div className="pt-2">
+              <Button
+                type="button"
+                onClick={() => {
+                  const text = `Join me on eFootballMarket.co.ke - Kenya's premier verified platform to safely buy and sell eFootball accounts with Safaricom Till 1572931 escrow. Sign up here: https://www.efootballmarket.co.ke/register?ref=${encodeURIComponent(username || "you")}`;
+                  window.open(`https://wa.me/?text=${encodeURIComponent(text)}`, "_blank");
+                }}
+                variant="primary"
+                size="md"
+                className="w-full bg-[#25D366] hover:bg-[#20bd5a] text-slate-950 font-bold flex items-center justify-center gap-2 text-xs py-2.5 shadow-md"
+              >
+                <MessageCircle className="w-4 h-4" />
+                <span>Share Directly on WhatsApp</span>
+              </Button>
+            </div>
           </div>
-        )}
 
-        <form onSubmit={handleUpdatePassword} className="space-y-4 max-w-lg">
-          <Input
-            label="New Password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="At least 8 characters"
-            value={newPassword}
-            onChange={(e) => setNewPassword(e.target.value)}
-            leftIcon={<Lock className="w-4 h-4" />}
-            required
-          />
-
-          <Input
-            label="Confirm New Password"
-            type="password"
-            autoComplete="new-password"
-            placeholder="Repeat new password"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            leftIcon={<Lock className="w-4 h-4" />}
-            required
-          />
-
-          <Button type="submit" variant="primary" size="md" className="font-bold" isLoading={updatingPassword}>
-            <KeyRound className="w-4 h-4 mr-2" />
-            Update Password
-          </Button>
-        </form>
-      </div>
-
-      {/* Card 4: Invite & Referral Hub */}
-      <div className="p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-pitch-surface border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
-        <div className="space-y-1 text-center sm:text-left">
-          <div className="flex items-center justify-center sm:justify-start gap-2 text-amber-400 font-bold text-sm">
-            <Users className="w-4 h-4" />
-            <span>Invite Friends &amp; Traders</span>
+          <div className="pt-2">
+            <Link href="/invite">
+              <Button variant="secondary" size="md" className="text-xs font-semibold">
+                <span>Open Full Email Invitation Hub</span>
+                <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+              </Button>
+            </Link>
           </div>
-          <p className="text-xs text-slate-300">
-            Share your personal referral link to help friends trade safely with Safaricom Till 1572931 escrow.
-          </p>
         </div>
-        <Link href="/invite" className="shrink-0 w-full sm:w-auto">
-          <Button variant="primary" size="md" className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
-            Open Invite Hub
-            <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
-          </Button>
-        </Link>
-      </div>
+      )}
     </div>
   );
 }

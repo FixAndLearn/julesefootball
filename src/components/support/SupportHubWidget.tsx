@@ -110,7 +110,13 @@ export function SupportHubWidget() {
     pathname.startsWith("/invite") ||
     pathname.startsWith("/auth");
 
-  if (isAuthRoute) {
+  const isHighIntentRoute =
+    pathname.startsWith("/orders/") ||
+    pathname.startsWith("/pay/") ||
+    pathname === "/seller/verification" ||
+    pathname === "/seller/create-listing";
+
+  if (isAuthRoute || isHighIntentRoute) {
     return null;
   }
 

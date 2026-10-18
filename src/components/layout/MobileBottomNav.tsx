@@ -18,8 +18,16 @@ export function MobileBottomNav() {
     pathname.startsWith("/invite") ||
     pathname.startsWith("/auth");
 
-  // Hide on pay/checkout, listing detail routes, and auth flows to prevent congestion
-  if (pathname.startsWith("/pay/") || pathname.startsWith("/listings/") || isAuthRoute) {
+  const isHighIntentRoute =
+    pathname.startsWith("/pay/") ||
+    pathname.startsWith("/orders/") ||
+    pathname.startsWith("/listings/") ||
+    pathname === "/seller/create-listing" ||
+    pathname === "/seller/verification" ||
+    pathname === "/profile";
+
+  // Hide on pay/checkout, escrow orders, detail routes, forms, and auth flows to prevent congestion
+  if (isHighIntentRoute || isAuthRoute) {
     return null;
   }
 

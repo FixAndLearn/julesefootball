@@ -97,6 +97,12 @@ export function Header() {
     pathname.startsWith("/invite") ||
     pathname.startsWith("/auth");
 
+  const isHighIntentRoute =
+    pathname.startsWith("/orders/") ||
+    pathname.startsWith("/pay/") ||
+    pathname === "/seller/verification" ||
+    pathname === "/seller/create-listing";
+
   if (isAuthRoute) {
     return (
       <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
@@ -108,6 +114,53 @@ export function Header() {
               className="text-xs sm:text-sm font-semibold text-[#94A3B8] hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#1F2937] hover:border-slate-700 bg-slate-900/60 transition-colors"
             >
               <span>Back to Marketplace</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+    );
+  }
+
+  if (isHighIntentRoute) {
+    let contextTitle = "Escrow Transaction";
+    let backHref = "/";
+    let backLabel = "Back to Marketplace";
+
+    if (pathname.startsWith("/orders/")) {
+      contextTitle = "Escrow Handover Room (Till 1572931 Protected)";
+      backHref = "/dashboard/buyer";
+      backLabel = "My Orders";
+    } else if (pathname.startsWith("/pay/")) {
+      contextTitle = "M-Pesa Escrow Checkout";
+      backHref = "/browse";
+      backLabel = "Cancel Checkout";
+    } else if (pathname === "/seller/create-listing") {
+      contextTitle = "Create Squad Listing";
+      backHref = "/dashboard/seller";
+      backLabel = "Seller Dashboard";
+    } else if (pathname === "/seller/verification") {
+      contextTitle = "Seller KYC & Verification";
+      backHref = "/dashboard/seller";
+      backLabel = "Back to Hub";
+    }
+
+    return (
+      <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-3">
+            <Logo clickable={true} size="md" />
+            <div className="h-5 w-px bg-slate-800 hidden sm:block" />
+            <span className="hidden sm:inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-xs font-bold text-emerald-300">
+              <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+              <span>{contextTitle}</span>
+            </span>
+          </div>
+          <div className="flex items-center gap-2">
+            <Link
+              href={backHref}
+              className="text-xs font-semibold text-[#94A3B8] hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#1F2937] hover:border-slate-700 bg-slate-900/60 transition-colors"
+            >
+              <span>{backLabel}</span>
             </Link>
           </div>
         </div>

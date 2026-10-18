@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 
 export function Footer() {
   const pathname = usePathname();
-  const isMinimalFlow = pathname.startsWith("/pay/");
   const isAuthRoute =
     pathname === "/login" ||
     pathname === "/register" ||
@@ -15,7 +14,13 @@ export function Footer() {
     pathname.startsWith("/invite") ||
     pathname.startsWith("/auth");
 
-  if (isAuthRoute) {
+  const isHighIntentRoute =
+    pathname.startsWith("/orders/") ||
+    pathname.startsWith("/pay/") ||
+    pathname === "/seller/verification" ||
+    pathname === "/seller/create-listing";
+
+  if (isAuthRoute || isHighIntentRoute) {
     return (
       <footer className="w-full border-t border-[#1F2937] bg-[#0B1220] text-[#94A3B8] text-xs mt-auto py-5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
@@ -28,55 +33,6 @@ export function Footer() {
             <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
             <span className="text-slate-700">|</span>
             <Link href="/escrow-guarantee" className="hover:text-white transition-colors">Escrow Guarantee</Link>
-          </div>
-        </div>
-      </footer>
-    );
-  }
-
-  // Minimal footer only for focused checkout flow
-  if (isMinimalFlow) {
-    return (
-      <footer className="w-full border-t border-[#1F2937] bg-[#0B1220] text-[#94A3B8] text-xs mt-auto py-5">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <div className="flex items-center gap-x-6 gap-y-2 flex-wrap text-[#94A3B8] justify-center md:justify-start">
-            <Link href="/" className="font-bold text-[#F8FAFC] hover:text-white transition-colors">
-              eFootballMarket
-            </Link>
-            <Link href="/browse" className="hover:text-[#F8FAFC] transition-colors">
-              Browse Accounts
-            </Link>
-            <Link href="/middleman" className="hover:text-[#F8FAFC] transition-colors">
-              Middleman
-            </Link>
-            <Link href="/tournaments" className="hover:text-[#F8FAFC] transition-colors">
-              Tournaments
-            </Link>
-            <Link href="/news" className="hover:text-[#F8FAFC] transition-colors">
-              News & Alerts
-            </Link>
-            <Link href="/escrow-guarantee" className="hover:text-[#F8FAFC] transition-colors">
-              Escrow Rules
-            </Link>
-            <Link href="/terms" className="hover:text-[#F8FAFC] transition-colors">
-              Terms
-            </Link>
-            <Link href="/privacy" className="hover:text-[#F8FAFC] transition-colors">
-              Privacy
-            </Link>
-          </div>
-
-          <div className="flex items-center gap-4 shrink-0 text-[11px] text-[#94A3B8]">
-            <a
-              href="https://wa.me/254794400365"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-md bg-[#111827] border border-[#1F2937] text-xs font-semibold text-[#22C55E] hover:underline transition-colors"
-            >
-              <MessageCircle className="w-3 h-3 text-[#22C55E]" />
-              <span>WhatsApp: 0794400365</span>
-            </a>
-            <span>© {new Date().getFullYear()} eFootballMarket</span>
           </div>
         </div>
       </footer>

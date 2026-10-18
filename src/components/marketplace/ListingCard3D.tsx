@@ -166,44 +166,23 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
                 </h3>
               </Link>
 
-              {/* Meta Card Tiers Badges [🔥 Epics], [⭐ Big Time], [💎 Show Time], [⚡ Highlights] */}
-              <div className="grid grid-cols-4 gap-1 sm:gap-1.5 mt-2.5 text-center">
-                <div className="p-1 rounded-lg bg-amber-950/30 border border-amber-500/40 overflow-hidden">
-                  <span className="block text-[8px] uppercase font-black text-amber-400 truncate">🔥 Epics</span>
-                  <span className="text-xs font-black text-amber-200 font-mono block">{epics}</span>
-                </div>
-                <div className="p-1 rounded-lg bg-purple-950/30 border border-purple-500/40 overflow-hidden">
-                  <span className="block text-[8px] uppercase font-black text-purple-400 truncate">⭐ BigTime</span>
-                  <span className="text-xs font-black text-purple-200 font-mono block">{bigTime}</span>
-                </div>
-                <div className="p-1 rounded-lg bg-sky-950/30 border border-sky-500/40 overflow-hidden">
-                  <span className="block text-[8px] uppercase font-black text-sky-400 truncate">💎 ShowTime</span>
-                  <span className="text-xs font-black text-sky-200 font-mono block">{showTime}</span>
-                </div>
-                <div className="p-1 rounded-lg bg-emerald-950/30 border border-emerald-500/40 overflow-hidden">
-                  <span className="block text-[8px] uppercase font-black text-emerald-400 truncate">⚡ Highl.</span>
-                  <span className="text-xs font-black text-emerald-200 font-mono block">{highlights}</span>
-                </div>
-              </div>
-
-              {/* Account Binding & Security Status Box (Critical for Buyer Trust) */}
-              <div className="mt-2.5 p-2 rounded-xl bg-slate-900/80 border border-slate-800 text-[10px] space-y-1">
-                <div className="flex items-center justify-between gap-1.5 text-slate-300">
-                  <span className="flex items-center gap-1 shrink-0 font-medium">
-                    <CheckCircle2 className="w-3 h-3 text-[#22C55E] shrink-0" />
-                    <span>Konami ID:</span>
-                  </span>
-                  <span className="font-semibold text-emerald-400 truncate text-right">
-                    Ready (Changeable)
-                  </span>
-                </div>
-                <div className="flex items-center justify-between gap-1.5 text-slate-300">
-                  <span className="flex items-center gap-1 shrink-0 font-medium">
-                    <Lock className="w-3 h-3 text-[#22C55E] shrink-0" />
-                    <span>Google Play:</span>
-                  </span>
-                  <span className="font-semibold text-emerald-400 truncate text-right">
-                    100% Unlinked (Clean)
+              {/* Progressive Disclosure: Clean High-Impact Summary */}
+              <div className="mt-2.5 flex items-center justify-between gap-1.5 flex-wrap">
+                <div className="flex items-center gap-1.5 flex-wrap">
+                  {epics + bigTime > 0 ? (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] font-bold text-amber-300">
+                      <Flame className="w-3 h-3 text-amber-400" />
+                      <span>{epics + bigTime} Epics &amp; Boosters</span>
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-medium text-slate-300">
+                      <Zap className="w-3 h-3 text-emerald-400" />
+                      <span>Balanced Squad</span>
+                    </span>
+                  )}
+                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-semibold text-emerald-300">
+                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
+                    <span>Clean Konami ID</span>
                   </span>
                 </div>
               </div>
