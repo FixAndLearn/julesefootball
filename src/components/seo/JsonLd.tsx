@@ -4,13 +4,15 @@ export function JsonLd({ siteUrl = "https://www.efootballmarket.co.ke" }: { site
   const websiteSchema = {
     "@context": "https://schema.org",
     "@type": "WebSite",
-    name: "eFootballMarket Kenya",
+    name: "eFootballMarket",
+    alternateName: ["eFootballMarket Kenya", "eFootball Market"],
     url: siteUrl,
+    description: "Kenya's #1 verified eFootball account trading platform with Safaricom M-Pesa Till 1572931 escrow protection.",
     potentialAction: {
       "@type": "SearchAction",
       target: {
         "@type": "EntryPoint",
-        urlTemplate: "https://efootballmarket.co.ke/browse?search={search_term_string}",
+        urlTemplate: "https://www.efootballmarket.co.ke/browse?search={search_term_string}",
       },
       "query-input": "required name=search_term_string",
     },
@@ -19,13 +21,17 @@ export function JsonLd({ siteUrl = "https://www.efootballmarket.co.ke" }: { site
   const organizationSchema = {
     "@context": "https://schema.org",
     "@type": "Organization",
-    name: "eFootballMarket Kenya",
-    url: "https://efootballmarket.co.ke",
-    logo: "https://efootballmarket.co.ke/icon.svg",
+    name: "eFootballMarket",
+    alternateName: ["eFootballMarket Kenya", "eFootball Market"],
+    url: "https://www.efootballmarket.co.ke",
+    logo: "https://www.efootballmarket.co.ke/logo.png",
+    image: "https://www.efootballmarket.co.ke/logo.png",
+    description:
+      "Kenya's verified peer-to-peer eFootball account marketplace with automated Safaricom M-Pesa escrow protection (Till 1572931), 24h inspection window, and tournament hosting.",
     founder: {
       "@type": "Person",
       name: "Brian Okibo",
-      jobTitle: "Founder & Lead Escrow Officer",
+      jobTitle: "Founder & Chief Executive Officer (CEO)",
     },
     contactPoint: {
       "@type": "ContactPoint",

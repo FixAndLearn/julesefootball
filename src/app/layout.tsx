@@ -35,11 +35,11 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading & Community Hub",
+    default: "eFootballMarket | Buy & Sell eFootball Accounts in Kenya",
     template: "%s | eFootballMarket",
   },
   description:
-    "Buy and sell verified eFootball accounts with automated Safaricom M-Pesa escrow protection (Till 1572931). Compete in Kenyan tournaments, follow live brackets, and trade safely with a 24-hr buyer inspection window.",
+    "Buy & sell verified eFootball accounts in Kenya with automated Safaricom M-Pesa Till 1572931 escrow. 24h inspection window, zero Google-link guarantee & instant delivery.",
   applicationName: "eFootballMarket",
   authors: [{ name: "Brian Okibo, Chief Executive Officer (CEO)" }],
   generator: "Next.js",
@@ -77,10 +77,16 @@ export const metadata: Metadata = {
     locale: "en_KE",
     url: siteUrl,
     siteName: "eFootballMarket",
-    title: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading & Community Hub",
+    title: "eFootballMarket | Buy & Sell eFootball Accounts in Kenya",
     description:
       "M-PESA NATIVE | 100% ESCROW PROTECTED | VERIFIED SELLERS. Buy and sell verified eFootball squads safely with M-Pesa Escrow (Till 1572931) and 24h buyer protection.",
     images: [
+      {
+        url: "/logo.png",
+        width: 512,
+        height: 512,
+        alt: "eFootballMarket Official Brand Shield Crest",
+      },
       {
         url: "/og-image.svg",
         width: 1200,
@@ -91,10 +97,10 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "eFootballMarket | Kenya's #1 Secure eFootball Account Trading & Community Hub",
+    title: "eFootballMarket | Buy & Sell eFootball Accounts in Kenya",
     description:
       "M-PESA NATIVE | 100% ESCROW PROTECTED | VERIFIED SELLERS. Buy and sell verified eFootball squads safely with M-Pesa Escrow.",
-    images: ["/og-image.svg"],
+    images: ["/logo.png"],
     creator: "@eFootballMarket",
   },
   robots: {
@@ -110,11 +116,16 @@ export const metadata: Metadata = {
   },
   icons: {
     icon: [
+      { url: "/favicon.ico", sizes: "32x32" },
+      { url: "/icon-48.png", sizes: "48x48", type: "image/png" },
+      { url: "/icon-96.png", sizes: "96x96", type: "image/png" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
       { url: "/icon.svg", type: "image/svg+xml" },
-      { url: "/favicon.svg", type: "image/svg+xml" },
     ],
-    shortcut: "/icon.svg",
-    apple: "/icon.svg",
+    shortcut: "/favicon.ico",
+    apple: [
+      { url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" },
+    ],
   },
   manifest: "/manifest.webmanifest",
   verification: {
@@ -184,6 +195,13 @@ export default function RootLayout({
           src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseId}`}
           crossOrigin="anonymous"
         />
+
+        {/* Google SERP Favicon & Mobile Touch Icons */}
+        <link rel="icon" type="image/x-icon" href="/favicon.ico" sizes="32x32" />
+        <link rel="icon" type="image/png" sizes="48x48" href="/icon-48.png" />
+        <link rel="icon" type="image/png" sizes="96x96" href="/icon-96.png" />
+        <link rel="icon" type="image/png" sizes="192x192" href="/icon-192.png" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       </head>
       <body className="bg-[#0B1220] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-[#22C55E] selection:text-[#0B1220] relative font-sans pb-16 md:pb-0">
         <LanguageProvider>
