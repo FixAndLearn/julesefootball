@@ -49,6 +49,25 @@ function LoginForm() {
       });
 
       if (authError) {
+        if (authError.message.toLowerCase().includes("email not confirmed") || authError.message.toLowerCase().includes("unconfirmed")) {
+          // Auto-trigger 6-digit code dispatch and transition to OTP verification tab
+          try {
+            await supabase.auth.resend({
+              type: "signup",
+              email: email.trim(),
+              options: {
+                emailRedirectTo: "https://www.efootballmarket.co.ke/auth/callback",
+              },
+            });
+          } catch {
+            // Non-blocking
+          }
+          setAuthMethod("otp");
+          setOtpSent(true);
+          setResendCooldown(45);
+          setInfoMessage("Your email is not verified yet. We dispatched a fresh 6-digit code to your email. Enter it below to activate your account.");
+          return;
+        }
         throw new Error(authError.message);
       }
 

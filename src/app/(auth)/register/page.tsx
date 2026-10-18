@@ -128,26 +128,10 @@ function RegisterForm() {
         }
       }
 
-      // If Supabase requires email confirmation, attempt immediate auto-login in case auto-confirm is active
-      if (authData.user && !authData.session) {
-        const { data: directLogin } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-
-        if (directLogin?.session) {
-          router.push(redirect);
-          router.refresh();
-          return;
-        }
-
-        setEmailConfirmationSent(true);
-        setLoading(false);
-        return;
-      }
-
-      router.push(redirect);
-      router.refresh();
+      // Mandate 6-digit email OTP verification before dashboard access (scam prevention)
+      setEmailConfirmationSent(true);
+      setLoading(false);
+      return;
     } catch (err: any) {
       setError(err.message || "Registration failed");
     } finally {
