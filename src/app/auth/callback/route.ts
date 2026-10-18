@@ -12,7 +12,8 @@ export async function GET(request: NextRequest) {
   const next = requestUrl.searchParams.get("redirect") || "/dashboard/buyer";
 
   const redirectTarget = next.startsWith("/") ? next : `/${next}`;
-  const response = NextResponse.redirect(new URL(redirectTarget, requestUrl.origin));
+  const canonicalOrigin = process.env.NEXT_PUBLIC_APP_URL || "https://www.efootballmarket.co.ke";
+  const response = NextResponse.redirect(new URL(redirectTarget, canonicalOrigin));
 
   const cookieStore = cookies();
   const supabase = createServerClient(

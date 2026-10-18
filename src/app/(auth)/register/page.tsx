@@ -54,12 +54,9 @@ function RegisterForm() {
     const internationalPhone = normalized.international;
 
     try {
-      const origin =
-        typeof window !== "undefined" && window.location.origin
-          ? window.location.origin
-          : process.env.NEXT_PUBLIC_APP_URL || "https://www.efootballmarket.co.ke";
-
-      const emailRedirectTo = `${origin}/auth/callback?redirect=${encodeURIComponent(redirect)}`;
+      // Always enforce the canonical custom domain for email redirects (never vercel.app)
+      const canonicalAppUrl = process.env.NEXT_PUBLIC_APP_URL || "https://www.efootballmarket.co.ke";
+      const emailRedirectTo = `${canonicalAppUrl}/auth/callback?redirect=${encodeURIComponent(redirect)}`;
 
       const supabase = createClient();
       const { data: authData, error: authError } = await supabase.auth.signUp({
