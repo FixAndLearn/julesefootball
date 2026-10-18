@@ -6,8 +6,7 @@ import { Header } from "@/components/layout/Header";
 import { Footer } from "@/components/layout/Footer";
 import { JsonLd } from "@/components/seo/JsonLd";
 import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
-import { WhatsAppSupportWidget } from "@/components/support/WhatsAppSupportWidget";
-import { AiAssistantWidget } from "@/components/ai/AiAssistantWidget";
+import { SupportHubWidget } from "@/components/support/SupportHubWidget";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { LanguageProvider } from "@/context/LanguageContext";
 
@@ -193,8 +192,7 @@ export default function RootLayout({
           <Footer />
           <MobileBottomNav />
           <CookieConsentBanner />
-          <WhatsAppSupportWidget />
-          <AiAssistantWidget />
+          <SupportHubWidget />
         </LanguageProvider>
       </body>
     </html>

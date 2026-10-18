@@ -24,6 +24,7 @@ function RegisterForm() {
   const [termsAccepted, setTermsAccepted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+  const [emailConfirmationSent, setEmailConfirmationSent] = useState(false);
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -53,11 +54,19 @@ function RegisterForm() {
     const internationalPhone = normalized.international;
 
     try {
+      const origin =
+        typeof window !== "undefined" && window.location.origin
+          ? window.location.origin
+          : process.env.NEXT_PUBLIC_APP_URL || "https://www.efootballmarket.co.ke";
+
+      const emailRedirectTo = `${origin}/auth/callback?redirect=${encodeURIComponent(redirect)}`;
+
       const supabase = createClient();
       const { data: authData, error: authError } = await supabase.auth.signUp({
         email,
         password,
         options: {
+          emailRedirectTo,
           data: {
             first_name: firstName,
             last_name: lastName,
@@ -107,6 +116,13 @@ function RegisterForm() {
         }
       }
 
+      // If Supabase requires email confirmation before signing in
+      if (authData.user && !authData.session) {
+        setEmailConfirmationSent(true);
+        setLoading(false);
+        return;
+      }
+
       router.push(redirect);
       router.refresh();
     } catch (err: any) {
@@ -115,6 +131,49 @@ function RegisterForm() {
       setLoading(false);
     }
   };
+
+  if (emailConfirmationSent) {
+    return (
+      <div className="w-full max-w-lg bg-pitch-surface border border-pitch-border rounded-2xl p-8 shadow-2xl space-y-6 text-center">
+        <div className="w-16 h-16 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 flex items-center justify-center text-emerald-400 mx-auto">
+          <Mail className="w-8 h-8" />
+        </div>
+        <div>
+          <h2 className="text-2xl font-bold text-white font-display">Check Your Gmail</h2>
+          <p className="text-sm text-slate-300 mt-2">
+            We sent a verification link to <strong className="text-white font-semibold">{email}</strong>.
+          </p>
+          <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+            Please open your Gmail and tap the confirmation button to activate your account and start trading immediately on eFootballMarket.
+          </p>
+        </div>
+
+        <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-2 text-left">
+          <span className="font-bold text-amber-300 block">Next Steps:</span>
+          <p>1. Open the email from eFootballMarket.</p>
+          <p>2. Tap the confirmation link.</p>
+          <p>3. You will be automatically authenticated and redirected to your dashboard.</p>
+        </div>
+
+        <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
+          <a
+            href="https://mail.google.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs transition-all shadow-md text-center"
+          >
+            Open Gmail App / Web
+          </a>
+          <Link
+            href={`/login?redirect=${encodeURIComponent(redirect)}`}
+            className="w-full sm:w-auto py-3 px-4 rounded-xl bg-pitch-card hover:bg-slate-800 border border-pitch-border text-slate-300 text-xs font-semibold text-center transition-all"
+          >
+            Go to Login
+          </Link>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="w-full max-w-lg bg-pitch-surface border border-pitch-border rounded-2xl p-8 shadow-2xl space-y-6">
