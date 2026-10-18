@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
 import { Lock, Mail, Phone, ShieldCheck, User, AlertCircle, KeyRound, CheckCircle2 } from "lucide-react";
 import { OtpCodeInput } from "@/components/auth/OtpCodeInput";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -350,6 +351,17 @@ function RegisterForm() {
           <span>{error}</span>
         </div>
       )}
+
+      {/* 1-Tap Google Registration */}
+      <GoogleSignInButton redirect={redirect} label="Sign up with Google" />
+
+      <div className="relative flex items-center justify-center my-4">
+        <div className="border-t border-pitch-border/80 w-full" />
+        <span className="bg-pitch-surface px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0">
+          Or register with email
+        </span>
+        <div className="border-t border-pitch-border/80 w-full" />
+      </div>
 
       <form onSubmit={handleRegister} className="space-y-4">
         <div className="grid grid-cols-2 gap-4">

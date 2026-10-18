@@ -12,7 +12,7 @@ export async function GET(request: NextRequest) {
   const next = requestUrl.searchParams.get("redirect") || "/dashboard/buyer";
 
   const redirectTarget = next.startsWith("/") ? next : `/${next}`;
-  const canonicalOrigin = process.env.NEXT_PUBLIC_APP_URL || "https://www.efootballmarket.co.ke";
+  const canonicalOrigin = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin || "https://www.efootballmarket.co.ke";
   const response = NextResponse.redirect(new URL(redirectTarget, canonicalOrigin));
 
   const cookieStore = cookies();
@@ -42,6 +42,51 @@ export async function GET(request: NextRequest) {
         token_hash,
         type: type as any,
       });
+    }
+
+    // Auto-sync user profile for OAuth sign-ins (e.g. Google)
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (user) {
+      const { data: existingProfile } = await supabase
+        .from("profiles")
+        .select("id")
+        .eq("id", user.id)
+        .maybeSingle();
+
+      if (!existingProfile) {
+        const metadata = user.user_metadata || {};
+        const fullName = metadata.full_name || metadata.name || "";
+        const nameParts = fullName.split(" ");
+        const firstName = metadata.first_name || nameParts[0] || "Trader";
+        const lastName = metadata.last_name || nameParts.slice(1).join(" ") || "";
+        const baseUsername = (
+          metadata.user_name ||
+          user.email?.split("@")[0] ||
+          `trader_${user.id.slice(0, 6)}`
+        )
+          .toLowerCase()
+          .replace(/[^a-z0-9_]/g, "");
+
+        await supabase.from("profiles").upsert({
+          id: user.id,
+          username: baseUsername,
+          first_name: firstName,
+          last_name: lastName,
+          phone_number: metadata.phone_number || "+254700000000",
+          country: "KEN",
+          is_verified_seller: false,
+          available_balance: 0.0,
+          escrow_balance: 0.0,
+        });
+
+        await supabase.from("user_roles").upsert({
+          user_id: user.id,
+          role_id: "buyer",
+        });
+      }
     }
   } catch (err) {
     console.warn("Auth callback session exchange error:", err);

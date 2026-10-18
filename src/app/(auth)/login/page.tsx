@@ -5,6 +5,7 @@ import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
 import { Lock, Mail, ShieldCheck, AlertCircle, KeyRound, CheckCircle2 } from "lucide-react";
 import { OtpCodeInput } from "@/components/auth/OtpCodeInput";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Suspense, useState, useEffect } from "react";
@@ -225,6 +226,17 @@ function LoginForm() {
         <p className="text-xs text-slate-400 mt-1">
           Access your eFootballMarket escrow account &amp; orders
         </p>
+      </div>
+
+      {/* 1-Tap Google Sign-In */}
+      <GoogleSignInButton redirect={redirect} label="Continue with Google" />
+
+      <div className="relative flex items-center justify-center my-4">
+        <div className="border-t border-pitch-border/80 w-full" />
+        <span className="bg-pitch-surface px-3 text-[11px] font-semibold text-slate-400 uppercase tracking-wider shrink-0">
+          Or sign in with email
+        </span>
+        <div className="border-t border-pitch-border/80 w-full" />
       </div>
 
       {/* Auth Method Selector Tabs */}

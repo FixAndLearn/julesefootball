@@ -319,6 +319,15 @@ export function Header() {
                         <CheckCircle2 className="w-4 h-4 text-sky-400" />
                         <span>Seller Verification</span>
                       </Link>
+
+                      <Link
+                        href="/profile"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-white hover:bg-[#1F2937] transition-colors"
+                      >
+                        <UserIcon className="w-4 h-4 text-brand-400" />
+                        <span>Profile &amp; Security Settings</span>
+                      </Link>
                     </div>
 
                     <div className="pt-1 border-t border-[#1F2937]">
@@ -571,7 +580,16 @@ export function Header() {
           </nav>
 
           {isAuthenticated && (
-            <div className="pt-2 border-t border-[#1F2937]">
+            <div className="pt-2 border-t border-[#1F2937] space-y-2">
+              <Link
+                href="/profile"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#111827] border border-[#1F2937] text-white text-xs font-semibold"
+              >
+                <span>Profile &amp; Security Settings</span>
+                <UserIcon className="w-4 h-4 text-brand-400" />
+              </Link>
+
               <button
                 type="button"
                 onClick={handleSignOut}
