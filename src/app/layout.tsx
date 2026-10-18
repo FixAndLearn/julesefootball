@@ -129,7 +129,10 @@ export const metadata: Metadata = {
   },
   manifest: "/manifest.webmanifest",
   verification: {
-    google: process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "googlee8e97a3f5a54db68",
+    google: [
+      process.env.NEXT_PUBLIC_GOOGLE_SITE_VERIFICATION || "jArU_x-bgCj3AzwB_o8h7757C6udJVplNQuhkAiYPvQ",
+      "googlee8e97a3f5a54db68",
+    ],
   },
 };
 
