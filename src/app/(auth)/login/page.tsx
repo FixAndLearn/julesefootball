@@ -120,8 +120,8 @@ function LoginForm() {
 
   const handleVerifyOtp = async (codeToVerify?: string) => {
     const token = (codeToVerify || otpCode).trim();
-    if (token.length !== 6) {
-      setError("Please enter the complete 6-digit code.");
+    if (token.length < 6 || token.length > 8) {
+      setError("Please enter the complete verification code from your email.");
       return;
     }
 
@@ -353,6 +353,7 @@ function LoginForm() {
           <div className="py-2">
             <OtpCodeInput
               value={otpCode}
+              length={8}
               onChange={(val) => {
                 setOtpCode(val);
                 setError("");
@@ -369,7 +370,7 @@ function LoginForm() {
             size="lg"
             onClick={() => handleVerifyOtp()}
             isLoading={verifying}
-            disabled={otpCode.length !== 6 || verifying}
+            disabled={otpCode.length < 6 || verifying}
             className="w-full font-bold shadow-lg"
           >
             Verify Code &amp; Sign In

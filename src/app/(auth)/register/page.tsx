@@ -141,8 +141,8 @@ function RegisterForm() {
 
   const handleVerifyCode = async (codeToVerify?: string) => {
     const token = (codeToVerify || code).trim();
-    if (token.length !== 6) {
-      setError("Please enter the complete 6-digit verification code.");
+    if (token.length < 6 || token.length > 8) {
+      setError("Please enter the complete verification code from your email.");
       return;
     }
 
@@ -169,7 +169,7 @@ function RegisterForm() {
       }
 
       if (verifyErr) {
-        throw new Error(verifyErr.message || "Invalid or expired 6-digit code. Please try again.");
+        throw new Error(verifyErr.message || "Invalid or expired verification code. Please check and try again.");
       }
 
       if (data?.session) {
@@ -207,7 +207,7 @@ function RegisterForm() {
         throw new Error(resendErr.message);
       }
 
-      setResendMessage("A new 6-digit code has been dispatched to your email!");
+      setResendMessage("A new verification code has been dispatched to your email!");
       setResendCooldown(45);
     } catch (err: any) {
       setError(err.message || "Failed to resend code.");
@@ -241,9 +241,9 @@ function RegisterForm() {
           <KeyRound className="w-7 h-7" />
         </div>
         <div className="space-y-1.5">
-          <h2 className="text-2xl font-bold text-white font-display">Enter 6-Digit Code</h2>
+          <h2 className="text-2xl font-bold text-white font-display">Enter Verification Code</h2>
           <p className="text-xs text-slate-300 leading-relaxed">
-            Enter the 6-digit verification code sent to <strong className="text-amber-400 font-mono font-semibold">{email}</strong>.
+            Enter the verification code sent to <strong className="text-amber-400 font-mono font-semibold">{email}</strong>.
           </p>
         </div>
 
@@ -261,10 +261,11 @@ function RegisterForm() {
           </div>
         )}
 
-        {/* 6-Digit OTP Box Input */}
+        {/* Dynamic 8-Digit OTP Box Input */}
         <div className="py-2">
           <OtpCodeInput
             value={code}
+            length={8}
             onChange={(val) => {
               setCode(val);
               setError("");
@@ -281,7 +282,7 @@ function RegisterForm() {
           size="lg"
           onClick={() => handleVerifyCode()}
           isLoading={verifying}
-          disabled={code.length !== 6 || verifying}
+          disabled={code.length < 6 || verifying}
           className="w-full font-bold shadow-lg"
         >
           Verify Code &amp; Start Trading
