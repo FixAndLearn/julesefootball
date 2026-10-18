@@ -10,9 +10,10 @@ import { useState } from "react";
 export interface BuyNowButtonProps {
   listingId: string;
   priceFormatted: string;
+  compact?: boolean;
 }
 
-export function BuyNowButton({ listingId, priceFormatted }: BuyNowButtonProps) {
+export function BuyNowButton({ listingId, priceFormatted, compact = false }: BuyNowButtonProps) {
   const router = useRouter();
   const { isAuthenticated, loading: authLoading } = useAuth();
   const [loading, setLoading] = useState(false);
@@ -52,6 +53,21 @@ export function BuyNowButton({ listingId, priceFormatted }: BuyNowButtonProps) {
       setLoading(false);
     }
   };
+
+  if (compact) {
+    return (
+      <Button
+        variant="gold"
+        size="sm"
+        className="font-bold text-xs whitespace-nowrap px-3.5 py-2.5 shadow-md shadow-amber-500/10 active:scale-95 transition-all"
+        onClick={handleBuyNow}
+        isLoading={loading}
+      >
+        <ShoppingCart className="w-3.5 h-3.5 mr-1.5" />
+        <span>Buy Now</span>
+      </Button>
+    );
+  }
 
   return (
     <div className="w-full space-y-3">

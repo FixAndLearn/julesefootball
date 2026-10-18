@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useRef, useEffect } from "react";
+import { usePathname } from "next/navigation";
 import {
   Bot,
   MessageCircle,
@@ -100,6 +101,8 @@ const WHATSAPP_TOPICS = [
 ];
 
 export function SupportHubWidget() {
+  const pathname = usePathname();
+  const isListingDetailPage = Boolean(pathname?.startsWith("/listings/") && pathname !== "/listings");
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"ai" | "whatsapp">("ai");
   const [inputMessage, setInputMessage] = useState("");
@@ -206,8 +209,12 @@ export function SupportHubWidget() {
 
   return (
     <>
-      {/* Floating Single Trigger Button - Elevated on Mobile to avoid collision with BottomNav */}
-      <div className="fixed bottom-20 md:bottom-6 right-4 sm:right-6 z-40 select-none font-sans">
+      {/* Floating Single Trigger Button - Elevated on Mobile to avoid collision with BottomNav or Sticky Action Bar */}
+      <div
+        className={`fixed ${
+          isListingDetailPage ? "bottom-[4.5rem]" : "bottom-20"
+        } md:bottom-6 right-4 sm:right-6 z-40 select-none font-sans`}
+      >
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
@@ -234,7 +241,11 @@ export function SupportHubWidget() {
 
       {/* Main Support Hub Window */}
       {isOpen && (
-        <div className="fixed inset-x-3 bottom-20 sm:inset-auto sm:bottom-20 sm:right-6 sm:w-[460px] h-[580px] max-h-[82vh] z-50 flex flex-col rounded-3xl bg-[#0F172A] border border-slate-700/80 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 font-sans">
+        <div
+          className={`fixed inset-x-3 ${
+            isListingDetailPage ? "bottom-[4.5rem]" : "bottom-20"
+          } sm:inset-auto sm:bottom-20 sm:right-6 sm:w-[460px] h-[580px] max-h-[82vh] z-50 flex flex-col rounded-3xl bg-[#0F172A] border border-slate-700/80 shadow-2xl overflow-hidden animate-in fade-in slide-in-from-bottom-4 font-sans`}
+        >
           {/* Header */}
           <div className="p-3.5 bg-gradient-to-r from-slate-900 via-pitch-card to-emerald-950/60 border-b border-pitch-border flex items-center justify-between shrink-0">
             {/* Tab Switcher */}

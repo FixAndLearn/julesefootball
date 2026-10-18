@@ -608,19 +608,19 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
       )}
 
       {/* Mobile Sticky Thumb-Zone Action Bar */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 bg-pitch/95 backdrop-blur-xl border-t border-pitch-border/90 px-4 py-3 lg:hidden flex items-center justify-between gap-3 shadow-2xl">
-        <div className="min-w-0">
-          <p className="text-[10px] text-slate-400 uppercase tracking-wider font-semibold">Total Price</p>
-          <p className="text-lg font-black font-mono text-emerald-400 truncate">
+      <div className="fixed bottom-0 left-0 right-0 z-40 bg-[#0B1220]/95 backdrop-blur-xl border-t border-slate-800/90 px-3.5 py-2.5 lg:hidden flex items-center justify-between gap-2 shadow-2xl safe-area-pb">
+        <div className="min-w-0 shrink-0">
+          <p className="text-[9px] uppercase tracking-wider font-semibold text-slate-400 leading-tight">Total Price</p>
+          <p className="text-base font-black font-mono text-emerald-400 leading-tight whitespace-nowrap">
             {formatCurrency(listing.price, listing.currency)}
           </p>
         </div>
-        <div className="flex items-center gap-2 shrink-0">
+        <div className="flex items-center gap-1.5 shrink-0">
           {isOwner ? (
             <Link href={`/seller/edit-listing/${listing.id}`}>
-              <Button variant="gold" size="sm">
-                <Edit3 className="w-3.5 h-3.5 mr-1.5" />
-                Edit Listing
+              <Button variant="gold" size="sm" className="text-xs font-bold">
+                <Edit3 className="w-3.5 h-3.5 mr-1" />
+                Edit
               </Button>
             </Link>
           ) : listing.status !== "published" ? (
@@ -631,13 +631,15 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
             <BuyNowButton
               listingId={listing.id}
               priceFormatted={formatCurrency(listing.price, listing.currency)}
+              compact={true}
             />
           ) : (
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1.5">
               <MakeOfferButton listing={listing} size="sm" />
               <BuyNowButton
                 listingId={listing.id}
                 priceFormatted={formatCurrency(listing.price, listing.currency)}
+                compact={true}
               />
             </div>
           )}
