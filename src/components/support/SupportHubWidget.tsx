@@ -102,6 +102,18 @@ const WHATSAPP_TOPICS = [
 
 export function SupportHubWidget() {
   const pathname = usePathname();
+  const isAuthRoute =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/invite") ||
+    pathname.startsWith("/auth");
+
+  if (isAuthRoute) {
+    return null;
+  }
+
   const isListingDetailPage = Boolean(pathname?.startsWith("/listings/") && pathname !== "/listings");
   const [isOpen, setIsOpen] = useState(false);
   const [activeTab, setActiveTab] = useState<"ai" | "whatsapp">("ai");

@@ -7,6 +7,32 @@ import { usePathname } from "next/navigation";
 export function Footer() {
   const pathname = usePathname();
   const isMinimalFlow = pathname.startsWith("/pay/");
+  const isAuthRoute =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/invite") ||
+    pathname.startsWith("/auth");
+
+  if (isAuthRoute) {
+    return (
+      <footer className="w-full border-t border-[#1F2937] bg-[#0B1220] text-[#94A3B8] text-xs mt-auto py-5">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+          <p className="text-slate-400 text-xs">
+            © {new Date().getFullYear()} eFootballMarket. 100% Escrow Protected (Safaricom Till 1572931).
+          </p>
+          <div className="flex items-center gap-4 text-xs text-slate-400">
+            <Link href="/terms" className="hover:text-white transition-colors">Terms of Service</Link>
+            <span className="text-slate-700">|</span>
+            <Link href="/privacy" className="hover:text-white transition-colors">Privacy Policy</Link>
+            <span className="text-slate-700">|</span>
+            <Link href="/escrow-guarantee" className="hover:text-white transition-colors">Escrow Guarantee</Link>
+          </div>
+        </div>
+      </footer>
+    );
+  }
 
   // Minimal footer only for focused checkout flow
   if (isMinimalFlow) {

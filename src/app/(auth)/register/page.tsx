@@ -3,7 +3,7 @@
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
 import { createClient } from "@/lib/supabase/client";
-import { Lock, Mail, Phone, ShieldCheck, User, AlertCircle, KeyRound, CheckCircle2 } from "lucide-react";
+import { Lock, Mail, Phone, ShieldCheck, User, AlertCircle, KeyRound, CheckCircle2, Sparkles } from "lucide-react";
 import { OtpCodeInput } from "@/components/auth/OtpCodeInput";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
@@ -15,6 +15,7 @@ function RegisterForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirect = searchParams.get("redirect") || "/dashboard/buyer";
+  const refParam = searchParams.get("ref");
 
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -349,6 +350,15 @@ function RegisterForm() {
         <div className="p-3 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-center gap-2">
           <AlertCircle className="w-4 h-4 shrink-0" />
           <span>{error}</span>
+        </div>
+      )}
+
+      {refParam && (
+        <div className="p-3.5 rounded-xl bg-amber-500/10 border border-amber-500/30 text-xs text-amber-200 flex items-center gap-2.5">
+          <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
+          <span>
+            You were invited by <strong className="text-white font-semibold">@{refParam}</strong>! Register now to trade safely with 100% Escrow Protection.
+          </span>
         </div>
       )}
 

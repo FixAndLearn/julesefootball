@@ -16,6 +16,7 @@ import {
   Shield,
   Save,
   ArrowRight,
+  Users,
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -451,6 +452,25 @@ function ProfileContent() {
             Update Password
           </Button>
         </form>
+      </div>
+
+      {/* Card 4: Invite & Referral Hub */}
+      <div className="p-6 rounded-2xl bg-gradient-to-r from-amber-500/10 via-slate-900 to-pitch-surface border border-amber-500/30 flex flex-col sm:flex-row items-center justify-between gap-4">
+        <div className="space-y-1 text-center sm:text-left">
+          <div className="flex items-center justify-center sm:justify-start gap-2 text-amber-400 font-bold text-sm">
+            <Users className="w-4 h-4" />
+            <span>Invite Friends &amp; Traders</span>
+          </div>
+          <p className="text-xs text-slate-300">
+            Share your personal referral link to help friends trade safely with Safaricom Till 1572931 escrow.
+          </p>
+        </div>
+        <Link href="/invite" className="shrink-0 w-full sm:w-auto">
+          <Button variant="primary" size="md" className="w-full bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs">
+            Open Invite Hub
+            <ArrowRight className="w-3.5 h-3.5 ml-1.5" />
+          </Button>
+        </Link>
       </div>
     </div>
   );

@@ -140,3 +140,96 @@ export async function sendEscrowPaymentReceivedEmail(params: {
     idempotencyKey: `escrow-pay-${params.orderId}`,
   });
 }
+
+/**
+ * Dispatches an official invitation email to join eFootball Market.
+ */
+export async function sendUserInvitationEmail(params: {
+  toEmail: string;
+  inviterName: string;
+  inviteCode: string;
+  inviteUrl: string;
+  personalMessage?: string;
+}) {
+  const html = `
+    <!DOCTYPE html>
+    <html>
+      <head>
+        <meta charset="utf-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>You're Invited to eFootball Market</title>
+      </head>
+      <body style="margin: 0; padding: 0; background-color: #0b1120; font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif; color: #e2e8f0;">
+        <table width="100%" cellpadding="0" cellspacing="0" style="background-color: #0b1120; padding: 40px 16px;">
+          <tr>
+            <td align="center">
+              <table width="100%" cellpadding="0" cellspacing="0" style="max-width: 520px; background-color: #111c33; border: 1px solid #1e293b; border-radius: 16px; overflow: hidden; box-shadow: 0 10px 25px rgba(0,0,0,0.5);">
+                <!-- Header -->
+                <tr>
+                  <td style="padding: 28px 32px; background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%); text-align: center;">
+                    <h1 style="margin: 0; font-size: 22px; font-weight: 800; color: #ffffff; letter-spacing: 0.5px;">eFootball Market</h1>
+                    <p style="margin: 6px 0 0; font-size: 13px; color: #bfdbfe;">Kenya's #1 Verified Escrow Gaming Platform</p>
+                  </td>
+                </tr>
+
+                <!-- Content -->
+                <tr>
+                  <td style="padding: 32px 32px 24px;">
+                    <h2 style="margin: 0 0 12px; font-size: 18px; font-weight: 700; color: #f8fafc;">You've Been Invited!</h2>
+                    <p style="margin: 0 0 16px; font-size: 14px; line-height: 1.6; color: #cbd5e1;">
+                      <strong>${params.inviterName}</strong> has invited you to join eFootball Market, Kenya's premier verified platform to safely buy and sell eFootball accounts with automated Safaricom M-Pesa Till 1572931 escrow.
+                    </p>
+
+                    ${
+                      params.personalMessage
+                        ? `<div style="background-color: #0b1324; border-left: 4px solid #3b82f6; border-radius: 8px; padding: 14px 16px; margin: 20px 0; font-size: 13px; color: #94a3b8; font-style: italic;">
+                            "${params.personalMessage}"
+                          </div>`
+                        : ""
+                    }
+
+                    <!-- Highlights Box -->
+                    <div style="background-color: #0b1324; border: 1px solid #1e293b; border-radius: 12px; padding: 18px; margin: 20px 0;">
+                      <p style="margin: 0 0 10px; font-size: 13px; font-weight: 700; color: #10b981;">What you get:</p>
+                      <p style="margin: 4px 0; font-size: 13px; color: #cbd5e1;">1. 100% Escrow Protection via Safaricom Till 1572931</p>
+                      <p style="margin: 4px 0; font-size: 13px; color: #cbd5e1;">2. 24-Hour Buyer Inspection Window</p>
+                      <p style="margin: 4px 0; font-size: 13px; color: #cbd5e1;">3. Verified Konami ID transfers &amp; zero scam risk</p>
+                    </div>
+
+                    <div style="text-align: center; margin: 28px 0 16px;">
+                      <a href="${params.inviteUrl}" style="background-color: #22c55e; color: #0b1220; padding: 14px 28px; border-radius: 10px; text-decoration: none; font-weight: 800; font-size: 14px; display: inline-block; box-shadow: 0 4px 14px rgba(34,197,94,0.35);">
+                        Accept Invitation &amp; Join Market
+                      </a>
+                    </div>
+
+                    <p style="margin: 16px 0 0; font-size: 12px; color: #64748b; text-align: center;">
+                      Invite code: <strong style="color: #f59e0b;">${params.inviteCode}</strong>
+                    </p>
+                  </td>
+                </tr>
+
+                <!-- Footer -->
+                <tr>
+                  <td style="padding: 20px 32px; background-color: #0b1324; border-top: 1px solid #1e293b; text-align: center;">
+                    <p style="margin: 0; font-size: 11px; color: #64748b;">
+                      eFootball Market | Safaricom Till 1572931 | Nairobi, Kenya
+                    </p>
+                  </td>
+                </tr>
+              </table>
+            </td>
+          </tr>
+        </table>
+      </body>
+    </html>
+  `;
+
+  return sendTransactionalEmail({
+    to: params.toEmail,
+    subject: `${params.inviterName} invited you to eFootball Market Kenya`,
+    html,
+    text: `${params.inviterName} has invited you to eFootball Market Kenya. Join here: ${params.inviteUrl}`,
+    idempotencyKey: `invite-${params.inviteCode}-${Date.now()}`,
+  });
+}
+

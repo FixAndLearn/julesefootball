@@ -27,17 +27,19 @@ import {
   Trophy,
   MessageCircle,
   Plus,
+  Users,
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { LiveActivityMarquee } from "@/components/layout/LiveActivityMarquee";
 import { useLanguage, Language } from "@/context/LanguageContext";
 import { Globe, Flame, ShieldAlert } from "lucide-react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
 
 export function Header() {
   const router = useRouter();
+  const pathname = usePathname();
   const { user, profile, loading, signOut, isAuthenticated, displayName } = useAuth();
   const { language, setLanguage, t } = useLanguage();
   const isAdminUser = isUserAdmin(user?.email, profile?.role);
@@ -86,6 +88,32 @@ export function Header() {
     }
     return name.slice(0, 2).toUpperCase();
   };
+
+  const isAuthRoute =
+    pathname === "/login" ||
+    pathname === "/register" ||
+    pathname.startsWith("/forgot-password") ||
+    pathname.startsWith("/reset-password") ||
+    pathname.startsWith("/invite") ||
+    pathname.startsWith("/auth");
+
+  if (isAuthRoute) {
+    return (
+      <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+          <Logo clickable={true} size="md" />
+          <div className="flex items-center gap-2 sm:gap-4">
+            <Link
+              href="/"
+              className="text-xs sm:text-sm font-semibold text-[#94A3B8] hover:text-white flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-[#1F2937] hover:border-slate-700 bg-slate-900/60 transition-colors"
+            >
+              <span>Back to Marketplace</span>
+            </Link>
+          </div>
+        </div>
+      </header>
+    );
+  }
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
@@ -327,6 +355,15 @@ export function Header() {
                       >
                         <UserIcon className="w-4 h-4 text-brand-400" />
                         <span>Profile &amp; Security Settings</span>
+                      </Link>
+
+                      <Link
+                        href="/invite"
+                        onClick={() => setDropdownOpen(false)}
+                        className="flex items-center gap-2 px-3 py-2 rounded-lg text-[#94A3B8] hover:text-white hover:bg-[#1F2937] transition-colors"
+                      >
+                        <Users className="w-4 h-4 text-emerald-400" />
+                        <span>Invite Friends &amp; Traders</span>
                       </Link>
                     </div>
 
@@ -588,6 +625,15 @@ export function Header() {
               >
                 <span>Profile &amp; Security Settings</span>
                 <UserIcon className="w-4 h-4 text-brand-400" />
+              </Link>
+
+              <Link
+                href="/invite"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#111827] border border-[#1F2937] text-white text-xs font-semibold"
+              >
+                <span>Invite Friends &amp; Traders</span>
+                <Users className="w-4 h-4 text-emerald-400" />
               </Link>
 
               <button

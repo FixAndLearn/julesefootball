@@ -11,7 +11,10 @@ export async function GET(request: NextRequest) {
   const type = requestUrl.searchParams.get("type");
   const next = requestUrl.searchParams.get("redirect") || "/dashboard/buyer";
 
-  const redirectTarget = next.startsWith("/") ? next : `/${next}`;
+  let redirectTarget = next.startsWith("/") ? next : `/${next}`;
+  if (type === "recovery") {
+    redirectTarget = "/reset-password";
+  }
   const canonicalOrigin = process.env.NEXT_PUBLIC_APP_URL || requestUrl.origin || "https://www.efootballmarket.co.ke";
   const response = NextResponse.redirect(new URL(redirectTarget, canonicalOrigin));
 
