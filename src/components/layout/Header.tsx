@@ -174,20 +174,20 @@ export function Header() {
       {/* Top Live Activity Marquee Ticker */}
       <LiveActivityMarquee />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20 gap-3 sm:gap-4 xl:gap-6">
+      <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20 gap-4 xl:gap-6">
           {/* Logo & Desktop Nav */}
-          <div className="flex items-center gap-4 xl:gap-8 min-w-0">
+          <div className="flex items-center gap-4 xl:gap-6 shrink-0">
             <Logo clickable={true} size="md" />
 
             <nav role="navigation" aria-label="Main Navigation" className="hidden lg:block shrink-0">
-              <ul role="menubar" className="flex items-center gap-1 xl:gap-1.5 text-xs xl:text-sm font-medium">
+              <ul role="menubar" className="flex items-center gap-1 xl:gap-2 text-xs xl:text-sm font-medium">
                 <li role="none">
                   <Link
                     href="/browse"
                     role="menuitem"
                     title="Browse Verified eFootball Mobile Accounts Kenya"
-                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap"
                   >
                     {t.browseSquads}
                   </Link>
@@ -197,7 +197,7 @@ export function Header() {
                     href="/escrow-guarantee"
                     role="menuitem"
                     title="Safaricom Till 1572931 Escrow Protection Guarantee"
-                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap"
                   >
                     {t.escrowGuide}
                   </Link>
@@ -207,40 +207,24 @@ export function Header() {
                     href="/scammer-check"
                     role="menuitem"
                     title="Live Kenyan Scammer Blacklist Directory"
-                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-rose-300 hover:bg-rose-500/10 transition-colors whitespace-nowrap shrink-0"
+                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-rose-300 hover:bg-rose-500/10 transition-colors whitespace-nowrap"
                   >
                     {t.scammerCheck}
                   </Link>
                 </li>
 
-                {/* Direct Links on XL screens (1280px+) */}
-                <li role="none" className="hidden xl:block">
-                  <Link
-                    href="/friday-drops"
-                    role="menuitem"
-                    title="Friday Drops - Weekly Flash Sales on Verified Squads"
-                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition-colors whitespace-nowrap shrink-0"
-                  >
-                    {t.fridayDrops}
-                  </Link>
-                </li>
-                <li role="none" className="hidden xl:block">
-                  <Link
-                    href="/news"
-                    role="menuitem"
-                    title="eFootball Kenya Community Bulletin & News"
-                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
-                  >
-                    {t.communityBulletin}
-                  </Link>
-                </li>
-
-                {/* More Dropdown on LG screens (1024-1279px) so words never collide or overlap */}
-                <li role="none" className="relative xl:hidden" ref={moreNavRef}>
+                {/* More Dropdown (Market Bulletin, Friday Drops, Wanted Board, Tournaments) */}
+                <li
+                  role="none"
+                  className="relative"
+                  ref={moreNavRef}
+                  onMouseEnter={() => setMoreNavOpen(true)}
+                  onMouseLeave={() => setMoreNavOpen(false)}
+                >
                   <button
                     type="button"
                     onClick={() => setMoreNavOpen(!moreNavOpen)}
-                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                    className="flex items-center gap-1 px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap"
                     title="More marketplace categories"
                   >
                     <span>More</span>
@@ -248,15 +232,7 @@ export function Header() {
                   </button>
 
                   {moreNavOpen && (
-                    <div className="absolute left-0 mt-2 w-48 rounded-xl bg-[#0F172A] border border-slate-800 shadow-2xl py-1.5 z-50 animate-in fade-in slide-in-from-top-1 text-xs font-medium">
-                      <Link
-                        href="/friday-drops"
-                        onClick={() => setMoreNavOpen(false)}
-                        className="flex items-center gap-2.5 px-3.5 py-2 text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 transition-colors"
-                      >
-                        <Flame className="w-4 h-4 text-amber-400 shrink-0" />
-                        <span>{t.fridayDrops}</span>
-                      </Link>
+                    <div className="absolute left-0 mt-1 w-52 rounded-xl bg-[#0F172A] border border-slate-800 shadow-2xl py-1.5 z-50 animate-in fade-in slide-in-from-top-1 text-xs font-medium">
                       <Link
                         href="/news"
                         onClick={() => setMoreNavOpen(false)}
@@ -265,7 +241,15 @@ export function Header() {
                         <Newspaper className="w-4 h-4 text-slate-400 shrink-0" />
                         <span>{t.communityBulletin}</span>
                       </Link>
-                      <div className="my-1 border-t border-slate-800" />
+                      <Link
+                        href="/friday-drops"
+                        onClick={() => setMoreNavOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 transition-colors"
+                      >
+                        <Flame className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>{t.fridayDrops}</span>
+                      </Link>
+                      <div className="my-1 border-t border-slate-800/80" />
                       <Link
                         href="/wanted"
                         onClick={() => setMoreNavOpen(false)}
