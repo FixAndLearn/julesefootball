@@ -13,7 +13,6 @@ import { FridayDropsSection } from "@/components/home/FridayDropsSection";
 import { EscrowStepsVisualizer } from "@/components/home/EscrowStepsVisualizer";
 import {
   ArrowRight,
-  ExternalLink,
   Handshake,
   MessageCircle,
   Newspaper,
@@ -565,28 +564,6 @@ export default async function HomePage() {
           </div>
 
           <HomeFaqAccordion />
-        </div>
-      </section>
-
-      {/* 10. COMPLIANCE & LEGAL NOTICE (Healthline-style medical/legal disclosure) */}
-      <section className="py-8 bg-[#090D16] text-xs text-slate-400">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-2xl bg-[#111827] border border-slate-800 p-5 leading-relaxed space-y-1.5">
-            <p className="font-bold text-white">
-              Independent Community Notice & Konami Terms Advisory:
-            </p>
-            <p className="text-slate-400">
-              eFootballMarket is an independent Kenyan escrow intermediary and is not affiliated with, endorsed by, or sponsored by Konami Digital Entertainment. Konami’s official terms of service prohibit selling, transferring, or sharing eFootball game account credentials. Trading may result in loss of account access or support.{" "}
-              <a
-                href="https://www.konami.com/efootball/en-us/topic/news/5174"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#22C55E] hover:underline font-semibold inline-flex items-center gap-0.5"
-              >
-                Read Konami’s official notice <ExternalLink className="w-3 h-3 ml-0.5 inline" />
-              </a>
-            </p>
-          </div>
         </div>
       </section>
     </div>

@@ -35,10 +35,10 @@ const FAQS: FaqItem[] = [
     badge: "Instant Payouts",
   },
   {
-    question: "What is eFootballMarket's relationship with Konami Digital Entertainment?",
+    question: "How do I list and sell my eFootball squad on the platform?",
     answer:
-      "eFootballMarket is an independent Kenyan peer-to-peer escrow intermediary and community organization. We are not endorsed by, sponsored by, or affiliated with Konami Digital Entertainment. As noted in Konami's official terms of service, buying, selling, and sharing game account credentials is prohibited by the game publisher and may risk account termination.",
-    badge: "Legal Notice",
+      "Click '+ Sell Account' in the top header navigation. Enter your collective team strength, Epic card counts, coin balance, and upload screenshots of your Starting XI and substitute bench. Once submitted, your squad is listed live. When a buyer purchases, funds are deposited into Till 1572931 escrow before you provide account credentials.",
+    badge: "Seller Guide",
   },
 ];
 

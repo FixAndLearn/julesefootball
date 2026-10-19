@@ -75,10 +75,10 @@ export function JsonLd({ siteUrl = "https://www.efootballmarket.co.ke" }: { site
       },
       {
         "@type": "Question",
-        name: "Is eFootballMarket affiliated with Konami Digital Entertainment?",
+        name: "How do I list and sell my eFootball squad on the platform?",
         acceptedAnswer: {
           "@type": "Answer",
-          text: "No. eFootballMarket is an independent Kenyan peer-to-peer escrow intermediary and community organizer. It is not affiliated with, endorsed by, or sponsored by Konami Digital Entertainment.",
+          text: "Click '+ Sell Account' in the top header navigation. Enter your collective team strength, Epic card counts, coin balance, and upload screenshots of your Starting XI and substitute bench. Once submitted, your squad is listed live. When a buyer purchases, funds are deposited into Till 1572931 escrow before you provide account credentials.",
         },
       },
     ],
