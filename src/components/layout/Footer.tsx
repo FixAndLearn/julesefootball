@@ -42,43 +42,6 @@ export function Footer() {
   // Full detailed footer for the homepage
   return (
     <footer className="w-full border-t border-[#1F2937] bg-[#0B1220] text-[#94A3B8] text-sm mt-auto">
-      {/* Trust & Escrow Guarantee Ribbon */}
-      <div className="border-b border-[#1F2937] bg-[#111827]/40">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/40 flex items-center justify-center text-[#22C55E] shrink-0">
-                <Shield className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[#F8FAFC]">100% Escrow Protected</p>
-                <p className="text-xs text-[#94A3B8]">Funds held safely until the buyer verifies squad credentials.</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-[#111827] border border-[#1F2937] flex items-center justify-center text-[#22C55E] shrink-0">
-                <CreditCard className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[#F8FAFC]">Instant M-Pesa STK Push</p>
-                <p className="text-xs text-[#94A3B8]">Direct payment via Safaricom Daraja API v2 (Till 1572931).</p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-amber-950/60 border border-amber-800/40 flex items-center justify-center text-[#FBBF24] shrink-0">
-                <Lock className="w-5 h-5" />
-              </div>
-              <div>
-                <p className="text-sm font-semibold text-[#F8FAFC]">AES-256 Encrypted Transfer</p>
-                <p className="text-xs text-[#94A3B8]">Konami ID credentials stored with authenticated encryption.</p>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
       {/* Main Footer Links */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-8">

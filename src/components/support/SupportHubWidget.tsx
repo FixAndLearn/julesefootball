@@ -231,21 +231,20 @@ export function SupportHubWidget() {
       <div
         className={`fixed ${
           isListingDetailPage ? "bottom-[4.5rem]" : "bottom-20"
-        } md:bottom-6 right-4 sm:right-6 z-40 select-none font-sans`}
+        } md:bottom-6 right-3 sm:right-6 z-40 select-none font-sans`}
       >
         <button
           type="button"
           onClick={() => setIsOpen((prev) => !prev)}
           aria-label="Open eFootball Support and AI Coach"
-          className="group flex items-center gap-2.5 px-4 py-3 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 text-white font-bold text-xs shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all duration-200 border border-emerald-400/30"
+          className="group flex items-center justify-center w-11 h-11 sm:w-auto sm:px-4 sm:py-2.5 rounded-full bg-gradient-to-r from-emerald-600 via-teal-600 to-amber-600 text-white font-bold text-xs shadow-xl shadow-emerald-950/50 hover:shadow-emerald-500/30 hover:scale-105 active:scale-95 transition-all duration-200 border border-emerald-400/30"
         >
           <div className="relative flex items-center justify-center">
             <Sparkles className="w-4 h-4 text-amber-200 animate-pulse" />
             <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-400 animate-ping" />
           </div>
-          <span className="hidden sm:inline font-display tracking-wide">Support & AI Coach</span>
-          <span className="inline sm:hidden font-display">Support</span>
-          <span className="w-2 h-2 rounded-full bg-emerald-400" />
+          <span className="hidden sm:inline font-display tracking-wide ml-1.5">Support & AI Coach</span>
+          <span className="hidden sm:inline w-1.5 h-1.5 rounded-full bg-emerald-400 ml-1" />
         </button>
       </div>
 

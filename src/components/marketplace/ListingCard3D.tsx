@@ -102,18 +102,12 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
 
             {/* Top Badges */}
             <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between gap-1.5 pointer-events-none z-20">
-              <div className="flex items-center gap-1 min-w-0 flex-1 overflow-hidden">
-                <span className="px-2 py-0.5 rounded-full bg-slate-950/80 backdrop-blur-md border border-slate-700/80 text-[10px] font-bold text-slate-200 shadow-md truncate shrink-0">
+              <div className="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
+                <span className="px-2.5 py-1 rounded-lg bg-slate-950/80 backdrop-blur-md border border-slate-700/80 text-[10px] font-bold text-slate-200 shadow-md truncate shrink-0">
                   {getPlatformLabel(listing.platform)}
                 </span>
-                {/* Swap is withdrawn if on flash sale or not published */}
-                {listing.allows_swap && !isFlashDrop && isAvailable && (
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-950/90 border border-emerald-500/60 text-[10px] font-bold text-emerald-300 shadow-md shrink-0">
-                    🔁 Swap
-                  </span>
-                )}
                 {isFlashDrop && (
-                  <span className="px-2 py-0.5 rounded-full bg-rose-600/90 border border-rose-400 text-[10px] font-extrabold text-white shadow-md shrink-0 animate-pulse flex items-center gap-1">
+                  <span className="px-2.5 py-1 rounded-lg bg-rose-600/90 border border-rose-400 text-[10px] font-extrabold text-white shadow-md shrink-0 flex items-center gap-1">
                     <Flame className="w-3 h-3 fill-white" />
                     <span>Flash Drop</span>
                   </span>
@@ -123,42 +117,21 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
               {/* Collective Strength High-Contrast Badge */}
               <div className="shrink-0">
                 <div
-                  className={`flex items-center gap-1 px-2.5 py-0.5 rounded-full backdrop-blur-md text-[11px] font-mono font-black shadow-lg ${
+                  className={`flex items-center gap-1 px-2.5 py-1 rounded-lg backdrop-blur-md text-[11px] font-mono font-black shadow-lg ${
                     isEliteStrength
-                      ? "bg-gradient-to-r from-amber-500/40 via-yellow-400/30 to-amber-600/40 border border-amber-400 text-amber-200 ring-1 ring-amber-400/50"
+                      ? "bg-amber-950/90 border border-amber-400 text-amber-200"
                       : "bg-black/90 border border-emerald-500/70 text-emerald-300"
                   }`}
                 >
-                  <Zap className="w-3 h-3 text-amber-400 fill-amber-400 animate-pulse shrink-0" />
+                  <Zap className="w-3 h-3 text-amber-400 fill-amber-400 shrink-0" />
                   <span>{listing.overall_team_strength} CS</span>
                 </div>
               </div>
             </div>
-
-            {/* Bottom Overlay Info & Inspect Action */}
-            <div className="absolute bottom-2 left-2.5 right-2.5 flex items-center justify-between gap-2 z-20">
-              <span className="text-[10px] font-semibold text-slate-200 bg-slate-900/90 backdrop-blur-md px-2 py-0.5 rounded border border-slate-700/80 shadow-md truncate max-w-[140px]">
-                {getPlaystyleLabel(listing.primary_playstyle)}
-              </span>
-
-              <button
-                type="button"
-                onClick={(e) => {
-                  e.preventDefault();
-                  e.stopPropagation();
-                  setInspectorOpen(true);
-                }}
-                className="px-2.5 py-1 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-slate-950 font-black text-[10px] shadow-lg flex items-center gap-1 transition-all active:scale-95 shrink-0"
-                title="Open Squad Inspector"
-              >
-                <Eye className="w-3 h-3 stroke-[3]" />
-                <span>Inspect Squad</span>
-              </button>
-            </div>
           </Link>
 
           {/* Card Body */}
-          <div className="p-3.5 sm:p-4 flex-1 flex flex-col justify-between space-y-3">
+          <div className="p-4 flex-1 flex flex-col justify-between space-y-3">
             <div>
               <Link href={`/listings/${listing.id}`}>
                 <h3 className="font-bold text-slate-100 text-sm line-clamp-1 group-hover:text-emerald-300 transition-colors">
@@ -166,25 +139,18 @@ export function ListingCard3D({ listing, featured = false }: ListingCard3DProps)
                 </h3>
               </Link>
 
-              {/* Progressive Disclosure: Clean High-Impact Summary */}
-              <div className="mt-2.5 flex items-center justify-between gap-1.5 flex-wrap">
-                <div className="flex items-center gap-1.5 flex-wrap">
-                  {epics + bigTime > 0 ? (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-[11px] font-bold text-amber-300">
-                      <Flame className="w-3 h-3 text-amber-400" />
-                      <span>{epics + bigTime} Epics &amp; Boosters</span>
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-800 border border-slate-700 text-[11px] font-medium text-slate-300">
-                      <Zap className="w-3 h-3 text-emerald-400" />
-                      <span>Balanced Squad</span>
-                    </span>
-                  )}
-                  <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-[10px] font-semibold text-emerald-300">
-                    <CheckCircle2 className="w-3 h-3 text-emerald-400" />
-                    <span>Clean Konami ID</span>
+              {/* Clean Decompressed Meta Specs */}
+              <div className="mt-2 flex items-center gap-2 text-xs text-slate-400 font-medium">
+                {epics + bigTime > 0 && (
+                  <span className="text-amber-300 font-semibold flex items-center gap-1">
+                    <Flame className="w-3 h-3 text-amber-400 shrink-0" />
+                    <span>{epics + bigTime} Epics</span>
                   </span>
-                </div>
+                )}
+                {epics + bigTime > 0 && <span className="text-slate-700">•</span>}
+                <span className="truncate">{getPlaystyleLabel(listing.primary_playstyle)}</span>
+                <span className="text-slate-700">•</span>
+                <span className="text-emerald-400 font-semibold">Clean ID</span>
               </div>
             </div>
 

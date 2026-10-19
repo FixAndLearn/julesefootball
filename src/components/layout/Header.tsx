@@ -170,43 +170,8 @@ export function Header() {
 
   return (
     <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
-      {/* 1. Top Live Activity Marquee Ticker */}
+      {/* Top Live Activity Marquee Ticker */}
       <LiveActivityMarquee />
-
-      {/* 2. Persistent Global Authority Trust Ribbon */}
-      <div className="bg-[#090D16] border-b border-[#1F2937]/80 py-1.5 px-3 sm:px-4 text-[11px]">
-        <div className="max-w-7xl mx-auto flex items-center justify-between text-[#94A3B8] gap-3">
-          <div className="flex items-center gap-2 sm:gap-3 overflow-x-auto no-scrollbar whitespace-nowrap">
-            <span className="inline-flex items-center gap-1.5 text-[#22C55E] font-semibold shrink-0">
-              <BadgeCheck className="w-3.5 h-3.5 text-[#22C55E]" />
-              <span>Safaricom Till 1572931</span>
-            </span>
-            <span className="text-slate-700 shrink-0">|</span>
-            <span className="inline-flex items-center gap-1 text-slate-300 shrink-0">
-              <Clock className="w-3.5 h-3.5 text-[#FBBF24]" />
-              <span>24H Buyer Inspection</span>
-            </span>
-            <span className="text-slate-700 hidden lg:inline shrink-0">|</span>
-            <span className="hidden lg:inline text-slate-400 shrink-0">
-              Kenya DPA (2019) Compliant
-            </span>
-          </div>
-
-          <div className="flex items-center gap-3 text-[11px] font-medium shrink-0">
-            <a
-              href="https://wa.me/254794400365"
-              target="_blank"
-              rel="noopener noreferrer"
-              className="text-[#22C55E] hover:underline flex items-center gap-1"
-            >
-              <Phone className="w-3 h-3" />
-              <span>0794400365</span>
-            </a>
-            <span className="text-slate-700 hidden sm:inline">|</span>
-            <span className="text-slate-400 hidden sm:inline">KES (M-Pesa)</span>
-          </div>
-        </div>
-      </div>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 gap-3">

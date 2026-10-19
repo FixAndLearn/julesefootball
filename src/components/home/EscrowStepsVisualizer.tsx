@@ -114,7 +114,7 @@ export function EscrowStepsVisualizer() {
         </div>
 
         {/* 5-Step Timeline Cards */}
-        <div className="grid grid-cols-1 md:grid-cols-5 gap-4 mb-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4 mb-6">
           {STEPS.map((step, idx) => {
             const Icon = step.icon;
             const isSelected = activeStep === idx;
@@ -122,13 +122,13 @@ export function EscrowStepsVisualizer() {
               <div
                 key={step.num}
                 onClick={() => setActiveStep(idx)}
-                className={`p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shadow-xl ${
+                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shadow-lg ${
                   isSelected
                     ? "bg-[#111827] border-emerald-500 shadow-emerald-500/10 ring-1 ring-emerald-500/50"
-                    : "bg-[#0E1626] border-slate-800 hover:border-slate-700"
+                    : "bg-[#0E1626] border-slate-800 hover:border-slate-700 hover:bg-[#111827]/70"
                 }`}
               >
-                <div className="space-y-3">
+                <div className="space-y-2.5">
                   <div className="flex items-center justify-between">
                     <span
                       className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono font-black text-xs ${
@@ -146,9 +146,9 @@ export function EscrowStepsVisualizer() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-2 pt-1">
                     <Icon
-                      className={`w-4 h-4 ${
+                      className={`w-4 h-4 shrink-0 ${
                         isSelected ? "text-[#22C55E]" : "text-slate-400"
                       }`}
                     />
@@ -157,22 +157,51 @@ export function EscrowStepsVisualizer() {
                     </h3>
                   </div>
 
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-400 leading-relaxed">
                     {step.subtitle}
                   </p>
+                </div>
 
-                  <ul className="space-y-1.5 pt-2 border-t border-slate-800/80 text-[10px] text-slate-300">
-                    {step.details.map((d, dIdx) => (
-                      <li key={dIdx} className="flex items-start gap-1.5">
-                        <CheckCircle2 className="w-3 h-3 text-[#22C55E] shrink-0 mt-0.5" />
-                        <span>{d}</span>
-                      </li>
-                    ))}
-                  </ul>
+                <div className="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-semibold text-slate-400">
+                  <span className={isSelected ? "text-emerald-400 font-bold" : ""}>
+                    {isSelected ? "Active Step" : "Click to view"}
+                  </span>
+                  <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-emerald-400 animate-pulse" : "bg-slate-700"}`} />
                 </div>
               </div>
             );
           })}
+        </div>
+
+        {/* Active Step Decompressed Deep-Dive Banner */}
+        <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div className="flex items-center gap-2.5">
+              <span className="w-8 h-8 rounded-xl bg-emerald-500/20 text-[#22C55E] flex items-center justify-center font-bold text-xs shrink-0">
+                {STEPS[activeStep].num}
+              </span>
+              <div>
+                <h4 className="font-bold text-white text-sm">
+                  Step {STEPS[activeStep].num}: {STEPS[activeStep].title}
+                </h4>
+                <p className="text-xs text-slate-400">
+                  {STEPS[activeStep].subtitle}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex flex-wrap items-center gap-2">
+              {STEPS[activeStep].details.map((detail, idx) => (
+                <div
+                  key={idx}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0B1220] border border-slate-800 text-xs text-slate-300"
+                >
+                  <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E] shrink-0" />
+                  <span>{detail}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
 
         {/* Highlight Callout Box: Why You Cannot Be Scammed */}

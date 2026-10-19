@@ -85,15 +85,9 @@ export default async function HomePage() {
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             {/* Left Column: Authority Copy, Search & Dual CTAs */}
             <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2.5">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/70 border border-emerald-800/80 text-emerald-300 text-xs font-semibold shadow-inner">
-                  <ShieldCheck className="w-3.5 h-3.5 text-[#22C55E]" />
-                  <span>Safaricom Till 1572931 Escrow</span>
-                </div>
-                <div className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-[#111827] border border-slate-700/80 text-xs text-slate-300">
-                  <BadgeCheck className="w-3.5 h-3.5 text-amber-400" />
-                  <span>Audited by Brian Okibo, Lead Escrow Officer</span>
-                </div>
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-700/60 text-emerald-300 text-xs font-semibold shadow-inner">
+                <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
+                <span>Safaricom Till 1572931 • 100% Escrow Protected</span>
               </div>
 
               <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black font-display tracking-tight text-[#F8FAFC] leading-[1.12]">
@@ -101,11 +95,11 @@ export default async function HomePage() {
               </h1>
 
               <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-sans font-medium">
-                M-PESA NATIVE | 100% ESCROW PROTECTED | VERIFIED SELLERS. No scams. No stress. Just football.
+                M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. Buy and sell verified squads safely with 24-hour buyer inspection.
               </p>
 
               {/* Instant Search Bar */}
-              <div className="max-w-2xl mx-auto lg:mx-0">
+              <div className="max-w-2xl mx-auto lg:mx-0 pt-1">
                 <form action="/browse" method="GET" className="relative flex items-center shadow-2xl">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                     <Search className="w-5 h-5" />
@@ -127,45 +121,10 @@ export default async function HomePage() {
                     </Button>
                   </div>
                 </form>
-
-                {/* Instant Filter Pills */}
-                <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 mt-3.5 text-xs">
-                  <span className="text-slate-400 font-medium">Popular:</span>
-                  <Link
-                    href="/browse?platform=android"
-                    className="px-3 py-1 rounded-lg bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 transition-colors"
-                  >
-                    Android
-                  </Link>
-                  <Link
-                    href="/browse?platform=ios"
-                    className="px-3 py-1 rounded-lg bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 transition-colors"
-                  >
-                    iOS Mobile
-                  </Link>
-                  <Link
-                    href="/browse?minStrength=3200"
-                    className="px-3 py-1 rounded-lg bg-[#111827] border border-amber-500/30 text-amber-400 hover:border-amber-400 transition-colors font-semibold"
-                  >
-                    3200+ OVR
-                  </Link>
-                  <Link
-                    href="/scammer-check"
-                    className="px-3 py-1 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-300 hover:text-white hover:border-rose-500 transition-colors font-semibold"
-                  >
-                    Scammer Check 🚨
-                  </Link>
-                  <Link
-                    href="/#friday-drops"
-                    className="px-3 py-1 rounded-lg bg-amber-950/40 border border-amber-800/60 text-amber-300 hover:text-white hover:border-amber-500 transition-colors font-semibold"
-                  >
-                    Friday Drops 🔥
-                  </Link>
-                </div>
               </div>
 
               {/* Dual CTAs (Glowing Green Primary + Outlined Gold Secondary) */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-2">
+              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-3">
                 <Link href="/browse">
                   <Button
                     variant="primary"
@@ -185,26 +144,6 @@ export default async function HomePage() {
                     List Your Squad for Free
                   </Button>
                 </Link>
-              </div>
-
-              {/* High-Impact Trust Metrics Bar (4 Pillars) */}
-              <div className="pt-3 grid grid-cols-2 sm:grid-cols-4 gap-2 text-left">
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300">
-                  <span className="font-bold text-[#22C55E] block">🛡️ 100% Guarantee</span>
-                  <span className="text-[10px] text-slate-400">Money-back escrow</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300">
-                  <span className="font-bold text-amber-400 block">✅ Konami ID Verified</span>
-                  <span className="text-[10px] text-slate-400">Clean credentials check</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300">
-                  <span className="font-bold text-[#22C55E] block">⚡ Instant M-Pesa</span>
-                  <span className="text-[10px] text-slate-400">Payout upon release</span>
-                </div>
-                <div className="p-2.5 rounded-xl bg-slate-900/80 border border-slate-800 text-[11px] text-slate-300">
-                  <span className="font-bold text-indigo-400 block">🔒 24/7 Moderation</span>
-                  <span className="text-[10px] text-slate-400">Executive dispute desk</span>
-                </div>
               </div>
             </div>
 
@@ -298,92 +237,10 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 2. REAL-TIME ESCROW TELEMETRY MARQUEE */}
-      <div className="bg-[#090D16] border-b border-slate-800 py-3 overflow-hidden">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex items-center justify-between gap-6 text-xs overflow-x-auto no-scrollbar whitespace-nowrap">
-            <div className="flex items-center gap-2 text-slate-300 shrink-0">
-              <span className="w-2 h-2 rounded-full bg-[#22C55E] animate-ping" />
-              <span className="font-mono font-bold text-[#22C55E]">LIPA NA M-PESA TILL 1572931</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-slate-400">Escrow Vault Active</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300 shrink-0">
-              <Clock className="w-3.5 h-3.5 text-[#FBBF24]" />
-              <span className="font-semibold text-white">24H Mandatory Buyer Inspection</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-slate-400">Zero Prepayment Risk</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300 shrink-0">
-              <Lock className="w-3.5 h-3.5 text-indigo-400" />
-              <span className="font-semibold text-white">AES-256 Vault Transfer</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-slate-400">Instant Konami 2FA Link</span>
-            </div>
-            <div className="flex items-center gap-2 text-slate-300 shrink-0">
-              <BadgeCheck className="w-3.5 h-3.5 text-[#22C55E]" />
-              <span className="font-semibold text-white">Kenya DPA (2019) Compliant</span>
-              <span className="text-slate-600">|</span>
-              <span className="text-slate-400">Gov. Regulated Standard</span>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* 3. CORE INSTITUTIONAL TRUST PILLARS (Healthline-style clean 4-card ribbon) */}
-      <section className="py-10 bg-[#0F172A] border-b border-slate-800">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
-            <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[#22C55E] flex items-center justify-center">
-                <ShieldCheck className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-white">Safaricom Till 1572931</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Direct integration with Safaricom Daraja API v2. Payouts disbursed only after buyer approves.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
-                <Clock className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-white">24-Hour Inspection</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Log into eFootball on your phone, test the squad, and link your credentials before money moves.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-400 flex items-center justify-center">
-                <Lock className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-white">AES-256 Encrypted Transfer</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Konami ID passwords and backup codes are stored with authenticated encryption and purged post-sale.
-              </p>
-            </div>
-
-            <div className="p-5 rounded-2xl bg-[#111827] border border-slate-800 space-y-2">
-              <div className="w-10 h-10 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-[#22C55E] flex items-center justify-center">
-                <Phone className="w-5 h-5" />
-              </div>
-              <h3 className="text-sm font-bold text-white">Nairobi Helpline Desk</h3>
-              <p className="text-xs text-slate-400 leading-relaxed">
-                Direct assistance from administrator Brian Okibo on WhatsApp (+254 794 400 365) with 5-minute response.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* 4. "FRIDAY DROPS" FLASH SALE MODULE (Up to 50% OFF with dynamic EAT countdown) */}
+      {/* 2. "FRIDAY DROPS" FLASH SALE MODULE (Up to 50% OFF with dynamic EAT countdown) */}
       <FridayDropsSection listings={listings} />
 
-      {/* 5. 5-STEP ESCROW VISUALIZER & CALLOUT BOX */}
-      <EscrowStepsVisualizer />
-
-      {/* 6. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
+      {/* 3. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
       <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
@@ -474,6 +331,9 @@ export default async function HomePage() {
         </div>
       </section>
 
+      {/* 4. 5-STEP ESCROW VISUALIZER & CALLOUT BOX */}
+      <EscrowStepsVisualizer />
+
       {/* 5. GOOGLE-COMPLIANT ADVERTISEMENT BANNER */}
       <section className="py-6 bg-[#090D16] border-b border-slate-800">
         <div className="max-w-5xl mx-auto px-4">
@@ -546,40 +406,32 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 7. COMPETITIVE TOURNAMENTS & KNOCKOUT CUPS (Real Supabase Data) */}
-      <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
-                <Trophy className="w-3.5 h-3.5" />
-                <span>eFootball Kenya Cups</span>
+      {/* 6. COMPETITIVE TOURNAMENTS & KNOCKOUT CUPS (Rendered only when active cups exist) */}
+      {tournaments.length > 0 && (
+        <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
+                  <Trophy className="w-3.5 h-3.5" />
+                  <span>eFootball Kenya Cups</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
+                  Competitive Knockout Tournaments
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                  Compete 1v1 with real match bracket tracking and verified Safaricom M-Pesa prize payouts.
+                </p>
               </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
-                Competitive Knockout Tournaments
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                Compete 1v1 with real match bracket tracking and verified Safaricom M-Pesa prize payouts.
-              </p>
+              <Link
+                href="/tournaments"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline shrink-0"
+              >
+                <span>View All Tournaments & Brackets</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-            <Link
-              href="/tournaments"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline shrink-0"
-            >
-              <span>View All Tournaments & Brackets</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
-          </div>
 
-          {tournaments.length === 0 ? (
-            <div className="rounded-3xl bg-[#111827] border border-slate-800 p-8 text-center max-w-lg mx-auto">
-              <Trophy className="w-10 h-10 text-slate-500 mx-auto mb-2 opacity-60" />
-              <h3 className="text-base font-bold text-white">No tournaments currently registering</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                New knockout cups are published weekly. Check back or speak to our desk lead on WhatsApp!
-              </p>
-            </div>
-          ) : (
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {tournaments.map((t) => (
                 <div
@@ -621,44 +473,36 @@ export default async function HomePage() {
                 </div>
               ))}
             </div>
-          )}
-        </div>
-      </section>
-
-      {/* 8. EDITORIAL BULLETINS & SCAMMER ALERTS (Healthline-style news & alerts) */}
-      <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0F172A]">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-1">
-                <Newspaper className="w-3.5 h-3.5" />
-                <span>Verified Alerts</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
-                News & Scammer Warnings
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                Official game updates, fraud advisories, and Kenyan community notices.
-              </p>
-            </div>
-            <Link
-              href="/news"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] hover:underline shrink-0"
-            >
-              <span>Read All Bulletins</span>
-              <ArrowRight className="w-3.5 h-3.5" />
-            </Link>
           </div>
+        </section>
+      )}
 
-          {articles.length === 0 ? (
-            <div className="rounded-3xl bg-[#111827] border border-slate-800 p-8 text-center max-w-lg mx-auto">
-              <Newspaper className="w-10 h-10 text-slate-500 mx-auto mb-2 opacity-60" />
-              <h3 className="text-base font-bold text-white">No published bulletins today</h3>
-              <p className="text-xs text-slate-400 mt-1">
-                Verified warnings and eFootball updates will appear here when published by the administration.
-              </p>
+      {/* 7. EDITORIAL BULLETINS & SCAMMER ALERTS (Rendered only when articles exist) */}
+      {articles.length > 0 && (
+        <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0F172A]">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
+              <div>
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-1">
+                  <Newspaper className="w-3.5 h-3.5" />
+                  <span>Verified Alerts</span>
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
+                  News & Scammer Warnings
+                </h2>
+                <p className="text-xs sm:text-sm text-slate-400 mt-1">
+                  Official game updates, fraud advisories, and Kenyan community notices.
+                </p>
+              </div>
+              <Link
+                href="/news"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] hover:underline shrink-0"
+              >
+                <span>Read All Bulletins</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
             </div>
-          ) : (
+
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
               {articles.map((article) => {
                 const isAlert = article.category === "scammer_alert";
@@ -700,9 +544,9 @@ export default async function HomePage() {
                 );
               })}
             </div>
-          )}
-        </div>
-      </section>
+          </div>
+        </section>
+      )}
 
       {/* 9. INTERACTIVE FAQ ACCORDION (Matches Schema.org FAQPage for Google Search) */}
       <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
