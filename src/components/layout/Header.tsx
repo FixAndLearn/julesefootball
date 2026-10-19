@@ -443,52 +443,71 @@ export function Header() {
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-emerald-500/20 bg-[#070D18]/98 backdrop-blur-2xl px-4 py-5 space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto">
+        <div className="lg:hidden border-t border-emerald-500/20 bg-[#070D18]/98 backdrop-blur-2xl px-4 py-4 space-y-3.5 max-h-[calc(100vh-4rem)] overflow-y-auto">
           {/* User profile card or guest action on mobile */}
           {isAuthenticated ? (
-            <div className="p-3 rounded-xl bg-[#111827] border border-[#1F2937] space-y-2">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-lg bg-gradient-to-tr from-[#FBBF24] to-[#22C55E] text-[#0B1220] font-bold text-sm flex items-center justify-center">
-                  {getInitials(displayName)}
+            <div className="p-3 rounded-2xl bg-pitch-surface/90 border border-pitch-border space-y-2.5 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center shrink-0 shadow-md">
+                    {getInitials(displayName)}
+                  </div>
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1.5">
+                      <p className="text-xs font-bold text-slate-100 truncate">{displayName}</p>
+                      {profile?.is_verified_seller && (
+                        <span className="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded-full shrink-0">
+                          Verified
+                        </span>
+                      )}
+                    </div>
+                    <p className="text-[11px] text-slate-400 truncate">{user?.email}</p>
+                  </div>
                 </div>
-                <div className="min-w-0 flex-1">
-                  <p className="text-sm font-bold text-[#F8FAFC] truncate">{displayName}</p>
-                  <p className="text-xs text-[#94A3B8] truncate">{user?.email}</p>
-                </div>
+
+                {isAdminUser && (
+                  <Link
+                    href="/admin"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold flex items-center gap-1 shrink-0"
+                  >
+                    <Crown className="w-3 h-3 text-amber-400" />
+                    <span>Admin</span>
+                  </Link>
+                )}
               </div>
-              <div className="grid grid-cols-2 gap-2 pt-1">
+
+              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-pitch-border/60">
                 <Link
                   href="/dashboard/buyer"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs py-1.5 rounded-lg bg-[#1F2937] border border-[#374151] text-[#F8FAFC]"
+                  className="text-center text-xs py-1.5 rounded-lg bg-pitch-card border border-pitch-border text-slate-200 hover:text-white hover:border-emerald-500/40 font-medium transition-colors"
                 >
                   Buyer Hub
                 </Link>
                 <Link
                   href="/dashboard/seller"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs py-1.5 rounded-lg bg-[#1F2937] border border-[#374151] text-[#F8FAFC]"
+                  className="text-center text-xs py-1.5 rounded-lg bg-pitch-card border border-pitch-border text-slate-200 hover:text-white hover:border-emerald-500/40 font-medium transition-colors"
                 >
                   Seller Hub
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="p-3.5 rounded-xl bg-[#111827] border border-[#1F2937] space-y-3">
+            <div className="p-3.5 rounded-2xl bg-pitch-surface/90 border border-pitch-border space-y-2.5 shadow-lg">
               <div>
-                <p className="text-xs font-bold text-[#F8FAFC]">Join eFootballMarket Kenya</p>
-                <p className="text-[11px] text-[#94A3B8] mt-0.5">
-                  Sign in or create an account to buy, sell, or compete with M-Pesa escrow protection.
-                </p>
+                <p className="text-xs font-bold text-slate-100">Welcome to eFootballMarket</p>
+                <p className="text-[11px] text-slate-400">Kenya&apos;s verified M-Pesa escrow marketplace</p>
               </div>
-              <div className="grid grid-cols-2 gap-2">
+              <div className="grid grid-cols-2 gap-2 pt-1">
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="secondary" size="sm" className="w-full bg-[#1F2937] border border-[#374151] text-[#F8FAFC] text-xs">
+                  <Button variant="secondary" size="sm" className="w-full text-xs py-1.5">
                     Log In
                   </Button>
                 </Link>
                 <Link href="/register" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="primary" size="sm" className="w-full bg-[#22C55E] text-[#0B1220] font-bold hover:bg-[#16a34a] text-xs">
+                  <Button variant="primary" size="sm" className="w-full text-xs py-1.5">
                     Register
                   </Button>
                 </Link>
@@ -496,7 +515,7 @@ export function Header() {
             </div>
           )}
 
-          {/* Mobile Instant Search Bar */}
+          {/* Instant Search Bar */}
           <form onSubmit={handleSearchSubmit} className="relative">
             <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
             <input
@@ -504,193 +523,171 @@ export function Header() {
               placeholder="Search squads (e.g. 3150 OVR, Epics)..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2.5 rounded-xl bg-[#111827] border border-[#1F2937] text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-[#22C55E]"
+              className="w-full pl-9 pr-3 py-2 rounded-xl bg-pitch-surface/90 border border-pitch-border text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-colors"
             />
           </form>
 
+          {/* Primary Quick CTA: Sell Account */}
+          <Link
+            href="/seller/create-listing"
+            title="List & Sell Your eFootball Account"
+            onClick={() => setMobileMenuOpen(false)}
+            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all"
+          >
+            <PlusCircle className="w-4 h-4 stroke-[2.5]" />
+            <span>+ Sell Account (0% Fee)</span>
+          </Link>
+
+          {/* Clean 2-Column Marketplace Grid */}
           <nav role="navigation" aria-label="Mobile Navigation">
-            <ul className="space-y-1 text-sm font-medium text-[#94A3B8]">
-              {isAdminUser && (
-                <li>
-                  <Link
-                    href="/admin"
-                    title="Admin Control Dashboard"
-                    onClick={() => setMobileMenuOpen(false)}
-                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[#FBBF24] font-bold"
-                  >
-                    <span>Admin Control Center</span>
-                    <Crown className="w-4 h-4 text-[#FBBF24]" />
-                  </Link>
-                </li>
-              )}
+            <div className="grid grid-cols-2 gap-2">
+              <Link
+                href="/browse"
+                title="Browse Verified eFootball Mobile Accounts Kenya"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-emerald-500/40 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Sparkles className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-xs font-bold text-slate-100 truncate">{t.browseSquads}</span>
+                  <span className="block text-[10px] text-slate-400 truncate">Catalog</span>
+                </div>
+              </Link>
 
+              <Link
+                href="/escrow-guarantee"
+                title="Safaricom Till 1572931 Escrow Guarantee"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-emerald-500/40 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-xs font-bold text-slate-100 truncate">{t.escrowGuide}</span>
+                  <span className="block text-[10px] text-slate-400 truncate">Till 1572931</span>
+                </div>
+              </Link>
 
-              <li>
-                <Link
-                  href="/browse"
-                  title="Browse Verified eFootball Mobile Accounts Kenya"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-                >
-                  <span>{t.browseSquads}</span>
-                  <Sparkles className="w-4 h-4 text-[#FBBF24]" />
-                </Link>
-              </li>
+              <Link
+                href="/scammer-check"
+                title="Live Kenyan Scammer Blacklist Directory"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-rose-500/40 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
+                  <ShieldAlert className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-xs font-bold text-slate-100 truncate">{t.scammerCheck}</span>
+                  <span className="block text-[10px] text-slate-400 truncate">Blacklist</span>
+                </div>
+              </Link>
 
-              <li>
-                <Link
-                  href="/friday-drops"
-                  title="Friday Flash Drops - Up to 35% OFF Accounts"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold"
-                >
-                  <span>{t.fridayDrops}</span>
-                  <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-                </Link>
-              </li>
+              <Link
+                href="/middleman"
+                title="Bring-Your-Own-Deal Middleman Escrow"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-emerald-500/40 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
+                  <Handshake className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-xs font-bold text-slate-100 truncate">Middleman</span>
+                  <span className="block text-[10px] text-slate-400 truncate">Custom Deals</span>
+                </div>
+              </Link>
 
-              <li>
-                <Link
-                  href="/scammer-check"
-                  title="Live Kenyan Scammer Blacklist Directory"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold"
-                >
-                  <span>{t.scammerCheck}</span>
-                  <ShieldAlert className="w-4 h-4 text-rose-400" />
-                </Link>
-              </li>
+              <Link
+                href="/wanted"
+                title="Wanted Squads & Formations Buyer Board"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-amber-500/40 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                  <Target className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-xs font-bold text-slate-100 truncate">Wanted Board</span>
+                  <span className="block text-[10px] text-slate-400 truncate">Buyer Requests</span>
+                </div>
+              </Link>
 
-              <li>
-                <Link
-                  href="/escrow-guarantee"
-                  title="Safaricom Till 1572931 Escrow Guarantee"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-                >
-                  <span>{t.escrowGuide}</span>
-                  <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/news"
-                  title="eFootball Community News & Patch Notes"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-                >
-                  <span>{t.communityBulletin}</span>
-                  <Newspaper className="w-4 h-4 text-[#94A3B8]" />
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/middleman"
-                  title="Bring-Your-Own-Deal Middleman Escrow"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#22C55E] font-semibold"
-                >
-                  <span>Bring-Your-Own-Deal Middleman</span>
-                  <Handshake className="w-4 h-4 text-[#22C55E]" />
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/tournaments"
-                  title="Competitive eFootball Tournaments Kenya"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-                >
-                  <span>Tournaments & Brackets</span>
-                  <Trophy className="w-4 h-4 text-[#FBBF24]" />
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/wanted"
-                  title="Wanted Squads & Formations Buyer Board"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-                >
-                  <span>Wanted Squads (Buyer Requests)</span>
-                  <Target className="w-4 h-4 text-[#FBBF24]" />
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/seller/create-listing"
-                  title="List & Sell Your eFootball Account"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#22C55E] to-emerald-400 text-[#0B1220] font-black text-xs shadow-lg shadow-emerald-950/40"
-                >
-                  <span>{t.sellAccount}</span>
-                  <PlusCircle className="w-4 h-4 stroke-[3]" />
-                </Link>
-              </li>
-
-              <li>
-                <Link
-                  href="/notifications"
-                  title="Account Notifications & Escrow Alerts"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] hover:text-[#F8FAFC]"
-                >
-                  <span>Notifications</span>
-                  <Bell className="w-4 h-4 text-[#94A3B8]" />
-                </Link>
-              </li>
-
-              <li>
-                <a
-                  href="https://wa.me/254794400365"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  onClick={() => setMobileMenuOpen(false)}
-                  title="Contact WhatsApp Escrow Desk Support"
-                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#111827] border border-[#1F2937] text-[#F8FAFC] text-xs font-semibold"
-                >
-                  <span>WhatsApp Support: 0794400365</span>
-                  <MessageCircle className="w-4 h-4 text-emerald-400" />
-                </a>
-              </li>
-            </ul>
+              <Link
+                href="/tournaments"
+                title="Competitive eFootball Tournaments Kenya"
+                onClick={() => setMobileMenuOpen(false)}
+                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-amber-500/40 transition-colors"
+              >
+                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+                  <Trophy className="w-3.5 h-3.5" />
+                </div>
+                <div className="min-w-0">
+                  <span className="block text-xs font-bold text-slate-100 truncate">Tournaments</span>
+                  <span className="block text-[10px] text-slate-400 truncate">Brackets & Cups</span>
+                </div>
+              </Link>
+            </div>
           </nav>
 
-          {isAuthenticated && (
-            <div className="pt-2 border-t border-[#1F2937] space-y-2">
+          {/* Compact Bottom Utilities Row */}
+          <div className="pt-2.5 border-t border-pitch-border/80 flex items-center justify-between text-xs text-slate-400">
+            <Link
+              href="/news"
+              title="eFootball Community News & Bulletin"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center gap-1.5 hover:text-white transition-colors"
+            >
+              <Newspaper className="w-3.5 h-3.5 text-slate-400" />
+              <span>Bulletin</span>
+            </Link>
+
+            <a
+              href="https://wa.me/254794400365"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileMenuOpen(false)}
+              title="Contact WhatsApp Escrow Desk Support"
+              className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
+            >
+              <MessageCircle className="w-3.5 h-3.5" />
+              <span>WhatsApp Desk</span>
+            </a>
+
+            {isAuthenticated ? (
               <Link
                 href="/profile"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#111827] border border-[#1F2937] text-white text-xs font-semibold"
+                className="flex items-center gap-1.5 hover:text-white transition-colors"
               >
-                <span>Profile &amp; Security Settings</span>
-                <UserIcon className="w-4 h-4 text-brand-400" />
+                <UserIcon className="w-3.5 h-3.5 text-slate-400" />
+                <span>Settings</span>
               </Link>
-
+            ) : (
               <Link
-                href="/invite"
+                href="/escrow-guarantee"
                 onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#111827] border border-[#1F2937] text-white text-xs font-semibold"
+                className="flex items-center gap-1.5 hover:text-white transition-colors"
               >
-                <span>Invite Friends &amp; Traders</span>
-                <Users className="w-4 h-4 text-emerald-400" />
+                <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
+                <span>Escrow</span>
               </Link>
+            )}
 
+            {isAuthenticated && (
               <button
                 type="button"
                 onClick={handleSignOut}
-                className="w-full flex items-center justify-center gap-2 py-2 rounded-lg bg-rose-950/40 border border-rose-800/60 text-rose-300 text-xs font-bold"
+                className="flex items-center gap-1 text-rose-400 hover:text-rose-300 transition-colors font-medium"
               >
-                <LogOut className="w-4 h-4" />
+                <LogOut className="w-3.5 h-3.5" />
                 <span>Sign Out</span>
               </button>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </header>

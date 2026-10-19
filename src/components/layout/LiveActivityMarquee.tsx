@@ -118,7 +118,7 @@ export function LiveActivityMarquee() {
   const marqueeList = items.concat(items);
 
   return (
-    <div className="w-full bg-[#070B14] border-b border-slate-800/80 overflow-hidden py-1.5 text-[11px] relative select-none">
+    <div className="hidden sm:block w-full bg-[#060B14] border-b border-pitch-border overflow-hidden py-1.5 text-[11px] relative select-none">
       <div className="flex items-center">
         {/* Static Prefix pill on larger screens */}
         <div className="hidden md:flex items-center gap-1.5 pl-4 pr-3 py-0.5 border-r border-slate-800 bg-[#070B14] shrink-0 z-10 text-slate-400 font-mono font-semibold">

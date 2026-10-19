@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Sparkles, Flame, ShieldAlert, PlusCircle } from "lucide-react";
+import { Home, Sparkles, ShieldCheck, ShieldAlert, PlusCircle } from "lucide-react";
 import { useLanguage } from "@/context/LanguageContext";
 
 export function MobileBottomNav() {
@@ -42,19 +42,7 @@ export function MobileBottomNav() {
       label: "Browse",
       href: "/browse",
       icon: Sparkles,
-      isActive: pathname.startsWith("/browse") || pathname.startsWith("/listings"),
-    },
-    {
-      label: "Drops",
-      href: "/friday-drops",
-      icon: Flame,
-      isActive: pathname.startsWith("/friday-drops"),
-    },
-    {
-      label: "Blacklist",
-      href: "/scammer-check",
-      icon: ShieldAlert,
-      isActive: pathname.startsWith("/scammer-check"),
+      isActive: pathname.startsWith("/browse"),
     },
     {
       label: "Sell",
@@ -63,12 +51,24 @@ export function MobileBottomNav() {
       highlight: true,
       isActive: pathname.startsWith("/seller"),
     },
+    {
+      label: "Escrow",
+      href: "/escrow-guarantee",
+      icon: ShieldCheck,
+      isActive: pathname.startsWith("/escrow-guarantee"),
+    },
+    {
+      label: "Blacklist",
+      href: "/scammer-check",
+      icon: ShieldAlert,
+      isActive: pathname.startsWith("/scammer-check"),
+    },
   ];
 
   return (
     <nav
       aria-label="Mobile Bottom Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#090D16]/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-1.5 shadow-2xl safe-area-pb"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#070D18]/95 backdrop-blur-xl border-t border-pitch-border px-2 py-1.5 shadow-[0_-4px_25px_rgba(0,0,0,0.6)] safe-area-pb"
     >
       <div className="grid grid-cols-5 gap-1 items-center max-w-md mx-auto">
         {navItems.map((item) => {
@@ -79,20 +79,30 @@ export function MobileBottomNav() {
               href={item.href}
               className={`flex flex-col items-center justify-center min-h-[48px] py-1 rounded-xl transition-all relative ${
                 item.highlight
-                  ? "text-emerald-400 font-semibold"
+                  ? "text-slate-950 font-black"
                   : item.isActive
-                  ? "text-emerald-400 bg-slate-900/60 font-semibold"
+                  ? "text-emerald-400 bg-pitch-surface/80 font-semibold"
                   : "text-slate-400 hover:text-white"
               }`}
             >
-              <div className="relative">
-                <Icon
-                  className={`w-5 h-5 transition-transform ${
-                    item.isActive ? "scale-105 stroke-[2.2]" : "stroke-[1.75]"
-                  } ${item.highlight ? "text-emerald-400" : ""}`}
-                />
-              </div>
-              <span className="text-[10px] tracking-tight mt-1 truncate max-w-[60px]">
+              {item.highlight ? (
+                <div className="w-8 h-8 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 flex items-center justify-center shadow-lg shadow-emerald-500/30 -mt-1">
+                  <Icon className="w-4 h-4 stroke-[2.5] text-slate-950" />
+                </div>
+              ) : (
+                <div className="relative">
+                  <Icon
+                    className={`w-5 h-5 transition-transform ${
+                      item.isActive ? "scale-105 stroke-[2.2]" : "stroke-[1.75]"
+                    }`}
+                  />
+                </div>
+              )}
+              <span
+                className={`text-[10px] tracking-tight mt-1 truncate max-w-[60px] ${
+                  item.highlight ? "font-bold text-emerald-400" : ""
+                }`}
+              >
                 {item.label}
               </span>
             </Link>
