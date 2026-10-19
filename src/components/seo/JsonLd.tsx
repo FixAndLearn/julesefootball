@@ -38,7 +38,7 @@ export function JsonLd({ siteUrl = "https://www.efootballmarket.co.ke" }: { site
       telephone: "+254-794-400-365",
       contactType: "customer service",
       areaServed: "KE",
-      availableLanguage: ["English", "Swahili"],
+      availableLanguage: ["English"],
     },
     sameAs: [
       "https://wa.me/254794400365",

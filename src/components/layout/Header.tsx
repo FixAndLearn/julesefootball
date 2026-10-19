@@ -31,8 +31,8 @@ import {
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { LiveActivityMarquee } from "@/components/layout/LiveActivityMarquee";
-import { useLanguage, Language } from "@/context/LanguageContext";
-import { Globe, Flame, ShieldAlert } from "lucide-react";
+import { useLanguage } from "@/context/LanguageContext";
+import { Flame, ShieldAlert } from "lucide-react";
 import Link from "next/link";
 import { useRouter, usePathname } from "next/navigation";
 import { useState, useRef, useEffect } from "react";
@@ -41,15 +41,13 @@ export function Header() {
   const router = useRouter();
   const pathname = usePathname();
   const { user, profile, loading, signOut, isAuthenticated, displayName } = useAuth();
-  const { language, setLanguage, t } = useLanguage();
+  const { t } = useLanguage();
   const isAdminUser = isUserAdmin(user?.email, profile?.role);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
-  const [langDropdownOpen, setLangDropdownOpen] = useState(false);
   const [moreNavOpen, setMoreNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
-  const langRef = useRef<HTMLDivElement>(null);
   const moreNavRef = useRef<HTMLLIElement>(null);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
@@ -66,9 +64,6 @@ export function Header() {
     function handleClickOutside(event: MouseEvent) {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target as Node)) {
         setDropdownOpen(false);
-      }
-      if (langRef.current && !langRef.current.contains(event.target as Node)) {
-        setLangDropdownOpen(false);
       }
       if (moreNavRef.current && !moreNavRef.current.contains(event.target as Node)) {
         setMoreNavOpen(false);
@@ -296,53 +291,6 @@ export function Header() {
 
           {/* Right Action Buttons */}
           <div className="flex items-center gap-2 sm:gap-2.5 xl:gap-3 shrink-0">
-            {/* Language Switcher Dropdown (Desktop / Tablet - Mobile has dedicated drawer toggle) */}
-            <div className="relative shrink-0 hidden sm:block" ref={langRef}>
-              <button
-                type="button"
-                onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1.5 px-2 xl:px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors whitespace-nowrap shrink-0"
-                title="Change language / Badilisha lugha"
-              >
-                <Globe className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                <span className="font-bold uppercase tracking-wider text-[11px] whitespace-nowrap">
-                  {language === "en" ? "EN" : "SW"}
-                </span>
-                <ChevronDown className="w-3 h-3 text-slate-500 shrink-0" />
-              </button>
-
-              {langDropdownOpen && (
-                <div className="absolute right-0 mt-2 w-36 rounded-xl bg-[#111827] border border-slate-800 shadow-2xl py-1 z-50 text-xs animate-in fade-in slide-in-from-top-1">
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLanguage("en");
-                      setLangDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-800 transition-colors ${
-                      language === "en" ? "text-emerald-400 font-bold" : "text-slate-300"
-                    }`}
-                  >
-                    <span>English</span>
-                    {language === "en" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setLanguage("sw");
-                      setLangDropdownOpen(false);
-                    }}
-                    className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-800 transition-colors ${
-                      language === "sw" ? "text-emerald-400 font-bold" : "text-slate-300"
-                    }`}
-                  >
-                    <span>Kiswahili</span>
-                    {language === "sw" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
-                  </button>
-                </div>
-              )}
-            </div>
-
             {/* Prominent Sell Account CTA */}
             <Link href="/seller/create-listing" className="hidden sm:inline-flex shrink-0">
               <Button
@@ -589,31 +537,6 @@ export function Header() {
                 </li>
               )}
 
-              {/* Mobile Language Selector */}
-              <li>
-                <div className="p-2.5 rounded-xl bg-[#111827] border border-[#1F2937] flex items-center justify-between">
-                  <span className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
-                    <Globe className="w-4 h-4 text-[#22C55E]" />
-                    <span>Language:</span>
-                  </span>
-                  <div className="flex items-center gap-1">
-                    {(["en", "sw"] as Language[]).map((l) => (
-                      <button
-                        key={l}
-                        type="button"
-                        onClick={() => setLanguage(l)}
-                        className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase transition-colors ${
-                          language === l
-                            ? "bg-[#22C55E] text-[#0B1220]"
-                            : "bg-slate-800 text-slate-300 hover:text-white"
-                        }`}
-                      >
-                        {l}
-                      </button>
-                    ))}
-                  </div>
-                </div>
-              </li>
 
               <li>
                 <Link
