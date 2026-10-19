@@ -46,15 +46,18 @@ export function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [langDropdownOpen, setLangDropdownOpen] = useState(false);
+  const [moreNavOpen, setMoreNavOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const dropdownRef = useRef<HTMLDivElement>(null);
   const langRef = useRef<HTMLDivElement>(null);
+  const moreNavRef = useRef<HTMLLIElement>(null);
 
   const handleSearchSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/browse?search=${encodeURIComponent(searchQuery.trim())}`);
       setMobileMenuOpen(false);
+      setMoreNavOpen(false);
     }
   };
 
@@ -66,6 +69,9 @@ export function Header() {
       }
       if (langRef.current && !langRef.current.contains(event.target as Node)) {
         setLangDropdownOpen(false);
+      }
+      if (moreNavRef.current && !moreNavRef.current.contains(event.target as Node)) {
+        setMoreNavOpen(false);
       }
     }
     document.addEventListener("mousedown", handleClickOutside);
@@ -174,31 +180,21 @@ export function Header() {
       <LiveActivityMarquee />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20 gap-4 sm:gap-6">
+        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20 gap-3 sm:gap-4 xl:gap-6">
           {/* Logo & Desktop Nav */}
-          <div className="flex items-center gap-6 xl:gap-10 min-w-0">
+          <div className="flex items-center gap-4 xl:gap-8 min-w-0">
             <Logo clickable={true} size="md" />
 
-            <nav role="navigation" aria-label="Main Navigation" className="hidden lg:block">
-              <ul role="menubar" className="flex items-center gap-1 xl:gap-2 text-sm font-medium">
+            <nav role="navigation" aria-label="Main Navigation" className="hidden lg:block shrink-0">
+              <ul role="menubar" className="flex items-center gap-1 xl:gap-1.5 text-xs xl:text-sm font-medium">
                 <li role="none">
                   <Link
                     href="/browse"
                     role="menuitem"
                     title="Browse Verified eFootball Mobile Accounts Kenya"
-                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
                   >
                     {t.browseSquads}
-                  </Link>
-                </li>
-                <li role="none">
-                  <Link
-                    href="/friday-drops"
-                    role="menuitem"
-                    title="Friday Drops - Weekly Flash Sales on Verified Squads"
-                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition-colors whitespace-nowrap shrink-0"
-                  >
-                    {t.fridayDrops}
                   </Link>
                 </li>
                 <li role="none">
@@ -206,7 +202,7 @@ export function Header() {
                     href="/escrow-guarantee"
                     role="menuitem"
                     title="Safaricom Till 1572931 Escrow Protection Guarantee"
-                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
                   >
                     {t.escrowGuide}
                   </Link>
@@ -216,33 +212,96 @@ export function Header() {
                     href="/scammer-check"
                     role="menuitem"
                     title="Live Kenyan Scammer Blacklist Directory"
-                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-rose-300 hover:bg-rose-500/10 transition-colors whitespace-nowrap shrink-0"
+                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-rose-300 hover:bg-rose-500/10 transition-colors whitespace-nowrap shrink-0"
                   >
                     {t.scammerCheck}
                   </Link>
                 </li>
-                <li role="none">
+
+                {/* Direct Links on XL screens (1280px+) */}
+                <li role="none" className="hidden xl:block">
+                  <Link
+                    href="/friday-drops"
+                    role="menuitem"
+                    title="Friday Drops - Weekly Flash Sales on Verified Squads"
+                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition-colors whitespace-nowrap shrink-0"
+                  >
+                    {t.fridayDrops}
+                  </Link>
+                </li>
+                <li role="none" className="hidden xl:block">
                   <Link
                     href="/news"
                     role="menuitem"
                     title="eFootball Kenya Community Bulletin & News"
-                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                    className="px-2.5 py-1.5 xl:px-3 xl:py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
                   >
                     {t.communityBulletin}
                   </Link>
+                </li>
+
+                {/* More Dropdown on LG screens (1024-1279px) so words never collide or overlap */}
+                <li role="none" className="relative xl:hidden" ref={moreNavRef}>
+                  <button
+                    type="button"
+                    onClick={() => setMoreNavOpen(!moreNavOpen)}
+                    className="flex items-center gap-1 px-2.5 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                    title="More marketplace categories"
+                  >
+                    <span>More</span>
+                    <ChevronDown className={`w-3.5 h-3.5 text-slate-400 transition-transform duration-200 ${moreNavOpen ? "rotate-180 text-white" : ""}`} />
+                  </button>
+
+                  {moreNavOpen && (
+                    <div className="absolute left-0 mt-2 w-48 rounded-xl bg-[#0F172A] border border-slate-800 shadow-2xl py-1.5 z-50 animate-in fade-in slide-in-from-top-1 text-xs font-medium">
+                      <Link
+                        href="/friday-drops"
+                        onClick={() => setMoreNavOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 transition-colors"
+                      >
+                        <Flame className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>{t.fridayDrops}</span>
+                      </Link>
+                      <Link
+                        href="/news"
+                        onClick={() => setMoreNavOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-slate-300 hover:text-white hover:bg-slate-800/70 transition-colors"
+                      >
+                        <Newspaper className="w-4 h-4 text-slate-400 shrink-0" />
+                        <span>{t.communityBulletin}</span>
+                      </Link>
+                      <div className="my-1 border-t border-slate-800" />
+                      <Link
+                        href="/wanted"
+                        onClick={() => setMoreNavOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-slate-300 hover:text-emerald-300 hover:bg-slate-800/70 transition-colors"
+                      >
+                        <Target className="w-4 h-4 text-emerald-400 shrink-0" />
+                        <span>Wanted Board</span>
+                      </Link>
+                      <Link
+                        href="/tournaments"
+                        onClick={() => setMoreNavOpen(false)}
+                        className="flex items-center gap-2.5 px-3.5 py-2 text-slate-300 hover:text-amber-300 hover:bg-slate-800/70 transition-colors"
+                      >
+                        <Trophy className="w-4 h-4 text-amber-400 shrink-0" />
+                        <span>Tournaments</span>
+                      </Link>
+                    </div>
+                  )}
                 </li>
               </ul>
             </nav>
           </div>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
+          <div className="flex items-center gap-2 sm:gap-2.5 xl:gap-3 shrink-0">
             {/* Language Switcher Dropdown (Desktop / Tablet - Mobile has dedicated drawer toggle) */}
             <div className="relative shrink-0 hidden sm:block" ref={langRef}>
               <button
                 type="button"
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors whitespace-nowrap shrink-0"
+                className="flex items-center gap-1.5 px-2 xl:px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors whitespace-nowrap shrink-0"
                 title="Change language / Badilisha lugha"
               >
                 <Globe className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
@@ -289,10 +348,11 @@ export function Header() {
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs flex items-center gap-1.5 whitespace-nowrap active:scale-95 transition-all"
+                className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs px-3 xl:px-4 py-2 sm:py-2.5 rounded-xl shadow-xs flex items-center gap-1.5 whitespace-nowrap active:scale-95 transition-all shrink-0"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[3] shrink-0" />
-                <span className="whitespace-nowrap">{t.sellAccount}</span>
+                <span className="hidden xl:inline whitespace-nowrap">{t.sellAccount}</span>
+                <span className="xl:hidden whitespace-nowrap">Sell</span>
               </Button>
             </Link>
 
@@ -417,17 +477,17 @@ export function Header() {
               </div>
             ) : (
               /* Guest Actions (Log In & Create Account) */
-              <div className="hidden sm:flex items-center gap-2">
-                <Link href="/login">
-                  <Button variant="secondary" size="sm" className="bg-[#111827] border-[#1F2937] text-[#F8FAFC] hover:bg-[#1F2937] text-xs font-semibold px-3 py-1.5 rounded-lg">
+              <div className="hidden sm:flex items-center gap-1.5 xl:gap-2 shrink-0">
+                <Link href="/login" className="shrink-0">
+                  <Button variant="secondary" size="sm" className="bg-[#111827] border-[#1F2937] text-[#F8FAFC] hover:bg-[#1F2937] text-xs font-semibold px-2.5 xl:px-3 py-1.5 rounded-lg whitespace-nowrap shrink-0">
                     <UserIcon className="w-3.5 h-3.5 mr-1 text-[#94A3B8]" />
-                    Log In
+                    <span>Log In</span>
                   </Button>
                 </Link>
-                <Link href="/register">
-                  <Button variant="primary" size="sm" className="bg-[#1F2937] border border-[#374151] hover:border-[#FBBF24]/60 text-[#FBBF24] text-xs font-bold px-3 py-1.5 rounded-lg shadow-sm">
+                <Link href="/register" className="shrink-0">
+                  <Button variant="primary" size="sm" className="bg-[#1F2937] border border-[#374151] hover:border-[#FBBF24]/60 text-[#FBBF24] text-xs font-bold px-2.5 xl:px-3 py-1.5 rounded-lg shadow-sm whitespace-nowrap shrink-0">
                     <Sparkles className="w-3.5 h-3.5 mr-1 text-[#FBBF24]" />
-                    Register
+                    <span>Register</span>
                   </Button>
                 </Link>
               </div>
