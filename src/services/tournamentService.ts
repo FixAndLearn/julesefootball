@@ -191,9 +191,24 @@ export class TournamentService {
       return { success: false, error: "This tournament is already full." };
     }
 
+    // Require valid community user_id
+    if (!user_id || !user_id.trim()) {
+      return {
+        success: false,
+        error: "Community Membership Required: Only registered members of our community can join tournaments. Please register or log in.",
+      };
+    }
+
     const cleanFriendId = friend_id.trim();
     if (participants.some((p) => p.friend_id.toLowerCase() === cleanFriendId.toLowerCase())) {
       return { success: false, error: "A gamer with this eFootball Friend ID has already registered." };
+    }
+
+    if (participants.some((p) => p.user_id === user_id)) {
+      return {
+        success: false,
+        error: "You are already registered for this tournament with your community account.",
+      };
     }
 
     const participantId = `part-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;

@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useCallback } from "react";
+import Link from "next/link";
 import { Badge } from "@/components/ui/Badge";
 import { Button } from "@/components/ui/Button";
 import { Input } from "@/components/ui/Input";
@@ -34,10 +35,13 @@ import {
   Crown,
   Play,
   RotateCw,
+  Lock,
+  UserPlus,
+  LogIn,
 } from "lucide-react";
 
 export default function TournamentsPage() {
-  const { user, profile } = useAuth();
+  const { user, profile, displayName } = useAuth();
   const isAdmin = isSuperAdminEmail(user?.email) || isUserAdmin(user?.email, profile?.role);
 
   const [tournaments, setTournaments] = useState<Tournament[]>([]);
@@ -46,6 +50,7 @@ export default function TournamentsPage() {
 
   // Modals state
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
+  const [isAuthRequiredOpen, setIsAuthRequiredOpen] = useState(false);
   const [isHostOpen, setIsHostOpen] = useState(false);
   const [isScoreOpen, setIsScoreOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<TournamentMatch | null>(null);
@@ -57,6 +62,18 @@ export default function TournamentsPage() {
   const [submittingReg, setSubmittingReg] = useState(false);
   const [regSuccess, setRegSuccess] = useState(false);
   const [regError, setRegError] = useState("");
+
+  // Auto-prefill registration fields for logged-in community members
+  useEffect(() => {
+    if (profile) {
+      if (!gamerTag && profile.username) {
+        setGamerTag(profile.username);
+      }
+      if (!phone && profile.phone_number) {
+        setPhone(profile.phone_number);
+      }
+    }
+  }, [profile, gamerTag, phone]);
 
   // Host Tournament Form State
   const [hostTitle, setHostTitle] = useState("");
@@ -139,8 +156,14 @@ export default function TournamentsPage() {
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedTourney) return;
-    setRegError("");
 
+    if (!user) {
+      setIsRegisterOpen(false);
+      setIsAuthRequiredOpen(true);
+      return;
+    }
+
+    setRegError("");
     setSubmittingReg(true);
     try {
       const res = await fetch("/api/tournaments", {
@@ -371,6 +394,50 @@ export default function TournamentsPage() {
         </div>
       </div>
 
+      {/* Community Membership Required Notice Banner for Guests */}
+      {!loading && !user && (
+        <div className="relative overflow-hidden rounded-3xl bg-gradient-to-r from-amber-500/10 via-pitch-card to-emerald-500/10 border border-amber-500/30 p-5 sm:p-6 shadow-xl flex flex-col md:flex-row items-start md:items-center justify-between gap-5 animate-in fade-in">
+          <div className="flex items-start sm:items-center gap-4">
+            <div className="w-12 h-12 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center shrink-0">
+              <Lock className="w-6 h-6" />
+            </div>
+            <div className="space-y-1">
+              <div className="flex items-center gap-2">
+                <span className="text-xs font-black uppercase tracking-wider text-amber-400">
+                  Community Rule
+                </span>
+                <span className="text-[10px] bg-amber-400/15 text-amber-300 font-bold px-2 py-0.5 rounded-full border border-amber-400/20">
+                  Members Only
+                </span>
+              </div>
+              <h3 className="text-base sm:text-lg font-bold text-white font-display">
+                You Must Register an Account to Join Tournaments
+              </h3>
+              <p className="text-xs text-slate-300 max-w-2xl leading-relaxed">
+                Tournaments feature real M-Pesa prize money via Till <strong>1572931</strong>. To prevent smurfing, maintain fair brackets, and guarantee instant payouts, you must be a registered member of our eFootballMarket community.
+              </p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3 w-full sm:w-auto shrink-0 pt-2 md:pt-0">
+            <Link
+              href="/register?redirect=/tournaments"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-lg shadow-amber-500/20 transition-all text-center"
+            >
+              <UserPlus className="w-4 h-4" />
+              <span>Register to Compete</span>
+            </Link>
+            <Link
+              href="/login?redirect=/tournaments"
+              className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-pitch-card hover:bg-slate-800 text-slate-200 border border-pitch-border font-bold text-xs transition-all text-center"
+            >
+              <LogIn className="w-4 h-4" />
+              <span>Sign In</span>
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Tournaments Grid Header */}
       <div className="space-y-6">
         <div className="flex items-center justify-between">
@@ -517,6 +584,10 @@ export default function TournamentsPage() {
                           disabled={isFull}
                           onClick={() => {
                             setSelectedTourney(t);
+                            if (!user) {
+                              setIsAuthRequiredOpen(true);
+                              return;
+                            }
                             setIsRegisterOpen(true);
                             setRegSuccess(false);
                             setRegError("");
@@ -842,6 +913,103 @@ export default function TournamentsPage() {
       {/* Certified Partner Ad Slot */}
       <AdBanner slot="tournaments_bottom" format="horizontal" />
 
+      {/* MODAL 0: Community Membership Required Guard Modal */}
+      {isAuthRequiredOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/85 backdrop-blur-md animate-in fade-in">
+          <div className="w-full max-w-md bg-pitch-surface border border-pitch-border rounded-3xl shadow-2xl overflow-hidden flex flex-col">
+            <div className="p-6 border-b border-pitch-border bg-gradient-to-r from-amber-950/60 via-pitch-card to-pitch-surface flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-400 flex items-center justify-center">
+                  <Lock className="w-5 h-5" />
+                </div>
+                <div>
+                  <h3 className="text-base font-bold text-white">Community Registration Required</h3>
+                  <p className="text-xs text-amber-400/90 font-medium">Official Tournament Entry Protocol</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                onClick={() => setIsAuthRequiredOpen(false)}
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-all"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+            <div className="p-6 space-y-5">
+              <div className="space-y-2">
+                <h4 className="text-sm font-bold text-white font-display">
+                  Only Registered Members Can Join Tournaments
+                </h4>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  To ensure competitive integrity, prevent bracket abandonment, and guarantee secure M-Pesa prize payouts, all players must be registered members of our eFootball Kenya community.
+                </p>
+              </div>
+
+              {/* Requirement Checklist */}
+              <div className="space-y-2.5 p-4 rounded-2xl bg-pitch-card border border-pitch-border/70 text-xs">
+                <div className="flex items-start gap-2.5 text-slate-300">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white">Fair Play & No Multiple Slots:</strong> One slot per verified community member account.
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5 text-slate-300">
+                  <Award className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white">Instant M-Pesa Payout:</strong> Winnings sent via Safaricom Till 1572931 directly to your phone.
+                  </div>
+                </div>
+                <div className="flex items-start gap-2.5 text-slate-300">
+                  <Swords className="w-4 h-4 text-indigo-400 shrink-0 mt-0.5" />
+                  <div>
+                    <strong className="text-white">Live Match Rooms:</strong> Direct access to opponents, bracket updates, and score submission.
+                  </div>
+                </div>
+              </div>
+
+              {selectedTourney && (
+                <div className="p-3 rounded-xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
+                  <span className="text-slate-400 truncate max-w-[200px]">
+                    Target: <strong className="text-white">{selectedTourney.title}</strong>
+                  </span>
+                  <span className="text-amber-400 font-bold shrink-0">
+                    Prize: {formatCurrency(selectedTourney.prize_pool_kes, "KES")}
+                  </span>
+                </div>
+              )}
+
+              {/* Action Buttons */}
+              <div className="space-y-2.5 pt-1">
+                <Link
+                  href="/register?redirect=/tournaments"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-lg shadow-amber-500/20 transition-all text-center"
+                >
+                  <UserPlus className="w-4 h-4" />
+                  <span>Create Free Account & Join Tournament</span>
+                </Link>
+
+                <Link
+                  href="/login?redirect=/tournaments"
+                  className="w-full inline-flex items-center justify-center gap-2 py-3 px-4 rounded-xl bg-pitch-card hover:bg-slate-800 border border-pitch-border text-white font-bold text-xs transition-all text-center"
+                >
+                  <LogIn className="w-4 h-4" />
+                  <span>Already Have an Account? Log In</span>
+                </Link>
+
+                <button
+                  type="button"
+                  onClick={() => setIsAuthRequiredOpen(false)}
+                  className="w-full py-2 text-xs text-slate-500 hover:text-slate-400 text-center transition-all"
+                >
+                  Maybe Later
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* MODAL 1: Registration Modal */}
       {isRegisterOpen && selectedTourney && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
@@ -889,6 +1057,26 @@ export default function TournamentsPage() {
                 </div>
               ) : (
                 <>
+                  {/* Verified Member Badge */}
+                  {user && (
+                    <div className="p-3 rounded-2xl bg-pitch-card border border-pitch-border/80 flex items-center justify-between">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                          <ShieldCheck className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="text-[11px] font-bold text-white block">
+                            Community Member Verified
+                          </span>
+                          <span className="text-[10px] text-emerald-400 font-mono">
+                            {displayName || profile?.username || user?.email}
+                          </span>
+                        </div>
+                      </div>
+                      <Badge variant="brand" size="sm">Eligible</Badge>
+                    </div>
+                  )}
+
                   {regError && (
                     <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs">
                       {regError}

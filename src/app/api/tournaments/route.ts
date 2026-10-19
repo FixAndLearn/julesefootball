@@ -103,6 +103,41 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    // Community Membership Check: Require active session or registered profile
+    const supabase = createServerSupabaseClient();
+    const {
+      data: { user: authUser },
+    } = await supabase.auth.getUser();
+
+    const verifiedUserId = authUser?.id || (user_id ? String(user_id).trim() : null);
+
+    if (!verifiedUserId) {
+      return NextResponse.json(
+        {
+          error:
+            "Community Membership Required: Only registered members of our eFootballMarket community can join tournaments. Please sign up or log in first.",
+        },
+        { status: 401 }
+      );
+    }
+
+    // Verify account exists in public.profiles table
+    const { data: memberProfile } = await supabase
+      .from("profiles")
+      .select("id, username")
+      .eq("id", verifiedUserId)
+      .maybeSingle();
+
+    if (!memberProfile && !authUser) {
+      return NextResponse.json(
+        {
+          error:
+            "Community Membership Required: No registered account found for this user ID. Please register to enter tournaments.",
+        },
+        { status: 401 }
+      );
+    }
+
     const normalizedPhone = normalizePhoneNumber(phone_number).international;
 
     const result = await TournamentService.registerParticipant({
@@ -110,7 +145,7 @@ export async function POST(req: NextRequest) {
       gamer_tag,
       friend_id,
       phone_number: normalizedPhone,
-      user_id,
+      user_id: verifiedUserId,
     });
 
     if (!result.success) {
