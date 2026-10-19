@@ -128,7 +128,7 @@ export async function watermarkSquadImage(
               resolve(watermarkedFile);
             },
             outputType,
-            0.92 // 92% high quality
+            0.98 // 98% Ultra-HD quality preservation
           );
         } catch (err) {
           console.warn("Watermarking failed, falling back to original image:", err);

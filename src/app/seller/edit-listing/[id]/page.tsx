@@ -6,22 +6,21 @@ import {
   ArrowLeft,
   CheckCircle2,
   Trash2,
-  Upload,
   UploadCloud,
   Zap,
   AlertCircle,
-  AlertTriangle,
   Loader2,
-  Image as ImageIcon,
+  Camera,
   Save,
   Eye,
-  Trophy,
+  Star,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Listing } from "@/types/database";
+import { watermarkSquadImage } from "@/lib/utils/watermark";
 
 interface UploadedImage {
   url: string;
@@ -33,7 +32,7 @@ export default function EditListingPage() {
   const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
-  const { user, isAuthenticated, loading: authLoading } = useAuth();
+  const { user, loading: authLoading, displayName } = useAuth();
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [initialLoading, setInitialLoading] = useState(true);
@@ -42,42 +41,16 @@ export default function EditListingPage() {
   const [error, setError] = useState("");
   const [successMessage, setSuccessMessage] = useState("");
 
-  // Form states
+  // Streamlined Essential Listing Fields
   const [title, setTitle] = useState("");
-  const [description, setDescription] = useState("");
   const [price, setPrice] = useState("");
   const [platform, setPlatform] = useState("android");
-  const [gameVersion, setGameVersion] = useState("v4.0.0");
-  const [region, setRegion] = useState("Global");
+  const [overallStrength, setOverallStrength] = useState("");
+  const [coinBalance, setCoinBalance] = useState("");
+  const [managerName, setManagerName] = useState("");
   const [status, setStatus] = useState("published");
 
-  // Account Strength & Balances
-  const [accountLevel, setAccountLevel] = useState("");
-  const [overallStrength, setOverallStrength] = useState("");
-  const [gpBalance, setGpBalance] = useState("");
-  const [coinBalance, setCoinBalance] = useState("");
-  const [efootballPoints, setEfootballPoints] = useState("");
-  const [contractTickets, setContractTickets] = useState("");
-
-  // Special Player Cards & Tactics
-  const [epicCount, setEpicCount] = useState("");
-  const [bigTimeCount, setBigTimeCount] = useState("");
-  const [highlightCount, setHighlightCount] = useState("");
-  const [featuredCount, setFeaturedCount] = useState("");
-  const [legendCount, setLegendCount] = useState("");
-  const [keyPlayers, setKeyPlayers] = useState("");
-
-  const [managerName, setManagerName] = useState("");
-  const [formation, setFormation] = useState("");
-  const [primaryPlaystyle, setPrimaryPlaystyle] = useState("quick_counter");
-  const [currentDivision, setCurrentDivision] = useState("");
-  const [highestDivision, setHighestDivision] = useState("");
-
-  // Security & Konami ID Status
-  const [konamiIdStatus, setKonamiIdStatus] = useState("linked_changeable");
-  const [linkedEmailStatus, setLinkedEmailStatus] = useState("transferable_full_access");
-
-  // Real Squad Images State
+  // Real Squad Images State (Up to 5 HD screenshots)
   const [images, setImages] = useState<UploadedImage[]>([]);
   const [uploadingImages, setUploadingImages] = useState(false);
   const [uploadError, setUploadError] = useState("");
@@ -108,41 +81,18 @@ export default function EditListingPage() {
         }
 
         setTitle(l.title || "");
-        setDescription(l.description || "");
         setPrice(String(l.price || ""));
         setPlatform(l.platform || "android");
-        setGameVersion(l.game_version || "v4.0.0");
-        setRegion(l.region || "Global");
-        setStatus(l.status || "published");
-
-        setAccountLevel(String(l.account_level || 1));
         setOverallStrength(String(l.overall_team_strength || ""));
-        setGpBalance(String(l.gp_balance || ""));
-        setCoinBalance(String(l.coin_balance || ""));
-        setEfootballPoints(String(l.efootball_points || ""));
-        setContractTickets(String(l.contract_renewal_tickets || ""));
-
-        setEpicCount(String(l.epic_players_count || ""));
-        setBigTimeCount(String(l.big_time_players_count || ""));
-        setHighlightCount(String(l.highlight_players_count || ""));
-        setFeaturedCount(String(l.featured_players_count || ""));
-        setLegendCount(String(l.legend_players_count || ""));
-        setKeyPlayers(Array.isArray(l.key_players_list) ? l.key_players_list.join(", ") : "");
-
+        setCoinBalance(String(l.coin_balance ?? 0));
         setManagerName(l.manager_name || "");
-        setFormation(l.formation || "");
-        setPrimaryPlaystyle(l.primary_playstyle || "quick_counter");
-        setCurrentDivision(String(l.current_division || ""));
-        setHighestDivision(String(l.highest_division || ""));
-
-        setKonamiIdStatus(l.konami_id_status || "linked_changeable");
-        setLinkedEmailStatus(l.linked_email_status || "transferable_full_access");
+        setStatus(l.status || "published");
 
         if (l.images && l.images.length > 0) {
           setImages(
             l.images.map((img) => ({
               url: img.image_url,
-              fileName: `Squad Image`,
+              fileName: "Squad Screenshot",
               size: 0,
             }))
           );
@@ -157,59 +107,115 @@ export default function EditListingPage() {
     loadListing();
   }, [id, user]);
 
+  // Upload handler for up to 5 HD screenshots
   const handleFilesUpload = async (fileList: FileList | File[]) => {
-    const files = Array.from(fileList);
-    if (!files.length) return;
+    if (!fileList || fileList.length === 0) return;
+    setUploadError("");
 
-    if (images.length + files.length > 5) {
-      setUploadError("Maximum 5 screenshots allowed per listing.");
+    const remainingSlots = 5 - images.length;
+    if (remainingSlots <= 0) {
+      setUploadError("Maximum 5 squad images allowed. Please remove an image first to upload another.");
       return;
     }
 
+    const filesToUpload = Array.from(fileList).slice(0, remainingSlots);
+    if (Array.from(fileList).length > remainingSlots) {
+      setUploadError(`Only ${remainingSlots} more image(s) could be added (maximum 5 screenshots allowed).`);
+    }
+
     setUploadingImages(true);
-    setUploadError("");
 
     try {
-      const uploadPromises = files.map(async (file) => {
-        if (!file.type.startsWith("image/")) {
-          throw new Error(`File "${file.name}" is not an image.`);
+      const validTypes = ["image/jpeg", "image/png", "image/webp", "image/jpg"];
+      const newUploaded: UploadedImage[] = [];
+
+      for (const file of filesToUpload) {
+        if (!validTypes.includes(file.type.toLowerCase())) {
+          throw new Error(`"${file.name}" is not supported. Please upload a real PNG, JPG, or WebP screenshot.`);
         }
-        if (file.size > 15 * 1024 * 1024) {
-          throw new Error(`"${file.name}" exceeds maximum allowed file size of 15MB.`);
+
+        if (file.size > 10 * 1024 * 1024) {
+          throw new Error(`"${file.name}" exceeds 10MB limit.`);
+        }
+
+        // Apply high-fidelity watermark to protect screenshots while preserving HD quality (quality 0.98)
+        let processedFile = file;
+        try {
+          processedFile = await watermarkSquadImage(file, {
+            sellerUsername: displayName || "Trader",
+            websiteUrl: "efootballmarket.co.ke",
+          });
+        } catch (wmErr) {
+          console.warn("Watermark note:", wmErr);
         }
 
         const formData = new FormData();
-        formData.append("file", file);
+        formData.append("file", processedFile);
 
         const res = await fetch("/api/upload", {
           method: "POST",
           body: formData,
         });
 
+        const data = await res.json();
         if (!res.ok) {
-          const errData = await res.json();
-          throw new Error(errData.error || `Upload failed for ${file.name}`);
+          throw new Error(data.error || `Failed to upload ${file.name}`);
         }
 
-        const result = await res.json();
-        return {
-          url: result.url,
+        newUploaded.push({
+          url: data.url,
           fileName: file.name,
           size: file.size,
-        };
-      });
+        });
+      }
 
-      const uploadedResults = await Promise.all(uploadPromises);
-      setImages((prev) => [...prev, ...uploadedResults]);
+      setImages((prev) => [...prev, ...newUploaded]);
     } catch (err: any) {
-      setUploadError(err.message || "Failed to upload screenshots.");
+      setUploadError(err.message || "Failed to upload image(s). Please try again.");
     } finally {
       setUploadingImages(false);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = "";
+      }
     }
   };
 
-  const removeImage = (indexToRemove: number) => {
-    setImages((prev) => prev.filter((_, idx) => idx !== indexToRemove));
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files) {
+      handleFilesUpload(e.target.files);
+    }
+  };
+
+  const handleDrop = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+    if (e.dataTransfer.files) {
+      handleFilesUpload(e.dataTransfer.files);
+    }
+  };
+
+  const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(true);
+  };
+
+  const handleDragLeave = (e: React.DragEvent<HTMLDivElement>) => {
+    e.preventDefault();
+    setIsDragOver(false);
+  };
+
+  const handleRemoveImage = (index: number) => {
+    setImages((prev) => prev.filter((_, i) => i !== index));
+    setUploadError("");
+  };
+
+  const handleSetPrimaryCover = (index: number) => {
+    if (index === 0) return;
+    setImages((prev) => {
+      const selected = prev[index];
+      const rest = prev.filter((_, i) => i !== index);
+      return [selected, ...rest];
+    });
   };
 
   const handleUpdate = async (e: React.FormEvent) => {
@@ -220,7 +226,7 @@ export default function EditListingPage() {
 
     try {
       if (!title.trim()) {
-        throw new Error("Please enter a listing title.");
+        throw new Error("Please enter a listing title for your eFootball squad.");
       }
 
       if (!price || Number(price) < 100) {
@@ -228,51 +234,26 @@ export default function EditListingPage() {
       }
 
       if (!overallStrength || Number(overallStrength) < 2000) {
-        throw new Error("Overall Team Strength (OVR) is required and must be at least 2000.");
+        throw new Error("Overall Team Strength (OVR) is required and must be at least 2000 (e.g. 3120).");
       }
 
       if (images.length === 0) {
-        throw new Error("Please retain at least one squad screenshot.");
+        throw new Error("Please retain at least one real squad screenshot (up to 5 images allowed) in HD quality.");
       }
 
-      const playersList = keyPlayers
-        .split(",")
-        .map((p) => p.trim())
-        .filter(Boolean);
-
-      const parseDiv = (v: string) => {
-        const n = Number(v);
-        if (isNaN(n) || n < 1 || n > 10) return 10;
-        return n;
-      };
+      const coins = coinBalance ? Number(coinBalance) : 0;
+      const coach = managerName.trim();
+      const finalDescription = `${title.trim()} - Verified ${platform.replace(/_/g, " ")} eFootball account with ${overallStrength} OVR collective strength, ${coins.toLocaleString()} eFootball coins${coach ? `, managed by ${coach}` : ""}. Full Safaricom Till 1572931 escrow protection with 24-hour buyer inspection window.`;
 
       const payload = {
         title: title.trim(),
-        description: description.trim(),
+        description: finalDescription,
         price: Number(price),
         platform,
-        game_version: gameVersion,
-        region,
-        status,
-        account_level: accountLevel ? Math.max(1, Number(accountLevel)) : 1,
         overall_team_strength: Number(overallStrength),
-        gp_balance: gpBalance ? Number(gpBalance) : 0,
-        coin_balance: coinBalance ? Number(coinBalance) : 0,
-        efootball_points: efootballPoints ? Number(efootballPoints) : 0,
-        contract_renewal_tickets: 0,
-        epic_players_count: epicCount ? Number(epicCount) : 0,
-        big_time_players_count: bigTimeCount ? Number(bigTimeCount) : 0,
-        highlight_players_count: highlightCount ? Number(highlightCount) : 0,
-        featured_players_count: featuredCount ? Number(featuredCount) : 0,
-        legend_players_count: legendCount ? Number(legendCount) : 0,
-        key_players_list: playersList,
-        manager_name: managerName.trim() || undefined,
-        formation: null,
-        primary_playstyle: primaryPlaystyle,
-        current_division: parseDiv(currentDivision),
-        highest_division: parseDiv(highestDivision),
-        konami_id_status: konamiIdStatus,
-        linked_email_status: linkedEmailStatus,
+        coin_balance: coins,
+        manager_name: coach || null,
+        status,
         image_urls: images.map((img) => img.url),
       };
 
@@ -285,13 +266,13 @@ export default function EditListingPage() {
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || "Failed to update listing.");
+        throw new Error(data.error || "Failed to update listing. Please verify your details.");
       }
 
       setSuccessMessage("Listing updated successfully! Redirecting...");
       setTimeout(() => {
         router.push(`/listings/${id}`);
-      }, 1200);
+      }, 1000);
     } catch (err: any) {
       setError(err.message || "Failed to update listing.");
     } finally {
@@ -328,15 +309,15 @@ export default function EditListingPage() {
   if (initialLoading || authLoading) {
     return (
       <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
-        <Loader2 className="w-8 h-8 text-amber-400 animate-spin" />
+        <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
         <p className="text-sm text-slate-400">Loading listing details...</p>
       </div>
     );
   }
 
   return (
-    <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
-      {/* Navigation */}
+    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+      {/* Navigation & Action Bar */}
       <div className="mb-6 flex items-center justify-between">
         <Link
           href={`/listings/${id}`}
@@ -349,7 +330,7 @@ export default function EditListingPage() {
           <Link href={`/listings/${id}`}>
             <Button variant="secondary" size="sm">
               <Eye className="w-3.5 h-3.5 mr-1" />
-              Preview Listing
+              Preview
             </Button>
           </Link>
           <Button
@@ -360,419 +341,371 @@ export default function EditListingPage() {
             disabled={deleting}
           >
             <Trash2 className="w-3.5 h-3.5 mr-1" />
-            {deleting ? "Deleting..." : "Delete Listing"}
+            {deleting ? "Deleting..." : "Delete"}
           </Button>
         </div>
       </div>
 
       {/* Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-100 font-display">
-          Edit Account Listing
+      <div className="mb-6">
+        <h1 className="text-2xl sm:text-3xl font-bold text-white font-display">
+          Edit eFootball Account Listing
         </h1>
         <p className="text-xs sm:text-sm text-slate-400 mt-1">
-          Update squad details, pricing, player cards, and screenshots for your account.
+          Update squad attributes, pricing, head coach, and HD squad screenshots (up to 5 photos).
         </p>
       </div>
 
       {error && (
-        <div className="mb-6 p-4 rounded-xl bg-rose-950/40 border border-rose-800/80 text-rose-300 text-xs sm:text-sm flex items-start gap-2.5">
-          <AlertCircle className="w-5 h-5 shrink-0 mt-0.5 text-rose-400" />
-          <div>{error}</div>
+        <div className="mb-6 p-4 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-sm flex items-center gap-2">
+          <AlertCircle className="w-5 h-5 shrink-0" />
+          <span>{error}</span>
         </div>
       )}
 
       {successMessage && (
-        <div className="mb-6 p-4 rounded-xl bg-emerald-950/40 border border-emerald-800/80 text-emerald-300 text-xs sm:text-sm flex items-start gap-2.5">
-          <CheckCircle2 className="w-5 h-5 shrink-0 mt-0.5 text-emerald-400" />
-          <div>{successMessage}</div>
+        <div className="mb-6 p-4 rounded-xl bg-emerald-950/60 border border-emerald-800 text-emerald-300 text-sm flex items-center gap-2">
+          <CheckCircle2 className="w-5 h-5 shrink-0" />
+          <span>{successMessage}</span>
         </div>
       )}
 
-      <form onSubmit={handleUpdate} className="space-y-8">
-        {/* Section 1: Screenshots */}
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4">
-          <div className="flex items-center justify-between">
-            <div>
-              <h2 className="text-base font-bold text-slate-100 font-display flex items-center gap-2">
-                <ImageIcon className="w-4 h-4 text-amber-400" />
-                Account Screenshots ({images.length}/5)
-              </h2>
-              <p className="text-xs text-slate-400 mt-0.5">
-                Upload up to 5 squad or player screenshots in original quality.
-              </p>
-            </div>
-            {images.length < 5 && (
-              <Button
-                type="button"
-                variant="secondary"
-                size="sm"
-                onClick={() => fileInputRef.current?.click()}
-                disabled={uploadingImages}
-              >
-                <Upload className="w-3.5 h-3.5 mr-1.5" />
-                Add Image
-              </Button>
-            )}
-          </div>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => e.target.files && handleFilesUpload(e.target.files)}
-          />
-
-          {uploadError && (
-            <p className="text-xs text-rose-400">{uploadError}</p>
-          )}
-
-          {/* Image Previews */}
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
-            {images.map((img, idx) => (
-              <div
-                key={idx}
-                className="group relative aspect-[4/3] rounded-xl overflow-hidden border border-pitch-border bg-slate-900"
-              >
-                <img
-                  src={img.url}
-                  alt={`Screenshot ${idx + 1}`}
-                  className="w-full h-full object-cover"
-                />
-                <button
-                  type="button"
-                  onClick={() => removeImage(idx)}
-                  className="absolute top-1.5 right-1.5 p-1 rounded-md bg-rose-600/90 text-white opacity-80 hover:opacity-100 transition-opacity"
-                  title="Remove image"
-                >
-                  <Trash2 className="w-3.5 h-3.5" />
-                </button>
-                {idx === 0 && (
-                  <span className="absolute bottom-1.5 left-1.5 px-1.5 py-0.5 text-[9px] font-bold bg-amber-500/90 text-slate-950 rounded">
-                    COVER
-                  </span>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Section 2: Core Details */}
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-5">
-          <h2 className="text-base font-bold text-slate-100 font-display">
-            Basic Information
-          </h2>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Listing Title *
-            </label>
-            <Input
-              value={title}
-              onChange={(e) => setTitle(e.target.value)}
-              placeholder="e.g. 3140 OVR Full Epic Milan squad + 1500 Coins"
-              required
-            />
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Price (KES) *
-              </label>
-              <Input
-                type="number"
-                min="100"
-                value={price}
-                onChange={(e) => setPrice(e.target.value)}
-                placeholder="2500"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Gaming Platform *
-              </label>
-              <select
-                value={platform}
-                onChange={(e) => setPlatform(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-xl bg-pitch-card border border-pitch-border text-slate-200 focus:outline-none focus:border-amber-400"
-              >
-                <option value="android">Android (Mobile)</option>
-                <option value="ios">iOS (iPhone/iPad)</option>
-                <option value="pc_steam">PC (Steam)</option>
-                <option value="playstation_4">PlayStation 4</option>
-                <option value="playstation_5">PlayStation 5</option>
-                <option value="xbox_one">Xbox One</option>
-                <option value="xbox_series_x">Xbox Series X|S</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Status
-              </label>
+      <form onSubmit={handleUpdate} className="space-y-6">
+        {/* Streamlined Card: Squad Details */}
+        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-5">
+          <div className="flex items-center justify-between border-b border-pitch-border/60 pb-3">
+            <h2 className="text-base font-bold text-slate-100 font-display flex items-center gap-2">
+              <Zap className="w-4 h-4 text-emerald-400" />
+              <span>Squad Information</span>
+            </h2>
+            <div className="flex items-center gap-2">
+              <label className="text-[11px] text-slate-400">Status:</label>
               <select
                 value={status}
                 onChange={(e) => setStatus(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-xl bg-pitch-card border border-pitch-border text-slate-200 focus:outline-none focus:border-amber-400"
+                className="bg-pitch-card border border-pitch-border rounded-lg px-2.5 py-1 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
               >
-                <option value="published">Published (Visible in Browse)</option>
+                <option value="published">Published</option>
                 <option value="draft">Draft (Hidden)</option>
                 <option value="archived">Archived</option>
               </select>
             </div>
           </div>
 
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Account Description
-            </label>
-            <textarea
-              rows={4}
-              value={description}
-              onChange={(e) => setDescription(e.target.value)}
-              placeholder="Highlight standout players, managers, achievements, and transfer details..."
-              className="w-full px-3.5 py-2.5 text-sm rounded-xl bg-pitch-card border border-pitch-border text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-amber-400"
+          {/* 1. Listing Title */}
+          <div className="space-y-1.5">
+            <Input
+              label="Listing Title"
+              placeholder="e.g. 3200 OVR Squad | 105 Messi + Booster Vieira | 850 Coins"
+              value={title}
+              onChange={(e) => setTitle(e.target.value)}
+              required
             />
           </div>
-        </div>
 
-        {/* Section 3: In-Game Stats & Resources */}
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-5">
-          <h2 className="text-base font-bold text-slate-100 font-display">
-            Squad Strength & In-Game Assets
-          </h2>
-
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Team Strength (OVR) *
-              </label>
+          {/* 2. Grid of Core Attributes */}
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            {/* Price (KES) */}
+            <div className="space-y-1.5">
               <Input
+                label="Listing Price (KES)"
                 type="number"
-                min="2000"
-                value={overallStrength}
-                onChange={(e) => setOverallStrength(e.target.value)}
-                placeholder="3120"
+                placeholder="e.g. 4500"
+                value={price}
+                onChange={(e) => setPrice(e.target.value)}
                 required
               />
+              <div className="pt-0.5 flex items-center gap-1.5">
+                <span className="text-[11px] text-slate-400">Quick set:</span>
+                <button
+                  type="button"
+                  onClick={() => setPrice("2500")}
+                  className={`text-[10px] px-2 py-0.5 rounded border transition-all ${
+                    price === "2500"
+                      ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
+                      : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
+                  }`}
+                >
+                  KES 2,500
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setPrice("4500")}
+                  className={`text-[10px] px-2 py-0.5 rounded border transition-all ${
+                    price === "4500"
+                      ? "bg-amber-400 text-slate-950 font-bold border-amber-300"
+                      : "bg-pitch-card border-pitch-border text-slate-300 hover:border-amber-400/50"
+                  }`}
+                >
+                  KES 4,500
+                </button>
+              </div>
+
+              {Number(price) > 0 && (
+                <div className="mt-2 p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-800/60 text-[11px] space-y-1">
+                  <div className="flex justify-between text-slate-300">
+                    <span>Escrow Fee (0% Promo):</span>
+                    <span className="font-semibold text-emerald-400">KES 0</span>
+                  </div>
+                  <div className="flex justify-between font-bold text-white border-t border-emerald-800/40 pt-1">
+                    <span>Your M-Pesa Payout:</span>
+                    <span className="text-emerald-300 font-mono">KES {Number(price).toLocaleString()}</span>
+                  </div>
+                </div>
+              )}
             </div>
+
+            {/* Gaming Platform */}
             <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Coins Balance
-              </label>
+              <label className="block text-xs font-medium text-slate-300 mb-1.5">Gaming Platform</label>
+              <select
+                value={platform}
+                onChange={(e) => setPlatform(e.target.value)}
+                className="w-full bg-pitch-card border border-pitch-border rounded-lg px-3 py-2 text-xs text-slate-200 focus:outline-none focus:border-brand-500"
+              >
+                <option value="android">Android Mobile</option>
+                <option value="ios">iOS Mobile</option>
+                <option value="pc_steam">PC / Steam</option>
+                <option value="playstation_4">PlayStation 4</option>
+                <option value="playstation_5">PlayStation 5</option>
+                <option value="xbox_one">Xbox One</option>
+                <option value="xbox_series_x">Xbox Series X/S</option>
+              </select>
+              <p className="text-[11px] text-slate-400 mt-1">Select the device OS this squad is played on.</p>
+            </div>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-1">
+            {/* Overall Team Strength (OVR) */}
+            <div className="space-y-1">
               <Input
+                label="Overall Team Strength (OVR)"
                 type="number"
-                min="0"
+                placeholder="e.g. 3120"
+                value={overallStrength}
+                onChange={(e) => setOverallStrength(e.target.value)}
+                required
+              />
+              <div className="flex items-center gap-1 text-[10px] text-slate-400 pt-0.5">
+                <span>Quick:</span>
+                <button
+                  type="button"
+                  onClick={() => setOverallStrength("3120")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  3120
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOverallStrength("3150")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  3150
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setOverallStrength("3200")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  3200
+                </button>
+              </div>
+            </div>
+
+            {/* Number of eFootball Coins */}
+            <div className="space-y-1">
+              <Input
+                label="Number of eFootball Coins"
+                type="number"
+                placeholder="e.g. 850"
                 value={coinBalance}
                 onChange={(e) => setCoinBalance(e.target.value)}
-                placeholder="1200"
               />
+              <div className="flex items-center gap-1 text-[10px] text-slate-400 pt-0.5">
+                <span>Quick:</span>
+                <button
+                  type="button"
+                  onClick={() => setCoinBalance("0")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  0
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCoinBalance("500")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  500
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setCoinBalance("1500")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  1500
+                </button>
+              </div>
             </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                GP Balance
-              </label>
-              <Input
-                type="number"
-                min="0"
-                value={gpBalance}
-                onChange={(e) => setGpBalance(e.target.value)}
-                placeholder="2500000"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                eFootball Points
-              </label>
-              <Input
-                type="number"
-                min="0"
-                value={efootballPoints}
-                onChange={(e) => setEfootballPoints(e.target.value)}
-                placeholder="15000"
-              />
-            </div>
-          </div>
 
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
-            <div>
-              <label className="block text-[11px] font-semibold text-amber-300 mb-1">
-                Epics Count
-              </label>
+            {/* Head Coach / Manager */}
+            <div className="space-y-1">
               <Input
-                type="number"
-                min="0"
-                value={epicCount}
-                onChange={(e) => setEpicCount(e.target.value)}
-                placeholder="8"
+                label="Head Coach / Manager"
+                placeholder="e.g. Pep Guardiola or L. Roman"
+                value={managerName}
+                onChange={(e) => setManagerName(e.target.value)}
               />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-indigo-300 mb-1">
-                Big Time Count
-              </label>
-              <Input
-                type="number"
-                min="0"
-                value={bigTimeCount}
-                onChange={(e) => setBigTimeCount(e.target.value)}
-                placeholder="4"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-emerald-300 mb-1">
-                Highlight Cards
-              </label>
-              <Input
-                type="number"
-                min="0"
-                value={highlightCount}
-                onChange={(e) => setHighlightCount(e.target.value)}
-                placeholder="12"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-purple-300 mb-1">
-                Featured Cards
-              </label>
-              <Input
-                type="number"
-                min="0"
-                value={featuredCount}
-                onChange={(e) => setFeaturedCount(e.target.value)}
-                placeholder="20"
-              />
-            </div>
-            <div>
-              <label className="block text-[11px] font-semibold text-slate-300 mb-1">
-                Legends Count
-              </label>
-              <Input
-                type="number"
-                min="0"
-                value={legendCount}
-                onChange={(e) => setLegendCount(e.target.value)}
-                placeholder="5"
-              />
-            </div>
-          </div>
-
-          <div>
-            <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-              Key Featured Players (comma-separated)
-            </label>
-            <Input
-              value={keyPlayers}
-              onChange={(e) => setKeyPlayers(e.target.value)}
-              placeholder="e.g. Rummenigge, Messi 2015, Vieira, Gullit, Cech, Cruyff"
-            />
-          </div>
-        </div>
-
-        {/* Section 4: Tactics & Divisions */}
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-5">
-          <h2 className="text-base font-bold text-slate-100 font-display">
-            Tactics & Safety Settings
-          </h2>
-
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Primary Playstyle
-              </label>
-              <select
-                value={primaryPlaystyle}
-                onChange={(e) => setPrimaryPlaystyle(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-xl bg-pitch-card border border-pitch-border text-slate-200 focus:outline-none focus:border-amber-400"
-              >
-                <option value="quick_counter">Quick Counter</option>
-                <option value="possession">Possession Game</option>
-                <option value="long_ball_counter">Long Ball Counter</option>
-                <option value="out_wide">Out Wide</option>
-                <option value="long_ball">Long Ball</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Current Division (1 - 10)
-              </label>
-              <Input
-                type="number"
-                min="1"
-                max="10"
-                value={currentDivision}
-                onChange={(e) => setCurrentDivision(e.target.value)}
-                placeholder="1"
-              />
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Highest Division (1 - 10)
-              </label>
-              <Input
-                type="number"
-                min="1"
-                max="10"
-                value={highestDivision}
-                onChange={(e) => setHighestDivision(e.target.value)}
-                placeholder="1"
-              />
-            </div>
-          </div>
-
-          {/* Strict Anti-Googling Policy */}
-          <div className="p-4 rounded-xl bg-rose-500/10 border border-rose-500/40 text-xs text-rose-200 space-y-1.5">
-            <div className="flex items-center gap-2 text-rose-300 font-bold">
-              <AlertTriangle className="w-4 h-4 text-rose-400 shrink-0" />
-              <span>STRICT PLATFORM RULE: Accounts Linked to Google Play (&quot;Googling&quot;) Are Prohibited</span>
-            </div>
-            <p className="text-[11px] text-slate-300 leading-relaxed">
-              Every account listed for sale on this marketplace must be purely Konami ID linked. Google Play links allow sellers to bypass passwords and recover the account, which destroys buyer protection. If your account is linked to Google Play, do not list it.
-            </p>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Konami ID Status
-              </label>
-              <select
-                value={konamiIdStatus}
-                onChange={(e) => setKonamiIdStatus(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-xl bg-pitch-card border border-pitch-border text-slate-200 focus:outline-none focus:border-amber-400"
-              >
-                <option value="linked_changeable">Linked (Email changeable to buyer)</option>
-                <option value="unlinked">Unlinked (Buyer binds directly)</option>
-                <option value="linked_immutable">Linked (Fixed email)</option>
-              </select>
-            </div>
-            <div>
-              <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                Linked Email Status
-              </label>
-              <select
-                value={linkedEmailStatus}
-                onChange={(e) => setLinkedEmailStatus(e.target.value)}
-                className="w-full px-3 py-2 text-sm rounded-xl bg-pitch-card border border-pitch-border text-slate-200 focus:outline-none focus:border-amber-400"
-              >
-                <option value="transferable_full_access">Transferable Full Access</option>
-                <option value="buyer_email_bindable">Buyer Email Bindable</option>
-              </select>
+              <div className="flex items-center gap-1 text-[10px] text-slate-400 pt-0.5">
+                <span>Quick:</span>
+                <button
+                  type="button"
+                  onClick={() => setManagerName("Pep Guardiola")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  Guardiola
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setManagerName("L. Roman")}
+                  className="px-1.5 py-0.5 rounded bg-pitch-card border border-pitch-border text-slate-300 hover:text-amber-300"
+                >
+                  L. Roman
+                </button>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Submit Actions */}
+        {/* Section 2: Real Squad Screenshots (HD Quality, Up to 5 Images) */}
+        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 shadow-xl space-y-4">
+          <div className="flex items-center justify-between border-b border-pitch-border/60 pb-3">
+            <div>
+              <h2 className="text-base font-bold text-slate-100 font-display flex items-center gap-2">
+                <Camera className="w-4 h-4 text-emerald-400" />
+                <span>Squad Screenshots (HD Quality)</span>
+              </h2>
+              <p className="text-xs text-slate-400 mt-0.5">
+                Upload up to 5 real in-game screenshots (Starting XI, Substitutes, Reserves &amp; Trainer). Full HD resolution is maintained.
+              </p>
+            </div>
+            <span className="px-2.5 py-1 rounded-full bg-slate-900 border border-slate-800 text-[11px] font-mono font-bold text-emerald-400 shrink-0">
+              {images.length}/5 Uploaded
+            </span>
+          </div>
+
+          {/* Hidden File Input */}
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/png, image/jpeg, image/webp"
+            multiple
+            className="hidden"
+            onChange={handleFileChange}
+          />
+
+          {/* Drag & Drop Upload Zone */}
+          {images.length < 5 && (
+            <div
+              onDrop={handleDrop}
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onClick={() => fileInputRef.current?.click()}
+              className={`p-6 sm:p-8 rounded-2xl border-2 border-dashed text-center cursor-pointer transition-all duration-200 flex flex-col items-center justify-center gap-2 ${
+                isDragOver
+                  ? "border-emerald-500 bg-emerald-500/10"
+                  : "border-slate-700/80 hover:border-emerald-500/60 bg-slate-900/60 hover:bg-slate-900"
+              }`}
+            >
+              {uploadingImages ? (
+                <div className="flex flex-col items-center gap-2 py-4">
+                  <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
+                  <p className="text-xs text-slate-300 font-medium">Processing &amp; uploading screenshots in HD...</p>
+                </div>
+              ) : (
+                <>
+                  <div className="w-12 h-12 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 mb-1">
+                    <UploadCloud className="w-6 h-6" />
+                  </div>
+                  <p className="text-xs sm:text-sm font-bold text-white">
+                    Click to browse or drag &amp; drop squad screenshots here
+                  </p>
+                  <p className="text-[11px] text-slate-400">
+                    PNG, JPG, or WebP up to 10MB each • Full HD quality preserved
+                  </p>
+                </>
+              )}
+            </div>
+          )}
+
+          {uploadError && (
+            <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800/80 text-rose-300 text-xs flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0" />
+              <span>{uploadError}</span>
+            </div>
+          )}
+
+          {/* Image Thumbnails Grid */}
+          {images.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 pt-2">
+              {images.map((img, idx) => (
+                <div
+                  key={img.url}
+                  className={`group relative rounded-xl overflow-hidden aspect-[16/10] bg-slate-900 border ${
+                    idx === 0 ? "border-emerald-500 ring-2 ring-emerald-500/20" : "border-slate-800"
+                  }`}
+                >
+                  <img
+                    src={img.url}
+                    alt={`Squad screenshot ${idx + 1}`}
+                    className="w-full h-full object-cover"
+                  />
+
+                  {/* Primary Cover Badge */}
+                  {idx === 0 ? (
+                    <span className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-emerald-600 text-slate-950 font-black text-[9px] flex items-center gap-1 shadow-md">
+                      <Star className="w-2.5 h-2.5 fill-current" />
+                      <span>Cover</span>
+                    </span>
+                  ) : (
+                    <button
+                      type="button"
+                      onClick={() => handleSetPrimaryCover(idx)}
+                      className="absolute top-1.5 left-1.5 px-2 py-0.5 rounded-md bg-black/80 hover:bg-emerald-600 text-white hover:text-slate-950 font-bold text-[9px] opacity-0 group-hover:opacity-100 transition-opacity"
+                    >
+                      Set Cover
+                    </button>
+                  )}
+
+                  {/* Delete Button */}
+                  <button
+                    type="button"
+                    onClick={() => handleRemoveImage(idx)}
+                    className="absolute top-1.5 right-1.5 p-1 rounded-md bg-rose-600/90 text-white hover:bg-rose-500 transition-colors shadow-md"
+                    title="Remove screenshot"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Action Buttons */}
         <div className="flex items-center justify-end gap-3 pt-4">
           <Link href={`/listings/${id}`}>
             <Button type="button" variant="secondary">
               Cancel
             </Button>
           </Link>
-          <Button type="submit" variant="gold" size="lg" disabled={saving}>
+          <Button
+            type="submit"
+            variant="primary"
+            size="lg"
+            disabled={saving || uploadingImages}
+            isLoading={saving}
+            className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-extrabold text-sm px-6 py-3 rounded-xl shadow-lg shadow-emerald-950/40"
+          >
             <Save className="w-4 h-4 mr-2" />
             {saving ? "Saving Changes..." : "Save Changes"}
           </Button>
