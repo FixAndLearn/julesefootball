@@ -53,11 +53,25 @@ function AdminControlCenterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { user, profile, isAuthenticated, loading: authLoading } = useAuth();
-
   const tabParam = searchParams.get("tab");
   const [activeTab, setActiveTab] = useState<"listings" | "disputes" | "users" | "news" | "withdrawals" | "telegram">(
     tabParam === "whatsapp" || tabParam === "telegram" ? "telegram" : (tabParam as any) || "listings"
   );
+
+  // Synchronize active tab whenever URL ?tab= updates from sidebar clicks
+  useEffect(() => {
+    if (tabParam) {
+      const normalized = tabParam === "whatsapp" ? "telegram" : tabParam;
+      if (["listings", "disputes", "users", "withdrawals", "news", "telegram"].includes(normalized)) {
+        setActiveTab(normalized as any);
+      }
+    }
+  }, [tabParam]);
+
+  const switchTab = (tab: "listings" | "disputes" | "users" | "news" | "withdrawals" | "telegram") => {
+    setActiveTab(tab);
+    router.push(`/admin?tab=${tab}`, { scroll: false });
+  };
 
   // Telegram Integration State
   const [telegramInfo, setTelegramInfo] = useState<any>(null);
@@ -785,14 +799,14 @@ function AdminControlCenterContent() {
       <div className="flex items-center border-b border-pitch-border/80 gap-2 overflow-x-auto">
         <button
           type="button"
-          onClick={() => setActiveTab("listings")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+          onClick={() => switchTab("listings")}
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
             activeTab === "listings"
-              ? "border-amber-400 text-amber-400 bg-pitch-surface"
+              ? "border-emerald-400 text-emerald-300 bg-pitch-card"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
-          <Layers className="w-4 h-4" />
+          <Layers className="w-4 h-4 text-emerald-400" />
           <span>Listing Moderation (Ban Posts)</span>
           <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
             {listings.length}
@@ -801,10 +815,10 @@ function AdminControlCenterContent() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("disputes")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+          onClick={() => switchTab("disputes")}
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
             activeTab === "disputes"
-              ? "border-rose-400 text-rose-400 bg-pitch-surface"
+              ? "border-rose-400 text-rose-300 bg-pitch-card"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
@@ -823,14 +837,14 @@ function AdminControlCenterContent() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("users")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+          onClick={() => switchTab("users")}
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
             activeTab === "users"
-              ? "border-amber-400 text-amber-400 bg-pitch-surface"
+              ? "border-amber-400 text-amber-300 bg-pitch-card"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
-          <Users className="w-4 h-4" />
+          <Users className="w-4 h-4 text-amber-400" />
           <span>User Management</span>
           <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
             {users.length}
@@ -839,14 +853,14 @@ function AdminControlCenterContent() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("withdrawals")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+          onClick={() => switchTab("withdrawals")}
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
             activeTab === "withdrawals"
-              ? "border-amber-400 text-amber-400 bg-pitch-surface"
+              ? "border-amber-400 text-amber-300 bg-pitch-card"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
-          <Banknote className="w-4 h-4" />
+          <Banknote className="w-4 h-4 text-amber-400" />
           <span>Seller Withdrawals (M-Pesa)</span>
           {pendingWithdrawalsCount > 0 ? (
             <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 animate-pulse">
@@ -861,15 +875,15 @@ function AdminControlCenterContent() {
 
         <button
           type="button"
-          onClick={() => setActiveTab("news")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+          onClick={() => switchTab("news")}
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
             activeTab === "news"
-              ? "border-amber-400 text-amber-400 bg-pitch-surface"
+              ? "border-emerald-400 text-emerald-300 bg-pitch-card"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
-          <Newspaper className="w-4 h-4" />
-          <span>Post News & Alerts</span>
+          <Newspaper className="w-4 h-4 text-emerald-400" />
+          <span>Post News &amp; Alerts</span>
           <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
             {articles.length}
           </span>
@@ -878,12 +892,12 @@ function AdminControlCenterContent() {
         <button
           type="button"
           onClick={() => {
-            setActiveTab("telegram");
+            switchTab("telegram");
             loadTelegramStatus();
           }}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 ${
+          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
             activeTab === "telegram"
-              ? "border-indigo-400 text-indigo-400 bg-pitch-surface"
+              ? "border-indigo-400 text-indigo-300 bg-pitch-card"
               : "border-transparent text-slate-400 hover:text-slate-200"
           }`}
         >
