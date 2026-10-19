@@ -61,8 +61,8 @@ export async function GET() {
         type: "promo",
         badge: "🔥 FRIDAY FLASH DROPS",
         badgeColor: "bg-amber-500/20 text-amber-300 border-amber-500/40",
-        text: "Curated high-OVR squads up to 50% OFF every Friday 12:00 AM – 11:59 PM EAT",
-        link: "/#friday-drops",
+        text: "Curated high-OVR squads discounted up to 35% every Friday (2:00 PM – 10:00 PM EAT)",
+        link: "/friday-drops",
         icon: "drops" as const,
       },
       {

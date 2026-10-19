@@ -5,6 +5,7 @@ import { PaymentService } from "@/services/paymentService";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 import { checkRateLimit, getIdempotencyResult, setIdempotencyResult } from "@/lib/security/rateLimiter";
+import { isListingOnFlashSale } from "@/lib/utils/flashSale";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -56,9 +57,14 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "This listing is no longer available for purchase." }, { status: 400 });
     }
 
-    // 2. Check offer if applicable
+    // 2. Determine price: backend is aware of Friday Flash Drop promotional pricing & bargaining rules
+    const isFlashSale = isListingOnFlashSale(listing);
     let finalPrice = Number(listing.price);
-    if (offerId) {
+
+    if (isFlashSale) {
+      // On Fridays, squads are locked at promotional flash drop price and bargaining is withdrawn
+      finalPrice = Number(listing.price);
+    } else if (offerId) {
       // Check /api/offers or Supabase
       try {
         const { data: offerData } = await adminSupabase

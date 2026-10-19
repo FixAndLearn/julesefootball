@@ -1,5 +1,6 @@
 import { Order, OrderStatus } from "@/types/database";
 import { SupabaseClient } from "@supabase/supabase-js";
+import { isListingOnFlashSale } from "@/lib/utils/flashSale";
 
 export class OrderService {
   constructor(private supabase: SupabaseClient) {}
@@ -36,6 +37,7 @@ export class OrderService {
       throw new Error("You cannot purchase your own account listing.");
     }
 
+    const isFlashSale = isListingOnFlashSale(listing);
     const price = Number(listing.price);
     const platformFeeRate = 0.00; // 0% platform fee - Launch promo (seller receives 100%)
     const platformFee = 0;

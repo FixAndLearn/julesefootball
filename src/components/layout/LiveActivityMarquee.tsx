@@ -40,8 +40,8 @@ const PROMOTIONAL_TICKER_ITEMS: TickerItem[] = [
     id: "promo-friday",
     badge: "FRIDAY DROPS",
     badgeColor: "bg-amber-500/10 text-amber-300 border-amber-500/30",
-    text: "Curated high-OVR squads discounted up to 50% every Friday (12:00 AM – 11:59 PM EAT)",
-    link: "/#friday-drops",
+    text: "Curated high-OVR squad drops unlock every Friday (2:00 PM – 10:00 PM EAT) with locked flash prices",
+    link: "/friday-drops",
   },
   {
     id: "promo-wanted",

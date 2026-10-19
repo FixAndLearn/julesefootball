@@ -193,7 +193,7 @@ export function Header() {
                 </li>
                 <li role="none">
                   <Link
-                    href="/#friday-drops"
+                    href="/friday-drops"
                     role="menuitem"
                     title="Friday Drops - Weekly Flash Sales on Verified Squads"
                     className="px-3 py-2 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition-colors whitespace-nowrap shrink-0"
@@ -569,8 +569,8 @@ export function Header() {
 
               <li>
                 <Link
-                  href="/#friday-drops"
-                  title="Friday Flash Drops - Up to 50% OFF Accounts"
+                  href="/friday-drops"
+                  title="Friday Flash Drops - Up to 35% OFF Accounts"
                   onClick={() => setMobileMenuOpen(false)}
                   className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold"
                 >

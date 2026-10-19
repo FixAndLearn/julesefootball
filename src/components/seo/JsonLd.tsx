@@ -98,8 +98,8 @@ export function JsonLd({ siteUrl = "https://www.efootballmarket.co.ke" }: { site
         "@type": "SiteNavigationElement",
         "@id": `${siteUrl}/#friday-drops`,
         name: "Friday Drops & Flash Sales",
-        description: "Weekly 24-hour flash sales featuring discounted high-OVR squads, Epics, and meta managers.",
-        url: `${siteUrl}/#friday-drops`,
+        description: "Weekly 8-hour flash sales featuring discounted high-OVR squads, Epics, and meta managers.",
+        url: `${siteUrl}/friday-drops`,
       },
       {
         "@type": "SiteNavigationElement",

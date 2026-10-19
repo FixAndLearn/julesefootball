@@ -46,9 +46,9 @@ export function MobileBottomNav() {
     },
     {
       label: "Drops",
-      href: "/#friday-drops",
+      href: "/friday-drops",
       icon: Flame,
-      isActive: false,
+      isActive: pathname.startsWith("/friday-drops"),
     },
     {
       label: "Blacklist",

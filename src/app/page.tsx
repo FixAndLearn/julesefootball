@@ -9,7 +9,6 @@ import { Listing, NewsArticle, Tournament } from "@/types/database";
 import { AdBanner } from "@/components/common/AdBanner";
 import { HomeFaqAccordion } from "@/components/home/HomeFaqAccordion";
 import { ListingCard3D } from "@/components/marketplace/ListingCard3D";
-import { FridayDropsSection } from "@/components/home/FridayDropsSection";
 import { EscrowStepsVisualizer } from "@/components/home/EscrowStepsVisualizer";
 import {
   ArrowRight,
@@ -236,10 +235,7 @@ export default async function HomePage() {
         </div>
       </section>
 
-      {/* 2. "FRIDAY DROPS" FLASH SALE MODULE (Up to 50% OFF with dynamic EAT countdown) */}
-      <FridayDropsSection listings={listings} />
-
-      {/* 3. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
+      {/* 2. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
       <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
