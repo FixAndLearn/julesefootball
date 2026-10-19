@@ -5,82 +5,55 @@ import Link from "next/link";
 import Image from "next/image";
 import { Listing } from "@/types/database";
 import { formatCurrency, getPlatformLabel } from "@/lib/utils";
-import { Flame, Clock, ShieldCheck, Sparkles, ArrowRight, Zap, CheckCircle2 } from "lucide-react";
+import {
+  getFridayDropCountdown,
+  FridayDropCountdown,
+  FRIDAY_DROP_START_HOUR_EAT,
+  FRIDAY_DROP_END_HOUR_EAT,
+} from "@/lib/utils/flashSale";
+import {
+  Flame,
+  Clock,
+  ShieldCheck,
+  Sparkles,
+  ArrowRight,
+  Zap,
+  CheckCircle2,
+  Lock,
+} from "lucide-react";
 
 interface FridayDropsProps {
   listings: Listing[];
 }
 
-interface TimeRemaining {
-  days: number;
-  hours: number;
-  minutes: number;
-  seconds: number;
-  isActive: boolean;
-}
-
 export function FridayDropsSection({ listings }: FridayDropsProps) {
-  const [timeLeft, setTimeLeft] = useState<TimeRemaining>({
+  const [countdown, setCountdown] = useState<FridayDropCountdown>({
+    isActive: false,
     days: 0,
     hours: 0,
     minutes: 0,
     seconds: 0,
-    isActive: false,
+    targetDateUtc: new Date(),
   });
+  const [mounted, setMounted] = useState(false);
 
-  // Calculate countdown to next Friday (or Friday remaining time) in EAT (UTC+3)
+  // Dynamic countdown to Friday 14:00 EAT (or remaining time until 22:00 EAT during active drop)
   useEffect(() => {
-    function calculateTime() {
-      const now = new Date();
-      // Convert current time to UTC+3 (East Africa Time)
-      const eatOffsetMs = 3 * 60 * 60 * 1000;
-      const eatNow = new Date(now.getTime() + (now.getTimezoneOffset() * 60 * 1000) + eatOffsetMs);
+    setMounted(true);
+    const updateCountdown = () => {
+      setCountdown(getFridayDropCountdown());
+    };
 
-      const dayOfWeek = eatNow.getDay(); // 0 is Sunday, 5 is Friday
-      const currentHour = eatNow.getHours();
-      const currentMin = eatNow.getMinutes();
-      const currentSec = eatNow.getSeconds();
-
-      const isFriday = dayOfWeek === 5;
-
-      if (isFriday) {
-        // Flash sale is LIVE! Calculate time until Friday 23:59:59 EAT
-        const endOfDay = new Date(eatNow);
-        endOfDay.setHours(23, 5, 59, 999);
-        const diffMs = Math.max(0, endOfDay.getTime() - eatNow.getTime());
-
-        const hours = Math.floor(diffMs / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-        setTimeLeft({ days: 0, hours, minutes, seconds, isActive: true });
-      } else {
-        // Calculate days until next Friday 00:00:00 EAT
-        let daysUntilFriday = (5 - dayOfWeek + 7) % 7;
-        if (daysUntilFriday === 0) daysUntilFriday = 7;
-
-        const nextFriday = new Date(eatNow);
-        nextFriday.setDate(eatNow.getDate() + daysUntilFriday);
-        nextFriday.setHours(0, 0, 0, 0);
-
-        const diffMs = Math.max(0, nextFriday.getTime() - eatNow.getTime());
-
-        const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-        const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-        const seconds = Math.floor((diffMs % (1000 * 60)) / 1000);
-
-        setTimeLeft({ days, hours, minutes, seconds, isActive: false });
-      }
-    }
-
-    calculateTime();
-    const interval = setInterval(calculateTime, 1000);
+    updateCountdown();
+    const interval = setInterval(updateCountdown, 1000);
     return () => clearInterval(interval);
   }, []);
 
-  // Filter or take top squads for the flash sale drops
-  const dropItems = listings.slice(0, 3);
+  const isDropActive = mounted && countdown.isActive;
+
+  // Filter top curated/featured squads for the flash sale drops during active window
+  const featuredDrops = listings.filter((item) => item.is_featured || (item as any).is_flash_sale);
+  const dropItems = (featuredDrops.length > 0 ? featuredDrops : listings).slice(0, 3);
 
   return (
     <section id="friday-drops" className="py-14 md:py-20 bg-[#0A0F1D] border-b border-slate-800 relative overflow-hidden">
@@ -96,13 +69,17 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
             <div className="space-y-2">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium tracking-wide">
                 <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>Friday Drops • Weekly Flash Event</span>
+                <span>
+                  {isDropActive ? "Friday Drops • 8-Hour Flash Window LIVE" : "Friday Drops • Weekly 8-Hour Flash Event"}
+                </span>
               </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white font-display tracking-tight">
                 Curated Squad Drops
               </h2>
               <p className="text-xs sm:text-sm text-slate-400 max-w-xl leading-relaxed">
-                Hand-curated, verified high-OVR accounts discounted exclusively for 24 hours. Full Safaricom M-Pesa Till 1572931 escrow guarantee applies.
+                {isDropActive
+                  ? "Hand-curated, verified high-OVR accounts discounted exclusively for 8 hours (2:00 PM – 10:00 PM EAT). Full Safaricom M-Pesa Till 1572931 escrow guarantee applies."
+                  : "Exclusive high-OVR accounts drop every Friday for 8 hours only (2:00 PM – 10:00 PM EAT) at locked flash prices. Squads vanish when the countdown hits zero."}
               </p>
             </div>
 
@@ -111,9 +88,9 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
               <div className="flex items-center gap-2 mb-2">
                 <Clock className="w-4 h-4 text-amber-400" />
                 <span className="text-[11px] font-mono font-bold uppercase tracking-wider text-amber-300">
-                  {timeLeft.isActive ? "⚡ FLASH SALE ENDS IN:" : "NEXT DROP UNLOCKS IN:"}
+                  {isDropActive ? "⚡ FLASH SALE ENDS IN:" : "NEXT DROP UNLOCKS IN:"}
                 </span>
-                {timeLeft.isActive && (
+                {isDropActive && (
                   <span className="px-2 py-0.5 rounded-full bg-emerald-500 text-slate-950 font-black text-[9px] animate-pulse">
                     LIVE
                   </span>
@@ -124,25 +101,25 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
               <div className="grid grid-cols-4 gap-2 text-center font-mono">
                 <div className="p-2 sm:p-2.5 rounded-xl bg-slate-900 border border-slate-800">
                   <span className="block text-xl sm:text-2xl font-black text-white">
-                    {String(timeLeft.days).padStart(2, "0")}
+                    {String(countdown.days).padStart(2, "0")}
                   </span>
                   <span className="text-[9px] text-slate-400 uppercase font-bold">Days</span>
                 </div>
                 <div className="p-2 sm:p-2.5 rounded-xl bg-slate-900 border border-slate-800">
                   <span className="block text-xl sm:text-2xl font-black text-amber-400">
-                    {String(timeLeft.hours).padStart(2, "0")}
+                    {String(countdown.hours).padStart(2, "0")}
                   </span>
                   <span className="text-[9px] text-slate-400 uppercase font-bold">Hours</span>
                 </div>
                 <div className="p-2 sm:p-2.5 rounded-xl bg-slate-900 border border-slate-800">
                   <span className="block text-xl sm:text-2xl font-black text-amber-400">
-                    {String(timeLeft.minutes).padStart(2, "0")}
+                    {String(countdown.minutes).padStart(2, "0")}
                   </span>
                   <span className="text-[9px] text-slate-400 uppercase font-bold">Mins</span>
                 </div>
                 <div className="p-2 sm:p-2.5 rounded-xl bg-slate-900 border border-slate-800">
                   <span className="block text-xl sm:text-2xl font-black text-emerald-400">
-                    {String(timeLeft.seconds).padStart(2, "0")}
+                    {String(countdown.seconds).padStart(2, "0")}
                   </span>
                   <span className="text-[9px] text-slate-400 uppercase font-bold">Secs</span>
                 </div>
@@ -150,14 +127,76 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
             </div>
           </div>
 
-          {/* Flash Cards Showcase */}
+          {/* Flash Cards Showcase OR Locked Vault State */}
           <div className="pt-8">
-            {dropItems.length === 0 ? (
+            {!isDropActive ? (
+              /* Outside the 8-Hour Window: Squads Disappear Completely & Show Locked Vault */
+              <div className="rounded-2xl bg-[#090D16] border border-amber-500/20 p-8 sm:p-12 text-center relative overflow-hidden">
+                <div className="absolute inset-0 bg-gradient-to-b from-amber-500/5 via-transparent to-transparent pointer-events-none" />
+
+                <div className="relative z-10 max-w-2xl mx-auto space-y-6">
+                  {/* Vault Lock Icon */}
+                  <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-3xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center mx-auto text-amber-400 shadow-xl shadow-amber-500/10">
+                    <Lock className="w-8 h-8 sm:w-10 sm:h-10 text-amber-400" />
+                  </div>
+
+                  {/* Heading & Notice */}
+                  <div className="space-y-2">
+                    <h3 className="text-xl sm:text-2xl font-extrabold text-white font-display">
+                      Friday Drop Vault is Locked
+                    </h3>
+                    <p className="text-xs sm:text-sm text-slate-400 leading-relaxed">
+                      Curated high-OVR squad drops unlock exclusively on{" "}
+                      <span className="text-amber-300 font-semibold">Fridays from 2:00 PM to 10:00 PM EAT</span>{" "}
+                      (strictly 8 hours). Squads vanish the moment the window closes until the following Friday.
+                    </p>
+                  </div>
+
+                  {/* Feature Badges */}
+                  <div className="flex flex-wrap items-center justify-center gap-2 sm:gap-3 text-xs text-slate-300 pt-1">
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-amber-300">
+                      <Clock className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Strict 8-Hour Window (14:00 – 22:00 EAT)</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-emerald-300">
+                      <Zap className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Up to 35% Flash Discounts</span>
+                    </span>
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-900 border border-slate-800 text-slate-300">
+                      <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                      <span>Till 1572931 Escrow Guarantee</span>
+                    </span>
+                  </div>
+
+                  {/* Action Buttons */}
+                  <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2">
+                    <Link href="/browse" className="w-full sm:w-auto">
+                      <button
+                        type="button"
+                        className="w-full sm:w-auto px-6 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-2 min-h-[44px]"
+                      >
+                        <span>Explore Active Marketplace</span>
+                        <ArrowRight className="w-4 h-4" />
+                      </button>
+                    </Link>
+                    <Link href="/seller/create-listing" className="w-full sm:w-auto">
+                      <button
+                        type="button"
+                        className="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-slate-200 border border-slate-700 font-bold text-xs transition-all active:scale-95 flex items-center justify-center gap-2 min-h-[44px]"
+                      >
+                        <Sparkles className="w-3.5 h-3.5 text-amber-400" />
+                        <span>Submit Squad for Next Friday Drop</span>
+                      </button>
+                    </Link>
+                  </div>
+                </div>
+              </div>
+            ) : dropItems.length === 0 ? (
               <div className="text-center py-10 space-y-3">
                 <Sparkles className="w-10 h-10 text-amber-400 mx-auto" />
                 <h4 className="text-base font-bold text-white">Next Friday Squad Drops Loading</h4>
                 <p className="text-xs text-slate-400 max-w-md mx-auto">
-                  New verified squads will be dropped at midnight EAT this Friday. Verified sellers can submit squads for admin curation today!
+                  New verified squads are being curated for this 8-hour drop window. Verified sellers can submit squads for admin curation now!
                 </p>
                 <Link
                   href="/seller/create-listing"
@@ -167,8 +206,9 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
                 </Link>
               </div>
             ) : (
+              /* Live 8-Hour Drop Squad Cards */
               <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                {dropItems.map((item, idx) => {
+                {dropItems.map((item) => {
                   const originalPrice = Math.round(item.price * 1.35); // 26% discount representation
                   const discountPercent = Math.round(((originalPrice - item.price) / originalPrice) * 100);
                   const primaryImage =
