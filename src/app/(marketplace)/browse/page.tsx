@@ -20,13 +20,12 @@ interface BrowsePageProps {
   searchParams: {
     search?: string;
     platform?: Platform | "all";
-    playstyle?: Playstyle | "all";
     minStrength?: string;
     minCoins?: string;
-    minEpics?: string;
+    manager?: string;
     minPrice?: string;
     maxPrice?: string;
-    sortBy?: "newest" | "price_asc" | "price_desc" | "strength_desc" | "views";
+    sortBy?: "newest" | "price_asc" | "price_desc" | "strength_desc" | "coins_desc" | "views";
     page?: string;
   };
 }
@@ -42,10 +41,9 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   const filters = {
     search: searchParams.search,
     platform: searchParams.platform,
-    playstyle: searchParams.playstyle,
     minStrength: searchParams.minStrength ? Number(searchParams.minStrength) : undefined,
     minCoins: searchParams.minCoins ? Number(searchParams.minCoins) : undefined,
-    minEpics: searchParams.minEpics ? Number(searchParams.minEpics) : undefined,
+    manager: searchParams.manager,
     minPrice: searchParams.minPrice ? Number(searchParams.minPrice) : undefined,
     maxPrice: searchParams.maxPrice ? Number(searchParams.maxPrice) : undefined,
     sortBy: searchParams.sortBy,
@@ -141,34 +139,56 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
               </Link>
             </div>
           )}
-          {(searchParams.search || (searchParams.platform && searchParams.platform !== "all") || (searchParams.playstyle && searchParams.playstyle !== "all") || searchParams.minStrength) && (
-            <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border">
-              <span className="text-xs text-slate-400 font-semibold">Active:</span>
+          {(searchParams.search ||
+            (searchParams.platform && searchParams.platform !== "all") ||
+            searchParams.minStrength ||
+            searchParams.minCoins ||
+            searchParams.manager ||
+            searchParams.minPrice ||
+            searchParams.maxPrice ||
+            (searchParams.sortBy && searchParams.sortBy !== "newest")) && (
+            <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border animate-in fade-in">
+              <span className="text-xs text-slate-400 font-semibold">Active Filters:</span>
               {searchParams.search && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-pitch-card border border-pitch-border text-xs text-slate-200">
-                  Keyword: "{searchParams.search}"
-                </span>
-              )}
-              {searchParams.platform && searchParams.platform !== "all" && (
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-pitch-card border border-pitch-border text-xs text-slate-200 capitalize">
-                  {searchParams.platform}
+                  Search: "{searchParams.search}"
                 </span>
               )}
               {searchParams.minStrength && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-950/60 border border-amber-500/40 text-xs text-amber-300 font-bold">
-                  {searchParams.minStrength}+ OVR
+                  ⚡ {searchParams.minStrength}+ OVR
                 </span>
               )}
-              {searchParams.playstyle && searchParams.playstyle !== "all" && (
+              {searchParams.platform && searchParams.platform !== "all" && (
                 <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-pitch-card border border-pitch-border text-xs text-slate-200 capitalize">
-                  {searchParams.playstyle.replace("_", " ")}
+                  {searchParams.platform.replace(/_/g, " ")}
+                </span>
+              )}
+              {searchParams.minCoins && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-500/10 border border-amber-500/30 text-xs text-amber-300 font-medium">
+                  🪙 {Number(searchParams.minCoins).toLocaleString()}+ Coins
+                </span>
+              )}
+              {searchParams.manager && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-pitch-card border border-pitch-border text-xs text-slate-200">
+                  Coach: {searchParams.manager}
+                </span>
+              )}
+              {(searchParams.minPrice || searchParams.maxPrice) && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-pitch-card border border-pitch-border text-xs text-slate-200">
+                  KES {searchParams.minPrice || "0"} - {searchParams.maxPrice || "Any"}
+                </span>
+              )}
+              {searchParams.sortBy && searchParams.sortBy !== "newest" && (
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-emerald-950/60 border border-emerald-500/30 text-xs text-emerald-300">
+                  Sorted: {searchParams.sortBy.replace("_", " ")}
                 </span>
               )}
               <Link
                 href="/browse"
                 className="text-xs text-rose-400 hover:text-rose-300 font-semibold underline ml-auto"
               >
-                Reset Filters
+                Clear All
               </Link>
             </div>
           )}

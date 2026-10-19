@@ -11,7 +11,8 @@ export interface ListingFilterParams {
   minCoins?: number;
   minGp?: number;
   minEpics?: number;
-  sortBy?: "newest" | "price_asc" | "price_desc" | "strength_desc" | "views";
+  manager?: string;
+  sortBy?: "newest" | "price_asc" | "price_desc" | "strength_desc" | "coins_desc" | "views";
   limit?: number;
   offset?: number;
 }
@@ -39,6 +40,7 @@ export class ListingService {
       minCoins,
       minGp,
       minEpics,
+      manager,
       sortBy = "newest",
       limit = 20,
       offset = 0,
@@ -82,6 +84,10 @@ export class ListingService {
       query = query.gte("epic_players_count", minEpics);
     }
 
+    if (manager && manager.trim() !== "") {
+      query = query.ilike("manager_name", `%${manager.trim()}%`);
+    }
+
     if (search && search.trim() !== "") {
       const sanitizedTerm = search.trim().replace(/[,()]/g, " ").trim();
       if (sanitizedTerm) {
@@ -99,6 +105,9 @@ export class ListingService {
         break;
       case "strength_desc":
         query = query.order("overall_team_strength", { ascending: false });
+        break;
+      case "coins_desc":
+        query = query.order("coin_balance", { ascending: false });
         break;
       case "views":
         query = query.order("views_count", { ascending: false });

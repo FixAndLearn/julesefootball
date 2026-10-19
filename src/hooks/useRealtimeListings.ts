@@ -15,6 +15,7 @@ export interface UseRealtimeListingsOptions {
     minEpics?: number;
     minPrice?: number;
     maxPrice?: number;
+    manager?: string;
     sortBy?: string;
   };
   sortBy?: string;
@@ -67,6 +68,10 @@ export function useRealtimeListings(options: UseRealtimeListingsOptions = {}) {
       if (filters.maxPrice && (listing.price || 0) > filters.maxPrice) {
         return false;
       }
+      if (filters.manager && filters.manager.trim()) {
+        const mgr = filters.manager.toLowerCase().trim();
+        if (!listing.manager_name?.toLowerCase().includes(mgr)) return false;
+      }
       if (filters.search) {
         const q = filters.search.toLowerCase().trim();
         const titleMatch = listing.title?.toLowerCase().includes(q);
@@ -91,6 +96,7 @@ export function useRealtimeListings(options: UseRealtimeListingsOptions = {}) {
     if (filters?.minEpics) params.set("minEpics", String(filters.minEpics));
     if (filters?.minPrice) params.set("minPrice", String(filters.minPrice));
     if (filters?.maxPrice) params.set("maxPrice", String(filters.maxPrice));
+    if (filters?.manager) params.set("manager", filters.manager);
     const activeSortBy = sortBy || filters?.sortBy;
     if (activeSortBy) params.set("sortBy", activeSortBy);
     return params.toString();

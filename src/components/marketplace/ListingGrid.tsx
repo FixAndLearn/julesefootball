@@ -21,6 +21,7 @@ export interface ListingGridProps {
     minEpics?: number;
     minPrice?: number;
     maxPrice?: number;
+    manager?: string;
     sortBy?: string;
   };
   isLoading?: boolean;

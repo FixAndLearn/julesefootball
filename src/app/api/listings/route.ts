@@ -100,6 +100,7 @@ export async function GET(req: NextRequest) {
     const minCoins = searchParams.get("minCoins") ? Number(searchParams.get("minCoins")) : undefined;
     const minGp = searchParams.get("minGp") ? Number(searchParams.get("minGp")) : undefined;
     const minEpics = searchParams.get("minEpics") ? Number(searchParams.get("minEpics")) : undefined;
+    const manager = searchParams.get("manager") || undefined;
     const sortBy = (searchParams.get("sortBy") as any) || "newest";
     const limit = searchParams.get("limit") ? Number(searchParams.get("limit")) : 20;
     const offset = searchParams.get("offset") ? Number(searchParams.get("offset")) : 0;
@@ -117,6 +118,7 @@ export async function GET(req: NextRequest) {
       minCoins,
       minGp,
       minEpics,
+      manager,
       sortBy,
       limit,
       offset,
