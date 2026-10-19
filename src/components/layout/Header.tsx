@@ -179,37 +179,59 @@ export function Header() {
           <div className="flex items-center gap-6 xl:gap-10 min-w-0">
             <Logo clickable={true} size="md" />
 
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-medium">
-              <Link
-                href="/browse"
-                className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
-              >
-                {t.browseSquads}
-              </Link>
-              <Link
-                href="/#friday-drops"
-                className="px-3 py-2 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition-colors whitespace-nowrap shrink-0"
-              >
-                {t.fridayDrops}
-              </Link>
-              <Link
-                href="/escrow-guarantee"
-                className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
-              >
-                {t.escrowGuide}
-              </Link>
-              <Link
-                href="/scammer-check"
-                className="px-3 py-2 rounded-lg text-slate-300 hover:text-rose-300 hover:bg-rose-500/10 transition-colors whitespace-nowrap shrink-0"
-              >
-                {t.scammerCheck}
-              </Link>
-              <Link
-                href="/news"
-                className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
-              >
-                {t.communityBulletin}
-              </Link>
+            <nav role="navigation" aria-label="Main Navigation" className="hidden lg:block">
+              <ul role="menubar" className="flex items-center gap-1 xl:gap-2 text-sm font-medium">
+                <li role="none">
+                  <Link
+                    href="/browse"
+                    role="menuitem"
+                    title="Browse Verified eFootball Mobile Accounts Kenya"
+                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                  >
+                    {t.browseSquads}
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
+                    href="/#friday-drops"
+                    role="menuitem"
+                    title="Friday Drops - Weekly Flash Sales on Verified Squads"
+                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition-colors whitespace-nowrap shrink-0"
+                  >
+                    {t.fridayDrops}
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
+                    href="/escrow-guarantee"
+                    role="menuitem"
+                    title="Safaricom Till 1572931 Escrow Protection Guarantee"
+                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                  >
+                    {t.escrowGuide}
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
+                    href="/scammer-check"
+                    role="menuitem"
+                    title="Live Kenyan Scammer Blacklist Directory"
+                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-rose-300 hover:bg-rose-500/10 transition-colors whitespace-nowrap shrink-0"
+                  >
+                    {t.scammerCheck}
+                  </Link>
+                </li>
+                <li role="none">
+                  <Link
+                    href="/news"
+                    role="menuitem"
+                    title="eFootball Kenya Community Bulletin & News"
+                    className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
+                  >
+                    {t.communityBulletin}
+                  </Link>
+                </li>
+              </ul>
             </nav>
           </div>
 
@@ -491,142 +513,182 @@ export function Header() {
             />
           </form>
 
-          <nav className="space-y-1 text-sm font-medium text-[#94A3B8]">
-            {isAdminUser && (
-              <Link
-                href="/admin"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[#FBBF24] font-bold"
-              >
-                <span>Admin Control Center</span>
-                <Crown className="w-4 h-4 text-[#FBBF24]" />
-              </Link>
-            )}
-
-            {/* Mobile Language Selector */}
-            <div className="p-2.5 rounded-xl bg-[#111827] border border-[#1F2937] flex items-center justify-between">
-              <span className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
-                <Globe className="w-4 h-4 text-[#22C55E]" />
-                <span>Language:</span>
-              </span>
-              <div className="flex items-center gap-1">
-                {(["en", "sw"] as Language[]).map((l) => (
-                  <button
-                    key={l}
-                    type="button"
-                    onClick={() => setLanguage(l)}
-                    className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase transition-colors ${
-                      language === l
-                        ? "bg-[#22C55E] text-[#0B1220]"
-                        : "bg-slate-800 text-slate-300 hover:text-white"
-                    }`}
+          <nav role="navigation" aria-label="Mobile Navigation">
+            <ul className="space-y-1 text-sm font-medium text-[#94A3B8]">
+              {isAdminUser && (
+                <li>
+                  <Link
+                    href="/admin"
+                    title="Admin Control Dashboard"
+                    onClick={() => setMobileMenuOpen(false)}
+                    className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/20 text-[#FBBF24] font-bold"
                   >
-                    {l}
-                  </button>
-                ))}
-              </div>
-            </div>
+                    <span>Admin Control Center</span>
+                    <Crown className="w-4 h-4 text-[#FBBF24]" />
+                  </Link>
+                </li>
+              )}
 
-            <Link
-              href="/browse"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-            >
-              <span>{t.browseSquads}</span>
-              <Sparkles className="w-4 h-4 text-[#FBBF24]" />
-            </Link>
+              {/* Mobile Language Selector */}
+              <li>
+                <div className="p-2.5 rounded-xl bg-[#111827] border border-[#1F2937] flex items-center justify-between">
+                  <span className="text-xs text-slate-300 font-semibold flex items-center gap-1.5">
+                    <Globe className="w-4 h-4 text-[#22C55E]" />
+                    <span>Language:</span>
+                  </span>
+                  <div className="flex items-center gap-1">
+                    {(["en", "sw"] as Language[]).map((l) => (
+                      <button
+                        key={l}
+                        type="button"
+                        onClick={() => setLanguage(l)}
+                        className={`px-2.5 py-1 rounded-lg text-xs font-bold uppercase transition-colors ${
+                          language === l
+                            ? "bg-[#22C55E] text-[#0B1220]"
+                            : "bg-slate-800 text-slate-300 hover:text-white"
+                        }`}
+                      >
+                        {l}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </li>
 
-            <Link
-              href="/#friday-drops"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold"
-            >
-              <span>{t.fridayDrops}</span>
-              <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
-            </Link>
+              <li>
+                <Link
+                  href="/browse"
+                  title="Browse Verified eFootball Mobile Accounts Kenya"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
+                >
+                  <span>{t.browseSquads}</span>
+                  <Sparkles className="w-4 h-4 text-[#FBBF24]" />
+                </Link>
+              </li>
 
-            <Link
-              href="/scammer-check"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold"
-            >
-              <span>{t.scammerCheck}</span>
-              <ShieldAlert className="w-4 h-4 text-rose-400" />
-            </Link>
+              <li>
+                <Link
+                  href="/#friday-drops"
+                  title="Friday Flash Drops - Up to 50% OFF Accounts"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-300 font-bold"
+                >
+                  <span>{t.fridayDrops}</span>
+                  <Flame className="w-4 h-4 text-amber-400 fill-amber-400" />
+                </Link>
+              </li>
 
-            <Link
-              href="/escrow-guarantee"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-            >
-              <span>{t.escrowGuide}</span>
-              <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
-            </Link>
+              <li>
+                <Link
+                  href="/scammer-check"
+                  title="Live Kenyan Scammer Blacklist Directory"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-300 font-bold"
+                >
+                  <span>{t.scammerCheck}</span>
+                  <ShieldAlert className="w-4 h-4 text-rose-400" />
+                </Link>
+              </li>
 
-            <Link
-              href="/news"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-            >
-              <span>{t.communityBulletin}</span>
-              <Newspaper className="w-4 h-4 text-[#94A3B8]" />
-            </Link>
+              <li>
+                <Link
+                  href="/escrow-guarantee"
+                  title="Safaricom Till 1572931 Escrow Guarantee"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
+                >
+                  <span>{t.escrowGuide}</span>
+                  <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
+                </Link>
+              </li>
 
-            <Link
-              href="/middleman"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#22C55E] font-semibold"
-            >
-              <span>Bring-Your-Own-Deal Middleman</span>
-              <Handshake className="w-4 h-4 text-[#22C55E]" />
-            </Link>
+              <li>
+                <Link
+                  href="/news"
+                  title="eFootball Community News & Patch Notes"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
+                >
+                  <span>{t.communityBulletin}</span>
+                  <Newspaper className="w-4 h-4 text-[#94A3B8]" />
+                </Link>
+              </li>
 
-            <Link
-              href="/tournaments"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-            >
-              <span>Tournaments & Brackets</span>
-              <Trophy className="w-4 h-4 text-[#FBBF24]" />
-            </Link>
+              <li>
+                <Link
+                  href="/middleman"
+                  title="Bring-Your-Own-Deal Middleman Escrow"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#22C55E] font-semibold"
+                >
+                  <span>Bring-Your-Own-Deal Middleman</span>
+                  <Handshake className="w-4 h-4 text-[#22C55E]" />
+                </Link>
+              </li>
 
-            <Link
-              href="/wanted"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
-            >
-              <span>Wanted Squads (Buyer Requests)</span>
-              <Target className="w-4 h-4 text-[#FBBF24]" />
-            </Link>
+              <li>
+                <Link
+                  href="/tournaments"
+                  title="Competitive eFootball Tournaments Kenya"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
+                >
+                  <span>Tournaments & Brackets</span>
+                  <Trophy className="w-4 h-4 text-[#FBBF24]" />
+                </Link>
+              </li>
 
-            <Link
-              href="/seller/create-listing"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#22C55E] to-emerald-400 text-[#0B1220] font-black text-xs shadow-lg shadow-emerald-950/40"
-            >
-              <span>{t.sellAccount}</span>
-              <PlusCircle className="w-4 h-4 stroke-[3]" />
-            </Link>
+              <li>
+                <Link
+                  href="/wanted"
+                  title="Wanted Squads & Formations Buyer Board"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] text-[#F8FAFC]"
+                >
+                  <span>Wanted Squads (Buyer Requests)</span>
+                  <Target className="w-4 h-4 text-[#FBBF24]" />
+                </Link>
+              </li>
 
-            <Link
-              href="/notifications"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] hover:text-[#F8FAFC]"
-            >
-              <span>Notifications</span>
-              <Bell className="w-4 h-4 text-[#94A3B8]" />
-            </Link>
+              <li>
+                <Link
+                  href="/seller/create-listing"
+                  title="List & Sell Your eFootball Account"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2.5 rounded-xl bg-gradient-to-r from-[#22C55E] to-emerald-400 text-[#0B1220] font-black text-xs shadow-lg shadow-emerald-950/40"
+                >
+                  <span>{t.sellAccount}</span>
+                  <PlusCircle className="w-4 h-4 stroke-[3]" />
+                </Link>
+              </li>
 
-            <a
-              href="https://wa.me/254794400365"
-              target="_blank"
-              rel="noopener noreferrer"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#111827] border border-[#1F2937] text-[#F8FAFC] text-xs font-semibold"
-            >
-              <span>WhatsApp Support: 0794400365</span>
-              <MessageCircle className="w-4 h-4 text-[#22C55E]" />
-            </a>
+              <li>
+                <Link
+                  href="/notifications"
+                  title="Account Notifications & Escrow Alerts"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center justify-between px-3 py-2 rounded-lg hover:bg-[#111827] hover:text-[#F8FAFC]"
+                >
+                  <span>Notifications</span>
+                  <Bell className="w-4 h-4 text-[#94A3B8]" />
+                </Link>
+              </li>
+
+              <li>
+                <a
+                  href="https://wa.me/254794400365"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={() => setMobileMenuOpen(false)}
+                  title="Contact WhatsApp Escrow Desk Support"
+                  className="flex items-center justify-between px-3 py-2 rounded-lg bg-[#111827] border border-[#1F2937] text-[#F8FAFC] text-xs font-semibold"
+                >
+                  <span>WhatsApp Support: 0794400365</span>
+                  <MessageCircle className="w-4 h-4 text-emerald-400" />
+                </a>
+              </li>
+            </ul>
           </nav>
 
           {isAuthenticated && (

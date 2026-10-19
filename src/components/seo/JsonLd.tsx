@@ -84,6 +84,68 @@ export function JsonLd({ siteUrl = "https://www.efootballmarket.co.ke" }: { site
     ],
   };
 
+  const navigationSchema = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#browse`,
+        name: "Browse Verified eFootball Accounts",
+        description: "Explore verified eFootball mobile accounts with Safaricom M-Pesa Till 1572931 escrow protection.",
+        url: `${siteUrl}/browse`,
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#friday-drops`,
+        name: "Friday Drops & Flash Sales",
+        description: "Weekly 24-hour flash sales featuring discounted high-OVR squads, Epics, and meta managers.",
+        url: `${siteUrl}/#friday-drops`,
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#middleman`,
+        name: "Middleman Escrow Service",
+        description: "Secure escrow service for WhatsApp, Facebook, and social media peer-to-peer trades.",
+        url: `${siteUrl}/middleman`,
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#scammer-check`,
+        name: "Scammer Blacklist Directory",
+        description: "Live anti-fraud intelligence checker for Kenyan phone numbers and trader WhatsApp handles.",
+        url: `${siteUrl}/scammer-check`,
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#escrow-guarantee`,
+        name: "Escrow Protection Guarantee",
+        description: "Mandatory 24-hour inspection window and automated Safaricom Till 1572931 payment custody.",
+        url: `${siteUrl}/escrow-guarantee`,
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#wanted`,
+        name: "Wanted Squads & Formations",
+        description: "Request specific meta players, custom card rosters, and tactical manager formations.",
+        url: `${siteUrl}/wanted`,
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#tournaments`,
+        name: "eFootball Kenya Tournaments",
+        description: "Competitive knockout brackets with instant M-Pesa prize pool disbursements.",
+        url: `${siteUrl}/tournaments`,
+      },
+      {
+        "@type": "SiteNavigationElement",
+        "@id": `${siteUrl}/#sell`,
+        name: "Sell Your eFootball Account",
+        description: "List your eFootball squad for free and receive automated M-Pesa payouts upon buyer verification.",
+        url: `${siteUrl}/seller/create-listing`,
+      },
+    ],
+  };
+
   return (
     <>
       <script
@@ -93,6 +155,10 @@ export function JsonLd({ siteUrl = "https://www.efootballmarket.co.ke" }: { site
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(navigationSchema) }}
       />
       <script
         type="application/ld+json"

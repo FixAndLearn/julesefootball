@@ -6,7 +6,11 @@ import { MessageCircle, ShieldCheck } from "lucide-react";
 
 export function Footer() {
   return (
-    <footer className="w-full border-t border-slate-800/80 bg-[#070B14] text-slate-400 text-xs mt-auto py-6">
+    <footer
+      role="contentinfo"
+      aria-label="Site Footer"
+      className="w-full border-t border-slate-800/80 bg-[#070B14] text-slate-400 text-xs mt-auto py-6"
+    >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
         {/* Left: Brand, Copyright & Escrow Badge */}
         <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">
@@ -20,29 +24,58 @@ export function Footer() {
           </span>
         </div>
 
-        {/* Right: Terms & Links with clean modern spacing (zero dots) */}
-        <nav aria-label="Footer Links" className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-xs font-medium text-slate-400">
-          <Link href="/browse" className="hover:text-white transition-colors">
-            Browse
-          </Link>
-          <Link href="/escrow-guarantee" className="hover:text-white transition-colors">
-            Escrow Guarantee
-          </Link>
-          <Link href="/terms" className="hover:text-white transition-colors">
-            Terms of Service
-          </Link>
-          <Link href="/privacy" className="hover:text-white transition-colors">
-            Privacy Policy
-          </Link>
-          <a
-            href="https://wa.me/254794400365"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1.5 text-slate-300 hover:text-emerald-400 transition-colors"
-          >
-            <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Support: 0794400365</span>
-          </a>
+        {/* Right: Terms & Links with strict semantic navigation for sitelinks */}
+        <nav role="navigation" aria-label="Footer Navigation">
+          <ul className="flex flex-wrap items-center justify-center gap-6 sm:gap-8 text-xs font-medium text-slate-400">
+            <li>
+              <Link
+                href="/browse"
+                title="Browse Verified eFootball Accounts Kenya"
+                className="hover:text-white transition-colors"
+              >
+                Browse Accounts
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/escrow-guarantee"
+                title="Safaricom Till 1572931 Escrow Guarantee"
+                className="hover:text-white transition-colors"
+              >
+                Escrow Guarantee
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/terms"
+                title="eFootballMarket Terms of Service"
+                className="hover:text-white transition-colors"
+              >
+                Terms of Service
+              </Link>
+            </li>
+            <li>
+              <Link
+                href="/privacy"
+                title="eFootballMarket Privacy Policy"
+                className="hover:text-white transition-colors"
+              >
+                Privacy Policy
+              </Link>
+            </li>
+            <li>
+              <a
+                href="https://wa.me/254794400365"
+                target="_blank"
+                rel="noopener noreferrer"
+                title="Contact Escrow Administrator on WhatsApp"
+                className="inline-flex items-center gap-1.5 text-slate-300 hover:text-emerald-400 transition-colors"
+              >
+                <MessageCircle className="w-3.5 h-3.5 text-emerald-400" />
+                <span>Support: 0794400365</span>
+              </a>
+            </li>
+          </ul>
         </nav>
       </div>
     </footer>
