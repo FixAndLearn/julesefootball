@@ -89,19 +89,19 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
       <div className="absolute bottom-0 left-1/4 w-96 h-96 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
-        {/* Module Header Container with neon-gold/emerald border */}
-        <div className="rounded-3xl p-6 sm:p-8 md:p-10 bg-gradient-to-br from-[#111827] via-[#0F172A] to-[#111827] border-2 border-amber-500/50 shadow-2xl shadow-amber-500/10 relative">
+        {/* Module Header Container with clean gold/slate styling */}
+        <div className="rounded-2xl p-6 sm:p-8 md:p-10 bg-[#0F172A] border border-slate-800 shadow-xl relative">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-slate-800">
             {/* Title & Badge */}
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-gradient-to-r from-amber-500/20 to-emerald-500/20 border border-amber-500/40 text-amber-300 text-xs font-black tracking-wide">
-                <Flame className="w-4 h-4 text-amber-400 fill-amber-400 animate-pulse" />
-                <span>FRIDAY DROPS FLASH SALE (UP TO 50% OFF)</span>
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium tracking-wide">
+                <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                <span>Friday Drops • Weekly Flash Event</span>
               </div>
-              <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display tracking-tight">
-                Elite Squad Drops | Every Friday EAT
+              <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white font-display tracking-tight">
+                Curated Squad Drops
               </h2>
-              <p className="text-xs sm:text-sm text-slate-300 max-w-xl leading-relaxed">
+              <p className="text-xs sm:text-sm text-slate-400 max-w-xl leading-relaxed">
                 Hand-curated, verified high-OVR accounts discounted exclusively for 24 hours. Full Safaricom M-Pesa Till 1572931 escrow guarantee applies.
               </p>
             </div>
@@ -253,10 +253,10 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
                       <Link href={`/listings/${item.id}`} className="w-full">
                         <button
                           type="button"
-                          className="w-full py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-emerald-500 hover:from-amber-400 hover:to-emerald-400 text-slate-950 font-black text-xs shadow-md transition-all active:scale-95 flex items-center justify-center gap-1.5 min-h-[44px]"
+                          className="w-full py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs shadow-xs transition-all active:scale-95 flex items-center justify-center gap-1.5 min-h-[44px]"
                         >
-                          <Flame className="w-3.5 h-3.5 fill-slate-950 shrink-0" />
-                          <span className="truncate">Claim Flash Drop (M-Pesa Escrow)</span>
+                          <Flame className="w-3.5 h-3.5 shrink-0" />
+                          <span>Claim Flash Drop</span>
                         </button>
                       </Link>
                     </div>

@@ -326,17 +326,14 @@ function MiddlemanContent() {
         <button
           type="button"
           onClick={() => setActiveTab("generator")}
-          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-bold transition-all ${
+          className={`flex items-center gap-2 px-4 py-2.5 rounded-xl text-xs sm:text-sm font-medium transition-all ${
             activeTab === "generator"
-              ? "bg-indigo-600 text-white shadow-lg"
+              ? "bg-slate-800 text-white shadow-sm border border-slate-700"
               : "bg-pitch-surface border border-pitch-border text-slate-300 hover:text-white"
           }`}
         >
           <Share2 className="w-4 h-4 text-emerald-400" />
-          <span>WhatsApp Group Link Generator</span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">
-            Viral for Groups 🔥
-          </span>
+          <span>WhatsApp Deal Link</span>
         </button>
 
         <button

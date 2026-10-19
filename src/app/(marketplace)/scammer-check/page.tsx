@@ -16,26 +16,26 @@ export default function ScammerCheckPage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 w-full space-y-12">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/80 border border-rose-800/80 text-rose-300 text-xs font-bold">
-          <ShieldAlert className="w-4 h-4 text-rose-400" />
-          <span>Kenyan eFootball Anti-Fraud Intelligence</span>
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300 text-xs font-medium">
+          <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
+          <span>Kenyan eFootball Anti-Fraud Advisory</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white font-display tracking-tight">
-          Live Scammer Blacklist Checker
+        <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white font-display tracking-tight">
+          Scammer Blacklist Directory
         </h1>
-        <p className="text-sm sm:text-base text-slate-300 leading-relaxed">
-          Verify any Kenyan phone number, WhatsApp contact, or social media handle before trading. Our database is updated daily by community reports and escrow incident logs.
+        <p className="text-sm sm:text-base text-slate-400 leading-relaxed">
+          Verify any Kenyan phone number, WhatsApp contact, or trader handle against verified escrow dispute records and community incident reports before transacting.
         </p>
       </div>
 
       {/* Interactive Tool Container */}
-      <div className="p-6 sm:p-8 rounded-3xl bg-[#111827] border-2 border-rose-500/30 shadow-2xl space-y-6">
+      <div className="p-6 sm:p-8 rounded-2xl bg-[#0F172A] border border-slate-800 shadow-xl space-y-6">
         <div>
-          <h2 className="text-lg font-bold text-white flex items-center gap-2">
-            <span>Instant Trader Verification Search</span>
+          <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">
+            <span>Instant Trader Verification</span>
           </h2>
           <p className="text-xs text-slate-400 mt-1">
-            Type the 10-digit Kenyan phone number (e.g. 0712345678), international format (+254...), or username handle.
+            Search by 10-digit Kenyan phone number (e.g. 0712345678), international format (+254...), or username handle.
           </p>
         </div>
 
@@ -103,11 +103,11 @@ export default function ScammerCheckPage() {
       <AdBanner slot="scammer_check_bottom" format="horizontal" />
 
       {/* Community Report Callout */}
-      <div className="rounded-3xl bg-gradient-to-r from-rose-950/70 via-[#111827] to-slate-900 border border-rose-500/40 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
+      <div className="rounded-2xl bg-[#0F172A] border border-slate-800 p-6 sm:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-6">
         <div className="space-y-1.5">
           <h3 className="text-lg font-bold text-white">Encountered an Impersonator or Scammer?</h3>
-          <p className="text-xs text-slate-300 max-w-xl leading-relaxed">
-            Submit screenshots, M-Pesa transaction statements, or phone numbers directly to our desk. We review evidence in under 15 minutes and flag bad actors to protect the community.
+          <p className="text-xs text-slate-400 max-w-xl leading-relaxed">
+            Submit screenshots, M-Pesa transaction statements, or phone numbers directly to our desk. We review evidence promptly and flag bad actors to protect the community.
           </p>
         </div>
 
@@ -115,9 +115,9 @@ export default function ScammerCheckPage() {
           href="https://wa.me/254794400365?text=Hello%20Brian%2C%20I%20want%20to%20report%20a%20scammer%20number"
           target="_blank"
           rel="noopener noreferrer"
-          className="px-5 py-3 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs flex items-center gap-2 shrink-0 shadow-lg active:scale-95 transition-all"
+          className="px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-semibold text-xs flex items-center gap-2 shrink-0 border border-slate-700 active:scale-95 transition-all"
         >
-          <MessageCircle className="w-4 h-4" />
+          <MessageCircle className="w-4 h-4 text-emerald-400" />
           <span>Report to Admin (0794400365)</span>
         </a>
       </div>

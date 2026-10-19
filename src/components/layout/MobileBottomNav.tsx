@@ -45,17 +45,15 @@ export function MobileBottomNav() {
       isActive: pathname.startsWith("/browse") || pathname.startsWith("/listings"),
     },
     {
-      label: "Drops 🔥",
+      label: "Drops",
       href: "/#friday-drops",
       icon: Flame,
-      badge: "-50%",
       isActive: false,
     },
     {
-      label: "Scammers",
+      label: "Blacklist",
       href: "/scammer-check",
       icon: ShieldAlert,
-      badgeDot: true,
       isActive: pathname.startsWith("/scammer-check"),
     },
     {
@@ -70,7 +68,7 @@ export function MobileBottomNav() {
   return (
     <nav
       aria-label="Mobile Bottom Navigation"
-      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#090D16]/95 backdrop-blur-xl border-t border-slate-800/90 px-2 py-1.5 shadow-2xl safe-area-pb"
+      className="md:hidden fixed bottom-0 left-0 right-0 z-40 bg-[#090D16]/95 backdrop-blur-xl border-t border-slate-800/80 px-2 py-1.5 shadow-2xl safe-area-pb"
     >
       <div className="grid grid-cols-5 gap-1 items-center max-w-md mx-auto">
         {navItems.map((item) => {
@@ -81,28 +79,20 @@ export function MobileBottomNav() {
               href={item.href}
               className={`flex flex-col items-center justify-center min-h-[48px] py-1 rounded-xl transition-all relative ${
                 item.highlight
-                  ? "text-[#22C55E]"
+                  ? "text-emerald-400 font-semibold"
                   : item.isActive
-                  ? "text-[#22C55E] bg-slate-900/60"
+                  ? "text-emerald-400 bg-slate-900/60 font-semibold"
                   : "text-slate-400 hover:text-white"
               }`}
             >
               <div className="relative">
                 <Icon
                   className={`w-5 h-5 transition-transform ${
-                    item.isActive ? "scale-110 stroke-[2.5]" : "stroke-[1.75]"
-                  } ${item.highlight ? "text-[#22C55E]" : ""}`}
+                    item.isActive ? "scale-105 stroke-[2.2]" : "stroke-[1.75]"
+                  } ${item.highlight ? "text-emerald-400" : ""}`}
                 />
-                {item.badge && (
-                  <span className="absolute -top-1.5 -right-3 px-1 py-0.2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-[8px] font-black text-slate-950 uppercase">
-                    {item.badge}
-                  </span>
-                )}
-                {item.badgeDot && (
-                  <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-rose-500 ring-2 ring-[#090D16]" />
-                )}
               </div>
-              <span className="text-[10px] font-semibold tracking-tight mt-1 truncate max-w-[56px]">
+              <span className="text-[10px] tracking-tight mt-1 truncate max-w-[60px]">
                 {item.label}
               </span>
             </Link>

@@ -90,17 +90,17 @@ export default async function HomePage() {
                 <span>Safaricom Till 1572931 • 100% Escrow Protected</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black font-display tracking-tight text-[#F8FAFC] leading-[1.12]">
-                Kenya&apos;s #1 Secure eFootball Account Trading &amp; Community Hub
+              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black font-display tracking-tight text-white leading-[1.14]">
+                The Secure Marketplace for Verified eFootball Accounts
               </h1>
 
               <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-sans font-medium">
-                M-PESA NATIVE • 100% ESCROW PROTECTED • VERIFIED SELLERS. Buy and sell verified squads safely with 24-hour buyer inspection.
+                Kenya&apos;s trusted gaming escrow platform. Buy and sell verified squads with automated Safaricom M-Pesa custody and a mandatory 24-hour inspection window before payment release.
               </p>
 
               {/* Instant Search Bar */}
               <div className="max-w-2xl mx-auto lg:mx-0 pt-1">
-                <form action="/browse" method="GET" className="relative flex items-center shadow-2xl">
+                <form action="/browse" method="GET" className="relative flex items-center shadow-lg">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
                     <Search className="w-5 h-5" />
                   </div>
@@ -108,14 +108,14 @@ export default async function HomePage() {
                     type="text"
                     name="search"
                     placeholder="Search meta players (e.g. Blitz Curler Son, Bully Messi, Gullit, Vieira)..."
-                    className="w-full pl-11 pr-28 py-3.5 rounded-2xl bg-[#111827] border border-slate-700 text-[#F8FAFC] placeholder:text-slate-500 focus:outline-none focus:border-[#22C55E] text-sm shadow-inner min-h-[48px]"
+                    className="w-full pl-11 pr-28 py-3.5 rounded-2xl bg-slate-900 border border-slate-700/80 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 text-sm shadow-inner min-h-[48px]"
                   />
                   <div className="absolute inset-y-1.5 right-1.5 flex items-center">
                     <Button
                       type="submit"
                       variant="primary"
                       size="md"
-                      className="bg-[#22C55E] text-[#0B1220] hover:bg-[#16a34a] font-bold text-xs px-5 rounded-xl min-h-[40px]"
+                      className="bg-emerald-600 text-slate-950 hover:bg-emerald-500 font-bold text-xs px-5 rounded-xl min-h-[40px]"
                     >
                       Search
                     </Button>
@@ -123,13 +123,13 @@ export default async function HomePage() {
                 </form>
               </div>
 
-              {/* Dual CTAs (Glowing Green Primary + Outlined Gold Secondary) */}
+              {/* Dual CTAs (Solid Emerald Primary + Clean Slate Secondary) */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-3">
                 <Link href="/browse">
                   <Button
                     variant="primary"
                     size="lg"
-                    className="bg-gradient-to-r from-[#22C55E] to-emerald-400 hover:from-emerald-500 hover:to-emerald-400 text-[#0B1220] font-black text-sm px-6 rounded-2xl min-h-[48px] shadow-lg shadow-emerald-950/50 active:scale-95 transition-all"
+                    className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-sm px-6 rounded-xl min-h-[48px] shadow-xs active:scale-95 transition-all"
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
                     Browse Verified Squads
@@ -139,9 +139,9 @@ export default async function HomePage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="bg-[#111827] border-2 border-amber-500/80 hover:border-amber-400 text-amber-400 hover:text-amber-300 font-black text-sm px-6 rounded-2xl min-h-[48px] shadow-lg shadow-amber-950/20 active:scale-95 transition-all"
+                    className="bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm px-6 rounded-xl min-h-[48px] transition-all"
                   >
-                    List Your Squad for Free
+                    List an Account
                   </Button>
                 </Link>
               </div>
@@ -149,10 +149,10 @@ export default async function HomePage() {
 
             {/* Right Column: Live Market Authority Panel */}
             <div className="lg:col-span-5">
-              <div className="rounded-3xl bg-[#111827] border border-slate-700/80 p-6 sm:p-7 shadow-2xl space-y-6">
+              <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-7 shadow-xl space-y-6">
                 <div className="flex items-center justify-between pb-4 border-b border-slate-800">
                   <div className="flex items-center gap-2">
-                    <span className="w-2.5 h-2.5 rounded-full bg-[#22C55E] animate-pulse" />
+                    <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span className="text-xs uppercase font-mono font-bold text-slate-300 tracking-wider">
                       Live Escrow Metrics
                     </span>
@@ -164,7 +164,7 @@ export default async function HomePage() {
 
                 {/* Real Database Metrics Grid (Zero demo data) */}
                 <div className="grid grid-cols-2 gap-3.5">
-                  <div className="p-4 rounded-2xl bg-[#1E293B]/60 border border-slate-800">
+                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
                     <span className="block text-2xl sm:text-3xl font-black text-white font-display">
                       {metrics.activeListingsCount}
                     </span>
@@ -173,25 +173,25 @@ export default async function HomePage() {
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-[#1E293B]/60 border border-slate-800">
-                    <span className="block text-2xl sm:text-3xl font-black text-[#22C55E] font-display">
+                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+                    <span className="block text-2xl sm:text-3xl font-black text-emerald-400 font-display">
                       {formatCurrency(metrics.totalVolumeKes)}
                     </span>
                     <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">
-                      Escrow Volume Handled
+                      Volume Processed
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-[#1E293B]/60 border border-slate-800">
+                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
                     <span className="block text-2xl sm:text-3xl font-black text-indigo-400 font-display">
                       {metrics.completedOrdersCount}
                     </span>
                     <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">
-                      Completed Deliveries
+                      Completed Orders
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-[#1E293B]/60 border border-slate-800">
+                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
                     <span className="block text-2xl sm:text-3xl font-black text-amber-400 font-display">
                       {metrics.verifiedSellersCount}
                     </span>
@@ -204,19 +204,19 @@ export default async function HomePage() {
                 {/* Verified Standards Checklist */}
                 <div className="space-y-2.5 pt-1 text-xs text-slate-300">
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#22C55E] shrink-0" />
-                    <span>Lipa Na M-Pesa Till 1572931 lock with zero seller prepayment</span>
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                    <span>Safaricom Till 1572931 escrow with zero seller prepayment</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#22C55E] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>24-hour mandatory inspection window before funds release</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#22C55E] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>AES-256 encrypted credential transfer protocol</span>
                   </div>
                   <div className="flex items-center gap-2">
-                    <CheckCircle2 className="w-4 h-4 text-[#22C55E] shrink-0" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
                     <span>Executive dispute resolution hotline: 0794400365</span>
                   </div>
                 </div>
@@ -227,7 +227,7 @@ export default async function HomePage() {
                     <Building2 className="w-4 h-4 text-amber-400" />
                     <span>Lead Officer: Brian Okibo</span>
                   </div>
-                  <Link href="/escrow-guarantee" className="text-[#22C55E] hover:underline font-semibold">
+                  <Link href="/escrow-guarantee" className="text-emerald-400 hover:underline font-semibold">
                     Read Policy &rarr;
                   </Link>
                 </div>

@@ -174,44 +174,39 @@ export function Header() {
       <LiveActivityMarquee />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-        <div className="flex items-center justify-between h-16 gap-3">
+        <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20 gap-4 sm:gap-6">
           {/* Logo & Desktop Nav */}
-          <div className="flex items-center gap-4 xl:gap-8 min-w-0">
+          <div className="flex items-center gap-6 xl:gap-10 min-w-0">
             <Logo clickable={true} size="md" />
 
-            <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-xs xl:text-sm font-medium">
+            <nav className="hidden lg:flex items-center gap-1 xl:gap-2 text-sm font-medium">
               <Link
                 href="/browse"
-                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors whitespace-nowrap shrink-0"
+                className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
               >
                 {t.browseSquads}
               </Link>
               <Link
                 href="/#friday-drops"
-                className="px-3 py-1.5 rounded-lg text-amber-300 hover:text-amber-200 hover:bg-amber-500/10 flex items-center gap-1.5 transition-colors font-medium whitespace-nowrap shrink-0"
+                className="px-3 py-2 rounded-lg text-slate-300 hover:text-amber-300 hover:bg-amber-500/10 transition-colors whitespace-nowrap shrink-0"
               >
-                <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>{t.fridayDrops}</span>
-                <span className="px-1.5 py-0.2 rounded-full bg-amber-500/20 border border-amber-500/30 text-[9px] font-mono font-bold text-amber-300">
-                  DROP
-                </span>
+                {t.fridayDrops}
               </Link>
               <Link
                 href="/escrow-guarantee"
-                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors whitespace-nowrap shrink-0"
+                className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
               >
                 {t.escrowGuide}
               </Link>
               <Link
                 href="/scammer-check"
-                className="px-3 py-1.5 rounded-lg text-rose-300/90 hover:text-rose-200 hover:bg-rose-500/10 flex items-center gap-1.5 transition-colors font-medium whitespace-nowrap shrink-0"
+                className="px-3 py-2 rounded-lg text-slate-300 hover:text-rose-300 hover:bg-rose-500/10 transition-colors whitespace-nowrap shrink-0"
               >
-                <ShieldAlert className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-                <span>{t.scammerCheck}</span>
+                {t.scammerCheck}
               </Link>
               <Link
                 href="/news"
-                className="px-3 py-1.5 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/60 transition-colors whitespace-nowrap shrink-0"
+                className="px-3 py-2 rounded-lg text-slate-300 hover:text-white hover:bg-slate-800/50 transition-colors whitespace-nowrap shrink-0"
               >
                 {t.communityBulletin}
               </Link>
@@ -219,16 +214,16 @@ export function Header() {
           </div>
 
           {/* Right Action Buttons */}
-          <div className="flex items-center gap-2 xl:gap-3 shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
             {/* Language Switcher Dropdown (Desktop / Tablet - Mobile has dedicated drawer toggle) */}
             <div className="relative shrink-0 hidden sm:block" ref={langRef}>
               <button
                 type="button"
                 onClick={() => setLangDropdownOpen(!langDropdownOpen)}
-                className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors whitespace-nowrap shrink-0"
+                className="flex items-center gap-1.5 px-2.5 py-2 rounded-xl bg-slate-900 border border-slate-800 hover:border-slate-700 text-xs text-slate-300 hover:text-white transition-colors whitespace-nowrap shrink-0"
                 title="Change language / Badilisha lugha"
               >
-                <Globe className="w-3.5 h-3.5 text-[#22C55E] shrink-0" />
+                <Globe className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                 <span className="font-bold uppercase tracking-wider text-[11px] whitespace-nowrap">
                   {language === "en" ? "EN" : "SW"}
                 </span>
@@ -236,19 +231,19 @@ export function Header() {
               </button>
 
               {langDropdownOpen && (
-                <div className="absolute right-0 mt-1.5 w-36 rounded-xl bg-[#111827] border border-[#1F2937] shadow-xl py-1 z-50 text-xs animate-in fade-in slide-in-from-top-1">
+                <div className="absolute right-0 mt-2 w-36 rounded-xl bg-[#111827] border border-slate-800 shadow-2xl py-1 z-50 text-xs animate-in fade-in slide-in-from-top-1">
                   <button
                     type="button"
                     onClick={() => {
                       setLanguage("en");
                       setLangDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1F2937] transition-colors ${
-                      language === "en" ? "text-[#22C55E] font-bold" : "text-slate-300"
+                    className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-800 transition-colors ${
+                      language === "en" ? "text-emerald-400 font-bold" : "text-slate-300"
                     }`}
                   >
                     <span>English</span>
-                    {language === "en" && <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />}
+                    {language === "en" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
                   </button>
                   <button
                     type="button"
@@ -256,12 +251,12 @@ export function Header() {
                       setLanguage("sw");
                       setLangDropdownOpen(false);
                     }}
-                    className={`w-full text-left px-3 py-1.5 flex items-center justify-between hover:bg-[#1F2937] transition-colors ${
-                      language === "sw" ? "text-[#22C55E] font-bold" : "text-slate-300"
+                    className={`w-full text-left px-3 py-2 flex items-center justify-between hover:bg-slate-800 transition-colors ${
+                      language === "sw" ? "text-emerald-400 font-bold" : "text-slate-300"
                     }`}
                   >
                     <span>Kiswahili</span>
-                    {language === "sw" && <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E]" />}
+                    {language === "sw" && <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />}
                   </button>
                 </div>
               )}
@@ -272,7 +267,7 @@ export function Header() {
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-gradient-to-r from-[#22C55E] to-emerald-400 hover:from-emerald-500 hover:to-emerald-400 text-slate-950 font-black text-xs px-3.5 py-2 rounded-xl shadow-md flex items-center gap-1.5 whitespace-nowrap active:scale-95 transition-all"
+                className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs px-4 py-2.5 rounded-xl shadow-xs flex items-center gap-1.5 whitespace-nowrap active:scale-95 transition-all"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[3] shrink-0" />
                 <span className="whitespace-nowrap">{t.sellAccount}</span>
@@ -282,7 +277,7 @@ export function Header() {
             {/* Interactive Notification Bell */}
             <NotificationBell />
 
-            <div className="h-5 w-px bg-slate-800 mx-0.5 hidden sm:block shrink-0" />
+            <div className="h-5 w-px bg-slate-800 mx-1 hidden sm:block shrink-0" />
 
             {/* Authenticated User Profile Menu OR Guest Actions */}
             {loading ? (
