@@ -21,17 +21,17 @@ export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
 
     const variantStyles = {
       primary:
-        "bg-brand-600 text-white hover:bg-brand-500 focus:ring-brand-500 shadow-lg shadow-brand-600/30",
+        "bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black hover:from-emerald-400 hover:to-teal-300 focus:ring-emerald-400 shadow-lg shadow-emerald-500/25",
       secondary:
-        "bg-pitch-surface text-slate-100 hover:bg-slate-700 border border-pitch-border focus:ring-slate-400",
+        "bg-pitch-card text-slate-100 hover:bg-pitch-surface border border-pitch-border hover:border-emerald-500/40 focus:ring-emerald-400 shadow-md",
       outline:
-        "border border-slate-600 text-slate-200 hover:bg-slate-800/60 hover:text-white focus:ring-slate-500",
+        "border border-pitch-border text-slate-200 hover:bg-pitch-surface hover:text-white hover:border-emerald-500/50 focus:ring-emerald-500",
       ghost:
-        "text-slate-300 hover:bg-slate-800 hover:text-white focus:ring-slate-600",
+        "text-slate-300 hover:bg-pitch-surface hover:text-emerald-300 focus:ring-emerald-500",
       danger:
         "bg-rose-600 text-white hover:bg-rose-500 focus:ring-rose-500 shadow-lg shadow-rose-600/30",
       gold:
-        "bg-gradient-to-r from-amber-500 to-amber-600 text-slate-950 font-semibold hover:from-amber-400 hover:to-amber-500 focus:ring-amber-400 shadow-lg shadow-amber-500/20",
+        "bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-black hover:from-amber-400 hover:to-yellow-400 focus:ring-amber-400 shadow-lg shadow-amber-500/25",
     };
 
     return (

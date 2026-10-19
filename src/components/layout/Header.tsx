@@ -170,9 +170,12 @@ export function Header() {
   }
 
   return (
-    <header className="sticky top-0 z-50 w-full border-b border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-md transition-all">
+    <header className="sticky top-0 z-50 w-full border-b border-emerald-500/20 bg-[#070D18]/90 backdrop-blur-xl shadow-[0_4px_30px_rgba(0,0,0,0.6)] transition-all">
       {/* Top Live Activity Marquee Ticker */}
       <LiveActivityMarquee />
+
+      {/* Subtle Luminous Stadium Floodlight Accent Line */}
+      <div className="h-[1px] w-full bg-gradient-to-r from-transparent via-emerald-500/40 via-amber-400/30 to-transparent" />
 
       <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-18 lg:h-20 gap-4 xl:gap-6">
@@ -280,7 +283,7 @@ export function Header() {
               <Button
                 variant="primary"
                 size="sm"
-                className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-xs px-3 xl:px-4 py-2 sm:py-2.5 rounded-xl shadow-xs flex items-center gap-1.5 whitespace-nowrap active:scale-95 transition-all shrink-0"
+                className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs px-3 xl:px-4 py-2 sm:py-2.5 rounded-xl shadow-lg shadow-emerald-500/20 flex items-center gap-1.5 whitespace-nowrap active:scale-95 transition-all shrink-0 border border-emerald-400/30"
               >
                 <Plus className="w-3.5 h-3.5 stroke-[3] shrink-0" />
                 <span className="hidden xl:inline whitespace-nowrap">{t.sellAccount}</span>
@@ -411,14 +414,14 @@ export function Header() {
               /* Guest Actions (Log In & Create Account) */
               <div className="hidden sm:flex items-center gap-1.5 xl:gap-2 shrink-0">
                 <Link href="/login" className="shrink-0">
-                  <Button variant="secondary" size="sm" className="bg-[#111827] border-[#1F2937] text-[#F8FAFC] hover:bg-[#1F2937] text-xs font-semibold px-2.5 xl:px-3 py-1.5 rounded-lg whitespace-nowrap shrink-0">
-                    <UserIcon className="w-3.5 h-3.5 mr-1 text-[#94A3B8]" />
+                  <Button variant="secondary" size="sm" className="bg-[#0B1528] border-emerald-500/30 text-emerald-300 hover:text-white hover:border-emerald-400 text-xs font-semibold px-2.5 xl:px-3 py-1.5 rounded-xl whitespace-nowrap shrink-0 transition-colors">
+                    <UserIcon className="w-3.5 h-3.5 mr-1 text-emerald-400" />
                     <span>Log In</span>
                   </Button>
                 </Link>
                 <Link href="/register" className="shrink-0">
-                  <Button variant="primary" size="sm" className="bg-[#1F2937] border border-[#374151] hover:border-[#FBBF24]/60 text-[#FBBF24] text-xs font-bold px-2.5 xl:px-3 py-1.5 rounded-lg shadow-sm whitespace-nowrap shrink-0">
-                    <Sparkles className="w-3.5 h-3.5 mr-1 text-[#FBBF24]" />
+                  <Button variant="primary" size="sm" className="bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 text-xs font-black px-2.5 xl:px-3 py-1.5 rounded-xl shadow-md shadow-amber-500/20 whitespace-nowrap shrink-0 border border-amber-300/40 transition-all">
+                    <Sparkles className="w-3.5 h-3.5 mr-1 text-slate-950" />
                     <span>Register</span>
                   </Button>
                 </Link>
@@ -440,7 +443,7 @@ export function Header() {
 
       {/* Mobile Menu Drawer */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-[#1F2937] bg-[#0B1220]/95 backdrop-blur-xl px-4 py-5 space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto">
+        <div className="lg:hidden border-t border-emerald-500/20 bg-[#070D18]/98 backdrop-blur-2xl px-4 py-5 space-y-4 max-h-[calc(100vh-4rem)] overflow-y-auto">
           {/* User profile card or guest action on mobile */}
           {isAuthenticated ? (
             <div className="p-3 rounded-xl bg-[#111827] border border-[#1F2937] space-y-2">

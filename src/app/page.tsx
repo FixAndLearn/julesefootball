@@ -77,19 +77,26 @@ export default async function HomePage() {
 
   return (
     <div className="relative min-h-screen bg-[#0B1220] text-[#F8FAFC]">
-      {/* 1. HERO SECTION (Cyber-Athletic High-Conversion Layout) */}
-      <section className="relative overflow-hidden pt-8 pb-14 md:pt-12 md:pb-20 border-b border-slate-800 bg-gradient-to-b from-[#0B1220] via-[#0D1527] to-[#0B1220]">
+      {/* 1. HERO SECTION (Cyber-Pitch Stadium Atmosphere & High-Conversion CTAs) */}
+      <section className="relative overflow-hidden pt-8 pb-14 md:pt-14 md:pb-24 border-b border-emerald-500/20 bg-gradient-to-b from-[#060B14] via-[#0A162B] to-[#060B14]">
+        {/* Stadium Ambient Floodlights */}
+        <div className="absolute top-0 left-1/4 w-[600px] h-[350px] bg-emerald-500/15 rounded-full blur-[130px] pointer-events-none -translate-y-1/2" />
+        <div className="absolute top-1/3 right-10 w-[500px] h-[350px] bg-amber-500/12 rounded-full blur-[130px] pointer-events-none" />
+
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
             {/* Left Column: Authority Copy, Search & Dual CTAs */}
             <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-emerald-950/60 border border-emerald-700/60 text-emerald-300 text-xs font-semibold shadow-inner">
+              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-emerald-950/80 via-emerald-900/50 to-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs font-semibold shadow-lg shadow-emerald-500/10">
                 <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
                 <span>Safaricom Till 1572931 • 100% Escrow Protected</span>
               </div>
 
-              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black font-display tracking-tight text-white leading-[1.14]">
-                The Secure Marketplace for Verified eFootball Accounts
+              <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black font-display tracking-tight leading-[1.14]">
+                <span className="text-white">The Secure Marketplace for </span>
+                <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent drop-shadow-sm">
+                  Verified eFootball Accounts
+                </span>
               </h1>
 
               <p className="text-sm sm:text-base md:text-lg text-slate-300 max-w-2xl mx-auto lg:mx-0 leading-relaxed font-sans font-medium">
@@ -98,22 +105,22 @@ export default async function HomePage() {
 
               {/* Instant Search Bar */}
               <div className="max-w-2xl mx-auto lg:mx-0 pt-1">
-                <form action="/browse" method="GET" className="relative flex items-center shadow-lg">
+                <form action="/browse" method="GET" className="relative flex items-center shadow-2xl">
                   <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-slate-400">
-                    <Search className="w-5 h-5" />
+                    <Search className="w-5 h-5 text-emerald-400" />
                   </div>
                   <input
                     type="text"
                     name="search"
                     placeholder="Search meta players (e.g. Blitz Curler Son, Bully Messi, Gullit, Vieira)..."
-                    className="w-full pl-11 pr-28 py-3.5 rounded-2xl bg-slate-900 border border-slate-700/80 text-white placeholder:text-slate-500 focus:outline-none focus:border-emerald-500 text-sm shadow-inner min-h-[48px]"
+                    className="w-full pl-11 pr-28 py-3.5 rounded-2xl bg-[#0A1426]/90 border border-emerald-500/35 text-white placeholder:text-slate-400 focus:outline-none focus:border-emerald-400 focus:ring-2 focus:ring-emerald-500/20 text-sm shadow-inner min-h-[48px]"
                   />
                   <div className="absolute inset-y-1.5 right-1.5 flex items-center">
                     <Button
                       type="submit"
                       variant="primary"
                       size="md"
-                      className="bg-emerald-600 text-slate-950 hover:bg-emerald-500 font-bold text-xs px-5 rounded-xl min-h-[40px]"
+                      className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs px-5 rounded-xl min-h-[40px] shadow-md shadow-emerald-500/20"
                     >
                       Search
                     </Button>
@@ -121,13 +128,13 @@ export default async function HomePage() {
                 </form>
               </div>
 
-              {/* Dual CTAs (Solid Emerald Primary + Clean Slate Secondary) */}
+              {/* Dual CTAs (Vibrant Emerald Primary + Championship Gold Secondary) */}
               <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-3">
                 <Link href="/browse">
                   <Button
                     variant="primary"
                     size="lg"
-                    className="bg-emerald-600 hover:bg-emerald-500 text-slate-950 font-bold text-sm px-6 rounded-xl min-h-[48px] shadow-xs active:scale-95 transition-all"
+                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm px-6 py-3.5 rounded-xl min-h-[48px] shadow-lg shadow-emerald-500/25 border border-emerald-400/40 active:scale-95 transition-all"
                   >
                     <Sparkles className="w-4 h-4 mr-2" />
                     Browse Verified Squads
@@ -137,7 +144,7 @@ export default async function HomePage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="bg-slate-900 border border-slate-700 hover:border-slate-500 text-slate-200 hover:text-white font-semibold text-sm px-6 rounded-xl min-h-[48px] transition-all"
+                    className="bg-[#0D1A33] border border-amber-500/40 hover:border-amber-400 text-amber-200 hover:text-white font-bold text-sm px-6 py-3.5 rounded-xl min-h-[48px] shadow-md shadow-amber-500/10 transition-all"
                   >
                     List an Account
                   </Button>
@@ -147,53 +154,53 @@ export default async function HomePage() {
 
             {/* Right Column: Live Market Authority Panel */}
             <div className="lg:col-span-5">
-              <div className="rounded-3xl bg-slate-900/90 border border-slate-800 p-6 sm:p-7 shadow-xl space-y-6">
-                <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="rounded-3xl bg-gradient-to-br from-[#0D1B34]/95 via-[#0A1426]/95 to-[#0D1B34]/95 border border-emerald-500/30 p-6 sm:p-7 shadow-2xl shadow-emerald-950/40 space-y-6 relative overflow-hidden backdrop-blur-xl">
+                <div className="flex items-center justify-between pb-4 border-b border-emerald-500/20">
                   <div className="flex items-center gap-2">
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-pulse" />
-                    <span className="text-xs uppercase font-mono font-bold text-slate-300 tracking-wider">
+                    <span className="text-xs uppercase font-mono font-bold text-emerald-300 tracking-wider">
                       Live Escrow Metrics
                     </span>
                   </div>
-                  <span className="text-[10px] font-mono font-bold text-emerald-400 bg-emerald-950/60 border border-emerald-800/80 px-2.5 py-0.5 rounded-full">
+                  <span className="text-[10px] font-mono font-bold text-amber-300 bg-amber-500/15 border border-amber-400/40 px-2.5 py-0.5 rounded-full shadow-sm">
                     Safaricom Daraja v2
                   </span>
                 </div>
 
                 {/* Real Database Metrics Grid (Zero demo data) */}
                 <div className="grid grid-cols-2 gap-3.5">
-                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <span className="block text-2xl sm:text-3xl font-black text-white font-display">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0F2242] to-[#0A1426] border border-amber-500/35 shadow-md shadow-amber-500/10">
+                    <span className="block text-2xl sm:text-3xl font-black text-amber-300 font-display">
                       {metrics.activeListingsCount}
                     </span>
-                    <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">
+                    <span className="text-[11px] text-amber-200/80 uppercase font-bold tracking-wider">
                       Verified Squads
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#0B2A3B] to-[#0A1426] border border-emerald-500/45 shadow-md shadow-emerald-500/10">
                     <span className="block text-2xl sm:text-3xl font-black text-emerald-400 font-display">
                       {formatCurrency(metrics.totalVolumeKes)}
                     </span>
-                    <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">
+                    <span className="text-[11px] text-emerald-200/80 uppercase font-bold tracking-wider">
                       Volume Processed
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <span className="block text-2xl sm:text-3xl font-black text-indigo-400 font-display">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#131F45] to-[#0A1426] border border-sky-500/35 shadow-md shadow-sky-500/10">
+                    <span className="block text-2xl sm:text-3xl font-black text-sky-300 font-display">
                       {metrics.completedOrdersCount}
                     </span>
-                    <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">
+                    <span className="text-[11px] text-sky-200/80 uppercase font-bold tracking-wider">
                       Completed Orders
                     </span>
                   </div>
 
-                  <div className="p-4 rounded-2xl bg-slate-950/60 border border-slate-800">
-                    <span className="block text-2xl sm:text-3xl font-black text-amber-400 font-display">
+                  <div className="p-4 rounded-2xl bg-gradient-to-br from-[#1E1742] to-[#0A1426] border border-purple-500/35 shadow-md shadow-purple-500/10">
+                    <span className="block text-2xl sm:text-3xl font-black text-purple-300 font-display">
                       {metrics.verifiedSellersCount}
                     </span>
-                    <span className="text-[11px] text-slate-400 uppercase font-bold tracking-wider">
+                    <span className="text-[11px] text-purple-200/80 uppercase font-bold tracking-wider">
                       Vetted Sellers
                     </span>
                   </div>
@@ -220,12 +227,12 @@ export default async function HomePage() {
                 </div>
 
                 {/* Reviewer signature badge */}
-                <div className="pt-3 border-t border-slate-800 flex items-center justify-between text-xs text-slate-400">
+                <div className="pt-3 border-t border-emerald-500/20 flex items-center justify-between text-xs text-slate-300">
                   <div className="flex items-center gap-2">
                     <Building2 className="w-4 h-4 text-amber-400" />
                     <span>Lead Officer: Brian Okibo</span>
                   </div>
-                  <Link href="/escrow-guarantee" className="text-emerald-400 hover:underline font-semibold">
+                  <Link href="/escrow-guarantee" className="text-emerald-400 hover:text-emerald-300 hover:underline font-semibold">
                     Read Policy &rarr;
                   </Link>
                 </div>
@@ -236,11 +243,11 @@ export default async function HomePage() {
       </section>
 
       {/* 2. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
-      <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
+      <section className="py-14 md:py-20 border-b border-emerald-500/20 bg-[#060B14]/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
             <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-1">
+              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
                 <Sparkles className="w-3.5 h-3.5" />
                 <span>Verified Inventory</span>
               </div>
@@ -253,48 +260,48 @@ export default async function HomePage() {
             </div>
             <Link
               href="/browse"
-              className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] hover:underline shrink-0"
+              className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline shrink-0"
             >
               <span>View All Listings ({metrics.activeListingsCount})</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
           </div>
 
-          {/* Instant Category Filter Pills */}
+          {/* Instant Category Filter Pills (Vibrant Cyber-Pitch Styling) */}
           <div className="flex flex-wrap items-center gap-2 mb-8">
             <Link
               href="/browse"
-              className="px-3.5 py-1.5 rounded-xl bg-[#22C55E]/15 border border-[#22C55E]/40 text-[#22C55E] text-xs font-bold transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/25 to-teal-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-bold shadow-md shadow-emerald-500/10 transition-colors"
             >
               All Verified Squads ({metrics.activeListingsCount})
             </Link>
             <Link
               href="/browse?platform=android"
-              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 text-xs font-medium transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-[#0D1829] border border-emerald-500/25 text-slate-300 hover:text-white hover:border-emerald-400 text-xs font-medium transition-colors"
             >
               Android Mobile
             </Link>
             <Link
               href="/browse?platform=ios"
-              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 text-xs font-medium transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-[#0D1829] border border-emerald-500/25 text-slate-300 hover:text-white hover:border-emerald-400 text-xs font-medium transition-colors"
             >
               iOS / iPhone
             </Link>
             <Link
               href="/browse?minStrength=3200"
-              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-amber-500/30 text-amber-300 hover:border-amber-400 text-xs font-bold transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/25 to-yellow-500/20 border border-amber-400/60 text-amber-300 hover:border-amber-300 text-xs font-bold shadow-md shadow-amber-500/15 transition-colors"
             >
               ★ 3200+ OVR Elite
             </Link>
             <Link
               href="/browse?playstyle=quick_counter"
-              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 text-xs font-medium transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-[#0D1829] border border-emerald-500/25 text-slate-300 hover:text-white hover:border-emerald-400 text-xs font-medium transition-colors"
             >
               Quick Counter
             </Link>
             <Link
               href="/browse?playstyle=possession"
-              className="px-3.5 py-1.5 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 hover:text-white hover:border-slate-600 text-xs font-medium transition-colors"
+              className="px-3.5 py-1.5 rounded-xl bg-[#0D1829] border border-emerald-500/25 text-slate-300 hover:text-white hover:border-emerald-400 text-xs font-medium transition-colors"
             >
               Possession Game
             </Link>
@@ -302,8 +309,8 @@ export default async function HomePage() {
 
           {listings.length === 0 ? (
             /* Clean Authentic Empty State (Zero fabricated data) */
-            <div className="rounded-3xl bg-[#111827] border border-slate-800 p-10 text-center space-y-4 max-w-xl mx-auto">
-              <div className="w-12 h-12 rounded-2xl bg-slate-800 text-slate-400 flex items-center justify-center mx-auto">
+            <div className="rounded-3xl bg-[#0D192E] border border-emerald-500/30 p-10 text-center space-y-4 max-w-xl mx-auto shadow-xl">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
                 <Sparkles className="w-6 h-6" />
               </div>
               <h3 className="text-base font-bold text-white">No active listings available right now</h3>
@@ -311,7 +318,7 @@ export default async function HomePage() {
                 All previous squads have been purchased or are currently in 24-hour buyer inspection. Be the first verified seller to list your squad!
               </p>
               <Link href="/seller/create-listing">
-                <Button variant="primary" size="md" className="bg-[#22C55E] text-[#0B1220] font-bold text-xs">
+                <Button variant="primary" size="md" className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs shadow-md shadow-emerald-500/20">
                   + Create First Listing
                 </Button>
               </Link>
@@ -330,19 +337,19 @@ export default async function HomePage() {
       <EscrowStepsVisualizer />
 
       {/* 5. GOOGLE-COMPLIANT ADVERTISEMENT BANNER */}
-      <section className="py-6 bg-[#090D16] border-b border-slate-800">
+      <section className="py-6 bg-[#060B14] border-b border-emerald-500/15">
         <div className="max-w-5xl mx-auto px-4">
           <AdBanner slot="home-featured-middle" />
         </div>
       </section>
 
       {/* 6. BRING-YOUR-OWN-DEAL MIDDLEMAN FEATURE (Healthline-style solution panel) */}
-      <section className="py-14 md:py-20 bg-[#0F172A] border-b border-slate-800">
+      <section className="py-14 md:py-20 bg-gradient-to-b from-[#060B14] via-[#091526] to-[#060B14] border-b border-emerald-500/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="rounded-3xl bg-gradient-to-r from-[#111827] via-[#162138] to-[#111827] border border-slate-700/80 p-8 sm:p-12 shadow-2xl">
+          <div className="rounded-3xl bg-gradient-to-r from-[#0B172E] via-[#0E2242] to-[#0B172E] border border-emerald-500/35 p-8 sm:p-12 shadow-2xl shadow-emerald-950/50">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-800/80 text-emerald-300 text-xs font-semibold">
+                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
                   <Handshake className="w-3.5 h-3.5 text-[#22C55E]" />
                   <span>Bring-Your-Own-Deal Middleman</span>
                 </div>
@@ -354,16 +361,16 @@ export default async function HomePage() {
                 </p>
 
                 <div className="grid grid-cols-3 gap-3 pt-2 text-xs">
-                  <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                  <div className="p-3.5 rounded-xl bg-[#091222]/90 border border-emerald-500/25 shadow-sm">
                     <span className="block font-bold text-white mb-0.5">1. Deposit</span>
                     <span className="text-[11px] text-slate-400">Buyer deposits to Till 1572931</span>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
+                  <div className="p-3.5 rounded-xl bg-[#091222]/90 border border-emerald-500/25 shadow-sm">
                     <span className="block font-bold text-white mb-0.5">2. Inspect</span>
                     <span className="text-[11px] text-slate-400">24h verification countdown</span>
                   </div>
-                  <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800">
-                    <span className="block font-bold text-[#22C55E] mb-0.5">3. Disburse</span>
+                  <div className="p-3.5 rounded-xl bg-[#091222]/90 border border-emerald-500/25 shadow-sm">
+                    <span className="block font-bold text-emerald-400 mb-0.5">3. Disburse</span>
                     <span className="text-[11px] text-slate-400">Instant M-Pesa seller payout</span>
                   </div>
                 </div>
@@ -374,7 +381,7 @@ export default async function HomePage() {
                   <Button
                     variant="primary"
                     size="lg"
-                    className="w-full bg-[#22C55E] text-[#0B1220] hover:bg-[#16a34a] font-black text-xs py-3.5 rounded-2xl min-h-[48px]"
+                    className="w-full bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-xs py-3.5 rounded-2xl min-h-[48px] shadow-lg shadow-emerald-500/25 border border-emerald-400/40"
                   >
                     <Handshake className="w-4 h-4 mr-2" />
                     Start Middleman Escrow
@@ -389,9 +396,9 @@ export default async function HomePage() {
                   <Button
                     variant="secondary"
                     size="lg"
-                    className="w-full bg-[#111827] border border-slate-700 text-white hover:border-slate-500 text-xs py-3.5 rounded-2xl min-h-[48px]"
+                    className="w-full bg-[#091222] border border-emerald-500/30 text-white hover:border-emerald-400 text-xs py-3.5 rounded-2xl min-h-[48px] transition-colors"
                   >
-                    <MessageCircle className="w-4 h-4 mr-2 text-[#22C55E]" />
+                    <MessageCircle className="w-4 h-4 mr-2 text-emerald-400" />
                     WhatsApp Admin: 0794400365
                   </Button>
                 </a>
@@ -403,12 +410,12 @@ export default async function HomePage() {
 
       {/* 6. COMPETITIVE TOURNAMENTS & KNOCKOUT CUPS (Rendered only when active cups exist) */}
       {tournaments.length > 0 && (
-        <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
+        <section className="py-14 md:py-20 border-b border-amber-500/20 bg-gradient-to-b from-[#060B14] via-[#0D1528] to-[#060B14]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
                 <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
-                  <Trophy className="w-3.5 h-3.5" />
+                  <Trophy className="w-3.5 h-3.5 text-amber-400" />
                   <span>eFootball Kenya Cups</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
@@ -420,7 +427,7 @@ export default async function HomePage() {
               </div>
               <Link
                 href="/tournaments"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:underline shrink-0"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 hover:text-amber-300 hover:underline shrink-0"
               >
                 <span>View All Tournaments & Brackets</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -431,11 +438,11 @@ export default async function HomePage() {
               {tournaments.map((t) => (
                 <div
                   key={t.id}
-                  className="rounded-3xl bg-[#111827] border border-slate-800 p-6 flex flex-col justify-between shadow-xl"
+                  className="rounded-3xl bg-gradient-to-br from-[#0F1E38] to-[#0A1426] border border-amber-500/35 p-6 flex flex-col justify-between shadow-xl shadow-amber-950/20"
                 >
                   <div className="space-y-3">
                     <div className="flex items-center justify-between">
-                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 border border-amber-500/20 text-amber-400">
+                      <span className="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/15 border border-amber-400/40 text-amber-300">
                         {t.status?.replace("_", " ")}
                       </span>
                       <span className="text-xs text-slate-400 font-mono">
@@ -446,7 +453,7 @@ export default async function HomePage() {
                     <h3 className="text-base font-bold text-white">{t.title}</h3>
                     <p className="text-xs text-slate-400 line-clamp-2">{t.subtitle}</p>
 
-                    <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-between text-xs">
+                    <div className="p-3 rounded-2xl bg-[#081224] border border-emerald-500/30 flex items-center justify-between text-xs">
                       <span className="text-slate-400">Prize Pool:</span>
                       <strong className="text-emerald-400 font-mono font-bold">
                         {formatCurrency(t.prize_pool_kes, "KES")}
@@ -454,12 +461,12 @@ export default async function HomePage() {
                     </div>
                   </div>
 
-                  <div className="pt-4 mt-4 border-t border-slate-800">
+                  <div className="pt-4 mt-4 border-t border-slate-800/80">
                     <Link href="/tournaments">
                       <Button
                         variant="primary"
                         size="md"
-                        className="w-full bg-[#22C55E] hover:bg-[#16a34a] text-[#0B1220] font-bold text-xs rounded-xl min-h-[44px]"
+                        className="w-full bg-gradient-to-r from-amber-400 to-amber-500 hover:from-amber-300 hover:to-amber-400 text-slate-950 font-black text-xs rounded-xl min-h-[44px] shadow-md shadow-amber-500/20 border border-amber-300/40"
                       >
                         Enter Tournament
                       </Button>
@@ -474,11 +481,11 @@ export default async function HomePage() {
 
       {/* 7. EDITORIAL BULLETINS & SCAMMER ALERTS (Rendered only when articles exist) */}
       {articles.length > 0 && (
-        <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0F172A]">
+        <section className="py-14 md:py-20 border-b border-emerald-500/20 bg-gradient-to-b from-[#060B14] via-[#091526] to-[#060B14]">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-1">
+                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
                   <Newspaper className="w-3.5 h-3.5" />
                   <span>Verified Alerts</span>
                 </div>
@@ -491,7 +498,7 @@ export default async function HomePage() {
               </div>
               <Link
                 href="/news"
-                className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] hover:underline shrink-0"
+                className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline shrink-0"
               >
                 <span>Read All Bulletins</span>
                 <ArrowRight className="w-3.5 h-3.5" />
@@ -505,7 +512,7 @@ export default async function HomePage() {
                   <Link
                     key={article.id}
                     href={`/news/${article.slug}`}
-                    className="rounded-3xl bg-[#111827] border border-slate-800 hover:border-slate-600 p-6 flex flex-col justify-between shadow-xl transition-all group"
+                    className="rounded-3xl bg-gradient-to-br from-[#0D1A30] to-[#070D18] border border-emerald-500/25 hover:border-emerald-400/60 p-6 flex flex-col justify-between shadow-xl shadow-emerald-950/20 transition-all group"
                   >
                     <div>
                       <div className="flex items-center justify-between gap-2 mb-3">
@@ -513,7 +520,7 @@ export default async function HomePage() {
                           className={`px-2.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
                             isAlert
                               ? "bg-rose-950/80 text-rose-300 border border-rose-800/80"
-                              : "bg-slate-800 text-slate-300 border border-slate-700"
+                              : "bg-emerald-950/60 text-emerald-300 border border-emerald-700/60"
                           }`}
                         >
                           {isAlert ? "🚨 Scammer Alert" : article.category?.replace("_", " ") || "Update"}
@@ -523,7 +530,7 @@ export default async function HomePage() {
                         </span>
                       </div>
 
-                      <h3 className="text-sm font-bold text-white group-hover:text-[#22C55E] transition-colors line-clamp-2 mb-2">
+                      <h3 className="text-sm font-bold text-white group-hover:text-emerald-300 transition-colors line-clamp-2 mb-2">
                         {article.title}
                       </h3>
                       <p className="text-xs text-slate-400 line-clamp-3 leading-relaxed">
@@ -531,9 +538,9 @@ export default async function HomePage() {
                       </p>
                     </div>
 
-                    <div className="mt-4 pt-3 border-t border-slate-800 flex items-center justify-between text-xs font-semibold text-slate-400">
+                    <div className="mt-4 pt-3 border-t border-slate-800/80 flex items-center justify-between text-xs font-semibold text-slate-400">
                       <span>Read bulletin</span>
-                      <ArrowRight className="w-3.5 h-3.5 text-[#22C55E] group-hover:translate-x-1 transition-transform" />
+                      <ArrowRight className="w-3.5 h-3.5 text-emerald-400 group-hover:translate-x-1 transition-transform" />
                     </div>
                   </Link>
                 );
@@ -544,10 +551,10 @@ export default async function HomePage() {
       )}
 
       {/* 9. INTERACTIVE FAQ ACCORDION (Matches Schema.org FAQPage for Google Search) */}
-      <section className="py-14 md:py-20 border-b border-slate-800 bg-[#0B1220]">
+      <section className="py-14 md:py-20 border-b border-emerald-500/20 bg-gradient-to-b from-[#060B14] to-[#04070D]">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-2">
+            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">
               <FileText className="w-3.5 h-3.5" />
               <span>Authority Knowledge Base</span>
             </div>

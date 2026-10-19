@@ -9,8 +9,9 @@ export function Footer() {
     <footer
       role="contentinfo"
       aria-label="Site Footer"
-      className="w-full border-t border-slate-800/80 bg-[#070B14] text-slate-400 text-xs mt-auto py-6"
+      className="w-full border-t border-pitch-border bg-[#060B14] text-slate-400 text-xs mt-auto py-8 relative overflow-hidden"
     >
+      <div className="absolute top-0 inset-x-0 h-px bg-gradient-to-r from-transparent via-emerald-500/30 to-transparent pointer-events-none" />
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col md:flex-row items-center justify-between gap-4 text-center md:text-left">
         {/* Left: Brand, Copyright & Escrow Badge */}
         <div className="flex flex-wrap items-center justify-center md:justify-start gap-3">

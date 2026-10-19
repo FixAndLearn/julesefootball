@@ -97,12 +97,16 @@ export function EscrowStepsVisualizer() {
   const [activeStep, setActiveStep] = useState(0);
 
   return (
-    <section className="py-14 md:py-20 bg-[#0B1220] border-b border-slate-800 relative">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-14 md:py-20 bg-[#070D18] border-b border-pitch-border relative overflow-hidden">
+      {/* Stadium floodlight ambience */}
+      <div className="absolute top-0 right-1/4 w-[450px] h-[300px] bg-emerald-500/10 blur-[130px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-0 left-10 w-[350px] h-[250px] bg-amber-500/10 blur-[120px] rounded-full pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-800/80 text-emerald-300 text-xs font-semibold mb-3">
-            <ShieldCheck className="w-3.5 h-3.5 text-[#22C55E]" />
+          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-3">
+            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
             <span>Safaricom Till 1572931 Security Architecture</span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display tracking-tight">
@@ -122,10 +126,10 @@ export function EscrowStepsVisualizer() {
               <div
                 key={step.num}
                 onClick={() => setActiveStep(idx)}
-                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shadow-lg ${
+                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shadow-xl ${
                   isSelected
-                    ? "bg-[#111827] border-emerald-500 shadow-emerald-500/10 ring-1 ring-emerald-500/50"
-                    : "bg-[#0E1626] border-slate-800 hover:border-slate-700 hover:bg-[#111827]/70"
+                    ? "bg-pitch-card border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.2)] ring-1 ring-emerald-500/50"
+                    : "bg-pitch-surface/90 border-pitch-border hover:border-emerald-500/50 hover:bg-pitch-card/90"
                 }`}
               >
                 <div className="space-y-2.5">
@@ -133,8 +137,8 @@ export function EscrowStepsVisualizer() {
                     <span
                       className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono font-black text-xs ${
                         isSelected
-                          ? "bg-[#22C55E] text-[#0B1220]"
-                          : "bg-slate-800 text-slate-400"
+                          ? "bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black"
+                          : "bg-slate-800 text-slate-300"
                       }`}
                     >
                       {step.num}
@@ -149,7 +153,7 @@ export function EscrowStepsVisualizer() {
                   <div className="flex items-center gap-2 pt-1">
                     <Icon
                       className={`w-4 h-4 shrink-0 ${
-                        isSelected ? "text-[#22C55E]" : "text-slate-400"
+                        isSelected ? "text-emerald-400" : "text-slate-400"
                       }`}
                     />
                     <h3 className="font-bold text-white text-sm leading-tight">
@@ -162,11 +166,11 @@ export function EscrowStepsVisualizer() {
                   </p>
                 </div>
 
-                <div className="pt-3 mt-3 border-t border-slate-800/80 flex items-center justify-between text-[11px] font-semibold text-slate-400">
+                <div className="pt-3 mt-3 border-t border-pitch-border/80 flex items-center justify-between text-[11px] font-semibold text-slate-400">
                   <span className={isSelected ? "text-emerald-400 font-bold" : ""}>
                     {isSelected ? "Active Step" : "Click to view"}
                   </span>
-                  <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-emerald-400 animate-pulse" : "bg-slate-700"}`} />
+                  <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_#10B981]" : "bg-slate-700"}`} />
                 </div>
               </div>
             );
@@ -174,10 +178,10 @@ export function EscrowStepsVisualizer() {
         </div>
 
         {/* Active Step Decompressed Deep-Dive Banner */}
-        <div className="rounded-2xl bg-slate-900/90 border border-slate-800 p-5 mb-8">
+        <div className="rounded-2xl bg-pitch-surface/90 border border-pitch-border p-5 mb-8 shadow-xl">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-2.5">
-              <span className="w-8 h-8 rounded-xl bg-emerald-500/20 text-[#22C55E] flex items-center justify-center font-bold text-xs shrink-0">
+              <span className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
                 {STEPS[activeStep].num}
               </span>
               <div>
@@ -194,9 +198,9 @@ export function EscrowStepsVisualizer() {
               {STEPS[activeStep].details.map((detail, idx) => (
                 <div
                   key={idx}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0B1220] border border-slate-800 text-xs text-slate-300"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300"
                 >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-[#22C55E] shrink-0" />
+                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
                   <span>{detail}</span>
                 </div>
               ))}
@@ -205,16 +209,16 @@ export function EscrowStepsVisualizer() {
         </div>
 
         {/* Highlight Callout Box: Why You Cannot Be Scammed */}
-        <div className="rounded-3xl bg-gradient-to-r from-emerald-950/60 via-[#111827] to-emerald-950/60 border border-emerald-500/40 p-6 sm:p-8 shadow-2xl">
-          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="rounded-3xl bg-gradient-to-r from-emerald-950/60 via-pitch-card to-amber-950/40 border border-emerald-500/40 p-6 sm:p-8 shadow-2xl relative overflow-hidden">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
             <div className="flex items-start gap-4">
-              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-[#22C55E] flex items-center justify-center shrink-0">
+              <div className="w-12 h-12 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 flex items-center justify-center shrink-0 shadow-[0_0_20px_rgba(16,185,129,0.3)]">
                 <Lock className="w-6 h-6" />
               </div>
               <div className="space-y-1.5">
                 <h4 className="text-base sm:text-lg font-black text-white font-display flex items-center gap-2">
                   <span>Why You Cannot Be Scammed</span>
-                  <span className="px-2.5 py-0.5 rounded-full bg-[#22C55E] text-[#0B1220] text-[10px] font-bold uppercase">
+                  <span className="px-2.5 py-0.5 rounded-full bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 text-[10px] font-black uppercase shadow-md">
                     Guaranteed
                   </span>
                 </h4>
@@ -228,7 +232,7 @@ export function EscrowStepsVisualizer() {
               <Link href="/browse">
                 <button
                   type="button"
-                  className="px-5 py-3 rounded-xl bg-[#22C55E] hover:bg-emerald-400 text-slate-950 font-black text-xs shadow-lg transition-all active:scale-95 flex items-center gap-1.5"
+                  className="px-5 py-3 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 hover:from-emerald-400 hover:to-teal-300 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 transition-all active:scale-95 flex items-center gap-1.5"
                 >
                   <span>Browse Accounts</span>
                   <ArrowRight className="w-3.5 h-3.5" />
@@ -237,7 +241,7 @@ export function EscrowStepsVisualizer() {
               <Link href="/escrow-guarantee">
                 <button
                   type="button"
-                  className="px-4 py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs border border-slate-700 transition-colors"
+                  className="px-4 py-3 rounded-xl bg-pitch-card hover:bg-pitch-surface text-amber-300 font-bold text-xs border border-amber-500/40 hover:border-amber-400 transition-colors shadow-md"
                 >
                   Read Escrow Rules
                 </button>

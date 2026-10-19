@@ -96,29 +96,30 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       />
 
       {/* Institutional Healthline-Style Trust Header Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-[#111827] border border-[#1F2937] shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4">
-        <div>
+      <div className="p-4 sm:p-5 rounded-2xl bg-pitch-surface/90 border border-pitch-border shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
+        <div className="absolute top-0 right-0 w-80 h-32 bg-emerald-500/10 blur-3xl pointer-events-none" />
+        <div className="relative z-10">
           <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-[#22C55E]/15 border border-[#22C55E]/40 text-[#22C55E] text-[11px] font-bold">
+            <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 text-[11px] font-bold">
               Till 1572931 Escrow Protected
             </span>
-            <span className="text-xs text-[#94A3B8]">24-Hour Inspection Guarantee</span>
+            <span className="text-xs text-slate-400">24-Hour Inspection Guarantee</span>
           </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white font-display">
             Browse eFootball Accounts
           </h1>
-          <p className="text-xs sm:text-sm text-[#94A3B8] mt-0.5">
-            Showing <span className="text-[#F8FAFC] font-semibold">{totalCount}</span> verified live listings | Inspected before payout
+          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
+            Showing <span className="text-emerald-300 font-semibold">{totalCount}</span> verified live listings | Inspected before payout
           </p>
         </div>
 
-        <div className="flex flex-wrap items-center gap-2.5 text-xs text-[#94A3B8]">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0B1220] border border-[#1F2937]">
-            <Lock className="w-3.5 h-3.5 text-[#22C55E]" />
+        <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-300 relative z-10">
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pitch-card border border-pitch-border">
+            <Lock className="w-3.5 h-3.5 text-emerald-400" />
             <span>Encrypted Konami 2FA</span>
           </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#0B1220] border border-[#1F2937]">
-            <CheckCircle2 className="w-3.5 h-3.5 text-[#FBBF24]" />
+          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pitch-card border border-pitch-border">
+            <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
             <span>Zero Unverified Claims</span>
           </div>
         </div>
@@ -141,25 +142,25 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
             </div>
           )}
           {(searchParams.search || (searchParams.platform && searchParams.platform !== "all") || (searchParams.playstyle && searchParams.playstyle !== "all") || searchParams.minStrength) && (
-            <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-[#111827] border border-[#1F2937]">
-              <span className="text-xs text-[#94A3B8] font-semibold">Active:</span>
+            <div className="flex flex-wrap items-center gap-2 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border">
+              <span className="text-xs text-slate-400 font-semibold">Active:</span>
               {searchParams.search && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0B1220] border border-[#1F2937] text-xs text-slate-200">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-pitch-card border border-pitch-border text-xs text-slate-200">
                   Keyword: "{searchParams.search}"
                 </span>
               )}
               {searchParams.platform && searchParams.platform !== "all" && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0B1220] border border-[#1F2937] text-xs text-slate-200 capitalize">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-pitch-card border border-pitch-border text-xs text-slate-200 capitalize">
                   {searchParams.platform}
                 </span>
               )}
               {searchParams.minStrength && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0B1220] border border-amber-500/40 text-xs text-[#FBBF24] font-bold">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-amber-950/60 border border-amber-500/40 text-xs text-amber-300 font-bold">
                   {searchParams.minStrength}+ OVR
                 </span>
               )}
               {searchParams.playstyle && searchParams.playstyle !== "all" && (
-                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-md bg-[#0B1220] border border-[#1F2937] text-xs text-slate-200 capitalize">
+                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-pitch-card border border-pitch-border text-xs text-slate-200 capitalize">
                   {searchParams.playstyle.replace("_", " ")}
                 </span>
               )}
