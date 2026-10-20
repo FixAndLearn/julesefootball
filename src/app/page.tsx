@@ -17,7 +17,6 @@ import {
   Newspaper,
   Phone,
   Search,
-  ShieldCheck,
   Sparkles,
   Swords,
   Trophy,
@@ -85,13 +84,8 @@ export default async function HomePage() {
 
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center">
-            {/* Left Column: Authority Copy, Search & Dual CTAs */}
+            {/* Left Column: Authority Copy & Search */}
             <div className="lg:col-span-7 text-center lg:text-left space-y-6">
-              <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-gradient-to-r from-emerald-950/80 via-emerald-900/50 to-emerald-950/80 border border-emerald-500/50 text-emerald-300 text-xs font-semibold shadow-lg shadow-emerald-500/10">
-                <ShieldCheck className="w-4 h-4 text-[#22C55E]" />
-                <span>Safaricom Till 1572931 • 100% Escrow Protected</span>
-              </div>
-
               <h1 className="text-3xl sm:text-4xl md:text-5xl xl:text-6xl font-black font-display tracking-tight leading-[1.14]">
                 <span className="text-white">The Secure Marketplace for </span>
                 <span className="bg-gradient-to-r from-emerald-400 via-teal-300 to-amber-300 bg-clip-text text-transparent drop-shadow-sm">
@@ -126,29 +120,6 @@ export default async function HomePage() {
                     </Button>
                   </div>
                 </form>
-              </div>
-
-              {/* Dual CTAs (Vibrant Emerald Primary + Championship Gold Secondary) */}
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 pt-3">
-                <Link href="/browse">
-                  <Button
-                    variant="primary"
-                    size="lg"
-                    className="bg-gradient-to-r from-emerald-500 to-emerald-600 hover:from-emerald-400 hover:to-emerald-500 text-slate-950 font-black text-sm px-6 py-3.5 rounded-xl min-h-[48px] shadow-lg shadow-emerald-500/25 border border-emerald-400/40 active:scale-95 transition-all"
-                  >
-                    <Sparkles className="w-4 h-4 mr-2" />
-                    Browse Verified Squads
-                  </Button>
-                </Link>
-                <Link href="/seller/create-listing">
-                  <Button
-                    variant="secondary"
-                    size="lg"
-                    className="bg-[#0D1A33] border border-amber-500/40 hover:border-amber-400 text-amber-200 hover:text-white font-bold text-sm px-6 py-3.5 rounded-xl min-h-[48px] shadow-md shadow-amber-500/10 transition-all"
-                  >
-                    List an Account
-                  </Button>
-                </Link>
               </div>
             </div>
 
@@ -267,45 +238,7 @@ export default async function HomePage() {
             </Link>
           </div>
 
-          {/* Instant Category Filter Pills (Vibrant Cyber-Pitch Styling) */}
-          <div className="flex flex-wrap items-center gap-2 mb-8">
-            <Link
-              href="/browse"
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-emerald-500/25 to-teal-500/20 border border-emerald-400/50 text-emerald-300 text-xs font-bold shadow-md shadow-emerald-500/10 transition-colors"
-            >
-              All Verified Squads ({metrics.activeListingsCount})
-            </Link>
-            <Link
-              href="/browse?platform=android"
-              className="px-3.5 py-1.5 rounded-xl bg-[#0D1829] border border-emerald-500/25 text-slate-300 hover:text-white hover:border-emerald-400 text-xs font-medium transition-colors"
-            >
-              Android Mobile
-            </Link>
-            <Link
-              href="/browse?platform=ios"
-              className="px-3.5 py-1.5 rounded-xl bg-[#0D1829] border border-emerald-500/25 text-slate-300 hover:text-white hover:border-emerald-400 text-xs font-medium transition-colors"
-            >
-              iOS / iPhone
-            </Link>
-            <Link
-              href="/browse?minStrength=3200"
-              className="px-3.5 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/25 to-yellow-500/20 border border-amber-400/60 text-amber-300 hover:border-amber-300 text-xs font-bold shadow-md shadow-amber-500/15 transition-colors"
-            >
-              ★ 3200+ OVR Elite
-            </Link>
-            <Link
-              href="/browse?playstyle=quick_counter"
-              className="px-3.5 py-1.5 rounded-xl bg-[#0D1829] border border-emerald-500/25 text-slate-300 hover:text-white hover:border-emerald-400 text-xs font-medium transition-colors"
-            >
-              Quick Counter
-            </Link>
-            <Link
-              href="/browse?playstyle=possession"
-              className="px-3.5 py-1.5 rounded-xl bg-[#0D1829] border border-emerald-500/25 text-slate-300 hover:text-white hover:border-emerald-400 text-xs font-medium transition-colors"
-            >
-              Possession Game
-            </Link>
-          </div>
+
 
           {listings.length === 0 ? (
             /* Clean Authentic Empty State (Zero fabricated data) */

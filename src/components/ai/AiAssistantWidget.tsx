@@ -181,21 +181,7 @@ export function AiAssistantWidget() {
             </div>
           </div>
 
-          {/* Quick Topics Ribbon */}
-          <div className="px-3 py-2 bg-slate-900/60 border-b border-pitch-border/50 overflow-x-auto no-scrollbar flex items-center gap-1.5">
-            <span className="text-[9px] uppercase font-bold text-slate-400 shrink-0">Topics:</span>
-            {QUICK_TOPICS.map((topic) => (
-              <button
-                key={topic.label}
-                type="button"
-                onClick={() => handleSendMessage(topic.query)}
-                disabled={loading}
-                className="px-2.5 py-1 rounded-full bg-pitch-card hover:bg-amber-500/20 border border-pitch-border hover:border-amber-500/40 text-[10px] text-slate-300 hover:text-amber-300 transition-all shrink-0 active:scale-95 whitespace-nowrap"
-              >
-                {topic.label}
-              </button>
-            ))}
-          </div>
+
 
           {/* Chat Messages */}
           <div className="flex-1 overflow-y-auto p-4 space-y-3.5 text-xs">

@@ -395,23 +395,7 @@ export function SupportHubWidget() {
                 <div ref={messagesEndRef} />
               </div>
 
-              {/* Quick Topic Chips when messages > 2 */}
-              {messages.length > 2 && (
-                <div className="px-3 py-1.5 bg-slate-900/80 border-t border-slate-800 overflow-x-auto no-scrollbar flex items-center gap-1.5 shrink-0">
-                  <span className="text-[9px] uppercase font-bold text-slate-400 shrink-0">Quick Topics:</span>
-                  {QUICK_CARDS.map((card) => (
-                    <button
-                      key={card.id}
-                      type="button"
-                      onClick={() => handleSendMessage(card.query)}
-                      disabled={loading}
-                      className="px-2.5 py-1 rounded-full bg-pitch-card hover:bg-amber-500/20 border border-pitch-border hover:border-amber-500/40 text-[10px] text-slate-300 hover:text-amber-300 transition-all shrink-0 active:scale-95 whitespace-nowrap"
-                    >
-                      {card.title}
-                    </button>
-                  ))}
-                </div>
-              )}
+
 
               {/* Chat Input Bar */}
               <div className="p-3 bg-slate-900/90 border-t border-pitch-border shrink-0">
