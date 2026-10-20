@@ -124,13 +124,10 @@ export function isListingOnFlashSale(listing?: Listing | null): boolean {
  */
 export function getFlashSalePricing(listing: Listing) {
   const flashPrice = Number(listing.price);
-  const originalPrice = Math.round(flashPrice * 1.35); // 26% flash discount
-  const discountPercent = Math.round(((originalPrice - flashPrice) / originalPrice) * 100);
-
   return {
-    originalPrice,
+    originalPrice: flashPrice,
     flashPrice,
-    discountPercent,
+    discountPercent: 0,
   };
 }
 

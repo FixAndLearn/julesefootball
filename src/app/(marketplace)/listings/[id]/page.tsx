@@ -36,7 +36,7 @@ import {
   Sparkles,
   Flame,
 } from "lucide-react";
-import { isListingOnFlashSale, getFlashSalePricing } from "@/lib/utils/flashSale";
+import { isListingOnFlashSale } from "@/lib/utils/flashSale";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -512,9 +512,9 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 <div className="p-3.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-rose-500/10 to-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-semibold flex items-center gap-2.5 shadow-md">
                   <Flame className="w-5 h-5 text-amber-400 fill-amber-400 animate-pulse shrink-0" />
                   <div>
-                    <span className="font-bold text-white block">Friday Flash Drop Price Locked</span>
+                    <span className="font-bold text-white block">Friday Vault Squad Locked</span>
                     <span className="text-[11px] text-amber-200/90 leading-tight block mt-0.5">
-                      Bargaining is withdrawn. Price is locked at maximum flash drop discount for immediate checkout.
+                      Bargaining is withdrawn. Squad is time-locked in Friday Drops for immediate escrow checkout via Till 1572931.
                     </span>
                   </div>
                 </div>

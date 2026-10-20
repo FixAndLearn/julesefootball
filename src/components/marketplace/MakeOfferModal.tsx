@@ -93,7 +93,7 @@ export function MakeOfferModal({
     setError("");
 
     if (isListingOnFlashSale(listing)) {
-      setError("This account is currently on Friday Flash Drop at a fixed promotional discount. Bargaining is withdrawn during flash sales.");
+      setError("This account is currently featured in the Friday Drop vault. Direct checkout via Till 1572931 escrow is required during the 8-hour window.");
       return;
     }
 
