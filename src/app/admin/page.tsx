@@ -672,9 +672,9 @@ function AdminControlCenterContent() {
   });
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
+    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
       {/* Super Admin Top Banner */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-pitch-border/80 pb-6">
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-pitch-border/80 pb-6 mb-8">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold mb-2">
             <Crown className="w-3.5 h-3.5 text-amber-400" />
@@ -692,22 +692,24 @@ function AdminControlCenterContent() {
           </p>
         </div>
 
-        <div className="flex items-center gap-2">
-          <Button
-            variant="secondary"
-            size="sm"
+        <div className="flex items-center gap-3">
+          <button
+            type="button"
             onClick={loadAdminData}
             disabled={loading}
-            className="text-xs"
+            className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-semibold border border-cyan-500/50 text-cyan-400 hover:bg-cyan-500/10 transition-colors disabled:opacity-50 cursor-pointer shadow-sm"
           >
             <RefreshCw className={`w-3.5 h-3.5 mr-1.5 ${loading ? "animate-spin" : ""}`} />
             Refresh Data
-          </Button>
+          </button>
           <Link href="/seller/create-listing">
-            <Button variant="gold" size="sm" className="text-xs font-bold shadow-md">
+            <button
+              type="button"
+              className="inline-flex items-center justify-center px-4 py-2 rounded-xl text-xs font-bold bg-yellow-500 hover:bg-yellow-400 text-slate-900 transition-colors shadow-md active:scale-95 cursor-pointer"
+            >
               <PlusCircle className="w-3.5 h-3.5 mr-1.5" />
               Direct Post
-            </Button>
+            </button>
           </Link>
         </div>
       </div>
@@ -715,7 +717,7 @@ function AdminControlCenterContent() {
       {/* Feedback Banner */}
       {feedback && (
         <div
-          className={`p-4 rounded-2xl border text-xs flex items-center justify-between gap-3 animate-in fade-in ${
+          className={`p-4 rounded-2xl border text-xs flex items-center justify-between gap-3 animate-in fade-in mb-8 ${
             feedback.type === "success"
               ? "bg-emerald-950/60 border-emerald-500/40 text-emerald-200"
               : "bg-rose-950/60 border-rose-500/40 text-rose-200"
@@ -740,190 +742,220 @@ function AdminControlCenterContent() {
       )}
 
       {/* Key Metric Overview Cards */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4">
-        <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-            Total Accounts
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-2 shadow-sm">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+            TOTAL ACCOUNTS
           </span>
-          <p className="text-2xl font-black text-white font-display">{users.length}</p>
-        </div>
-        <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-            Total Listings
+          <p className="text-3xl font-black text-white font-display">{users.length}</p>
+          <span className="text-xs text-slate-400 block font-mono">
+            Registered platform members
           </span>
-          <p className="text-2xl font-black text-brand-400 font-display">{listings.length}</p>
         </div>
-        <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
-          <span className="text-[11px] font-semibold text-rose-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Escrow Disputes</span>
+
+        <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-2 shadow-sm">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+            TOTAL LISTINGS
+          </span>
+          <p className="text-3xl font-black text-white font-display">{listings.length}</p>
+          <span className="text-xs text-emerald-400 block font-mono">
+            Active in catalog
+          </span>
+        </div>
+
+        <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-2 shadow-sm">
+          <span className="text-xs font-semibold text-red-400 uppercase tracking-wider flex items-center justify-between">
+            <span className="flex items-center gap-1.5">
+              <span aria-hidden="true">⚠️</span>
+              <span>ESCROW DISPUTES</span>
+            </span>
             {openDisputesCount > 0 && (
-              <span className="w-2 h-2 rounded-full bg-rose-400 animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-red-400 animate-pulse" />
             )}
           </span>
-          <p className="text-2xl font-black text-rose-400 font-display">{openDisputesCount}</p>
-          <span className="text-[10px] text-slate-400 block font-mono truncate">
+          <p className="text-3xl font-black text-white font-display">{openDisputesCount}</p>
+          <span className="text-xs text-slate-400 block font-mono">
             {disputes.length} total cases
           </span>
         </div>
-        <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
-          <span className="text-[11px] font-semibold text-amber-400 uppercase tracking-wider flex items-center justify-between">
-            <span>Pending Payouts</span>
+
+        <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-2 shadow-sm">
+          <span className="text-xs font-semibold text-amber-400 uppercase tracking-wider flex items-center justify-between">
+            <span>PENDING PAYOUTS</span>
             {pendingWithdrawalsCount > 0 && (
-              <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse" />
+              <span className="w-2.5 h-2.5 rounded-full bg-amber-400 animate-pulse" />
             )}
           </span>
-          <p className="text-2xl font-black text-amber-400 font-display">
+          <p className="text-3xl font-black text-white font-display">
             {pendingWithdrawalsCount}
           </p>
-          <span className="text-[10px] text-slate-400 block font-mono truncate">
+          <span className="text-xs text-slate-400 block font-mono">
             {formatCurrency(pendingWithdrawalsSum)} queued
           </span>
         </div>
-        <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-            Active Bans
+
+        <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-2 shadow-sm">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+            ACTIVE BANS
           </span>
-          <p className="text-2xl font-black text-rose-400 font-display">
+          <p className="text-3xl font-black text-white font-display">
             {users.filter((u) => u.is_suspended).length}
           </p>
-        </div>
-        <div className="p-4 rounded-2xl bg-pitch-surface border border-pitch-border space-y-1">
-          <span className="text-[11px] font-semibold text-slate-400 uppercase tracking-wider">
-            News & Alerts
+          <span className="text-xs text-slate-400 block font-mono">
+            Suspended user accounts
           </span>
-          <p className="text-2xl font-black text-indigo-400 font-display">{articles.length}</p>
+        </div>
+
+        <div className="p-6 rounded-2xl bg-pitch-surface border border-pitch-border space-y-2 shadow-sm">
+          <span className="text-xs font-semibold text-slate-400 uppercase tracking-wider block">
+            NEWS &amp; ALERTS
+          </span>
+          <p className="text-3xl font-black text-white font-display">{articles.length}</p>
+          <span className="text-xs text-slate-400 block font-mono">
+            Community broadcasts
+          </span>
         </div>
       </div>
 
       {/* Tab Navigation */}
-      <div className="flex items-center border-b border-pitch-border/80 gap-2 overflow-x-auto">
-        <button
-          type="button"
-          onClick={() => switchTab("listings")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
-            activeTab === "listings"
-              ? "border-emerald-400 text-emerald-300 bg-pitch-card"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          <Layers className="w-4 h-4 text-emerald-400" />
-          <span>Listing Moderation (Ban Posts)</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
-            {listings.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => switchTab("disputes")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
-            activeTab === "disputes"
-              ? "border-rose-400 text-rose-300 bg-pitch-card"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          <Scale className="w-4 h-4 text-rose-400" />
-          <span>Escrow Disputes &amp; Arbitration</span>
-          {openDisputesCount > 0 ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse">
-              {openDisputesCount} open
+      <div className="border-b border-pitch-border/80 mb-8">
+        <nav className="-mb-px flex items-center gap-1 sm:gap-2 overflow-x-auto scrollbar-none" aria-label="Admin Navigation Tabs">
+          <button
+            type="button"
+            onClick={() => switchTab("listings")}
+            className={`px-4 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeTab === "listings"
+                ? "border-cyan-400 text-cyan-300 bg-cyan-950/20"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600"
+            }`}
+          >
+            <Layers className="w-4 h-4 text-cyan-400" />
+            <span>Listing Moderation (Ban Posts)</span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+              activeTab === "listings" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-slate-800 text-slate-300"
+            }`}>
+              {listings.length}
             </span>
-          ) : (
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
-              {disputes.length}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => switchTab("disputes")}
+            className={`px-4 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeTab === "disputes"
+                ? "border-cyan-400 text-cyan-300 bg-cyan-950/20"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600"
+            }`}
+          >
+            <Scale className="w-4 h-4 text-rose-400" />
+            <span>Escrow Disputes &amp; Arbitration</span>
+            {openDisputesCount > 0 ? (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse">
+                {openDisputesCount} open
+              </span>
+            ) : (
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                activeTab === "disputes" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-slate-800 text-slate-300"
+              }`}>
+                {disputes.length}
+              </span>
+            )}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => switchTab("users")}
+            className={`px-4 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeTab === "users"
+                ? "border-cyan-400 text-cyan-300 bg-cyan-950/20"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600"
+            }`}
+          >
+            <Users className="w-4 h-4 text-amber-400" />
+            <span>User Management</span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+              activeTab === "users" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-slate-800 text-slate-300"
+            }`}>
+              {users.length}
             </span>
-          )}
-        </button>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => switchTab("users")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
-            activeTab === "users"
-              ? "border-amber-400 text-amber-300 bg-pitch-card"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          <Users className="w-4 h-4 text-amber-400" />
-          <span>User Management</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
-            {users.length}
-          </span>
-        </button>
+          <button
+            type="button"
+            onClick={() => switchTab("withdrawals")}
+            className={`px-4 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeTab === "withdrawals"
+                ? "border-cyan-400 text-cyan-300 bg-cyan-950/20"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600"
+            }`}
+          >
+            <Banknote className="w-4 h-4 text-amber-400" />
+            <span>Seller Withdrawals (M-Pesa)</span>
+            {pendingWithdrawalsCount > 0 ? (
+              <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 animate-pulse">
+                {pendingWithdrawalsCount} pending
+              </span>
+            ) : (
+              <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+                activeTab === "withdrawals" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-slate-800 text-slate-300"
+              }`}>
+                {withdrawals.length}
+              </span>
+            )}
+          </button>
 
-        <button
-          type="button"
-          onClick={() => switchTab("withdrawals")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
-            activeTab === "withdrawals"
-              ? "border-amber-400 text-amber-300 bg-pitch-card"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          <Banknote className="w-4 h-4 text-amber-400" />
-          <span>Seller Withdrawals (M-Pesa)</span>
-          {pendingWithdrawalsCount > 0 ? (
-            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40 animate-pulse">
-              {pendingWithdrawalsCount} pending
+          <button
+            type="button"
+            onClick={() => switchTab("news")}
+            className={`px-4 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeTab === "news"
+                ? "border-cyan-400 text-cyan-300 bg-cyan-950/20"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600"
+            }`}
+          >
+            <Newspaper className="w-4 h-4 text-emerald-400" />
+            <span>Market Bulletins</span>
+            <span className={`text-[10px] px-1.5 py-0.5 rounded-full ${
+              activeTab === "news" ? "bg-cyan-500/20 text-cyan-300 border border-cyan-500/30" : "bg-slate-800 text-slate-300"
+            }`}>
+              {articles.length}
             </span>
-          ) : (
-            <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
-              {withdrawals.length}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              switchTab("telegram");
+              loadTelegramStatus();
+            }}
+            className={`px-4 py-3 text-xs font-bold transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
+              activeTab === "telegram"
+                ? "border-cyan-400 text-cyan-300 bg-cyan-950/20"
+                : "border-transparent text-slate-400 hover:text-slate-200 hover:border-slate-600"
+            }`}
+          >
+            <Bot className="w-4 h-4 text-indigo-400" />
+            <span>Telegram Executive Hub</span>
+            <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
+              telegramInfo?.isConfigured
+                ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40"
+                : "bg-amber-500/20 text-amber-300 border-amber-500/40"
+            }`}>
+              {telegramInfo?.isConfigured ? "Telegram Active ⚡" : "Setup Bot"}
             </span>
-          )}
-        </button>
+          </button>
 
-        <button
-          type="button"
-          onClick={() => switchTab("news")}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
-            activeTab === "news"
-              ? "border-emerald-400 text-emerald-300 bg-pitch-card"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          <Newspaper className="w-4 h-4 text-emerald-400" />
-          <span>Post News &amp; Alerts</span>
-          <span className="text-[10px] px-1.5 py-0.2 rounded-full bg-slate-800 text-slate-300">
-            {articles.length}
-          </span>
-        </button>
-
-        <button
-          type="button"
-          onClick={() => {
-            switchTab("telegram");
-            loadTelegramStatus();
-          }}
-          className={`px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 flex items-center gap-2 shrink-0 cursor-pointer ${
-            activeTab === "telegram"
-              ? "border-indigo-400 text-indigo-300 bg-pitch-card"
-              : "border-transparent text-slate-400 hover:text-slate-200"
-          }`}
-        >
-          <Bot className="w-4 h-4 text-indigo-400" />
-          <span>Telegram Executive Hub</span>
-          <span className={`text-[10px] px-2 py-0.5 rounded-full font-bold border ${
-            telegramInfo?.isConfigured
-              ? "bg-indigo-500/20 text-indigo-300 border-indigo-500/40"
-              : "bg-amber-500/20 text-amber-300 border-amber-500/40"
-          }`}>
-            {telegramInfo?.isConfigured
-              ? "Telegram Active ⚡"
-              : "Setup Bot"}
-          </span>
-        </button>
-
-        <Link
-          href="/tournaments"
-          className="px-4 py-2.5 text-xs font-bold rounded-t-xl transition-all border-b-2 border-transparent text-amber-400 hover:text-amber-300 hover:bg-pitch-surface flex items-center gap-2 shrink-0"
-        >
-          <Trophy className="w-4 h-4 text-amber-400" />
-          <span>Tournaments & Brackets</span>
-          <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">
-            Host Cups
-          </span>
-        </Link>
+          <Link
+            href="/tournaments"
+            className="px-4 py-3 text-xs font-bold transition-all border-b-2 border-transparent text-amber-400 hover:text-amber-300 hover:bg-pitch-surface flex items-center gap-2 shrink-0"
+          >
+            <Trophy className="w-4 h-4 text-amber-400" />
+            <span>Tournaments &amp; Brackets</span>
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-500/40">
+              Host Cups
+            </span>
+          </Link>
+        </nav>
       </div>
 
       {/* TAB 1: LISTING MODERATION (BRING DOWN / BAN POSTS) */}
