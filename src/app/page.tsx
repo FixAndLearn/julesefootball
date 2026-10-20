@@ -6,7 +6,6 @@ import { ListingService } from "@/services/listingService";
 import { NewsService } from "@/services/newsService";
 import { TournamentService } from "@/services/tournamentService";
 import { Listing, NewsArticle, Tournament } from "@/types/database";
-import { AdBanner } from "@/components/common/AdBanner";
 import { ListingCard3D } from "@/components/marketplace/ListingCard3D";
 import { EscrowStepsVisualizer } from "@/components/home/EscrowStepsVisualizer";
 import {
@@ -257,13 +256,6 @@ export default async function HomePage() {
 
       {/* 4. 5-STEP ESCROW VISUALIZER & CALLOUT BOX */}
       <EscrowStepsVisualizer />
-
-      {/* 5. GOOGLE-COMPLIANT ADVERTISEMENT BANNER */}
-      <section className="py-6 bg-[#060B14] border-b border-emerald-500/15">
-        <div className="max-w-5xl mx-auto px-4">
-          <AdBanner slot="home-featured-middle" />
-        </div>
-      </section>
 
       {/* 6. BRING-YOUR-OWN-DEAL MIDDLEMAN FEATURE (Healthline-style solution panel) */}
       <section className="py-14 md:py-20 bg-gradient-to-b from-[#060B14] via-[#091526] to-[#060B14] border-b border-emerald-500/20">

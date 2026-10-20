@@ -1,13 +1,12 @@
 import { Button } from "@/components/ui/Button";
 import { CheckCircle2, Clock, Lock, ShieldCheck, ShoppingCart, Building2, AlertTriangle } from "lucide-react";
-import { AdBanner } from "@/components/common/AdBanner";
 import Link from "next/link";
 import { Metadata } from "next";
 
 export const metadata: Metadata = {
   title: "Escrow Guarantee & Buyer Protection | eFootballMarket Kenya",
   description:
-    "Learn how eFootballMarket's automated Safaricom M-Pesa escrow vault protects your money and account transfers with a 24-hour buyer inspection window.",
+    "Learn how eFootballMarket's automated M-Pesa escrow vault protects your money and account transfers with a 24-hour buyer inspection window.",
 };
 
 export default function EscrowGuaranteePage() {
@@ -109,7 +108,7 @@ export default function EscrowGuaranteePage() {
             <span className="font-mono font-bold text-emerald-400 text-sm block">00:00</span>
             <strong className="text-white block font-semibold">Payment Locked</strong>
             <p className="text-slate-400 text-[11px] leading-relaxed">
-              Buyer completes STK push to Safaricom Till 1572931. Funds are locked into neutral escrow.
+              Buyer completes STK push to Till 1572931. Funds are locked into neutral escrow.
             </p>
           </div>
 
@@ -213,8 +212,38 @@ export default function EscrowGuaranteePage() {
         </div>
       </div>
 
-      {/* AdSense Certified Unit */}
-      <AdBanner slot="escrow_guarantee_bottom" format="horizontal" />
+      {/* Safaricom Payment Infrastructure & Neutral Role Notice */}
+      <div className="p-6 sm:p-8 rounded-2xl bg-[#0B1424] border border-slate-800 shadow-xl space-y-4">
+        <div className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-emerald-400">
+            <ShieldCheck className="w-5 h-5" />
+          </div>
+          <div>
+            <h3 className="text-base font-bold text-white font-display">
+              Safaricom&apos;s Role in Payment &amp; Escrow Holding
+            </h3>
+            <p className="text-xs text-slate-400">
+              Lipa Na M-Pesa Payment Rail &amp; Holding Till 1572931
+            </p>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-xs text-slate-300 leading-relaxed pt-2">
+          <div className="p-4 rounded-xl bg-[#070D18] border border-slate-800/80 space-y-1.5">
+            <strong className="text-white block font-semibold">Payment Processing Gateway</strong>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              Safaricom Lipa Na M-Pesa provides the telecommunications payment rail (STK Push via Daraja API) to execute instantaneous, cashless shillings transfers directly from buyers&apos; phones.
+            </p>
+          </div>
+
+          <div className="p-4 rounded-xl bg-[#070D18] border border-slate-800/80 space-y-1.5">
+            <strong className="text-white block font-semibold">Independent Platform Notice</strong>
+            <p className="text-slate-400 text-[11px] leading-relaxed">
+              Safaricom PLC is our telecommunications payment processor and is not a corporate sponsor, partner, or arbitrator of gaming trades. All escrow dispute arbitration is conducted exclusively by eFootballMarket administrators.
+            </p>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
