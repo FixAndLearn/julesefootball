@@ -38,6 +38,8 @@ import {
   Lock,
   UserPlus,
   LogIn,
+  Share2,
+  Copy,
 } from "lucide-react";
 
 export default function TournamentsPage() {
@@ -75,19 +77,43 @@ export default function TournamentsPage() {
     }
   }, [profile, gamerTag, phone]);
 
-  // Host Tournament Form State
+  // Host Tournament Form State (Users can host tournaments as Moderators)
+  const [hostType, setHostType] = useState<"paid" | "free">("paid");
   const [hostTitle, setHostTitle] = useState("");
   const [hostSubtitle, setHostSubtitle] = useState("");
   const [hostPlatform, setHostPlatform] = useState<"all" | "android" | "ios" | "crossplay" | "console_pc">("crossplay");
-  const [hostPrizePool, setHostPrizePool] = useState("");
-  const [hostFirstPlace, setHostFirstPlace] = useState("");
-  const [hostSecondPlace, setHostSecondPlace] = useState("");
-  const [hostEntryFee, setHostEntryFee] = useState("");
+  const [hostEntryFee, setHostEntryFee] = useState("100");
   const [hostFormat, setHostFormat] = useState("Single Knockout 1v1 (10-Minute Extra Time & PKs)");
   const [hostMaxPlayers, setHostMaxPlayers] = useState("8");
   const [hostStartDate, setHostStartDate] = useState("");
   const [submittingHost, setSubmittingHost] = useState(false);
   const [hostError, setHostError] = useState("");
+  const [copiedTourneyId, setCopiedTourneyId] = useState<string | null>(null);
+
+  // Handle URL join parameter (e.g. ?join=tourney-id)
+  useEffect(() => {
+    if (typeof window !== "undefined" && tournaments.length > 0) {
+      const urlParams = new URLSearchParams(window.location.search);
+      const joinId = urlParams.get("join");
+      if (joinId) {
+        const found = tournaments.find((t) => t.id === joinId);
+        if (found) {
+          setSelectedTourney(found);
+        }
+      }
+    }
+  }, [tournaments]);
+
+  const handleCopyInvite = async (t: Tournament) => {
+    try {
+      const inviteUrl = `${window.location.origin}/tournaments?join=${t.id}`;
+      await navigator.clipboard.writeText(inviteUrl);
+      setCopiedTourneyId(t.id);
+      setTimeout(() => setCopiedTourneyId(null), 2000);
+    } catch {
+      // quiet fallback
+    }
+  };
 
   // Score Post Form State
   const [score1, setScore1] = useState("0");
@@ -193,29 +219,49 @@ export default function TournamentsPage() {
     }
   };
 
-  // Handle Admin Hosting a Tournament
+  // Handle Tournament Creation (Users host as Moderators)
   const handleHostTournament = async (e: React.FormEvent) => {
     e.preventDefault();
     setHostError("");
     setSubmittingHost(true);
 
     try {
+      if (!hostTitle.trim()) {
+        throw new Error("Tournament title is required.");
+      }
+
+      if (!hostStartDate.trim()) {
+        throw new Error("Start date / time is required (e.g. This Saturday, 8:00 PM EAT).");
+      }
+
+      const numPlayers = Number(hostMaxPlayers || 8);
+      const isPaid = hostType === "paid";
+      const entryFee = isPaid ? Math.max(0, Number(hostEntryFee || 0)) : 0;
+      const totalPot = entryFee * numPlayers;
+      const adminFee = isPaid && entryFee > 0 ? 50 : 0; // Flat KES 50 admin deal per tournament
+      const netPrizePool = Math.max(0, totalPot - adminFee);
+      const firstPlace = isPaid ? Math.round(netPrizePool * 0.8) : 0;
+      const secondPlace = isPaid ? Math.max(0, netPrizePool - firstPlace) : 0;
+
       const res = await fetch("/api/tournaments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           action: "create",
-          title: hostTitle,
-          subtitle: hostSubtitle,
+          title: hostTitle.trim(),
+          subtitle:
+            hostSubtitle.trim() ||
+            (isPaid
+              ? `${numPlayers}-Player Knockout | KES ${netPrizePool.toLocaleString()} Prize Pool (Till 1572931 Escrow)`
+              : `${numPlayers}-Player Knockout | Free Community Cup`),
           platform: hostPlatform,
-          prize_pool_kes: Number(hostPrizePool),
-          first_place_kes: Number(hostFirstPlace),
-          second_place_kes: Number(hostSecondPlace),
-          entry_fee_kes: Number(hostEntryFee),
+          prize_pool_kes: netPrizePool,
+          first_place_kes: firstPlace,
+          second_place_kes: secondPlace,
+          entry_fee_kes: entryFee,
           format: hostFormat,
-          max_players: Number(hostMaxPlayers),
-          start_date: hostStartDate,
-          admin_email: user?.email,
+          max_players: numPlayers,
+          start_date: hostStartDate.trim(),
         }),
       });
 
@@ -227,6 +273,7 @@ export default function TournamentsPage() {
       setIsHostOpen(false);
       setHostTitle("");
       setHostSubtitle("");
+      setHostStartDate("");
       await fetchTourneys();
       if (data.tournament) {
         setSelectedTourney(data.tournament);
@@ -370,23 +417,27 @@ export default function TournamentsPage() {
             </div>
           </div>
 
-          {/* Admin Host Button */}
-          {isAdmin && (
-            <div className="flex flex-col gap-2 shrink-0">
-              <Button
-                variant="gold"
-                size="lg"
-                onClick={() => setIsHostOpen(true)}
-                className="font-bold flex items-center gap-2 shadow-lg"
-              >
-                <PlusCircle className="w-5 h-5" />
-                <span>Host Tournament</span>
-              </Button>
-              <span className="text-[11px] text-amber-400/80 font-medium text-center">
-                👑 Super Admin Privileges Active
-              </span>
-            </div>
-          )}
+          {/* Host Tournament Button (Available to all users as Moderators) */}
+          <div className="flex flex-col gap-2 shrink-0">
+            <Button
+              variant="gold"
+              size="lg"
+              onClick={() => {
+                if (!user) {
+                  setIsAuthRequiredOpen(true);
+                } else {
+                  setIsHostOpen(true);
+                }
+              }}
+              className="font-bold flex items-center justify-center gap-2 shadow-xl shadow-amber-500/10 cursor-pointer"
+            >
+              <PlusCircle className="w-5 h-5" />
+              <span>Host a Tournament</span>
+            </Button>
+            <span className="text-[11px] text-slate-400 font-medium text-center">
+              Free or Paid Prize Pool • Flat KES 50 Platform Deal
+            </span>
+          </div>
         </div>
       </div>
 
@@ -434,16 +485,16 @@ export default function TournamentsPage() {
         </div>
       )}
 
-      {/* Tournaments Grid Header */}
+      {/* Tournaments Grid Header - Mobile Collision Fixed */}
       <div className="space-y-6">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-amber-400" />
-            <h2 className="text-xl font-bold text-white font-display">
-              Official Tournaments & Cups
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 items-start pb-2 border-b border-slate-800/80">
+          <div className="flex items-center gap-2.5">
+            <Trophy className="w-6 h-6 text-amber-400 shrink-0" />
+            <h2 className="text-xl sm:text-2xl font-black text-white font-display tracking-tight">
+              Community &amp; Official Tournaments
             </h2>
           </div>
-          <span className="text-xs text-slate-400">Weekly Knockouts | Kenya Time (EAT)</span>
+          <span className="text-xs text-slate-400 font-medium">Weekly Knockouts • Kenya Time (EAT)</span>
         </div>
 
         {loading ? (
@@ -459,29 +510,23 @@ export default function TournamentsPage() {
             <p className="text-xs text-slate-400 max-w-md mx-auto">
               There are currently no scheduled tournaments. When Brian Okibo or tournament organizers host a new cup, it will appear here with live brackets and player registration.
             </p>
-            {isAdmin ? (
-              <div className="pt-2">
-                <Button
-                  variant="gold"
-                  size="md"
-                  onClick={() => setIsHostOpen(true)}
-                  className="font-bold inline-flex items-center gap-2"
-                >
-                  <PlusCircle className="w-4 h-4" />
-                  <span>Host the First Tournament</span>
-                </Button>
-              </div>
-            ) : (
-              <a
-                href="https://wa.me/254794400365?text=Hello%20Brian%20Okibo%2C%20I%20am%20interested%20in%20participating%20in%20an%20eFootball%20tournament!"
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-800 hover:bg-emerald-700 text-white font-bold text-xs transition-all shadow-md"
+            <div className="pt-2">
+              <Button
+                variant="gold"
+                size="md"
+                onClick={() => {
+                  if (!user) {
+                    setIsAuthRequiredOpen(true);
+                  } else {
+                    setIsHostOpen(true);
+                  }
+                }}
+                className="font-bold inline-flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/10"
               >
-                <MessageCircle className="w-4 h-4" />
-                <span>Request a Tournament on WhatsApp</span>
-              </a>
-            )}
+                <PlusCircle className="w-4 h-4" />
+                <span>Host the First Tournament</span>
+              </Button>
+            </div>
           </div>
         ) : (
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
@@ -489,6 +534,8 @@ export default function TournamentsPage() {
               const isFull = t.registered_count >= t.max_players;
               const progressPercent = Math.min(100, Math.round((t.registered_count / t.max_players) * 100));
               const isSelected = selectedTourney?.id === t.id;
+              const isModerator = (user && t.created_by === user.id) || isAdmin;
+              const isMyTournament = user && t.created_by === user.id;
 
               return (
                 <div
@@ -500,24 +547,40 @@ export default function TournamentsPage() {
                   }`}
                 >
                   <div className="space-y-4">
-                    <div className="flex items-center justify-between gap-2">
-                      <Badge
-                        variant={
-                          t.status === "completed"
-                            ? "default"
+                    <div className="flex items-center justify-between gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
+                        <Badge
+                          variant={
+                            t.status === "completed"
+                              ? "default"
+                              : t.status === "in_progress"
+                              ? "brand"
+                              : "gold"
+                          }
+                          size="sm"
+                        >
+                          {t.status === "registration_open"
+                            ? "REGISTRATION OPEN"
                             : t.status === "in_progress"
-                            ? "brand"
-                            : "gold"
-                        }
-                        size="sm"
-                      >
-                        {t.status === "registration_open"
-                          ? "REGISTRATION OPEN"
-                          : t.status === "in_progress"
-                          ? "BRACKETS LIVE"
-                          : "COMPLETED"}
-                      </Badge>
-                      <span className="text-xs font-bold text-emerald-400">
+                            ? "BRACKETS LIVE"
+                            : "COMPLETED"}
+                        </Badge>
+                        {isMyTournament ? (
+                          <span className="text-[10px] font-bold text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-800">
+                            👑 You are Moderator
+                          </span>
+                        ) : t.created_by ? (
+                          <span className="text-[10px] font-medium text-slate-300 bg-slate-800 px-2 py-0.5 rounded-full border border-slate-700">
+                            Community Hosted
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold text-emerald-300 bg-emerald-950/80 px-2 py-0.5 rounded-full border border-emerald-800">
+                            Official Cup
+                          </span>
+                        )}
+                      </div>
+
+                      <span className="text-xs font-bold text-emerald-400 font-mono">
                         {t.entry_fee_kes === 0 ? "FREE ENTRY" : `Entry: KES ${t.entry_fee_kes}`}
                       </span>
                     </div>
@@ -539,6 +602,12 @@ export default function TournamentsPage() {
                         <div>🥇 1st: <strong>{formatCurrency(t.first_place_kes, "KES")}</strong></div>
                         <div>🥈 2nd: <strong>{formatCurrency(t.second_place_kes, "KES")}</strong></div>
                       </div>
+                      {t.entry_fee_kes > 0 && (
+                        <div className="pt-1 text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
+                          <ShieldCheck className="w-3.5 h-3.5" />
+                          <span>Till 1572931 Escrow Custody Active</span>
+                        </div>
+                      )}
                     </div>
 
                     {/* Registered Progress Bar */}
@@ -555,9 +624,14 @@ export default function TournamentsPage() {
                       </div>
                     </div>
 
-                    <div className="flex items-center gap-2 text-xs text-slate-400">
-                      <Clock className="w-4 h-4 text-slate-500" />
-                      <span>{t.start_date}</span>
+                    <div className="flex items-center justify-between text-xs text-slate-400">
+                      <div className="flex items-center gap-1.5">
+                        <Clock className="w-4 h-4 text-slate-500" />
+                        <span>{t.start_date}</span>
+                      </div>
+                      <span className="uppercase text-[10px] font-bold text-slate-400">
+                        {t.platform}
+                      </span>
                     </div>
 
                     {/* Winner Banner if Completed */}
@@ -576,7 +650,7 @@ export default function TournamentsPage() {
                         <Button
                           variant="gold"
                           size="md"
-                          className="flex-1 font-bold text-xs"
+                          className="flex-1 font-bold text-xs cursor-pointer"
                           disabled={isFull}
                           onClick={() => {
                             setSelectedTourney(t);
@@ -596,33 +670,64 @@ export default function TournamentsPage() {
                       <Button
                         variant={isSelected ? "gold" : "secondary"}
                         size="md"
-                        className="flex-1 text-xs font-semibold"
+                        className="flex-1 text-xs font-semibold cursor-pointer"
                         onClick={() => setSelectedTourney(t)}
                       >
                         {isSelected ? "Viewing Bracket" : "View Bracket"}
                       </Button>
                     </div>
 
-                    {/* Admin management buttons */}
-                    {isAdmin && (
-                      <div className="flex items-center gap-2 pt-1">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setSelectedTourney(t);
-                            handleGenerateBrackets(false);
-                          }}
-                          disabled={generatingBrackets}
-                          className="flex-1 text-[11px] font-bold text-amber-400 hover:text-amber-300 py-1 px-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all text-center flex items-center justify-center gap-1"
-                        >
-                          <Play className="w-3 h-3" />
-                          <span>Form Brackets</span>
-                        </button>
+                    {/* Invite Players Trigger */}
+                    <div className="flex items-center gap-2 pt-1">
+                      <a
+                        href={`https://wa.me/?text=${encodeURIComponent(
+                          `🎮 Join my eFootball tournament "${t.title}"!\n🏆 Prize Pool: KES ${t.prize_pool_kes.toLocaleString()}\n🎟️ Entry Fee: ${
+                            t.entry_fee_kes > 0 ? `KES ${t.entry_fee_kes}` : "FREE"
+                          }\n⚡ Format: ${t.format}\n\n👉 Register now: https://efootballmarket.co.ke/tournaments?join=${t.id}`
+                        )}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex-1 inline-flex items-center justify-center gap-1.5 py-1.5 px-3 rounded-xl bg-emerald-950/60 hover:bg-emerald-900/60 border border-emerald-800/80 text-emerald-300 font-bold text-[11px] transition-all shadow-xs cursor-pointer"
+                      >
+                        <MessageCircle className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
+                        <span>Invite on WhatsApp</span>
+                      </a>
+                      <button
+                        type="button"
+                        onClick={() => handleCopyInvite(t)}
+                        className="p-2 rounded-xl bg-pitch-card hover:bg-slate-800 border border-pitch-border text-slate-300 hover:text-white transition-all text-xs cursor-pointer"
+                        title="Copy Tournament Link"
+                      >
+                        {copiedTourneyId === t.id ? (
+                          <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        ) : (
+                          <Share2 className="w-3.5 h-3.5" />
+                        )}
+                      </button>
+                    </div>
+
+                    {/* Moderator / Admin Management Buttons */}
+                    {isModerator && (
+                      <div className="flex items-center gap-2 pt-1 border-t border-pitch-border/40">
+                        {t.status === "registration_open" && (
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setSelectedTourney(t);
+                              handleGenerateBrackets(false);
+                            }}
+                            disabled={generatingBrackets}
+                            className="flex-1 text-[11px] font-bold text-amber-400 hover:text-amber-300 py-1.5 px-2 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 transition-all text-center flex items-center justify-center gap-1 cursor-pointer"
+                          >
+                            <Play className="w-3 h-3" />
+                            <span>Form Brackets</span>
+                          </button>
+                        )}
                         <button
                           type="button"
                           onClick={() => handleDeleteTournament(t.id)}
-                          className="p-1 rounded-lg text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 transition-all"
-                          title="Delete tournament"
+                          className="p-1.5 rounded-xl text-rose-400 hover:text-rose-300 hover:bg-rose-950/40 border border-rose-800/50 transition-all cursor-pointer"
+                          title="Delete / cancel tournament"
                         >
                           <Trash2 className="w-4 h-4" />
                         </button>
@@ -663,12 +768,12 @@ export default function TournamentsPage() {
                 Prize Pool: <strong className="text-emerald-400">{formatCurrency(selectedTourney.prize_pool_kes, "KES")}</strong>
               </span>
 
-              {isAdmin && (
+              {((user && selectedTourney.created_by === user.id) || isAdmin) && (
                 <div className="flex items-center gap-2">
                   <Button
                     variant="gold"
                     size="sm"
-                    className="text-xs font-bold flex items-center gap-1.5"
+                    className="text-xs font-bold flex items-center gap-1.5 cursor-pointer"
                     disabled={generatingBrackets}
                     onClick={() => handleGenerateBrackets(false)}
                   >
@@ -737,7 +842,8 @@ export default function TournamentsPage() {
 
                           <div className="space-y-3">
                             {roundMatches.map((m) => {
-                              const canPostScore = !m.is_completed || isAdmin;
+                              const isModerator = (user && selectedTourney?.created_by === user.id) || isAdmin;
+                              const canPostScore = !m.is_completed || isModerator;
 
                               return (
                                 <div
@@ -815,7 +921,7 @@ export default function TournamentsPage() {
                                         className="w-full py-1.5 px-3 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 text-amber-300 font-bold text-[11px] transition-all flex items-center justify-center gap-1.5"
                                       >
                                         <Award className="w-3.5 h-3.5" />
-                                        <span>{m.is_completed ? "Update Score (Admin)" : "Post Match Result"}</span>
+                                        <span>{m.is_completed ? "Update Score (Moderator)" : "Post Match Result"}</span>
                                       </button>
                                     </div>
                                   )}
@@ -1134,24 +1240,24 @@ export default function TournamentsPage() {
         </div>
       )}
 
-      {/* MODAL 2: Admin Host Tournament Modal */}
+      {/* MODAL 2: User / Moderator Host Tournament Modal */}
       {isHostOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
           <div className="w-full max-w-lg bg-pitch-surface border border-pitch-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
             <div className="p-6 border-b border-pitch-border bg-pitch-card/60 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
                 <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                  <Crown className="w-5 h-5" />
+                  <Trophy className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Host New Tournament</h3>
-                  <p className="text-xs text-slate-400">Brian Okibo Administrator Console</p>
+                  <h3 className="text-base font-bold text-white">Host a Tournament</h3>
+                  <p className="text-xs text-slate-400">You become the Tournament Moderator</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsHostOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1164,19 +1270,50 @@ export default function TournamentsPage() {
                 </div>
               )}
 
+              {/* Tournament Type: Paid vs Free */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-semibold text-slate-300">
+                  Tournament Entry Type
+                </label>
+                <div className="grid grid-cols-2 gap-2.5">
+                  <button
+                    type="button"
+                    onClick={() => setHostType("paid")}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      hostType === "paid"
+                        ? "bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500/30"
+                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
+                    }`}
+                  >
+                    <span className="text-xs font-bold block text-white">🏆 Paid Prize Pool</span>
+                    <span className="text-[10px] text-slate-400 mt-0.5 block leading-tight">
+                      Pay via Till 1572931 • Flat KES 50 deal
+                    </span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setHostType("free")}
+                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                      hostType === "free"
+                        ? "bg-emerald-500/15 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/30"
+                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
+                    }`}
+                  >
+                    <span className="text-xs font-bold block text-white">🎮 Free Community Cup</span>
+                    <span className="text-[10px] text-slate-400 mt-0.5 block leading-tight">
+                      Free to enter • Community ranking
+                    </span>
+                  </button>
+                </div>
+              </div>
+
               <Input
                 label="Tournament Title"
-                placeholder="e.g. Nairobi Weekend Clash Cup #1"
+                placeholder="e.g. Weekend Knockout Cup #1"
                 value={hostTitle}
                 onChange={(e) => setHostTitle(e.target.value)}
                 required
-              />
-
-              <Input
-                label="Subtitle / Short Description"
-                placeholder="e.g. 8-Player Single Knockout | 10-Minute Extra Time & Penalties"
-                value={hostSubtitle}
-                onChange={(e) => setHostSubtitle(e.target.value)}
               />
 
               <div className="grid grid-cols-2 gap-4">
@@ -1198,7 +1335,7 @@ export default function TournamentsPage() {
 
                 <div>
                   <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Max Players
+                    Player Slots
                   </label>
                   <select
                     className="w-full px-3.5 py-2 rounded-xl bg-pitch-card border border-pitch-border text-white text-xs focus:outline-none focus:border-amber-500"
@@ -1212,53 +1349,93 @@ export default function TournamentsPage() {
                 </div>
               </div>
 
-              <div className="grid grid-cols-3 gap-3">
-                <Input
-                  label="Total Prize (KES)"
-                  type="number"
-                  value={hostPrizePool}
-                  onChange={(e) => setHostPrizePool(e.target.value)}
-                  required
-                />
-                <Input
-                  label="1st Place (KES)"
-                  type="number"
-                  value={hostFirstPlace}
-                  onChange={(e) => setHostFirstPlace(e.target.value)}
-                  required
-                />
-                <Input
-                  label="2nd Place (KES)"
-                  type="number"
-                  value={hostSecondPlace}
-                  onChange={(e) => setHostSecondPlace(e.target.value)}
-                  required
-                />
-              </div>
+              {/* Paid Prize Pool & Flat Rate KES 50 Admin Calculation */}
+              {hostType === "paid" ? (
+                <div className="space-y-3">
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Entry Fee per Player (KES)
+                    </label>
+                    <div className="flex items-center gap-2 mb-2">
+                      {["50", "100", "200", "500"].map((preset) => (
+                        <button
+                          key={preset}
+                          type="button"
+                          onClick={() => setHostEntryFee(preset)}
+                          className={`flex-1 py-1 px-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
+                            hostEntryFee === preset
+                              ? "bg-amber-500 text-black border-amber-400 font-bold"
+                              : "bg-pitch-card border-pitch-border text-slate-300 hover:text-white"
+                          }`}
+                        >
+                          KES {preset}
+                        </button>
+                      ))}
+                    </div>
+                    <Input
+                      type="number"
+                      placeholder="e.g. 100"
+                      value={hostEntryFee}
+                      onChange={(e) => setHostEntryFee(e.target.value)}
+                      required
+                    />
+                  </div>
 
-              <div className="grid grid-cols-2 gap-4">
-                <Input
-                  label="Entry Fee (KES)"
-                  type="number"
-                  placeholder="0 for Free"
-                  value={hostEntryFee}
-                  onChange={(e) => setHostEntryFee(e.target.value)}
-                  required
-                />
-                <Input
-                  label="Start Date / Time"
-                  placeholder="e.g. This Saturday, 8:00 PM EAT"
-                  value={hostStartDate}
-                  onChange={(e) => setHostStartDate(e.target.value)}
-                  required
-                />
-              </div>
+                  {/* Real-time Flat 50 Deal Calculation Card */}
+                  {(() => {
+                    const num = Number(hostMaxPlayers || 8);
+                    const fee = Math.max(0, Number(hostEntryFee || 0));
+                    const pot = num * fee;
+                    const adminFee = fee > 0 ? 50 : 0;
+                    const prizePool = Math.max(0, pot - adminFee);
+                    const p1 = Math.round(prizePool * 0.8);
+                    const p2 = Math.max(0, prizePool - p1);
+
+                    return (
+                      <div className="p-4 rounded-2xl bg-pitch-card border border-amber-500/30 space-y-2 text-xs">
+                        <div className="flex items-center justify-between text-slate-300">
+                          <span>Total Collected Pot ({num} players × KES {fee}):</span>
+                          <strong className="text-white font-mono">KES {pot.toLocaleString()}</strong>
+                        </div>
+                        <div className="flex items-center justify-between text-slate-300">
+                          <span className="flex items-center gap-1">
+                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
+                            <span>Platform Admin Deal (Flat Rate):</span>
+                          </span>
+                          <strong className="text-amber-400 font-mono">KES 50 flat</strong>
+                        </div>
+                        <div className="pt-2 border-t border-pitch-border flex items-center justify-between text-sm">
+                          <span className="font-bold text-white">Net Winner Prize Pool:</span>
+                          <span className="text-base font-black text-emerald-400 font-mono font-display">
+                            KES {prizePool.toLocaleString()}
+                          </span>
+                        </div>
+                        <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-400">
+                          <div>🥇 1st Place: <strong className="text-amber-300 font-mono">KES {p1.toLocaleString()}</strong></div>
+                          <div>🥈 2nd Place: <strong className="text-slate-200 font-mono">KES {p2.toLocaleString()}</strong></div>
+                        </div>
+                        <p className="text-[10px] text-slate-400 pt-1 leading-relaxed border-t border-pitch-border/60">
+                          Players pay their entry into Safaricom Till 1572931. Prize pool is held safely in escrow until you (the tournament moderator) crown the champion!
+                        </p>
+                      </div>
+                    );
+                  })()}
+                </div>
+              ) : (
+                <div className="p-3.5 rounded-2xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-1">
+                  <span className="font-bold text-emerald-400 block">Free Community Entry:</span>
+                  <p className="text-slate-400 text-[11px] leading-relaxed">
+                    Zero entry fees and zero platform fees. Players register for free, knockout brackets generate automatically, and you moderate the match results.
+                  </p>
+                </div>
+              )}
 
               <Input
-                label="Match Format Details"
-                placeholder="e.g. Single Knockout 1v1 (10-Minute Extra Time & PKs)"
-                value={hostFormat}
-                onChange={(e) => setHostFormat(e.target.value)}
+                label="Start Date / Time"
+                placeholder="e.g. This Saturday, 8:00 PM EAT"
+                value={hostStartDate}
+                onChange={(e) => setHostStartDate(e.target.value)}
+                required
               />
 
               <div className="pt-2">
@@ -1266,10 +1443,10 @@ export default function TournamentsPage() {
                   type="submit"
                   variant="gold"
                   size="lg"
-                  className="w-full font-bold"
+                  className="w-full font-bold cursor-pointer"
                   isLoading={submittingHost}
                 >
-                  Publish Tournament
+                  Create Tournament &amp; Become Moderator
                 </Button>
               </div>
             </form>

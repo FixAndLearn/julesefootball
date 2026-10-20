@@ -22,25 +22,17 @@ export async function POST(req: NextRequest) {
     const body = await req.json();
     const action = body.action;
 
-    // 1. ACTION: Host / Create New Tournament (Admin Action)
+    // 1. ACTION: Host / Create New Tournament (Available to any registered user as Moderator)
     if (action === "create" || body.prize_pool_kes !== undefined) {
       const supabase = createServerSupabaseClient();
       const {
         data: { user },
       } = await supabase.auth.getUser();
 
-      const userEmail = user?.email || body.admin_email;
-      let userRole = null;
-      if (user) {
-        const { data: p } = await supabase.from("profiles").select("role").eq("id", user.id).single();
-        userRole = p?.role;
-      }
-
-      const isAuthorized = isSuperAdminEmail(userEmail) || isUserAdmin(userEmail, userRole);
-      if (!isAuthorized) {
+      if (!user) {
         return NextResponse.json(
-          { error: "Forbidden: Only authorized administrators (Brian Okibo) can host tournaments." },
-          { status: 403 }
+          { error: "Unauthorized: You must be logged in to host a tournament." },
+          { status: 401 }
         );
       }
 
@@ -184,14 +176,19 @@ export async function DELETE(req: NextRequest) {
       return NextResponse.json({ error: "Tournament ID required." }, { status: 400 });
     }
 
+    const tourney = await TournamentService.getTournamentById(id);
+    if (!tourney) {
+      return NextResponse.json({ error: "Tournament not found." }, { status: 404 });
+    }
+
     const supabase = createServerSupabaseClient();
     const {
       data: { user },
     } = await supabase.auth.getUser();
 
-    const isAuthorized = isSuperAdminEmail(user?.email);
+    const isAuthorized = isSuperAdminEmail(user?.email) || (user && tourney.created_by === user.id);
     if (!isAuthorized) {
-      return NextResponse.json({ error: "Forbidden: Super admin privilege required." }, { status: 403 });
+      return NextResponse.json({ error: "Forbidden: Only the tournament host or platform administrator can delete this tournament." }, { status: 403 });
     }
 
     await TournamentService.deleteTournament(id);

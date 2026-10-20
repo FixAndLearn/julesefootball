@@ -170,8 +170,8 @@ export default function WantedBoardPage() {
 
       {/* Filter and Search Bar */}
       <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-4 mb-8">
-        {/* Platform Tabs */}
-        <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 scrollbar-none">
+        {/* Platform Tabs - Clean wrapped layout without horizontal sliding scrollbar */}
+        <div className="flex flex-wrap items-center gap-2">
           {[
             { id: "all", label: "All Platforms" },
             { id: "android", label: "Android" },
@@ -182,7 +182,7 @@ export default function WantedBoardPage() {
             <button
               key={tab.id}
               onClick={() => setPlatformFilter(tab.id)}
-              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-all whitespace-nowrap ${
+              className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold transition-colors cursor-pointer ${
                 platformFilter === tab.id
                   ? "bg-amber-500 text-slate-950 font-bold shadow-md shadow-amber-500/20"
                   : "bg-pitch-surface border border-pitch-border text-slate-300 hover:text-white hover:border-slate-600"
@@ -214,15 +214,12 @@ export default function WantedBoardPage() {
           ))}
         </div>
       ) : filteredRequests.length === 0 ? (
-        <div className="text-center py-16 bg-pitch-surface border border-pitch-border rounded-3xl p-8 space-y-4">
+        <div className="text-center py-16 bg-pitch-surface border border-pitch-border rounded-3xl p-8 space-y-3">
           <Target className="w-12 h-12 text-slate-500 mx-auto stroke-[1.5]" />
           <h3 className="text-lg font-bold text-white">No active requests for this filter</h3>
           <p className="text-xs text-slate-400 max-w-md mx-auto">
-            Be the first buyer to post a request or check back shortly as Kenyan gamers post new squad desires.
+            No buyer requests currently open under this category. Use the &quot;Post Account Request&quot; button above to publish your target squad wish.
           </p>
-          <Button variant="gold" size="sm" onClick={() => setIsModalOpen(true)}>
-            Post a Wanted Request
-          </Button>
         </div>
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">

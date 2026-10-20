@@ -19,19 +19,25 @@ export async function POST(req: NextRequest) {
     }
 
     const body = await req.json();
-    const userEmail = user?.email || body.admin_email;
-
-    const isAuthorized = isSuperAdminEmail(userEmail) || isUserAdmin(userEmail, userRole);
-    if (!isAuthorized) {
-      return NextResponse.json(
-        { error: "Forbidden: Only authorized administrators (Brian Okibo) can form tournament brackets." },
-        { status: 403 }
-      );
-    }
-
     const { tournament_id, shuffle = false } = body;
     if (!tournament_id) {
       return NextResponse.json({ error: "Tournament ID is required." }, { status: 400 });
+    }
+
+    const tourney = await TournamentService.getTournamentById(tournament_id);
+    if (!tourney) {
+      return NextResponse.json({ error: "Tournament not found." }, { status: 404 });
+    }
+
+    const userEmail = user?.email || body.admin_email;
+    const isAdmin = isSuperAdminEmail(userEmail) || isUserAdmin(userEmail, userRole);
+    const isModerator = user && tourney.created_by === user.id;
+
+    if (!isAdmin && !isModerator) {
+      return NextResponse.json(
+        { error: "Forbidden: Only the tournament moderator or platform administrator can form brackets." },
+        { status: 403 }
+      );
     }
 
     const result = await TournamentService.generateBrackets(tournament_id, { shuffle });
