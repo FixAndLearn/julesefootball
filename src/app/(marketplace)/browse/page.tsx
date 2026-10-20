@@ -63,36 +63,10 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
     hasSearchError = true;
   }
 
-  const itemListSchema = {
-    "@context": "https://schema.org",
-    "@type": "ItemList",
-    name: "Verified eFootball Mobile Accounts Kenya",
-    description: "Curated peer-to-peer eFootball accounts with M-Pesa escrow guarantee.",
-    numberOfItems: listings.length,
-    itemListElement: listings.map((l, index) => ({
-      "@type": "ListItem",
-      position: index + 1,
-      item: {
-        "@type": "Product",
-        name: l.title,
-        url: `https://www.efootballmarket.co.ke/listings/${l.id}`,
-        offers: {
-          "@type": "Offer",
-          price: l.price,
-          priceCurrency: "KES",
-          availability: "https://schema.org/InStock",
-        },
-      },
-    })),
-  };
-
+  
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListSchema) }}
-      />
-
+      
       {/* Institutional Healthline-Style Trust Header Banner */}
       <div className="p-4 sm:p-5 rounded-2xl bg-pitch-surface/90 border border-pitch-border shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-32 bg-emerald-500/10 blur-3xl pointer-events-none" />

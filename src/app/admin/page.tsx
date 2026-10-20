@@ -1474,7 +1474,7 @@ function AdminControlCenterContent() {
                             )}
                           </td>
                           <td className="p-3.5 text-slate-400">
-                            <span>{u.completed_sales_count || 0} sales</span> / <span>⭐ {u.seller_rating || "5.0"}</span>
+                            <span>{u.completed_sales_count || 0} sales</span> / <span>{u.seller_rating ? `⭐ ${u.seller_rating}` : "No reviews yet"}</span>
                           </td>
                           <td className="p-3.5 text-right">
                             <div className="flex items-center justify-end gap-1.5">

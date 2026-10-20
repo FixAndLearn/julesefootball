@@ -14,7 +14,6 @@ import {
   ShieldCheck,
   User,
 } from "lucide-react";
-import { NewsArticleJsonLd } from "@/components/seo/JsonLd";
 import { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -85,8 +84,7 @@ export default async function NewsArticlePage({ params }: NewsArticlePageProps) 
 
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
-      <NewsArticleJsonLd article={article} />
-
+      
       {/* Navigation & WhatsApp Alert Bar */}
       <div className="flex items-center justify-between gap-4">
         <Link

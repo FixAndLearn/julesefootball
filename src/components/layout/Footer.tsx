@@ -3,7 +3,6 @@
 import React from "react";
 import Link from "next/link";
 import { ShieldCheck, MessageCircle } from "lucide-react";
-import { ThemeToggle } from "@/components/common/ThemeToggle";
 
 export function Footer() {
   return (
@@ -36,12 +35,7 @@ export function Footer() {
             </span>
           </div>
 
-          {/* Theme Toggle (Dark / Bright Mode) */}
-          <div className="flex items-center gap-2">
-            <span className="text-[11px] text-slate-400 font-medium hidden sm:inline">Theme:</span>
-            <ThemeToggle showLabel className="px-3 py-1.5" />
-          </div>
-        </div>
+                  </div>
 
         {/* Middle Row: Curated Navigation Links */}
         <nav role="navigation" aria-label="Footer Navigation" className="pt-2 border-t border-slate-800/60">

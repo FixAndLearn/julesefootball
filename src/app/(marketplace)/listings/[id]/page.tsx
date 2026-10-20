@@ -10,7 +10,6 @@ import { ListingGallery } from "@/components/marketplace/ListingGallery";
 import { VerifiedSellerBadge } from "@/components/marketplace/VerifiedSellerBadge";
 import { MakeOfferButton } from "@/components/marketplace/MakeOfferButton";
 import { SellerListingOffersPanel } from "@/components/marketplace/SellerListingOffersPanel";
-import { ProductJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ListingCard3D } from "@/components/marketplace/ListingCard3D";
 import { AdBanner } from "@/components/common/AdBanner";
 import { Button } from "@/components/ui/Button";
@@ -138,9 +137,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-24 lg:pb-8 w-full space-y-8">
-      <ProductJsonLd listing={listing} />
-      <BreadcrumbJsonLd items={breadcrumbItems} />
-
+            
       {/* Semantic Breadcrumbs & Navigation Bar */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-2 border-b border-pitch-border/60">
         <nav aria-label="Breadcrumb" className="flex items-center gap-2 text-xs text-slate-400 flex-wrap">

@@ -27,38 +27,7 @@ interface ScammerRecord {
 }
 
 // Known community blacklist records (verified fraudulent handles)
-const BLACKLIST_DATABASE: ScammerRecord[] = [
-  {
-    id: "scam-01",
-    phone: "0712345678",
-    handle: "@efootball_seller_ke",
-    alias: "Fake Konami Seller",
-    status: "blacklisted",
-    fraudType: "Fake M-Pesa STK receipts & credential recovery",
-    reportedDate: "2026-03-22",
-    notes: "Takes direct personal M-Pesa payments on WhatsApp groups and blocks the buyer immediately.",
-  },
-  {
-    id: "scam-02",
-    phone: "0798765432",
-    handle: "@pes_coins_cheaper",
-    alias: "Coin Generator Impersonator",
-    status: "blacklisted",
-    fraudType: "Konami ID credential theft via phishing links",
-    reportedDate: "2026-04-01",
-    notes: "Sends fake Konami 2FA OTP phishing links claiming to top up free eFootball coins.",
-  },
-  {
-    id: "scam-03",
-    phone: "0701122334",
-    handle: "@nairobi_middleman",
-    alias: "Impersonator Middleman",
-    status: "blacklisted",
-    fraudType: "Fake middleman group administrator",
-    reportedDate: "2026-04-10",
-    notes: "Clones admin profile pictures on WhatsApp community groups to intercept squad sales.",
-  },
-];
+const BLACKLIST_DATABASE: ScammerRecord[] = [];
 
 export function ScammerLookupTool() {
   const [query, setQuery] = useState("");

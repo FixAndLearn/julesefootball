@@ -19,7 +19,7 @@ export function VerifiedSellerBadge({
   const [popoverOpen, setPopoverOpen] = useState(false);
 
   const salesCount = Number(seller?.completed_sales_count || 0);
-  const rating = Number(seller?.seller_rating || 5.0);
+  const rating = Number(seller?.seller_rating || 0);
   const tier = getSellerTier(salesCount, rating);
 
   const iconSizes = {
@@ -95,14 +95,19 @@ export function VerifiedSellerBadge({
               </span>
             </div>
 
-            {salesCount > 0 && (
-              <div className="flex items-center gap-1.5 text-amber-300">
-                <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
-                <span>
-                  <strong>{rating.toFixed(1)} / 5.0</strong> seller satisfaction rating
-                </span>
-              </div>
-            )}
+            {salesCount > 0 && rating > 0 ? (
+                <div className="flex items-center gap-1.5 text-amber-300">
+                  <Star className="w-3.5 h-3.5 fill-amber-400 text-amber-400 shrink-0" />
+                  <span>
+                    <strong>{rating.toFixed(1)} / 5.0</strong> seller satisfaction rating
+                  </span>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1.5 text-slate-400">
+                  <Star className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                  <span>No buyer reviews yet</span>
+                </div>
+              )}
 
             <div className="flex items-center gap-1.5 text-slate-200">
               <Phone className="w-3.5 h-3.5 text-indigo-400 shrink-0" />

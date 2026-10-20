@@ -98,16 +98,9 @@ export class AnalyticsService {
     }
 
     // Average price from live catalog or realistic baseline
-    const avgListingPrice =
-      activeListings.length > 0
-        ? activeListings.reduce((sum, l) => sum + Number(l.price || 0), 0) / activeListings.length
-        : 1850;
-
-    const finalCompletedOrders = Math.max(ordersCount, profileSalesCount);
-
-    // Traded volume calculation (real orders/payments or completed profile sales + wallet balances)
-    const estimatedSalesVolume = Math.round(profileSalesCount * Math.max(avgListingPrice, 1850)) + totalBalances;
-    const finalVolume = Math.max(ordersVolume, paymentsVolume, estimatedSalesVolume);
+    const finalCompletedOrders = ordersCount > 0 ? ordersCount : profileSalesCount;
+    // Strictly real traded volume from completed orders or payments (zero artificial multipliers)
+    const finalVolume = Math.max(ordersVolume, paymentsVolume);
 
     return {
       totalListingsCount: listingsCountRes.count || activeListings.length,

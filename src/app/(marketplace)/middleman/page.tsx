@@ -8,7 +8,6 @@ import { Input } from "@/components/ui/Input";
 import { formatCurrency } from "@/lib/utils";
 import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { MiddlemanDeal } from "@/app/api/middleman/route";
-import { HowToEscrowJsonLd } from "@/components/seo/JsonLd";
 import { AdBanner } from "@/components/common/AdBanner";
 import {
   Handshake,
@@ -219,8 +218,7 @@ function MiddlemanContent() {
 
   return (
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full space-y-8">
-      <HowToEscrowJsonLd />
-
+      
       {/* Header */}
       <div className="relative rounded-3xl bg-gradient-to-r from-emerald-950/60 via-pitch-card to-slate-900 border border-emerald-500/40 p-6 sm:p-10 shadow-2xl overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
