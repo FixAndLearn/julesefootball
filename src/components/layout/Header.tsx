@@ -31,6 +31,7 @@ import {
 } from "lucide-react";
 import { NotificationBell } from "@/components/layout/NotificationBell";
 import { LiveActivityMarquee } from "@/components/layout/LiveActivityMarquee";
+import { ThemeToggle } from "@/components/common/ThemeToggle";
 import { useLanguage } from "@/context/LanguageContext";
 import { Flame, ShieldAlert } from "lucide-react";
 import Link from "next/link";
@@ -427,6 +428,9 @@ export function Header() {
                 </Link>
               </div>
             )}
+
+            {/* Theme Toggle Button (Dark / Bright Mode) */}
+            <ThemeToggle className="shrink-0" />
 
             {/* Mobile Menu Hamburger */}
             <button

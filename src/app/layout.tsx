@@ -9,6 +9,7 @@ import { CookieConsentBanner } from "@/components/common/CookieConsentBanner";
 import { SupportHubWidget } from "@/components/support/SupportHubWidget";
 import { MobileBottomNav } from "@/components/layout/MobileBottomNav";
 import { LanguageProvider } from "@/context/LanguageContext";
+import { ThemeProvider } from "@/context/ThemeContext";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -218,7 +219,8 @@ export default function RootLayout({
         <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
       </head>
       <body className="bg-[#0B1220] text-[#F8FAFC] min-h-screen flex flex-col antialiased selection:bg-[#22C55E] selection:text-[#0B1220] relative font-sans pb-16 md:pb-0">
-        <LanguageProvider>
+        <ThemeProvider>
+          <LanguageProvider>
           <Header />
           <main className="flex-1 flex flex-col relative z-10">{children}</main>
           <Footer />
@@ -226,6 +228,7 @@ export default function RootLayout({
           <CookieConsentBanner />
           <SupportHubWidget />
         </LanguageProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

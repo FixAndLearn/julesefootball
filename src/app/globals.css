@@ -243,3 +243,78 @@ body {
   transform: translateY(2px);
   box-shadow: 0 2px 0 #3730a3, 0 4px 8px rgba(99, 102, 241, 0.3);
 }
+
+
+/* =========================================================================
+   LIGHT / BRIGHT THEME STYLING
+   ========================================================================= */
+html.light,
+html.light body {
+  background-color: #F8FAFC !important;
+  color: #0F172A !important;
+  background-image: 
+    radial-gradient(ellipse 90% 55% at 50% -12%, rgba(16, 185, 129, 0.08), transparent 70%),
+    radial-gradient(circle at 95% 30%, rgba(245, 158, 11, 0.05), transparent 45%),
+    radial-gradient(circle at 5% 75%, rgba(16, 185, 129, 0.05), transparent 50%) !important;
+}
+
+html.light header {
+  background-color: rgba(255, 255, 255, 0.96) !important;
+  border-color: #E2E8F0 !important;
+}
+
+html.light footer {
+  background-color: #F1F5F9 !important;
+  border-color: #E2E8F0 !important;
+  color: #475569 !important;
+}
+
+html.light .bg-\[\#060B14\],
+html.light .bg-\[\#040812\],
+html.light .bg-\[\#070D18\],
+html.light .bg-\[\#050914\]\/95,
+html.light .bg-\[\#0B1220\],
+html.light .bg-\[\#090D16\],
+html.light .bg-\[\#080F1E\],
+html.light .bg-\[\#0D1629\] {
+  background-color: #FFFFFF !important;
+}
+
+html.light .bg-pitch-surface,
+html.light .bg-pitch-card,
+html.light .bg-\[\#0D192E\],
+html.light .bg-\[\#0F172A\],
+html.light .bg-\[\#0F1A30\],
+html.light .bg-\[\#111827\] {
+  background-color: #F8FAFC !important;
+  border-color: #E2E8F0 !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.06) !important;
+}
+
+html.light .text-white,
+html.light .text-slate-100,
+html.light .text-slate-200,
+html.light .text-\[\#F8FAFC\] {
+  color: #0F172A !important;
+}
+
+html.light .text-slate-300,
+html.light .text-slate-400 {
+  color: #475569 !important;
+}
+
+html.light .border-pitch-border,
+html.light .border-slate-800,
+html.light .border-slate-800\/80,
+html.light .border-slate-800\/60,
+html.light .border-slate-700 {
+  border-color: #E2E8F0 !important;
+}
+
+html.light ::-webkit-scrollbar-track {
+  background: #F1F5F9;
+}
+
+html.light ::-webkit-scrollbar-thumb {
+  background: #CBD5E1;
+}
