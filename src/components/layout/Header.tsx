@@ -441,15 +441,23 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Drawer */}
+      {/* Mobile Menu Backdrop */}
       {mobileMenuOpen && (
-        <div className="lg:hidden border-t border-emerald-500/20 bg-[#070D18]/98 backdrop-blur-2xl px-4 py-4 space-y-3.5 max-h-[calc(100vh-4rem)] overflow-y-auto">
+        <div
+          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Compact Floating Mobile Dropdown Menu (Only Necessary Pages, No Duplicates from Bottom Bar) */}
+      {mobileMenuOpen && (
+        <div className="lg:hidden absolute top-[calc(100%+0.5rem)] right-3 w-[calc(100%-1.5rem)] max-w-sm rounded-2xl border border-slate-800 bg-[#090F1E]/98 backdrop-blur-2xl p-4 shadow-2xl shadow-black/90 space-y-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
           {/* User profile card or guest action on mobile */}
           {isAuthenticated ? (
-            <div className="p-3 rounded-2xl bg-pitch-surface/90 border border-pitch-border space-y-2.5 shadow-lg">
+            <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
-                  <div className="w-9 h-9 rounded-xl bg-gradient-to-tr from-amber-400 to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center shrink-0 shadow-md">
+                  <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center shrink-0 shadow-md">
                     {getInitials(displayName)}
                   </div>
                   <div className="min-w-0">
@@ -469,7 +477,7 @@ export function Header() {
                   <Link
                     href="/admin"
                     onClick={() => setMobileMenuOpen(false)}
-                    className="px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold flex items-center gap-1 shrink-0"
+                    className="px-2 py-1 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-[10px] font-bold flex items-center gap-1 shrink-0 hover:bg-amber-500/25 transition-colors"
                   >
                     <Crown className="w-3 h-3 text-amber-400" />
                     <span>Admin</span>
@@ -477,30 +485,27 @@ export function Header() {
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-pitch-border/60">
+              <div className="grid grid-cols-2 gap-2 pt-1 border-t border-slate-800/80">
                 <Link
                   href="/dashboard/buyer"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs py-1.5 rounded-lg bg-pitch-card border border-pitch-border text-slate-200 hover:text-white hover:border-emerald-500/40 font-medium transition-colors"
+                  className="text-center text-xs py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 hover:text-white hover:border-emerald-500/40 font-medium transition-colors"
                 >
                   Buyer Hub
                 </Link>
                 <Link
                   href="/dashboard/seller"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs py-1.5 rounded-lg bg-pitch-card border border-pitch-border text-slate-200 hover:text-white hover:border-emerald-500/40 font-medium transition-colors"
+                  className="text-center text-xs py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 hover:text-white hover:border-emerald-500/40 font-medium transition-colors"
                 >
                   Seller Hub
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="p-3.5 rounded-2xl bg-pitch-surface/90 border border-pitch-border space-y-2.5 shadow-lg">
-              <div>
-                <p className="text-xs font-bold text-slate-100">Welcome to eFootballMarket</p>
-                <p className="text-[11px] text-slate-400">Kenya&apos;s verified M-Pesa escrow marketplace</p>
-              </div>
-              <div className="grid grid-cols-2 gap-2 pt-1">
+            <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
+              <p className="text-xs font-bold text-slate-100">Welcome to eFootballMarket</p>
+              <div className="grid grid-cols-2 gap-2">
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
                   <Button variant="secondary" size="sm" className="w-full text-xs py-1.5">
                     Log In
@@ -515,149 +520,93 @@ export function Header() {
             </div>
           )}
 
-          {/* Instant Search Bar */}
-          <form onSubmit={handleSearchSubmit} className="relative">
-            <Search className="w-4 h-4 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2 pointer-events-none" />
-            <input
-              type="text"
-              placeholder="Search squads (e.g. 3150 OVR, Epics)..."
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-              className="w-full pl-9 pr-3 py-2 rounded-xl bg-pitch-surface/90 border border-pitch-border text-xs text-slate-200 placeholder:text-slate-500 focus:outline-none focus:border-emerald-500/60 transition-colors"
-            />
-          </form>
-
-          {/* Primary Quick CTA: Sell Account */}
-          <Link
-            href="/seller/create-listing"
-            title="List & Sell Your eFootball Account"
-            onClick={() => setMobileMenuOpen(false)}
-            className="flex items-center justify-center gap-2 w-full py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black text-xs shadow-lg shadow-emerald-500/20 active:scale-95 transition-all"
-          >
-            <PlusCircle className="w-4 h-4 stroke-[2.5]" />
-            <span>+ Sell Account (0% Fee)</span>
-          </Link>
-
-          {/* Clean 2-Column Marketplace Grid */}
-          <nav role="navigation" aria-label="Mobile Navigation">
-            <div className="grid grid-cols-2 gap-2">
-              <Link
-                href="/browse"
-                title="Browse Verified eFootball Mobile Accounts Kenya"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-emerald-500/40 transition-colors"
-              >
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Sparkles className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <span className="block text-xs font-bold text-slate-100 truncate">{t.browseSquads}</span>
-                  <span className="block text-[10px] text-slate-400 truncate">Catalog</span>
-                </div>
-              </Link>
-
-              <Link
-                href="/escrow-guarantee"
-                title="Safaricom Till 1572931 Escrow Guarantee"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-emerald-500/40 transition-colors"
-              >
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <span className="block text-xs font-bold text-slate-100 truncate">{t.escrowGuide}</span>
-                  <span className="block text-[10px] text-slate-400 truncate">Till 1572931</span>
-                </div>
-              </Link>
-
-              <Link
-                href="/scammer-check"
-                title="Live Kenyan Scammer Blacklist Directory"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-rose-500/40 transition-colors"
-              >
-                <div className="w-7 h-7 rounded-lg bg-rose-500/10 border border-rose-500/20 flex items-center justify-center text-rose-400 shrink-0">
-                  <ShieldAlert className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <span className="block text-xs font-bold text-slate-100 truncate">{t.scammerCheck}</span>
-                  <span className="block text-[10px] text-slate-400 truncate">Blacklist</span>
-                </div>
-              </Link>
-
-              <Link
-                href="/middleman"
-                title="Bring-Your-Own-Deal Middleman Escrow"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-emerald-500/40 transition-colors"
-              >
-                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400 shrink-0">
-                  <Handshake className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <span className="block text-xs font-bold text-slate-100 truncate">Middleman</span>
-                  <span className="block text-[10px] text-slate-400 truncate">Custom Deals</span>
-                </div>
-              </Link>
-
-              <Link
-                href="/wanted"
-                title="Wanted Squads & Formations Buyer Board"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-amber-500/40 transition-colors"
-              >
-                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
-                  <Target className="w-3.5 h-3.5" />
-                </div>
-                <div className="min-w-0">
-                  <span className="block text-xs font-bold text-slate-100 truncate">Wanted Board</span>
-                  <span className="block text-[10px] text-slate-400 truncate">Buyer Requests</span>
-                </div>
-              </Link>
-
-              <Link
-                href="/tournaments"
-                title="Competitive eFootball Tournaments Kenya"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-2.5 p-2.5 rounded-xl bg-pitch-surface/90 border border-pitch-border hover:border-amber-500/40 transition-colors"
-              >
-                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 flex items-center justify-center text-amber-400 shrink-0">
+          {/* Necessary Marketplace Links (Non-Duplicated from Mobile Bottom Bar) */}
+          <div className="space-y-1">
+            <Link
+              href="/tournaments"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
                   <Trophy className="w-3.5 h-3.5" />
                 </div>
-                <div className="min-w-0">
-                  <span className="block text-xs font-bold text-slate-100 truncate">Tournaments</span>
-                  <span className="block text-[10px] text-slate-400 truncate">Brackets & Cups</span>
-                </div>
-              </Link>
-            </div>
-          </nav>
-
-          {/* Compact Bottom Utilities Row */}
-          <div className="pt-2.5 border-t border-pitch-border/80 flex items-center justify-between text-xs text-slate-400">
-            <Link
-              href="/news"
-              title="eFootball Community News & Bulletin"
-              onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-1.5 hover:text-white transition-colors"
-            >
-              <Newspaper className="w-3.5 h-3.5 text-slate-400" />
-              <span>Bulletin</span>
+                <span className="text-xs font-semibold">Tournaments &amp; Cups</span>
+              </div>
+              <span className="text-[10px] text-amber-400 font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/10">Cash Prizes</span>
             </Link>
 
+            <Link
+              href="/wanted"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Target className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-semibold">Wanted Squads Board</span>
+              </div>
+              <span className="text-[10px] text-slate-400 font-medium">Buyer Requests</span>
+            </Link>
+
+            <Link
+              href="/middleman"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Handshake className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-semibold">Middleman Escrow</span>
+              </div>
+              <span className="text-[10px] text-slate-400 font-medium">Custom Deals</span>
+            </Link>
+
+            <Link
+              href="/friday-drops"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <Flame className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-semibold">Friday Drops</span>
+              </div>
+              <span className="text-[10px] text-amber-400 font-mono font-bold">8h Flash</span>
+            </Link>
+
+            <Link
+              href="/news"
+              onClick={() => setMobileMenuOpen(false)}
+              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+            >
+              <div className="flex items-center gap-2.5">
+                <div className="w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center shrink-0">
+                  <Newspaper className="w-3.5 h-3.5" />
+                </div>
+                <span className="text-xs font-semibold">Official Bulletins</span>
+              </div>
+              <span className="text-[10px] text-slate-400 font-medium">Updates &amp; Alerts</span>
+            </Link>
+          </div>
+
+          {/* Quick Support & Account Controls */}
+          <div className="pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
             <a
               href="https://wa.me/254794400365"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
-              title="Contact WhatsApp Escrow Desk Support"
               className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
             >
               <MessageCircle className="w-3.5 h-3.5" />
               <span>WhatsApp Desk</span>
             </a>
 
-            {isAuthenticated ? (
+            {isAuthenticated && (
               <Link
                 href="/profile"
                 onClick={() => setMobileMenuOpen(false)}
@@ -665,15 +614,6 @@ export function Header() {
               >
                 <UserIcon className="w-3.5 h-3.5 text-slate-400" />
                 <span>Settings</span>
-              </Link>
-            ) : (
-              <Link
-                href="/escrow-guarantee"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-1.5 hover:text-white transition-colors"
-              >
-                <ShieldCheck className="w-3.5 h-3.5 text-slate-400" />
-                <span>Escrow</span>
               </Link>
             )}
 
