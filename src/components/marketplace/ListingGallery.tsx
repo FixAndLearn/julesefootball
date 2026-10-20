@@ -48,6 +48,17 @@ export function ListingGallery({
   const [isLightboxOpen, setIsLightboxOpen] = useState(false);
   const [zoomLevel, setZoomLevel] = useState(1);
 
+  useEffect(() => {
+    if (isLightboxOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isLightboxOpen]);
+
   // Normalize image list
   const validImages = images.length > 0 ? images : [];
   const activeImage = validImages[activeIndex]?.image_url || "";
@@ -269,7 +280,7 @@ export function ListingGallery({
       {/* Fullscreen High-Resolution Lightbox & Inspection Modal */}
       {isLightboxOpen && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-xl flex flex-col justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none"
+          className="fixed inset-0 z-[100] bg-black/95 backdrop-blur-xl flex flex-col justify-between p-4 sm:p-6 animate-in fade-in duration-200 select-none"
           onClick={() => {
             setIsLightboxOpen(false);
             setZoomLevel(1);
@@ -347,7 +358,7 @@ export function ListingGallery({
                   setIsLightboxOpen(false);
                   setZoomLevel(1);
                 }}
-                className="p-2 rounded-xl bg-rose-600/80 hover:bg-rose-500 text-white border border-rose-400/30 transition-all shadow-lg"
+                className="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-600 transition-all shadow-xl active:scale-95"
                 title="Close Lightbox (Esc)"
               >
                 <X className="w-5 h-5" />
@@ -400,7 +411,7 @@ export function ListingGallery({
               <img
                 src={activeImage}
                 alt={title}
-                className="max-w-[90vw] max-h-[80vh] object-contain rounded-xl shadow-2xl border border-white/10"
+                className="w-full max-w-[96vw] max-h-[75vh] sm:max-h-[82vh] object-contain rounded-xl shadow-2xl border border-white/10"
                 style={{
                   cursor: zoomLevel > 1 ? "zoom-out" : "zoom-in",
                   imageRendering: "auto",
@@ -428,16 +439,15 @@ export function ListingGallery({
             className="flex items-center justify-between text-xs text-slate-400 pt-3 border-t border-white/10 z-30"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center gap-3">
-              <span className="hidden sm:inline">Shortcuts:</span>
-              <kbd className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-[11px] text-slate-300">
-                ESC
-              </kbd>
-              <span className="hidden sm:inline">to close,</span>
-              <kbd className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-[11px] text-slate-300">
-                ← / →
-              </kbd>
-              <span className="hidden sm:inline">to navigate</span>
+            <div className="hidden sm:flex items-center gap-3">
+              <span>Shortcuts:</span>
+              <kbd className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-[11px] text-slate-300">ESC</kbd>
+              <span>to close,</span>
+              <kbd className="px-2 py-0.5 rounded bg-slate-900 border border-slate-800 font-mono text-[11px] text-slate-300">← / →</kbd>
+              <span>to navigate</span>
+            </div>
+            <div className="sm:hidden text-[11px] text-slate-400">
+              Tap image to zoom • Tap outside to close
             </div>
 
             <div className="flex items-center gap-2">

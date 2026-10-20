@@ -34,6 +34,17 @@ export function ListingFilters() {
   // Mobile Drawer State
   const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
+  useEffect(() => {
+    if (isMobileDrawerOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [isMobileDrawerOpen]);
+
   // Sync state whenever URL searchParams change
   useEffect(() => {
     setSearch(searchParams.get("search") || "");
@@ -493,10 +504,10 @@ export function ListingFilters() {
           Opens when user taps "Filters" on mobile, keeping screen clean by default
       ========================================================================= */}
       {isMobileDrawerOpen && (
-        <div className="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-lg bg-pitch-surface border border-pitch-border rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-6">
+        <div className="fixed inset-0 z-[100] flex items-end sm:items-center justify-center p-0 sm:p-4 bg-black/90 backdrop-blur-xl animate-in fade-in">
+          <div className="w-full max-w-lg bg-[#070D18] border border-slate-800 rounded-t-3xl sm:rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[85vh] animate-in slide-in-from-bottom-6 z-10">
             {/* Drawer Header */}
-            <div className="p-4 border-b border-pitch-border bg-pitch-card/60 flex items-center justify-between">
+            <div className="p-4 border-b border-slate-800 bg-[#0B1424] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <SlidersHorizontal className="w-4 h-4 text-emerald-400" />
                 <h3 className="text-sm font-bold text-white">Filter eFootball Accounts</h3>

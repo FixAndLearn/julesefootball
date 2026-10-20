@@ -67,27 +67,14 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full space-y-6">
       
-      {/* Institutional Healthline-Style Trust Header Banner */}
-      <div className="p-4 sm:p-5 rounded-2xl bg-pitch-surface/90 border border-pitch-border shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-80 h-32 bg-emerald-500/10 blur-3xl pointer-events-none" />
-        <div className="relative z-10">
-          <h1 className="text-2xl sm:text-3xl font-bold text-white font-display">
-            Browse eFootball Accounts
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-pitch-border/60">
+        <div>
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
+            Browse Verified Squads
           </h1>
-          <p className="text-xs sm:text-sm text-slate-400 mt-0.5">
-            Showing <span className="text-emerald-300 font-semibold">{totalCount}</span> verified live listings | Inspected before payout
+          <p className="text-xs text-slate-400 mt-0.5">
+            Showing <span className="text-emerald-400 font-bold">{totalCount}</span> live listings via Till 1572931 Escrow
           </p>
-        </div>
-
-        <div className="flex flex-wrap items-center gap-2.5 text-xs text-slate-300 relative z-10">
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pitch-card border border-pitch-border">
-            <Lock className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Encrypted Konami 2FA</span>
-          </div>
-          <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pitch-card border border-pitch-border">
-            <CheckCircle2 className="w-3.5 h-3.5 text-amber-400" />
-            <span>Zero Unverified Claims</span>
-          </div>
         </div>
       </div>
 

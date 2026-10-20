@@ -266,44 +266,38 @@ export function SellerDashboardView({
             {listings.map((item) => (
               <div
                 key={item.id}
-                className="py-4 flex flex-col sm:flex-row sm:items-center justify-between gap-4 hover:bg-pitch-card/40 px-3 rounded-xl transition-colors"
+                className="py-3.5 px-3 rounded-xl hover:bg-pitch-card/40 transition-colors flex flex-col sm:flex-row sm:items-center justify-between gap-3"
               >
-                <div>
-                  <div className="flex items-center gap-2">
+                <div className="space-y-1">
+                  <div className="flex items-center gap-2 flex-wrap">
                     <Badge variant={item.status === "published" ? "success" : "default"} size="sm">
                       {item.status.toUpperCase()}
                     </Badge>
                     <span className="text-xs text-slate-400">{getPlatformLabel(item.platform)}</span>
-                    <span className="text-xs text-amber-300 font-semibold font-mono">OVR {item.overall_team_strength}</span>
+                    <span className="text-xs text-amber-300 font-semibold font-mono">
+                      OVR {item.overall_team_strength}
+                    </span>
                   </div>
-                  <h3 className="text-sm font-semibold text-slate-200 mt-1">{item.title}</h3>
+                  <h3 className="text-sm font-semibold text-slate-100">{item.title}</h3>
                 </div>
 
-                <div className="flex items-center gap-2 sm:gap-3">
-                  <span className="text-base font-bold text-emerald-400 font-display font-mono mr-2">
+                <div className="flex items-center justify-between sm:justify-end gap-3 pt-2 sm:pt-0 border-t sm:border-t-0 border-pitch-border/40">
+                  <span className="text-base font-bold text-emerald-400 font-display font-mono">
                     {formatCurrency(item.price, item.currency)}
                   </span>
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    className="text-xs text-amber-300 border-amber-500/40 hover:bg-amber-500/10"
-                    onClick={() => setSelectedFlyerListing(item)}
-                  >
-                    <Sparkles className="w-3.5 h-3.5 mr-1 text-amber-400" />
-                    Flyer
-                  </Button>
-                  <FastBuyLinkButton listingId={item.id} variant="compact" />
-                  <Link href={`/seller/edit-listing/${item.id}`}>
-                    <Button variant="gold" size="sm">
-                      <Edit3 className="w-3.5 h-3.5 mr-1" />
-                      Edit
-                    </Button>
-                  </Link>
-                  <Link href={`/listings/${item.id}`}>
-                    <Button variant="secondary" size="sm">
-                      View
-                    </Button>
-                  </Link>
+                  <div className="flex items-center gap-2">
+                    <Link href={`/seller/edit-listing/${item.id}`}>
+                      <Button variant="gold" size="sm" className="text-xs px-3 py-1.5">
+                        <Edit3 className="w-3.5 h-3.5 mr-1" />
+                        Edit
+                      </Button>
+                    </Link>
+                    <Link href={`/listings/${item.id}`}>
+                      <Button variant="secondary" size="sm" className="text-xs px-3 py-1.5">
+                        View
+                      </Button>
+                    </Link>
+                  </div>
                 </div>
               </div>
             ))}
