@@ -216,19 +216,10 @@ export default async function HomePage() {
       {/* 2. CURATED MARKETPLACE DIRECTORY (100% Real Supabase Data, Zero Demo Data) */}
       <section className="py-14 md:py-20 border-b border-emerald-500/20 bg-[#060B14]/80">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
-            <div>
-              <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
-                <Sparkles className="w-3.5 h-3.5" />
-                <span>Verified Inventory</span>
-              </div>
-              <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
-                Featured Verified Squads
-              </h2>
-              <p className="text-xs sm:text-sm text-slate-400 mt-1">
-                Accounts inspected for Konami ID cleanliness, OVR veracity, and unlinked email status.
-              </p>
-            </div>
+          <div className="flex items-center justify-between gap-4 mb-6">
+            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
+              Featured Verified Squads
+            </h2>
             <Link
               href="/browse"
               className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 hover:text-emerald-300 hover:underline shrink-0"
