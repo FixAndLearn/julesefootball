@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React from "react";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -10,8 +10,6 @@ import {
   CheckCircle2,
   Lock,
   ArrowRight,
-  AlertCircle,
-  Clock,
   Sparkles,
 } from "lucide-react";
 
@@ -94,8 +92,6 @@ const STEPS: Step[] = [
 ];
 
 export function EscrowStepsVisualizer() {
-  const [activeStep, setActiveStep] = useState(0);
-
   return (
     <section className="py-14 md:py-20 bg-[#070D18] border-b border-pitch-border relative overflow-hidden">
       {/* Stadium floodlight ambience */}
@@ -118,29 +114,17 @@ export function EscrowStepsVisualizer() {
         </div>
 
         {/* 5-Step Timeline Cards */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4 mb-6">
-          {STEPS.map((step, idx) => {
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 sm:gap-4 mb-8">
+          {STEPS.map((step) => {
             const Icon = step.icon;
-            const isSelected = activeStep === idx;
             return (
               <div
                 key={step.num}
-                onClick={() => setActiveStep(idx)}
-                className={`p-4 sm:p-5 rounded-2xl border transition-all cursor-pointer flex flex-col justify-between shadow-xl ${
-                  isSelected
-                    ? "bg-pitch-card border-emerald-500 shadow-[0_0_25px_rgba(16,185,129,0.2)] ring-1 ring-emerald-500/50"
-                    : "bg-pitch-surface/90 border-pitch-border hover:border-emerald-500/50 hover:bg-pitch-card/90"
-                }`}
+                className="p-5 rounded-2xl border border-pitch-border/80 bg-pitch-surface/90 flex flex-col justify-between shadow-xl transition-all hover:border-emerald-500/40 hover:bg-pitch-card"
               >
-                <div className="space-y-2.5">
+                <div className="space-y-3">
                   <div className="flex items-center justify-between">
-                    <span
-                      className={`w-7 h-7 rounded-lg flex items-center justify-center font-mono font-black text-xs ${
-                        isSelected
-                          ? "bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950 font-black"
-                          : "bg-slate-800 text-slate-300"
-                      }`}
-                    >
+                    <span className="w-7 h-7 rounded-lg flex items-center justify-center font-mono font-black text-xs bg-gradient-to-r from-emerald-500 to-teal-400 text-slate-950">
                       {step.num}
                     </span>
                     <span
@@ -150,12 +134,8 @@ export function EscrowStepsVisualizer() {
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-1">
-                    <Icon
-                      className={`w-4 h-4 shrink-0 ${
-                        isSelected ? "text-emerald-400" : "text-slate-400"
-                      }`}
-                    />
+                  <div className="flex items-center gap-2 pt-0.5">
+                    <Icon className="w-4 h-4 shrink-0 text-emerald-400" />
                     <h3 className="font-bold text-white text-sm leading-tight">
                       {step.title}
                     </h3>
@@ -164,48 +144,19 @@ export function EscrowStepsVisualizer() {
                   <p className="text-xs text-slate-400 leading-relaxed">
                     {step.subtitle}
                   </p>
-                </div>
 
-                <div className="pt-3 mt-3 border-t border-pitch-border/80 flex items-center justify-between text-[11px] font-semibold text-slate-400">
-                  <span className={isSelected ? "text-emerald-400 font-bold" : ""}>
-                    {isSelected ? "Active Step" : "Click to view"}
-                  </span>
-                  <span className={`w-1.5 h-1.5 rounded-full ${isSelected ? "bg-emerald-400 animate-pulse shadow-[0_0_8px_#10B981]" : "bg-slate-700"}`} />
+                  <div className="pt-3 border-t border-pitch-border/70 space-y-1.5">
+                    {step.details.map((detail, dIdx) => (
+                      <div key={dIdx} className="flex items-start gap-1.5 text-[11px] text-slate-300 leading-snug">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
+                        <span>{detail}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             );
           })}
-        </div>
-
-        {/* Active Step Decompressed Deep-Dive Banner */}
-        <div className="rounded-2xl bg-pitch-surface/90 border border-pitch-border p-5 mb-8 shadow-xl">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-            <div className="flex items-center gap-2.5">
-              <span className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-500/30 text-emerald-400 flex items-center justify-center font-bold text-xs shrink-0">
-                {STEPS[activeStep].num}
-              </span>
-              <div>
-                <h4 className="font-bold text-white text-sm">
-                  Step {STEPS[activeStep].num}: {STEPS[activeStep].title}
-                </h4>
-                <p className="text-xs text-slate-400">
-                  {STEPS[activeStep].subtitle}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {STEPS[activeStep].details.map((detail, idx) => (
-                <div
-                  key={idx}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300"
-                >
-                  <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                  <span>{detail}</span>
-                </div>
-              ))}
-            </div>
-          </div>
         </div>
 
         {/* Highlight Callout Box: Why You Cannot Be Scammed */}

@@ -7,7 +7,6 @@ import { NewsService } from "@/services/newsService";
 import { TournamentService } from "@/services/tournamentService";
 import { Listing, NewsArticle, Tournament } from "@/types/database";
 import { AdBanner } from "@/components/common/AdBanner";
-import { HomeFaqAccordion } from "@/components/home/HomeFaqAccordion";
 import { ListingCard3D } from "@/components/marketplace/ListingCard3D";
 import { EscrowStepsVisualizer } from "@/components/home/EscrowStepsVisualizer";
 import {
@@ -27,7 +26,6 @@ import {
   CheckCircle2,
   AlertTriangle,
   Building2,
-  FileText,
   BadgeCheck,
 } from "lucide-react";
 import Link from "next/link";
@@ -474,25 +472,6 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* 9. INTERACTIVE FAQ ACCORDION (Matches Schema.org FAQPage for Google Search) */}
-      <section className="py-14 md:py-20 border-b border-emerald-500/20 bg-gradient-to-b from-[#060B14] to-[#04070D]">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center mb-10">
-            <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-2">
-              <FileText className="w-3.5 h-3.5" />
-              <span>Authority Knowledge Base</span>
-            </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
-              Frequently Asked Questions
-            </h2>
-            <p className="text-xs sm:text-sm text-slate-400 mt-1 max-w-xl mx-auto">
-              Clear, transparent answers on Safaricom M-Pesa escrow protection, dispute timing, and account safety.
-            </p>
-          </div>
-
-          <HomeFaqAccordion />
-        </div>
-      </section>
     </div>
   );
 }
