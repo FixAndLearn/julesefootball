@@ -58,10 +58,6 @@ export default async function FridayDropsPage() {
         <section className="py-14 md:py-20 border-t border-slate-800/80 bg-[#090E1A]">
           <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 space-y-10">
             <div className="text-center space-y-3">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs font-bold uppercase tracking-wider">
-                <HelpCircle className="w-3.5 h-3.5" />
-                <span>Protocol Rules</span>
-              </div>
               <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
                 How Friday Flash Drops Work
               </h2>

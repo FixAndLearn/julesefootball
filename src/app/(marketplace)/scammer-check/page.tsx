@@ -16,10 +16,6 @@ export default function ScammerCheckPage() {
     <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-10 sm:py-14 w-full space-y-12">
       {/* Header */}
       <div className="text-center max-w-3xl mx-auto space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-900 border border-slate-800 text-slate-300 text-xs font-medium">
-          <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-          <span>Kenyan eFootball Anti-Fraud Advisory</span>
-        </div>
         <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold text-white font-display tracking-tight">
           Scammer Blacklist Directory
         </h1>
@@ -45,10 +41,6 @@ export default function ScammerCheckPage() {
       {/* Top 3 Scams in Kenyan eFootball Trading */}
       <div className="space-y-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
-            <AlertTriangle className="w-4 h-4" />
-            <span>Fraud Prevention Advisory</span>
-          </div>
           <h2 className="text-2xl font-black text-white font-display">
             The 3 Most Common Scams in Kenya & How to Stay Safe
           </h2>

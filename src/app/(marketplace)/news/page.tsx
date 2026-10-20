@@ -104,10 +104,6 @@ export default function NewsFeedPage() {
       {/* Header Banner */}
       <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 border-b border-pitch-border/80 pb-8">
         <div>
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-brand-500/10 border border-brand-500/30 text-brand-300 text-xs font-semibold mb-3">
-            <Newspaper className="w-3.5 h-3.5 text-brand-400" />
-            <span>Marketplace Community & Intelligence</span>
-          </div>
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">
             eFootball News & Scammer Alerts
           </h1>

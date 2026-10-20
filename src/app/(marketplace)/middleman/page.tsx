@@ -226,11 +226,6 @@ function MiddlemanContent() {
         <div className="absolute top-0 right-0 w-80 h-80 bg-emerald-500/10 rounded-full blur-3xl pointer-events-none" />
 
         <div className="relative z-10 space-y-4 max-w-2xl">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
-            <Handshake className="w-4 h-4 text-emerald-400" />
-            <span>Bring-Your-Own-Deal — Safe Middleman Service</span>
-          </div>
-
           <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">
             Safe Escrow for WhatsApp & Facebook Trades
           </h1>
@@ -615,10 +610,6 @@ function MiddlemanContent() {
       {activeTab === "generator" && (
         <div className="bg-pitch-surface border border-emerald-500/50 rounded-3xl p-6 sm:p-8 space-y-6 shadow-2xl">
           <div className="border-b border-pitch-border/80 pb-4">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/40 text-emerald-300 text-xs font-bold mb-2">
-              <Share2 className="w-3.5 h-3.5 text-emerald-400" />
-              <span>Viral Growth Tool for WhatsApp Gaming Groups</span>
-            </div>
             <h3 className="text-xl font-bold text-white font-display">
               Generate 1-Click WhatsApp Escrow Contract Invite
             </h3>

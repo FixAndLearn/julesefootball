@@ -67,12 +67,6 @@ export function FridayDropsSection({ listings }: FridayDropsProps) {
           <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6 pb-8 border-b border-slate-800">
             {/* Title & Badge */}
             <div className="space-y-2">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium tracking-wide">
-                <Flame className="w-3.5 h-3.5 text-amber-400 shrink-0" />
-                <span>
-                  {isDropActive ? "Friday Drops • 8-Hour Flash Window LIVE" : "Friday Drops • Weekly 8-Hour Flash Event"}
-                </span>
-              </div>
               <h2 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-white font-display tracking-tight">
                 Curated Squad Drops
               </h2>

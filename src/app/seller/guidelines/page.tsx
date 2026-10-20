@@ -11,10 +11,6 @@ export default function SellerGuidelinesPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-10">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-konami-blue/20 border border-konami-blue/40 text-sky-400 text-xs font-semibold">
-          <Trophy className="w-4 h-4" />
-          <span>Merchant Operational Excellence</span>
-        </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
           Seller Guidelines & Merchant Standards
         </h1>

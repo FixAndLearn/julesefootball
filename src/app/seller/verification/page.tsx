@@ -27,10 +27,6 @@ function SellerVerificationContent() {
 
       {/* Hero Badge & Heading */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-bold">
-          <Clock className="w-3.5 h-3.5 animate-pulse" />
-          <span>Regulatory Licensing in Progress</span>
-        </div>
 
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">
           Seller Identity Verification (KYC)

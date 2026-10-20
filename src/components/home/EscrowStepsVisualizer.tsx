@@ -101,10 +101,6 @@ export function EscrowStepsVisualizer() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         {/* Header */}
         <div className="text-center max-w-3xl mx-auto mb-12">
-          <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/70 border border-emerald-500/30 text-emerald-400 text-xs font-semibold mb-3">
-            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-            <span>Safaricom Till 1572931 Security Architecture</span>
-          </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white font-display tracking-tight">
             The 5-Step Escrow Guarantee
           </h2>

@@ -97,12 +97,6 @@ export default async function BrowsePage({ searchParams }: BrowsePageProps) {
       <div className="p-4 sm:p-5 rounded-2xl bg-pitch-surface/90 border border-pitch-border shadow-xl flex flex-col md:flex-row md:items-center justify-between gap-4 relative overflow-hidden">
         <div className="absolute top-0 right-0 w-80 h-32 bg-emerald-500/10 blur-3xl pointer-events-none" />
         <div className="relative z-10">
-          <div className="flex items-center gap-2 mb-1">
-            <span className="px-2.5 py-0.5 rounded-full bg-emerald-950/70 border border-emerald-500/40 text-emerald-400 text-[11px] font-bold">
-              Till 1572931 Escrow Protected
-            </span>
-            <span className="text-xs text-slate-400">24-Hour Inspection Guarantee</span>
-          </div>
           <h1 className="text-2xl sm:text-3xl font-bold text-white font-display">
             Browse eFootball Accounts
           </h1>

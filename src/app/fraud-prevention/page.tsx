@@ -11,10 +11,6 @@ export default function FraudPreventionPage() {
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-10">
       {/* Header */}
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-950/80 border border-rose-800/80 text-rose-400 text-xs font-semibold">
-          <ShieldAlert className="w-4 h-4" />
-          <span>Institutional Fraud Mitigation Standard</span>
-        </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
           Anti-Fraud & Cyber Security Policy
         </h1>

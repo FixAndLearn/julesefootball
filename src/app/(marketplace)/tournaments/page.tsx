@@ -348,10 +348,6 @@ export default function TournamentsPage() {
 
         <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-3 max-w-3xl">
-            <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-bold">
-              <Trophy className="w-4 h-4 text-amber-400" />
-              <span>eFootball Kenya Competitive League & Real Cups</span>
-            </div>
 
             <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display tracking-tight">
               Host & Play 1v1 Tournaments for Real M-Pesa Cash Prizes

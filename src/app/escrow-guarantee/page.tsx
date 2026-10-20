@@ -13,10 +13,6 @@ export default function EscrowGuaranteePage() {
   return (
     <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-10">
       <div className="text-center space-y-3">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-800/80 text-emerald-400 text-xs font-semibold">
-          <ShieldCheck className="w-4 h-4" />
-          <span>Non-Custodial Escrow Security Model</span>
-        </div>
         <h1 className="text-3xl sm:text-4xl font-extrabold text-white font-display">
           eFootballMarket Escrow Guarantee
         </h1>
@@ -91,10 +87,6 @@ export default function EscrowGuaranteePage() {
       {/* 24-Hour Inspection Lifecycle Timeline */}
       <div className="p-6 sm:p-8 rounded-2xl bg-pitch-surface border border-pitch-border shadow-xl space-y-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-bold text-[#22C55E] uppercase tracking-wider mb-1">
-            <Clock className="w-3.5 h-3.5" />
-            <span>Inspection Lifecycle Roadmap</span>
-          </div>
           <h2 className="text-xl font-bold text-white font-display">
             The 24-Hour Verification Timeline
           </h2>

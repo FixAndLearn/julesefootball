@@ -263,10 +263,6 @@ export default async function HomePage() {
           <div className="rounded-3xl bg-gradient-to-r from-[#0B172E] via-[#0E2242] to-[#0B172E] border border-emerald-500/35 p-8 sm:p-12 shadow-2xl shadow-emerald-950/50">
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
               <div className="lg:col-span-8 space-y-4">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/40 text-emerald-300 text-xs font-semibold">
-                  <Handshake className="w-3.5 h-3.5 text-[#22C55E]" />
-                  <span>Bring-Your-Own-Deal Middleman</span>
-                </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-white font-display">
                   Trading outside on WhatsApp or Facebook? Don&apos;t get scammed.
                 </h2>
@@ -328,10 +324,6 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-amber-400 uppercase tracking-wider mb-1">
-                  <Trophy className="w-3.5 h-3.5 text-amber-400" />
-                  <span>eFootball Kenya Cups</span>
-                </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
                   Competitive Knockout Tournaments
                 </h2>
@@ -399,10 +391,6 @@ export default async function HomePage() {
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-8">
               <div>
-                <div className="inline-flex items-center gap-1.5 text-xs font-bold text-emerald-400 uppercase tracking-wider mb-1">
-                  <Newspaper className="w-3.5 h-3.5" />
-                  <span>Verified Alerts</span>
-                </div>
                 <h2 className="text-2xl sm:text-3xl font-extrabold text-[#F8FAFC] font-display">
                   News & Scammer Warnings
                 </h2>
