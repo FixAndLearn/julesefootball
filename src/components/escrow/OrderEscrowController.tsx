@@ -6,13 +6,13 @@ import { DisputeModal } from "@/components/escrow/DisputeModal";
 import { EscrowStatusStepper } from "@/components/escrow/EscrowStatusStepper";
 import { EscrowReceiptModal } from "@/components/escrow/EscrowReceiptModal";
 import { DisputeEvidenceLocker } from "@/components/escrow/DisputeEvidenceLocker";
-import { KonamiTransferChecklistModal, EscrowHandoverGuideCard } from "@/components/escrow/KonamiTransferChecklistModal";
+import { KonamiTransferChecklistModal } from "@/components/escrow/KonamiTransferChecklistModal";
 import { MpesaPaymentModal } from "@/components/payments/MpesaPaymentModal";
 import { Button } from "@/components/ui/Button";
 import { formatCurrency } from "@/lib/utils";
 import { createClient } from "@/lib/supabase/client";
 import { EscrowState, Order, OrderStatus } from "@/types/database";
-import { AlertCircle, AlertTriangle, CheckCircle2, FileText, KeyRound, Lock, Send, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
+import { AlertCircle, AlertTriangle, CheckCircle2, Clock, FileText, KeyRound, Lock, Send, ShieldAlert, ShieldCheck, Smartphone } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useState, useEffect } from "react";
 
@@ -219,42 +219,74 @@ export function OrderEscrowController({ order, currentUserId }: OrderEscrowContr
         <EscrowStatusStepper state={currentEscrowState} />
       </div>
 
-      {/* Universal Escrow Exchange Guide Card (Available from Beginning) */}
-      <EscrowHandoverGuideCard onOpenGuide={() => setIsChecklistModalOpen(true)} />
-
       {/* Stage 1: Payment Pending (Buyer STK Push Trigger) */}
       {currentStatus === "payment_pending" && (
-        <div className="bg-pitch-surface border border-pitch-border rounded-2xl p-6 space-y-4">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-xl bg-emerald-950/60 border border-emerald-800/60 flex items-center justify-center text-emerald-400">
-              <Smartphone className="w-5 h-5" />
+        <div className="bg-gradient-to-br from-[#0D192E] via-pitch-surface to-[#0A1220] border border-amber-500/40 rounded-2xl p-5 sm:p-6 shadow-xl space-y-4 relative overflow-hidden">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-3 border-b border-pitch-border/80">
+            <div className="flex items-center gap-3">
+              <div className="w-11 h-11 rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shrink-0 shadow-inner">
+                <Smartphone className="w-5 h-5 animate-pulse" />
+              </div>
+              <div>
+                <div className="flex items-center gap-2">
+                  <h3 className="text-base font-bold text-white font-display">Awaiting M-Pesa Deposit</h3>
+                  <span className="text-[10px] font-bold text-amber-300 bg-amber-950/80 px-2 py-0.5 rounded-full border border-amber-800">
+                    Safaricom Till 1572931
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 mt-0.5">
+                  Deposit escrow amount to unlock seller credentials &amp; encrypted chat.
+                </p>
+              </div>
             </div>
-            <div>
-              <h3 className="text-base font-bold text-slate-100">M-Pesa Payment Awaiting Settlement</h3>
-              <p className="text-xs text-slate-400">
-                Amount: <strong className="text-emerald-400">{formatCurrency(order.total_amount, order.currency)}</strong>
-              </p>
+
+            <div className="text-left sm:text-right">
+              <span className="text-[11px] text-slate-400 block font-medium">Payable Total</span>
+              <span className="text-2xl font-black text-emerald-400 font-mono tracking-tight">
+                {formatCurrency(order.total_amount, order.currency)}
+              </span>
             </div>
           </div>
 
           {isBuyer ? (
-            <div className="space-y-3">
-              <p className="text-xs text-slate-300">
-                Click below to trigger an automated Lipa Na M-Pesa STK Push directly to your Safaricom mobile handset.
-              </p>
-              <Button
-                variant="gold"
-                size="lg"
-                onClick={() => setIsPaymentModalOpen(true)}
-                className="w-full sm:w-auto"
-              >
-                <Smartphone className="w-4 h-4 mr-2" />
-                Pay via M-Pesa STK Push
-              </Button>
+            <div className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs">
+                <div className="p-2.5 rounded-xl bg-pitch-card border border-pitch-border flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">1</span>
+                  <span className="text-slate-300 text-[11px] leading-tight">Tap Pay to trigger M-Pesa prompt on phone</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-pitch-card border border-pitch-border flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">2</span>
+                  <span className="text-slate-300 text-[11px] leading-tight">Enter your Safaricom PIN on handset</span>
+                </div>
+                <div className="p-2.5 rounded-xl bg-pitch-card border border-pitch-border flex items-start gap-2">
+                  <span className="w-5 h-5 rounded-full bg-emerald-500/20 text-emerald-400 font-bold text-[10px] flex items-center justify-center shrink-0 mt-0.5">3</span>
+                  <span className="text-slate-300 text-[11px] leading-tight">Locked in Till 1572931 custody instantly</span>
+                </div>
+              </div>
+
+              <div className="flex flex-col sm:flex-row items-center gap-3 pt-1">
+                <Button
+                  variant="gold"
+                  size="lg"
+                  onClick={() => setIsPaymentModalOpen(true)}
+                  className="w-full sm:w-auto font-bold shadow-lg shadow-amber-500/10 cursor-pointer"
+                >
+                  <Smartphone className="w-4 h-4 mr-2" />
+                  Pay via M-Pesa STK Push
+                </Button>
+                <span className="text-[11px] text-slate-400 flex items-center gap-1.5">
+                  <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <span>100% money-back escrow guarantee if seller fails to deliver</span>
+                </span>
+              </div>
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-400">
-              Waiting for buyer to complete M-Pesa payment. You will receive an immediate notification once funds are locked into escrow.
+            <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 flex items-center gap-3">
+              <Clock className="w-4 h-4 text-amber-400 shrink-0 animate-spin" />
+              <span>
+                Awaiting buyer M-Pesa settlement into Safaricom Till 1572931. <strong>Do NOT share account credentials</strong> until escrow confirmation illuminates.
+              </span>
             </div>
           )}
         </div>

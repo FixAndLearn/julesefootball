@@ -231,20 +231,11 @@ export function OrderChatBox({
       </div>
 
       {/* Permanent Anti-Googling & Handover Security Banner */}
-      <div className="px-4 py-2 bg-rose-500/10 border-b border-rose-500/25 flex items-center justify-between gap-2 text-[11px] text-rose-200">
-        <div className="flex items-center gap-1.5 truncate">
-          <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
-          <span className="truncate">
-            <strong>CRITICAL RULE:</strong> Never accept an account linked to Google Play (&quot;Googling&quot;).
-          </span>
-        </div>
-        <button
-          type="button"
-          onClick={() => setIsGuideOpen(true)}
-          className="underline text-emerald-400 hover:text-emerald-300 shrink-0 font-semibold"
-        >
-          View Guide
-        </button>
+      <div className="px-4 py-2 bg-rose-500/10 border-b border-rose-500/25 flex items-center gap-2 text-[11px] text-rose-200">
+        <AlertTriangle className="w-3.5 h-3.5 text-rose-400 shrink-0" />
+        <span className="leading-tight">
+          <strong className="text-rose-300">CRITICAL RULE:</strong> Never accept an account linked to Google Play (&quot;Googling&quot;). Check Support &gt; Link Data.
+        </span>
       </div>
 
       {/* Message History */}

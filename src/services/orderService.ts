@@ -100,7 +100,10 @@ export class OrderService {
       .from("orders")
       .select(`
         *,
-        listing:listings(*),
+        listing:listings(
+          *,
+          images:listing_images(id, image_url, is_primary)
+        ),
         buyer:profiles!orders_buyer_id_fkey(*),
         seller:profiles!orders_seller_id_fkey(*),
         escrow:escrow_accounts(*)
