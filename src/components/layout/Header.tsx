@@ -441,20 +441,23 @@ export function Header() {
         </div>
       </div>
 
-      {/* Mobile Menu Backdrop */}
+      {/* Dark Dimmed Backdrop over page */}
       {mobileMenuOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/60 backdrop-blur-xs lg:hidden"
+          className="fixed inset-0 top-14 z-40 bg-black/85 lg:hidden"
           onClick={() => setMobileMenuOpen(false)}
         />
       )}
 
-      {/* Compact Floating Mobile Dropdown Menu (Only Necessary Pages, No Duplicates from Bottom Bar) */}
+      {/* Solid Opaque Mobile Navigation attached to Header */}
       {mobileMenuOpen && (
-        <div className="lg:hidden absolute top-[calc(100%+0.5rem)] right-3 w-[calc(100%-1.5rem)] max-w-sm rounded-2xl border border-slate-800 bg-[#090F1E]/98 backdrop-blur-2xl p-4 shadow-2xl shadow-black/90 space-y-3.5 z-50 animate-in fade-in zoom-in-95 duration-150">
+        <div
+          style={{ backgroundColor: "#070D18" }}
+          className="lg:hidden absolute top-full inset-x-0 z-50 border-b border-emerald-500/25 bg-[#070D18] shadow-2xl shadow-black px-4 py-4 space-y-3 max-h-[calc(100vh-5rem)] overflow-y-auto animate-in slide-in-from-top-2 duration-150"
+        >
           {/* User profile card or guest action on mobile */}
           {isAuthenticated ? (
-            <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2.5">
+            <div className="p-3 rounded-xl bg-[#0D1629] border border-slate-800 space-y-2.5">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-2.5 min-w-0">
                   <div className="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-400 to-emerald-400 text-slate-950 font-black text-xs flex items-center justify-center shrink-0 shadow-md">
@@ -462,7 +465,7 @@ export function Header() {
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-1.5">
-                      <p className="text-xs font-bold text-slate-100 truncate">{displayName}</p>
+                      <p className="text-xs font-bold text-white truncate">{displayName}</p>
                       {profile?.is_verified_seller && (
                         <span className="text-[9px] text-emerald-400 font-bold bg-emerald-950/60 border border-emerald-500/30 px-1.5 py-0.5 rounded-full shrink-0">
                           Verified
@@ -489,25 +492,28 @@ export function Header() {
                 <Link
                   href="/dashboard/buyer"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 hover:text-white hover:border-emerald-500/40 font-medium transition-colors"
+                  className="text-center text-xs py-2 rounded-lg bg-[#070D18] border border-slate-800 text-slate-200 hover:text-white hover:border-emerald-500/40 font-semibold transition-colors"
                 >
                   Buyer Hub
                 </Link>
                 <Link
                   href="/dashboard/seller"
                   onClick={() => setMobileMenuOpen(false)}
-                  className="text-center text-xs py-1.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-200 hover:text-white hover:border-emerald-500/40 font-medium transition-colors"
+                  className="text-center text-xs py-2 rounded-lg bg-[#070D18] border border-slate-800 text-slate-200 hover:text-white hover:border-emerald-500/40 font-semibold transition-colors"
                 >
                   Seller Hub
                 </Link>
               </div>
             </div>
           ) : (
-            <div className="p-3 rounded-xl bg-slate-900/80 border border-slate-800 space-y-2">
-              <p className="text-xs font-bold text-slate-100">Welcome to eFootballMarket</p>
+            <div className="p-3.5 rounded-xl bg-[#0D1629] border border-slate-800 space-y-2.5">
+              <div>
+                <p className="text-xs font-bold text-white">Welcome to eFootballMarket</p>
+                <p className="text-[11px] text-slate-400">Kenya&apos;s verified M-Pesa escrow marketplace</p>
+              </div>
               <div className="grid grid-cols-2 gap-2">
                 <Link href="/login" onClick={() => setMobileMenuOpen(false)}>
-                  <Button variant="secondary" size="sm" className="w-full text-xs py-1.5">
+                  <Button variant="secondary" size="sm" className="w-full text-xs py-1.5 bg-[#070D18]">
                     Log In
                   </Button>
                 </Link>
@@ -520,46 +526,57 @@ export function Header() {
             </div>
           )}
 
-          {/* Necessary Marketplace Links (Non-Duplicated from Mobile Bottom Bar) */}
-          <div className="space-y-1">
+          {/* Clean List of Non-Duplicated Marketplace Pages */}
+          <div className="space-y-1 pt-1 border-t border-slate-800/80">
             <Link
               href="/tournaments"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+              className="flex items-center justify-between p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-[#0E182E] transition-colors group"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                  <Trophy className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <Trophy className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-semibold">Tournaments &amp; Cups</span>
+                <div>
+                  <span className="text-xs font-semibold text-white block">Tournaments &amp; Cups</span>
+                  <span className="text-[10px] text-slate-400 block">1v1 Knockout Brackets</span>
+                </div>
               </div>
-              <span className="text-[10px] text-amber-400 font-mono font-bold px-1.5 py-0.5 rounded bg-amber-500/10">Cash Prizes</span>
+              <span className="text-[10px] text-amber-400 font-mono font-bold px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/20">
+                Cash Prizes
+              </span>
             </Link>
 
             <Link
               href="/wanted"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+              className="flex items-center justify-between p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-[#0E182E] transition-colors group"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                  <Target className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Target className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-semibold">Wanted Squads Board</span>
+                <div>
+                  <span className="text-xs font-semibold text-white block">Wanted Squads Board</span>
+                  <span className="text-[10px] text-slate-400 block">Buyer Squad Requests</span>
+                </div>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">Buyer Requests</span>
+              <span className="text-[10px] text-slate-400 font-medium">Ready Cash</span>
             </Link>
 
             <Link
               href="/middleman"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+              className="flex items-center justify-between p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-[#0E182E] transition-colors group"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
-                  <Handshake className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-lg bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0">
+                  <Handshake className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-semibold">Middleman Escrow</span>
+                <div>
+                  <span className="text-xs font-semibold text-white block">Middleman Escrow</span>
+                  <span className="text-[10px] text-slate-400 block">Off-Platform WhatsApp Deals</span>
+                </div>
               </div>
               <span className="text-[10px] text-slate-400 font-medium">Custom Deals</span>
             </Link>
@@ -567,66 +584,73 @@ export function Header() {
             <Link
               href="/friday-drops"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+              className="flex items-center justify-between p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-[#0E182E] transition-colors group"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
-                  <Flame className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-lg bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center shrink-0">
+                  <Flame className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-semibold">Friday Drops</span>
+                <div>
+                  <span className="text-xs font-semibold text-white block">Friday Drops</span>
+                  <span className="text-[10px] text-slate-400 block">Weekly Limited Squad Drops</span>
+                </div>
               </div>
-              <span className="text-[10px] text-amber-400 font-mono font-bold">8h Flash</span>
+              <span className="text-[10px] text-amber-400 font-mono font-bold px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/20">
+                8h Flash
+              </span>
             </Link>
 
             <Link
               href="/news"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center justify-between p-2 rounded-xl text-slate-200 hover:text-white hover:bg-slate-800/60 transition-colors group"
+              className="flex items-center justify-between p-2.5 rounded-xl text-slate-200 hover:text-white hover:bg-[#0E182E] transition-colors group"
             >
-              <div className="flex items-center gap-2.5">
-                <div className="w-6 h-6 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center shrink-0">
-                  <Newspaper className="w-3.5 h-3.5" />
+              <div className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 text-slate-300 flex items-center justify-center shrink-0">
+                  <Newspaper className="w-4 h-4" />
                 </div>
-                <span className="text-xs font-semibold">Official Bulletins</span>
+                <div>
+                  <span className="text-xs font-semibold text-white block">Official Bulletins</span>
+                  <span className="text-[10px] text-slate-400 block">Scammer Warnings &amp; Patch Notes</span>
+                </div>
               </div>
-              <span className="text-[10px] text-slate-400 font-medium">Updates &amp; Alerts</span>
+              <span className="text-[10px] text-slate-400 font-medium">News</span>
             </Link>
           </div>
 
-          {/* Quick Support & Account Controls */}
+          {/* Compact Utilities Row */}
           <div className="pt-2.5 border-t border-slate-800/80 flex items-center justify-between text-xs text-slate-400">
             <a
               href="https://wa.me/254794400365"
               target="_blank"
               rel="noopener noreferrer"
               onClick={() => setMobileMenuOpen(false)}
-              className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-medium"
+              className="flex items-center gap-1.5 text-emerald-400 hover:text-emerald-300 transition-colors font-semibold"
             >
               <MessageCircle className="w-3.5 h-3.5" />
               <span>WhatsApp Desk</span>
             </a>
 
-            {isAuthenticated && (
-              <Link
-                href="/profile"
-                onClick={() => setMobileMenuOpen(false)}
-                className="flex items-center gap-1.5 hover:text-white transition-colors"
-              >
-                <UserIcon className="w-3.5 h-3.5 text-slate-400" />
-                <span>Settings</span>
-              </Link>
-            )}
-
-            {isAuthenticated && (
-              <button
-                type="button"
-                onClick={handleSignOut}
-                className="flex items-center gap-1 text-rose-400 hover:text-rose-300 transition-colors font-medium"
-              >
-                <LogOut className="w-3.5 h-3.5" />
-                <span>Sign Out</span>
-              </button>
-            )}
+            {isAuthenticated ? (
+              <div className="flex items-center gap-3">
+                <Link
+                  href="/profile"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="flex items-center gap-1.5 text-slate-300 hover:text-white transition-colors"
+                >
+                  <UserIcon className="w-3.5 h-3.5 text-slate-400" />
+                  <span>Settings</span>
+                </Link>
+                <button
+                  type="button"
+                  onClick={handleSignOut}
+                  className="flex items-center gap-1 text-rose-400 hover:text-rose-300 transition-colors font-medium"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              </div>
+            ) : null}
           </div>
         </div>
       )}
