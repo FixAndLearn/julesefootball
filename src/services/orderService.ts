@@ -132,8 +132,17 @@ export class OrderService {
       .from("orders")
       .select(`
         *,
-        listing:listings(title, platform, price, overall_team_strength),
-        escrow:escrow_accounts(escrow_state)
+        listing:listings(
+          id,
+          title,
+          platform,
+          price,
+          currency,
+          overall_team_strength,
+          images:listing_images(id, image_url, is_primary)
+        ),
+        seller:profiles(username, phone_number),
+        escrow:escrow_accounts(id, escrow_state, inspection_deadline)
       `)
       .eq(column, userId)
       .order("created_at", { ascending: false });
