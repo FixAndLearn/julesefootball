@@ -7,11 +7,8 @@ import { ListingService } from "@/services/listingService";
 import { Listing } from "@/types/database";
 import { BuyNowButton } from "@/components/marketplace/BuyNowButton";
 import { ListingGallery } from "@/components/marketplace/ListingGallery";
-import { WhatsAppShareButton } from "@/components/marketplace/WhatsAppShareButton";
 import { VerifiedSellerBadge } from "@/components/marketplace/VerifiedSellerBadge";
-import { FlyerTriggerButton } from "@/components/seller/FlyerTriggerButton";
 import { MakeOfferButton } from "@/components/marketplace/MakeOfferButton";
-import { FastBuyLinkButton } from "@/components/marketplace/FastBuyLinkButton";
 import { SellerListingOffersPanel } from "@/components/marketplace/SellerListingOffersPanel";
 import { ProductJsonLd, BreadcrumbJsonLd } from "@/components/seo/JsonLd";
 import { ListingCard3D } from "@/components/marketplace/ListingCard3D";
@@ -538,17 +535,6 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                 </a>
               </div>
             )}
-
-            {/* 1-Click WhatsApp Share, Fast Buy Link & Promo Flyer Tools */}
-            <div className="pt-2 space-y-2">
-              <FastBuyLinkButton
-                listingId={listing.id}
-                listingTitle={listing.title}
-                price={Number(listing.price)}
-              />
-              <WhatsAppShareButton listing={listing} />
-              <FlyerTriggerButton listing={listing} />
-            </div>
 
             {/* Escrow Guarantee Bullets */}
             <div className="border-t border-pitch-border/60 pt-4 space-y-2.5 text-xs text-slate-300">
