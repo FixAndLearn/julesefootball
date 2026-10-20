@@ -125,7 +125,7 @@ function MiddlemanContent() {
   }, [searchParams]);
 
   const numAmount = Number(dealAmount) || 0;
-  const escrowFee = numAmount > 0 ? Math.max(50, Math.min(350, Math.round(numAmount * 0.05))) : 0;
+  const escrowFee = numAmount > 0 ? Math.max(50, Math.min(500, Math.round(numAmount * 0.05))) : 0;
   const totalPayable = numAmount + escrowFee;
 
   const appBaseUrl = typeof window !== "undefined" ? window.location.origin : "https://www.efootballmarket.co.ke";

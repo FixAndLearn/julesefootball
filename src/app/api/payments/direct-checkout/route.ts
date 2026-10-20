@@ -6,6 +6,7 @@ import { normalizePhoneNumber } from "@/lib/utils/phone";
 import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 import { checkRateLimit, getIdempotencyResult, setIdempotencyResult } from "@/lib/security/rateLimiter";
 import { isListingOnFlashSale } from "@/lib/utils/flashSale";
+import { calculateEscrowCommission } from "@/lib/utils/commission";
 import { z } from "zod";
 
 export const dynamic = "force-dynamic";
@@ -146,8 +147,8 @@ export async function POST(req: NextRequest) {
         buyer_id: buyerId,
         seller_id: listing.seller_id,
         total_amount: finalPrice,
-        platform_fee: 0,
-        seller_net_amount: finalPrice,
+        platform_fee: calculateEscrowCommission(finalPrice),
+        seller_net_amount: Math.max(0, finalPrice - calculateEscrowCommission(finalPrice)),
         currency: listing.currency || "KES",
         status: "payment_pending",
       })
@@ -168,8 +169,8 @@ export async function POST(req: NextRequest) {
         buyer_id: buyerId,
         seller_id: listing.seller_id,
         gross_amount: finalPrice,
-        fee_amount: 0,
-        net_amount: finalPrice,
+        fee_amount: calculateEscrowCommission(finalPrice),
+        net_amount: Math.max(0, finalPrice - calculateEscrowCommission(finalPrice)),
         currency: listing.currency || "KES",
         escrow_state: "pending",
       });

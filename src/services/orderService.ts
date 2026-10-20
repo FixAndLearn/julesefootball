@@ -1,6 +1,7 @@
 import { Order, OrderStatus } from "@/types/database";
 import { SupabaseClient } from "@supabase/supabase-js";
 import { isListingOnFlashSale } from "@/lib/utils/flashSale";
+import { calculateEscrowCommission } from "@/lib/utils/commission";
 
 export class OrderService {
   constructor(private supabase: SupabaseClient) {}
@@ -39,9 +40,9 @@ export class OrderService {
 
     const isFlashSale = isListingOnFlashSale(listing);
     const price = Number(listing.price);
-    const platformFeeRate = 0.00; // 0% platform fee - Launch promo (seller receives 100%)
-    const platformFee = 0;
-    const sellerNetAmount = price;
+    // Platform escrow commission: 5% based on account value, bounded between KES 50 and KES 500
+    const platformFee = calculateEscrowCommission(price);
+    const sellerNetAmount = Math.max(0, price - platformFee);
     const orderNumber = this.generateOrderNumber();
 
     // 2. Insert order

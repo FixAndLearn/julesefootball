@@ -504,6 +504,17 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
                   priceFormatted={formatCurrency(listing.price, listing.currency)}
                 />
                 <MakeOfferButton listing={listing} />
+                <a
+                  href={`https://wa.me/254794400365?text=${encodeURIComponent(
+                    `Hello Brian Okibo (eFootballMarket Admin), I want to trigger WhatsApp escrow for this squad:\n\n🎮 Squad: ${listing.title}\n💰 Price: KES ${Number(listing.price).toLocaleString()}\n🔗 Link: https://www.efootballmarket.co.ke/listings/${listing.id}\n\nPlease verify and fast-track the Till 1572931 escrow process.`
+                  )}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-gradient-to-r from-emerald-600 via-teal-600 to-emerald-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs shadow-lg shadow-emerald-950/40 border border-emerald-400/30 transition-all active:scale-95"
+                >
+                  <MessageCircle className="w-4 h-4 fill-white" />
+                  <span>Instant WhatsApp Escrow Trigger</span>
+                </a>
               </div>
             )}
 

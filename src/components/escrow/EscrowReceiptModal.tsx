@@ -171,7 +171,9 @@ export function EscrowReceiptModal({ order, isOpen, onClose }: EscrowReceiptModa
             </div>
             <div className="flex justify-between text-slate-400 print:text-gray-600">
               <span>eFootballMarket Service Fee (Seller Payout Protection)</span>
-              <span className="font-mono text-emerald-400 print:text-black">KES 0.00 (0% Fee)</span>
+              <span className="font-mono text-emerald-400 print:text-black">
+                {order.platform_fee ? formatCurrency(order.platform_fee, order.currency) : "Included (KES 50 - 500)"}
+              </span>
             </div>
             <div className="flex justify-between text-slate-400 print:text-gray-600">
               <span>Konami ID AES-256-GCM Vault Handover</span>

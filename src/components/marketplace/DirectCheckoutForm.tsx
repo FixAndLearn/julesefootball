@@ -24,6 +24,8 @@ import {
 } from "lucide-react";
 import Link from "next/link";
 import { isListingOnFlashSale } from "@/lib/utils/flashSale";
+import { calculateEscrowCommission } from "@/lib/utils/commission";
+import { MessageCircle } from "lucide-react";
 
 interface DirectCheckoutFormProps {
   listing: Listing;
@@ -336,7 +338,9 @@ export function DirectCheckoutForm({
 
           <div className="flex justify-between text-slate-400">
             <span>Escrow Protection Fee</span>
-            <span className="text-emerald-400 font-semibold">0 KES (Free Launch Promo)</span>
+            <span className="text-emerald-400 font-semibold font-mono">
+              KES {calculateEscrowCommission(payablePrice)} (5% Tiered: KES 50 - 500)
+            </span>
           </div>
 
           <div className="border-t border-pitch-border/60 pt-2 flex justify-between items-baseline font-bold text-sm">
@@ -431,7 +435,22 @@ export function DirectCheckoutForm({
             Pay {formatCurrency(payablePrice)} via M-Pesa
           </Button>
 
-          <div className="pt-2 flex items-center justify-between text-xs text-slate-400">
+          
+          {/* Instant WhatsApp Support Trigger */}
+          <div className="pt-1">
+            <a
+              href={`https://wa.me/254794400365?text=${encodeURIComponent(
+                `Hello Brian Okibo (eFootballMarket Admin), I am checking out squad "${listing.title}" (KES ${payablePrice}). Please confirm M-Pesa Till 1572931 escrow availability.`
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="w-full inline-flex items-center justify-center gap-2 p-2.5 rounded-xl bg-slate-900 border border-slate-700/80 hover:border-emerald-500/50 hover:bg-slate-800 transition-all text-xs font-semibold text-white"
+            >
+              <MessageCircle className="w-3.5 h-3.5 text-emerald-400 fill-emerald-400" />
+              <span>Instant WhatsApp Escrow Support (0794400365)</span>
+            </a>
+          </div>
+<div className="pt-2 flex items-center justify-between text-xs text-slate-400">
             <div className="flex items-center gap-1.5">
               <Lock className="w-3.5 h-3.5 text-emerald-400" />
               <span>Safaricom Daraja API Protected</span>

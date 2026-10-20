@@ -69,7 +69,7 @@ export function getSellerTier(salesCount: number = 0, rating: number = 5.0): Sel
     description: "Seller trading under standard 24-hour Safaricom Till 1572931 Escrow Protection.",
     perks: [
       "Escrow Protection via Till 1572931",
-      "0% platform seller fee (full net payout)",
+      "Lowest 5% escrow commission (KES 50 - 500)",
       "Automatic promotion after 3 completed sales",
     ],
   };

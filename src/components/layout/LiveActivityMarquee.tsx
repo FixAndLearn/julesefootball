@@ -19,7 +19,7 @@ const PROMOTIONAL_TICKER_ITEMS: TickerItem[] = [
     id: "promo-sell",
     badge: "SELL SQUAD",
     badgeColor: "bg-amber-500/10 text-amber-300 border-amber-500/30",
-    text: "List your high-OVR squad with 0% seller fees & automated Safaricom M-Pesa payouts",
+    text: "List your high-OVR squad with low escrow fees (KES 50 - 500) & automated Safaricom M-Pesa payouts",
     link: "/seller/create-listing",
   },
   {

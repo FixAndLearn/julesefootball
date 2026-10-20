@@ -155,13 +155,13 @@ export default function EscrowGuaranteePage() {
               <tr>
                 <td className="py-3 px-4 font-semibold text-white">Marketplace Listing Purchase</td>
                 <td className="py-3 px-4 text-[#22C55E] font-bold">0% (Free)</td>
-                <td className="py-3 px-4">5% (Deducted from payout)</td>
+                <td className="py-3 px-4 font-mono font-semibold text-amber-300">5% (Min KES 50, Max KES 500)</td>
                 <td className="py-3 px-4 font-mono">Instant STK Push</td>
               </tr>
               <tr>
                 <td className="py-3 px-4 font-semibold text-white">Bring-Your-Own-Deal Middleman</td>
                 <td className="py-3 px-4 text-[#22C55E] font-bold">0% (Free)</td>
-                <td className="py-3 px-4">5% (Min KES 100)</td>
+                <td className="py-3 px-4 font-mono font-semibold text-amber-300">5% (Min KES 50, Max KES 500)</td>
                 <td className="py-3 px-4 font-mono">Instant STK Push</td>
               </tr>
               <tr>

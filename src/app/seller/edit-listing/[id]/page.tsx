@@ -21,6 +21,7 @@ import { useEffect, useRef, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { Listing } from "@/types/database";
 import { watermarkSquadImage } from "@/lib/utils/watermark";
+import { calculateEscrowCommission } from "@/lib/utils/commission";
 
 interface UploadedImage {
   url: string;
@@ -444,13 +445,20 @@ export default function EditListingPage() {
               {Number(price) > 0 && (
                 <div className="mt-2 p-2.5 rounded-xl bg-emerald-950/60 border border-emerald-800/60 text-[11px] space-y-1">
                   <div className="flex justify-between text-slate-300">
-                    <span>Escrow Fee (0% Promo):</span>
-                    <span className="font-semibold text-emerald-400">KES 0</span>
+                    <span>Escrow Commission (5% based on value):</span>
+                    <span className="font-semibold text-amber-400">
+                      KES {calculateEscrowCommission(Number(price)).toLocaleString()}
+                    </span>
                   </div>
                   <div className="flex justify-between font-bold text-white border-t border-emerald-800/40 pt-1">
-                    <span>Your M-Pesa Payout:</span>
-                    <span className="text-emerald-300 font-mono">KES {Number(price).toLocaleString()}</span>
+                    <span>Your Net M-Pesa Payout:</span>
+                    <span className="text-emerald-300 font-mono">
+                      KES {(Number(price) - calculateEscrowCommission(Number(price))).toLocaleString()}
+                    </span>
                   </div>
+                  <p className="text-[10px] text-slate-400 mt-0.5">
+                    Tiered fee: KES 50 (min) to KES 500 (max) platform custody &amp; inspection protection.
+                  </p>
                 </div>
               )}
             </div>

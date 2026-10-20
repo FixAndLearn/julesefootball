@@ -90,9 +90,9 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "Agreed deal amount must be at least KES 100." }, { status: 400 });
     }
 
-    // 5% Escrow commission (minimum 50 KES, maximum 350 KES)
+    // 5% Escrow commission (minimum 50 KES, maximum 500 KES)
     const rawFee = Math.round(amount * 0.05);
-    const fee = Math.max(50, Math.min(350, rawFee));
+    const fee = Math.max(50, Math.min(500, rawFee));
     const total = amount + fee;
 
     const randomSuffix = Math.floor(10000 + Math.random() * 90000);
