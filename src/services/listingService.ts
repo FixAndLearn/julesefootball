@@ -259,6 +259,29 @@ export class ListingService {
       throw new Error("Unauthorized: You can only edit your own listings.");
     }
 
+    if (existing.status === "sold") {
+      throw new Error("Cannot edit an account that has already been sold.");
+    }
+
+    if (existing.status === "in_escrow") {
+      throw new Error("Cannot edit an account currently locked in an active escrow transaction.");
+    }
+
+    // Check if there is any active or completed order for this listing
+    const { data: activeOrder } = await this.supabase
+      .from("orders")
+      .select("id, status")
+      .eq("listing_id", id)
+      .not("status", "in", '("cancelled","refunded")')
+      .maybeSingle();
+
+    if (activeOrder) {
+      if (activeOrder.status === "completed" || existing.status === "sold") {
+        throw new Error("Cannot edit an account that has already been sold.");
+      }
+      throw new Error("Cannot edit an account currently locked in an active escrow trade.");
+    }
+
     const { data: updated, error: updateError } = await this.supabase
       .from("listings")
       .update({
@@ -295,7 +318,7 @@ export class ListingService {
   async deleteListing(id: string, userId: string, isAdmin = false): Promise<void> {
     const { data: existing, error: findError } = await this.supabase
       .from("listings")
-      .select("id, seller_id")
+      .select("id, seller_id, status")
       .eq("id", id)
       .is("deleted_at", null)
       .single();
@@ -306,6 +329,25 @@ export class ListingService {
 
     if (!isAdmin && existing.seller_id !== userId) {
       throw new Error("Unauthorized: You can only delete your own listings.");
+    }
+
+    if (existing.status === "sold") {
+      throw new Error("Cannot delete an account that has already been sold.");
+    }
+
+    if (existing.status === "in_escrow") {
+      throw new Error("Cannot delete an account currently locked in an active escrow transaction.");
+    }
+
+    const { data: orderExists } = await this.supabase
+      .from("orders")
+      .select("id")
+      .eq("listing_id", id)
+      .not("status", "in", '("cancelled","refunded")')
+      .maybeSingle();
+
+    if (orderExists) {
+      throw new Error("Cannot delete an account that has an associated escrow trade.");
     }
 
     const { error: deleteError } = await this.supabase

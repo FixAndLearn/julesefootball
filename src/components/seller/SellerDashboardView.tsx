@@ -9,7 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency, getPlatformLabel } from "@/lib/utils";
 import { Listing, ListingOffer, Order } from "@/types/database";
 import { SellerListingOffersPanel } from "@/components/marketplace/SellerListingOffersPanel";
-import { ArrowRight, ArrowUpRight, Edit3, PlusCircle, ShieldCheck, Star, Trophy, Wallet, Sparkles, Crown } from "lucide-react";
+import { ArrowRight, ArrowUpRight, Edit3, PlusCircle, ShieldCheck, Star, Trophy, Wallet, Sparkles, Crown, Lock } from "lucide-react";
 import { getSellerTier } from "@/lib/utils/sellerTier";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -286,12 +286,24 @@ export function SellerDashboardView({
                     {formatCurrency(item.price, item.currency)}
                   </span>
                   <div className="flex items-center gap-2">
-                    <Link href={`/seller/edit-listing/${item.id}`}>
-                      <Button variant="gold" size="sm" className="text-xs px-3 py-1.5">
-                        <Edit3 className="w-3.5 h-3.5 mr-1" />
-                        Edit
-                      </Button>
-                    </Link>
+                    {item.status === "sold" ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-xs font-semibold text-slate-400 select-none">
+                        <Lock className="w-3.5 h-3.5 text-slate-500" />
+                        <span>Sold (Locked)</span>
+                      </span>
+                    ) : item.status === "in_escrow" ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-amber-950/60 border border-amber-800/60 text-xs font-semibold text-amber-300 select-none">
+                        <Lock className="w-3.5 h-3.5 text-amber-400" />
+                        <span>In Escrow</span>
+                      </span>
+                    ) : (
+                      <Link href={`/seller/edit-listing/${item.id}`}>
+                        <Button variant="gold" size="sm" className="text-xs px-3 py-1.5">
+                          <Edit3 className="w-3.5 h-3.5 mr-1" />
+                          Edit
+                        </Button>
+                      </Link>
+                    )}
                     <Link href={`/listings/${item.id}`}>
                       <Button variant="secondary" size="sm" className="text-xs px-3 py-1.5">
                         View

@@ -14,6 +14,7 @@ import {
   Save,
   Eye,
   Star,
+  Lock,
 } from "lucide-react";
 import Link from "next/link";
 import { useParams, useRouter } from "next/navigation";
@@ -50,6 +51,7 @@ export default function EditListingPage() {
   const [coinBalance, setCoinBalance] = useState("");
   const [managerName, setManagerName] = useState("");
   const [status, setStatus] = useState("published");
+  const [originalStatus, setOriginalStatus] = useState("published");
 
   // Real Squad Images State (Up to 5 HD screenshots)
   const [images, setImages] = useState<UploadedImage[]>([]);
@@ -88,6 +90,7 @@ export default function EditListingPage() {
         setCoinBalance(String(l.coin_balance ?? 0));
         setManagerName(l.manager_name || "");
         setStatus(l.status || "published");
+        setOriginalStatus(l.status || "published");
 
         if (l.images && l.images.length > 0) {
           setImages(
@@ -226,6 +229,14 @@ export default function EditListingPage() {
     setSuccessMessage("");
 
     try {
+      if (originalStatus === "sold") {
+        throw new Error("This account has already been sold and transferred. Sold accounts cannot be edited.");
+      }
+
+      if (originalStatus === "in_escrow") {
+        throw new Error("This account is currently locked in active escrow and cannot be edited.");
+      }
+
       if (!title.trim()) {
         throw new Error("Please enter a listing title for your eFootball squad.");
       }
@@ -282,6 +293,16 @@ export default function EditListingPage() {
   };
 
   const handleDelete = async () => {
+    if (originalStatus === "sold") {
+      setError("Cannot delete an account that has already been sold.");
+      return;
+    }
+
+    if (originalStatus === "in_escrow") {
+      setError("Cannot delete an account currently locked in an active escrow transaction.");
+      return;
+    }
+
     if (!window.confirm("Are you sure you want to delete/archive this listing? This cannot be undone.")) {
       return;
     }
@@ -312,6 +333,74 @@ export default function EditListingPage() {
       <div className="min-h-[60vh] flex flex-col items-center justify-center space-y-4">
         <Loader2 className="w-8 h-8 text-emerald-400 animate-spin" />
         <p className="text-sm text-slate-400">Loading listing details...</p>
+      </div>
+    );
+  }
+
+  // Guard: If account was sold or is currently locked in escrow, disallow editing
+  if (originalStatus === "sold" || originalStatus === "in_escrow") {
+    const isSold = originalStatus === "sold";
+    return (
+      <div className="max-w-2xl mx-auto px-4 sm:px-6 lg:px-8 py-12 w-full space-y-6">
+        <Link
+          href="/dashboard/seller"
+          className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 hover:text-emerald-400 transition-colors"
+        >
+          <ArrowLeft className="w-4 h-4" />
+          <span>Back to Seller Dashboard</span>
+        </Link>
+
+        <div className="rounded-3xl bg-gradient-to-br from-[#0D192E] via-pitch-surface to-[#0A1220] border border-slate-800 p-6 sm:p-8 shadow-2xl text-center space-y-5">
+          <div className="w-16 h-16 rounded-3xl bg-slate-800/90 border border-slate-700/80 flex items-center justify-center mx-auto text-emerald-400 shadow-inner">
+            <Lock className="w-8 h-8 text-emerald-400" />
+          </div>
+
+          <div className="space-y-1.5">
+            <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-bold border bg-emerald-500/10 text-emerald-400 border-emerald-500/30 mb-2">
+              <CheckCircle2 className="w-3.5 h-3.5" />
+              <span>{isSold ? "ACCOUNT SOLD & DELIVERED" : "LOCKED UNDER ACTIVE ESCROW"}</span>
+            </div>
+            <h1 className="text-2xl sm:text-3xl font-black text-white font-display">
+              {isSold ? "This Account Has Been Sold" : "Active Escrow Transaction in Progress"}
+            </h1>
+            <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
+              {isSold
+                ? "This eFootball squad has been sold and ownership has transferred to the buyer. Sold listings are permanently locked to preserve escrow audit history and protect buyer security."
+                : "This eFootball squad is currently locked under an active escrow order. Listing details, pricing, and squad attributes cannot be modified during trade inspection."}
+            </p>
+          </div>
+
+          {/* Account Mini-Card */}
+          <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border text-left space-y-2">
+            <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider block">Target Account</span>
+            <h3 className="text-base font-bold text-white font-display">{title}</h3>
+            <div className="flex flex-wrap items-center gap-3 text-xs text-slate-300">
+              <span className="text-emerald-400 font-mono font-bold">KES {Number(price || 0).toLocaleString()}</span>
+              <span className="text-slate-600">•</span>
+              <span>{platform.toUpperCase()}</span>
+              {overallStrength && (
+                <>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-amber-300 font-mono font-bold">⚡ {overallStrength} OVR</span>
+                </>
+              )}
+            </div>
+          </div>
+
+          <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link href="/dashboard/seller">
+              <Button variant="gold" size="md" className="w-full sm:w-auto font-bold cursor-pointer">
+                Return to Seller Dashboard
+              </Button>
+            </Link>
+            <Link href={`/listings/${id}`}>
+              <Button variant="secondary" size="md" className="w-full sm:w-auto cursor-pointer">
+                <Eye className="w-4 h-4 mr-1.5" />
+                View Listing Archive
+              </Button>
+            </Link>
+          </div>
+        </div>
       </div>
     );
   }

@@ -339,15 +339,27 @@ export function SquadInspectorModal({ listing, isOpen, onClose }: SquadInspector
             </Link>
 
             {isOwner ? (
-              <Link href={`/seller/edit-listing/${listing.id}`} className="flex-1 sm:flex-none">
-                <button
-                  type="button"
-                  className="w-full px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md flex items-center justify-center gap-1.5 min-h-[44px]"
-                >
-                  <Edit3 className="w-3.5 h-3.5" />
-                  <span>Edit in Seller Hub</span>
-                </button>
-              </Link>
+              listing.status === "sold" ? (
+                <span className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-slate-800/80 border border-slate-700/80 text-slate-400 font-bold text-xs flex items-center justify-center gap-1.5 min-h-[44px] select-none">
+                  <Lock className="w-3.5 h-3.5 text-slate-500" />
+                  <span>Account Sold</span>
+                </span>
+              ) : listing.status === "in_escrow" ? (
+                <span className="flex-1 sm:flex-none px-4 py-2.5 rounded-xl bg-amber-950/60 border border-amber-800/60 text-amber-300 font-bold text-xs flex items-center justify-center gap-1.5 min-h-[44px] select-none">
+                  <Lock className="w-3.5 h-3.5 text-amber-400" />
+                  <span>In Escrow</span>
+                </span>
+              ) : (
+                <Link href={`/seller/edit-listing/${listing.id}`} className="flex-1 sm:flex-none">
+                  <button
+                    type="button"
+                    className="w-full px-4 py-2.5 rounded-xl bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold text-xs shadow-md flex items-center justify-center gap-1.5 min-h-[44px]"
+                  >
+                    <Edit3 className="w-3.5 h-3.5" />
+                    <span>Edit in Seller Hub</span>
+                  </button>
+                </Link>
+              )
             ) : !isAvailable ? (
               <button
                 type="button"

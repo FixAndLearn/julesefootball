@@ -162,7 +162,7 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
             <ArrowLeft className="w-4 h-4" />
             <span>Back to Browse</span>
           </Link>
-          {isOwner && (
+          {isOwner && listing.status !== "sold" && listing.status !== "in_escrow" && (
             <Link href={`/seller/edit-listing/${listing.id}`}>
               <Button variant="gold" size="sm">
                 <Edit3 className="w-3.5 h-3.5 mr-1.5" />
@@ -448,18 +448,44 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
             {/* Buy Now or Edit Interactive Button */}
             {isOwner ? (
               <div className="space-y-4">
-                <Link href={`/seller/edit-listing/${listing.id}`} className="block">
-                  <Button variant="gold" size="lg" className="w-full">
-                    <Edit3 className="w-4 h-4 mr-2" />
-                    Edit This Listing
-                  </Button>
-                </Link>
+                {listing.status === "sold" ? (
+                  <div className="p-4 rounded-xl bg-slate-800/80 border border-slate-700 text-center space-y-2">
+                    <div className="flex items-center justify-center gap-2 text-slate-300 font-bold text-sm">
+                      <Lock className="w-4 h-4 text-slate-400" />
+                      <span>Account Sold &amp; Transferred</span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      This squad has been sold and delivered. Sold accounts cannot be edited.
+                    </p>
+                  </div>
+                ) : listing.status === "in_escrow" ? (
+                  <div className="p-4 rounded-xl bg-amber-950/40 border border-amber-800/60 text-center space-y-2">
+                    <div className="flex items-center justify-center gap-2 text-amber-300 font-bold text-sm">
+                      <Lock className="w-4 h-4 text-amber-400" />
+                      <span>Locked Under Escrow Trade</span>
+                    </div>
+                    <p className="text-xs text-slate-400">
+                      Active trade in progress. Account details cannot be edited during handover.
+                    </p>
+                  </div>
+                ) : (
+                  <Link href={`/seller/edit-listing/${listing.id}`} className="block">
+                    <Button variant="gold" size="lg" className="w-full">
+                      <Edit3 className="w-4 h-4 mr-2" />
+                      Edit This Listing
+                    </Button>
+                  </Link>
+                )}
 
                 {/* Seller Offers Management Panel */}
-                <SellerListingOffersPanel listingId={listing.id} />
+                {listing.status === "published" && (
+                  <SellerListingOffersPanel listingId={listing.id} />
+                )}
 
                 <p className="text-[11px] text-center text-slate-400">
-                  You own this listing. Buyers see the Buy Now and Make Offer buttons.
+                  {listing.status === "sold"
+                    ? "This account has been sold under escrow."
+                    : "You own this listing. Buyers see the Buy Now and Make Offer buttons."}
                 </p>
               </div>
             ) : listing.status !== "published" ? (
@@ -638,12 +664,24 @@ export default async function ListingDetailPage({ params }: ListingDetailPagePro
         </div>
         <div className="flex items-center gap-1.5 shrink-0">
           {isOwner ? (
-            <Link href={`/seller/edit-listing/${listing.id}`}>
-              <Button variant="gold" size="sm" className="text-xs font-bold">
-                <Edit3 className="w-3.5 h-3.5 mr-1" />
-                Edit
-              </Button>
-            </Link>
+            listing.status === "sold" ? (
+              <span className="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-400 flex items-center gap-1">
+                <Lock className="w-3.5 h-3.5 text-slate-500" />
+                Sold (Locked)
+              </span>
+            ) : listing.status === "in_escrow" ? (
+              <span className="px-3 py-1.5 rounded-xl bg-amber-950/60 border border-amber-800/60 text-xs font-semibold text-amber-300 flex items-center gap-1">
+                <Lock className="w-3.5 h-3.5 text-amber-400" />
+                In Escrow
+              </span>
+            ) : (
+              <Link href={`/seller/edit-listing/${listing.id}`}>
+                <Button variant="gold" size="sm" className="text-xs font-bold">
+                  <Edit3 className="w-3.5 h-3.5 mr-1" />
+                  Edit
+                </Button>
+              </Link>
+            )
           ) : listing.status !== "published" ? (
             <span className="px-3 py-1.5 rounded-xl bg-slate-800 border border-slate-700 text-xs font-semibold text-slate-400">
               {listing.status === "sold" ? "Sold" : "In Escrow"}

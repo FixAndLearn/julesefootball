@@ -146,21 +146,42 @@ export function DirectCheckoutForm({
 
   // 1. Guardrail: Seller cannot purchase their own listing
   if (isOwner) {
+    const isSold = listing.status === "sold";
+    const isInEscrow = listing.status === "in_escrow";
+
     return (
       <div className="w-full max-w-xl mx-auto p-8 rounded-3xl bg-[#111827] border border-slate-800 text-center space-y-4">
         <div className="w-12 h-12 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto">
           <Lock className="w-6 h-6 text-amber-400" />
         </div>
-        <h2 className="text-xl font-bold text-white font-display">You Own This Listing</h2>
+        <h2 className="text-xl font-bold text-white font-display">
+          {isSold
+            ? "Account Sold & Delivered"
+            : isInEscrow
+            ? "Account Under Active Escrow"
+            : "You Own This Listing"}
+        </h2>
         <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
-          Sellers cannot initiate M-Pesa STK push payments or buy their own listed eFootball accounts.
+          {isSold
+            ? "This account has already been sold and transferred. Sold accounts cannot be edited or purchased."
+            : isInEscrow
+            ? "This account is currently locked in an active escrow transaction."
+            : "Sellers cannot initiate M-Pesa STK push payments or buy their own listed eFootball accounts."}
         </p>
-        <div className="pt-2">
-          <Link href={`/seller/edit-listing/${listing.id}`}>
-            <Button variant="gold" size="md">
-              Edit in Seller Hub
-            </Button>
-          </Link>
+        <div className="pt-2 flex justify-center gap-3">
+          {!isSold && !isInEscrow ? (
+            <Link href={`/seller/edit-listing/${listing.id}`}>
+              <Button variant="gold" size="md">
+                Edit in Seller Hub
+              </Button>
+            </Link>
+          ) : (
+            <Link href="/dashboard/seller">
+              <Button variant="secondary" size="md">
+                Back to Seller Dashboard
+              </Button>
+            </Link>
+          )}
         </div>
       </div>
     );
