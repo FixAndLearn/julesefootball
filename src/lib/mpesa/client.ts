@@ -251,19 +251,6 @@ class MpesaService {
       }
 
       const statusStr = String(data.TransactionStatus || data.status || "").toLowerCase();
-      const isSuccess =
-        statusStr === "completed" ||
-        statusStr === "success" ||
-        data.TransactionCode === "0" ||
-        data.TransactionCode === 0 ||
-        data.ResponseCode === "0" ||
-        data.ResponseCode === 0;
-
-      const isFailed =
-        statusStr === "failed" ||
-        statusStr === "cancelled" ||
-        String(data.TransactionStatus || "").toLowerCase() === "cancelled";
-
       const receipt =
         data.TransactionReceipt ||
         data.mpesa_receipt_number ||
@@ -271,16 +258,46 @@ class MpesaService {
         data.ReceiptNumber ||
         undefined;
 
+      const isSuccess =
+        statusStr === "completed" ||
+        statusStr === "success" ||
+        statusStr === "successful" ||
+        statusStr === "paid" ||
+        data.TransactionCode === "0" ||
+        data.TransactionCode === 0 ||
+        data.ResponseCode === "0" ||
+        data.ResponseCode === 0 ||
+        Boolean(receipt && String(receipt).trim().length >= 8);
+
+      const isFailed =
+        !isSuccess &&
+        !statusStr.includes("pending") &&
+        (statusStr === "failed" ||
+          statusStr === "cancelled" ||
+          statusStr === "rejected" ||
+          statusStr.includes("cancel") ||
+          statusStr.includes("fail") ||
+          data.TransactionCode === "1032" ||
+          data.TransactionCode === 1032 ||
+          data.TransactionCode === "1037" ||
+          data.TransactionCode === 1037);
+
+      const isPending = !isSuccess && !isFailed;
+
       return {
         merchantRequestId:
           data.MerchantRequestID || data.transaction_request_id || transactionId,
         checkoutRequestId:
           data.CheckoutRequestID || data.transaction_request_id || transactionId,
-        resultCode: isSuccess ? 0 : isFailed ? 1037 : 1032,
+        resultCode: isSuccess ? 0 : isFailed ? 1037 : 100,
         resultDesc:
           data.ResultDesc ||
           data.message ||
-          (isSuccess ? "Transaction completed successfully" : data.TransactionStatus || "Pending"),
+          (isSuccess
+            ? "Transaction completed successfully"
+            : isPending
+            ? "Transaction pending"
+            : data.TransactionStatus || "Transaction failed"),
         receiptNumber: receipt,
         amount: data.TransactionAmount ? Number(data.TransactionAmount) : undefined,
         phoneNumber: data.Msisdn || data.phoneNumber,

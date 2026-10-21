@@ -414,6 +414,46 @@ export class TournamentService {
   }
 
   /**
+   * Retrieve the latest tournament payment for a user or phone number
+   */
+  static async getLatestPaymentForUser(
+    tournamentId: string,
+    userId?: string,
+    phoneNumber?: string
+  ): Promise<TournamentPayment | null> {
+    try {
+      const supabase = getSupabase();
+      let query = supabase
+        .from("tournament_payments")
+        .select("*")
+        .eq("tournament_id", tournamentId)
+        .order("created_at", { ascending: false });
+
+      if (userId && phoneNumber) {
+        query = query.or(`user_id.eq.${userId},phone_number.eq.${phoneNumber}`);
+      } else if (userId) {
+        query = query.eq("user_id", userId);
+      } else if (phoneNumber) {
+        query = query.eq("phone_number", phoneNumber);
+      }
+
+      const { data, error } = await query.limit(1).maybeSingle();
+      if (!error && data) {
+        return data as TournamentPayment;
+      }
+    } catch (err) {
+      console.warn("Supabase getLatestPaymentForUser notice:", err);
+    }
+
+    const found = MEMORY_TOURNAMENT_PAYMENTS.find(
+      (p) =>
+        p.tournament_id === tournamentId &&
+        ((userId && p.user_id === userId) || (phoneNumber && p.phone_number === phoneNumber))
+    );
+    return found || null;
+  }
+
+  /**
    * Confirm tournament payment upon live M-Pesa verification and atomically register participant.
    */
   static async confirmTournamentPayment(
