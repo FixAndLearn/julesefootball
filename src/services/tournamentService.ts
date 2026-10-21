@@ -118,7 +118,7 @@ export class TournamentService {
       first_place_kes: params.first_place_kes,
       second_place_kes: params.second_place_kes,
       entry_fee_kes: params.entry_fee_kes,
-      format: params.format.trim() || "Single Knockout 1v1 (10-Minute Extra Time & PKs)",
+      format: params.format.trim() || "Single Knockout 1v1 (12-Minute Game + Extra Time & PKs)",
       max_players: params.max_players || 8,
       registered_count: 0,
       start_date: params.start_date.trim(),

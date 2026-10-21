@@ -83,7 +83,8 @@ export default function TournamentsPage() {
   const [hostSubtitle, setHostSubtitle] = useState("");
   const [hostPlatform, setHostPlatform] = useState<"all" | "android" | "ios" | "crossplay" | "console_pc">("crossplay");
   const [hostEntryFee, setHostEntryFee] = useState("100");
-  const [hostFormat, setHostFormat] = useState("Single Knockout 1v1 (10-Minute Extra Time & PKs)");
+  const [hostFormat, setHostFormat] = useState("Single Knockout 1v1 (12-Minute Game + Extra Time & PKs)");
+  const [hostPayoutSplit, setHostPayoutSplit] = useState<"winner_takes_all" | "80_20" | "70_30">("winner_takes_all");
   const [hostMaxPlayers, setHostMaxPlayers] = useState("8");
   const [hostStartDate, setHostStartDate] = useState("");
   const [submittingHost, setSubmittingHost] = useState(false);
@@ -998,8 +999,8 @@ export default function TournamentsPage() {
         </h3>
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs text-slate-300 pt-1">
           <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
-            <strong className="text-amber-400 block font-bold">1. Match Settings</strong>
-            Standard 10-minute match length, Extra Time enabled, PK shootout enabled. No network tampering.
+            <strong className="text-amber-400 block font-bold">1. Match Settings (12-Minute Game)</strong>
+            Standard 12-minute match length, Extra Time enabled, PK shootout enabled. Both players set match duration to 12 mins in eFootball Friend Match settings.
           </div>
           <div className="p-4 rounded-xl bg-pitch-card border border-pitch-border space-y-1.5">
             <strong className="text-amber-400 block font-bold">2. Score Verification</strong>
@@ -1381,6 +1382,51 @@ export default function TournamentsPage() {
                     />
                   </div>
 
+                  {/* Agreed Payout Split Selector */}
+                  <div>
+                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
+                      Agreed Winner Payout Agreement
+                    </label>
+                    <div className="grid grid-cols-3 gap-2">
+                      <button
+                        type="button"
+                        onClick={() => setHostPayoutSplit("winner_takes_all")}
+                        className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer ${
+                          hostPayoutSplit === "winner_takes_all"
+                            ? "bg-amber-500 text-black border-amber-400 font-bold shadow-md shadow-amber-500/20"
+                            : "bg-pitch-card border-pitch-border text-slate-300 hover:text-white"
+                        }`}
+                      >
+                        <span className="block text-[11px] font-bold">Winner 100%</span>
+                        <span className="block text-[9px] opacity-80">Winner takes all</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setHostPayoutSplit("80_20")}
+                        className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer ${
+                          hostPayoutSplit === "80_20"
+                            ? "bg-amber-500 text-black border-amber-400 font-bold shadow-md shadow-amber-500/20"
+                            : "bg-pitch-card border-pitch-border text-slate-300 hover:text-white"
+                        }`}
+                      >
+                        <span className="block text-[11px] font-bold">80% / 20%</span>
+                        <span className="block text-[9px] opacity-80">1st &amp; 2nd Split</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => setHostPayoutSplit("70_30")}
+                        className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer ${
+                          hostPayoutSplit === "70_30"
+                            ? "bg-amber-500 text-black border-amber-400 font-bold shadow-md shadow-amber-500/20"
+                            : "bg-pitch-card border-pitch-border text-slate-300 hover:text-white"
+                        }`}
+                      >
+                        <span className="block text-[11px] font-bold">70% / 30%</span>
+                        <span className="block text-[9px] opacity-80">1st &amp; 2nd Split</span>
+                      </button>
+                    </div>
+                  </div>
+
                   {/* Real-time Flat 50 Deal Calculation Card */}
                   {(() => {
                     const num = Number(hostMaxPlayers || 8);
@@ -1388,11 +1434,18 @@ export default function TournamentsPage() {
                     const pot = num * fee;
                     const adminFee = fee > 0 ? 50 : 0;
                     const prizePool = Math.max(0, pot - adminFee);
-                    const p1 = Math.round(prizePool * 0.8);
-                    const p2 = Math.max(0, prizePool - p1);
+                    let p1 = prizePool;
+                    let p2 = 0;
+                    if (hostPayoutSplit === "70_30") {
+                      p1 = Math.round(prizePool * 0.7);
+                      p2 = Math.max(0, prizePool - p1);
+                    } else if (hostPayoutSplit === "80_20") {
+                      p1 = Math.round(prizePool * 0.8);
+                      p2 = Math.max(0, prizePool - p1);
+                    }
 
                     return (
-                      <div className="p-4 rounded-2xl bg-pitch-card border border-amber-500/30 space-y-2 text-xs">
+                      <div className="p-4 rounded-2xl bg-pitch-card border border-amber-500/30 space-y-2 text-xs shadow-inner">
                         <div className="flex items-center justify-between text-slate-300">
                           <span>Total Collected Pot ({num} players × KES {fee}):</span>
                           <strong className="text-white font-mono">KES {pot.toLocaleString()}</strong>
@@ -1402,7 +1455,7 @@ export default function TournamentsPage() {
                             <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                             <span>Platform Admin Deal (Flat Rate):</span>
                           </span>
-                          <strong className="text-amber-400 font-mono">KES 50 flat</strong>
+                          <strong className="text-amber-400 font-mono font-bold">KES 50 flat</strong>
                         </div>
                         <div className="pt-2 border-t border-pitch-border flex items-center justify-between text-sm">
                           <span className="font-bold text-white">Net Winner Prize Pool:</span>
@@ -1412,10 +1465,10 @@ export default function TournamentsPage() {
                         </div>
                         <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-400">
                           <div>🥇 1st Place: <strong className="text-amber-300 font-mono">KES {p1.toLocaleString()}</strong></div>
-                          <div>🥈 2nd Place: <strong className="text-slate-200 font-mono">KES {p2.toLocaleString()}</strong></div>
+                          <div>🥈 2nd Place: <strong className="text-slate-200 font-mono">{p2 > 0 ? `KES ${p2.toLocaleString()}` : "Prestige / Trophy"}</strong></div>
                         </div>
                         <p className="text-[10px] text-slate-400 pt-1 leading-relaxed border-t border-pitch-border/60">
-                          Players pay their entry into Safaricom Till 1572931. Prize pool is held safely in escrow until you (the tournament moderator) crown the champion!
+                          Players pay their entry into Safaricom Till 1572931. Prize pool is held safely in escrow until you (the tournament moderator) conclude the final and crown the champion!
                         </p>
                       </div>
                     );
@@ -1429,6 +1482,63 @@ export default function TournamentsPage() {
                   </p>
                 </div>
               )}
+
+              {/* Match Duration & Format (12-Minute Game Standard) */}
+              <div className="space-y-2">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-semibold text-slate-300">
+                    Match Duration &amp; Rules
+                  </label>
+                  <span className="text-[10px] text-amber-400 font-bold font-mono">
+                    ⏱️ 12-Minute Game Standard
+                  </span>
+                </div>
+                <div className="grid grid-cols-3 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => setHostFormat("Single Knockout 1v1 (12-Minute Game + Extra Time & PKs)")}
+                    className={`p-2.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${
+                      hostFormat.includes("Single Knockout")
+                        ? "bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500/30"
+                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
+                    }`}
+                  >
+                    <span className="font-bold text-white block text-[11px]">12-Min Knockout</span>
+                    <span className="text-[9px] text-slate-400 block mt-0.5">ET &amp; PKs enabled</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHostFormat("Home & Away 1v1 (12-Minute Two-Leg Aggregate)")}
+                    className={`p-2.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${
+                      hostFormat.includes("Two-Leg")
+                        ? "bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500/30"
+                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
+                    }`}
+                  >
+                    <span className="font-bold text-white block text-[11px]">12-Min Two-Leg</span>
+                    <span className="text-[9px] text-slate-400 block mt-0.5">Home &amp; Away agg</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setHostFormat("Best of 3 Series (12-Minute Matches)")}
+                    className={`p-2.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${
+                      hostFormat.includes("Best of 3")
+                        ? "bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500/30"
+                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
+                    }`}
+                  >
+                    <span className="font-bold text-white block text-[11px]">12-Min Best of 3</span>
+                    <span className="text-[9px] text-slate-400 block mt-0.5">First to 2 wins</span>
+                  </button>
+                </div>
+                <Input
+                  label="Match Format Details"
+                  value={hostFormat}
+                  onChange={(e) => setHostFormat(e.target.value)}
+                  helperText="All participants must set their match duration to 12 minutes in the eFootball Friend Match room."
+                  required
+                />
+              </div>
 
               <Input
                 label="Start Date / Time"
