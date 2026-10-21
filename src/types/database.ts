@@ -411,10 +411,28 @@ export interface TournamentParticipant {
   friend_id: string;
   phone_number: string;
   payment_status: 'pending' | 'paid' | 'exempt';
-  payment_method?: 'wallet' | 'mpesa_till' | 'free';
+  payment_method?: 'wallet' | 'mpesa_till' | 'mpesa_stk' | 'free';
   amount_paid?: number;
   seed?: number | null;
   created_at: string;
+}
+
+export interface TournamentPayment {
+  id: string;
+  tournament_id: string;
+  user_id?: string | null;
+  gamer_tag: string;
+  friend_id: string;
+  phone_number: string;
+  amount: number;
+  checkout_request_id?: string | null;
+  merchant_request_id?: string | null;
+  mpesa_receipt_number?: string | null;
+  status: 'pending' | 'completed' | 'failed' | 'cancelled';
+  result_code?: number | null;
+  result_desc?: string | null;
+  created_at: string;
+  updated_at?: string;
 }
 
 export interface Tournament {

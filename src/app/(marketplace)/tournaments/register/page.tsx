@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
@@ -24,6 +24,10 @@ import {
   MessageCircle,
   RotateCw,
   Home,
+  AlertCircle,
+  KeyRound,
+  Check,
+  X,
 } from "lucide-react";
 
 export default function RegisterTournamentPage() {
@@ -40,11 +44,27 @@ export default function RegisterTournamentPage() {
   const [gamerTag, setGamerTag] = useState("");
   const [friendId, setFriendId] = useState("");
   const [phone, setPhone] = useState("");
-  const [paymentMethod, setPaymentMethod] = useState<"wallet" | "mpesa_till">("wallet");
+  const [paymentMethod, setPaymentMethod] = useState<"mpesa_stk" | "wallet">("mpesa_stk");
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState("");
+
+  // STK Push Waiting & Polling State
+  const [isStkWaiting, setIsStkWaiting] = useState(false);
+  const [stkCheckoutId, setStkCheckoutId] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState(90);
+  const [showManualInput, setShowManualInput] = useState(false);
+  const [manualReceipt, setManualReceipt] = useState("");
+  const [verifyingManual, setVerifyingManual] = useState(false);
+  const [manualError, setManualError] = useState("");
+
+  // Final Success State
   const [regSuccess, setRegSuccess] = useState(false);
-  const [regResult, setRegResult] = useState<{ remaining_balance?: number; paid_via_wallet?: boolean } | null>(null);
+  const [regResult, setRegResult] = useState<{
+    remaining_balance?: number;
+    paid_via_wallet?: boolean;
+    paid_via_mpesa?: boolean;
+    receipt_number?: string;
+  } | null>(null);
 
   // Prefill user details
   useEffect(() => {
@@ -86,7 +106,7 @@ export default function RegisterTournamentPage() {
     loadTournaments();
   }, [tourneyId]);
 
-  // Update default payment method based on wallet balance
+  // Default payment method selection
   useEffect(() => {
     if (selectedTourney) {
       const balance = profile?.available_balance || 0;
@@ -94,11 +114,72 @@ export default function RegisterTournamentPage() {
       if (fee > 0 && balance >= fee) {
         setPaymentMethod("wallet");
       } else {
-        setPaymentMethod("mpesa_till");
+        setPaymentMethod("mpesa_stk");
       }
     }
   }, [selectedTourney, profile]);
 
+  // Polling for STK Push verification
+  useEffect(() => {
+    if (!isStkWaiting || !stkCheckoutId) return;
+
+    let isMounted = true;
+    let pollInterval: NodeJS.Timeout;
+    let timerInterval: NodeJS.Timeout;
+
+    // Countdown timer
+    timerInterval = setInterval(() => {
+      setCountdown((prev) => {
+        if (prev <= 1) {
+          clearInterval(timerInterval);
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
+
+    // Active status poll every 2.5 seconds
+    pollInterval = setInterval(async () => {
+      try {
+        const res = await fetch(
+          `/api/tournaments/payment-status?checkoutRequestId=${encodeURIComponent(stkCheckoutId)}`
+        );
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (!isMounted) return;
+
+        if (data.status === "completed") {
+          clearInterval(pollInterval);
+          clearInterval(timerInterval);
+          setIsStkWaiting(false);
+          setRegResult({
+            paid_via_mpesa: true,
+            receipt_number: data.receiptNumber || "CONFIRMED",
+          });
+          setRegSuccess(true);
+        } else if (data.status === "failed") {
+          clearInterval(pollInterval);
+          clearInterval(timerInterval);
+          setIsStkWaiting(false);
+          setError(
+            data.resultDesc ||
+              "M-Pesa transaction was cancelled or failed. Slot was NOT reserved. Please try again."
+          );
+        }
+      } catch (err) {
+        console.warn("Poll status check error:", err);
+      }
+    }, 2500);
+
+    return () => {
+      isMounted = false;
+      clearInterval(pollInterval);
+      clearInterval(timerInterval);
+    };
+  }, [isStkWaiting, stkCheckoutId]);
+
+  // Form submission handler
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!selectedTourney) return;
@@ -120,38 +201,146 @@ export default function RegisterTournamentPage() {
     }
 
     if (!phone.trim()) {
-      setError("Please enter your Safaricom phone number for M-Pesa payouts.");
+      setError("Please enter your Safaricom phone number for M-Pesa payments and payouts.");
       return;
     }
 
-    setSubmitting(true);
+    const isPaid = (selectedTourney.entry_fee_kes || 0) > 0;
+
+    // 1. FREE TOURNAMENT FLOW
+    if (!isPaid) {
+      setSubmitting(true);
+      try {
+        const res = await fetch("/api/tournaments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "register",
+            tournament_id: selectedTourney.id,
+            gamer_tag: gamerTag.trim(),
+            friend_id: friendId.trim(),
+            phone_number: normalizePhoneNumber(phone).international,
+            user_id: user.id,
+            payment_method: "free",
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to register for tournament.");
+        }
+
+        setRegResult({ paid_via_wallet: false });
+        setRegSuccess(true);
+      } catch (err: any) {
+        setError(err.message || "Failed to complete free registration.");
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    // 2. PAID TOURNAMENT VIA ACCOUNT WALLET BALANCE
+    if (paymentMethod === "wallet") {
+      setSubmitting(true);
+      try {
+        const res = await fetch("/api/tournaments", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            action: "register",
+            tournament_id: selectedTourney.id,
+            gamer_tag: gamerTag.trim(),
+            friend_id: friendId.trim(),
+            phone_number: normalizePhoneNumber(phone).international,
+            user_id: user.id,
+            payment_method: "wallet",
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to process wallet payment.");
+        }
+
+        setRegResult({
+          paid_via_wallet: true,
+          remaining_balance: data.remainingBalance,
+        });
+        setRegSuccess(true);
+      } catch (err: any) {
+        setError(err.message || "Failed to complete wallet payment.");
+      } finally {
+        setSubmitting(false);
+      }
+      return;
+    }
+
+    // 3. PAID TOURNAMENT VIA M-PESA STK PUSH (UPFRONT CONFIRMATION)
+    if (paymentMethod === "mpesa_stk") {
+      setSubmitting(true);
+      try {
+        const res = await fetch("/api/tournaments/stkpush", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            tournament_id: selectedTourney.id,
+            gamer_tag: gamerTag.trim(),
+            friend_id: friendId.trim(),
+            phone_number: phone.trim(),
+            user_id: user.id,
+          }),
+        });
+
+        const data = await res.json();
+        if (!res.ok) {
+          throw new Error(data.error || "Failed to initiate M-Pesa STK Push.");
+        }
+
+        setStkCheckoutId(data.checkoutRequestId);
+        setCountdown(90);
+        setIsStkWaiting(true);
+      } catch (err: any) {
+        setError(err.message || "Failed to send M-Pesa prompt. Please try again.");
+      } finally {
+        setSubmitting(false);
+      }
+    }
+  };
+
+  // Manual Receipt Verification Handler
+  const handleVerifyManualReceipt = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!stkCheckoutId || !manualReceipt.trim()) return;
+
+    setVerifyingManual(true);
+    setManualError("");
+
     try {
-      const isPaid = (selectedTourney.entry_fee_kes || 0) > 0;
-      const res = await fetch("/api/tournaments", {
+      const res = await fetch("/api/tournaments/payment-status", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          action: "register",
-          tournament_id: selectedTourney.id,
-          gamer_tag: gamerTag.trim(),
-          friend_id: friendId.trim(),
-          phone_number: normalizePhoneNumber(phone).international,
-          user_id: user?.id,
-          payment_method: isPaid ? paymentMethod : "free",
+          checkoutRequestId: stkCheckoutId,
+          receiptNumber: manualReceipt.trim().toUpperCase(),
         }),
       });
 
       const data = await res.json();
       if (!res.ok) {
-        throw new Error(data.error || "Failed to register for tournament.");
+        throw new Error(data.error || "Failed to verify M-Pesa receipt.");
       }
 
-      setRegResult(data);
+      setIsStkWaiting(false);
+      setRegResult({
+        paid_via_mpesa: true,
+        receipt_number: data.receiptNumber || manualReceipt.trim().toUpperCase(),
+      });
       setRegSuccess(true);
     } catch (err: any) {
-      setError(err.message || "Failed to complete registration.");
+      setManualError(err.message || "Invalid receipt code. Please verify the 10-character code.");
     } finally {
-      setSubmitting(false);
+      setVerifyingManual(false);
     }
   };
 
@@ -205,7 +394,7 @@ export default function RegisterTournamentPage() {
                 Lock In Your Match Slot
               </h1>
               <p className="text-xs text-slate-300 max-w-xl">
-                Enter with your Konami eFootball Friend ID. Winnings are safeguarded via Safaricom Till <strong>1572931</strong> escrow custody.
+                Pay your entry fee securely via M-Pesa STK Push or Account Balance before joining. Zero unpaid registrations permitted.
               </p>
             </div>
             <div className="shrink-0">
@@ -255,68 +444,192 @@ export default function RegisterTournamentPage() {
           </div>
         )}
 
-        {/* Success Screen */}
-        {regSuccess && selectedTourney ? (
-          <div className="p-8 rounded-3xl bg-pitch-surface border border-emerald-500/40 shadow-2xl space-y-6 text-center animate-in fade-in">
-            <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto">
-              <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+        {/* VIEW 1: ACTIVE STK PUSH WAITING STATE */}
+        {isStkWaiting && selectedTourney ? (
+          <div className="p-6 sm:p-10 rounded-3xl bg-pitch-surface border border-amber-500/50 shadow-2xl space-y-6 text-center animate-in fade-in">
+            {/* Animated Pulsing Phone Icon */}
+            <div className="relative mx-auto w-20 h-20 flex items-center justify-center">
+              <div className="absolute inset-0 rounded-full bg-amber-500/20 animate-ping" />
+              <div className="w-16 h-16 rounded-3xl bg-gradient-to-br from-amber-500 to-amber-600 border border-amber-400 text-black flex items-center justify-center shadow-lg shadow-amber-500/30 z-10">
+                <Smartphone className="w-8 h-8 animate-bounce" />
+              </div>
             </div>
 
             <div className="space-y-2 max-w-lg mx-auto">
               <h2 className="text-2xl font-black text-white font-display">
-                Registration Confirmed!
+                M-Pesa STK Push Sent!
               </h2>
-              <p className="text-xs text-slate-300">
-                You have successfully registered for <strong>{selectedTourney.title}</strong>.
+              <p className="text-xs text-slate-300 leading-relaxed">
+                Please check your phone <strong>{phone}</strong> now. Enter your M-Pesa PIN to complete payment of{" "}
+                <strong className="text-amber-300 font-mono">KES {selectedTourney.entry_fee_kes.toLocaleString()}</strong> to Safaricom Till{" "}
+                <strong className="text-amber-300 font-mono">1572931</strong> (EFootballMarket).
               </p>
             </div>
 
-            {regResult?.paid_via_wallet ? (
-              <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500/40 text-xs text-slate-200 space-y-1.5 max-w-md mx-auto text-left shadow-inner">
-                <div className="flex items-center gap-2 text-emerald-300 font-bold">
-                  <Wallet className="w-4 h-4" />
-                  <span>Paid from Account Balance!</span>
-                </div>
-                <p className="text-[11px] text-slate-300">
-                  Entry fee of <strong>KES {selectedTourney.entry_fee_kes.toLocaleString()}</strong> was deducted instantly from your earnings wallet. Your slot is guaranteed!
-                </p>
-                {regResult.remaining_balance !== undefined && (
-                  <div className="pt-1.5 border-t border-emerald-500/30 flex items-center justify-between text-[11px]">
-                    <span className="text-slate-400">Remaining Balance:</span>
-                    <strong className="text-emerald-300 font-mono">
-                      KES {regResult.remaining_balance.toLocaleString()}
-                    </strong>
+            {/* Waiting Indicator & Countdown */}
+            <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-2 max-w-md mx-auto text-xs">
+              <div className="flex items-center justify-between text-slate-300">
+                <span className="flex items-center gap-2 text-amber-400 font-semibold">
+                  <RotateCw className="w-4 h-4 animate-spin text-amber-400" />
+                  <span>Waiting for PIN confirmation...</span>
+                </span>
+                <span className="font-mono font-bold text-white bg-slate-800 px-2.5 py-1 rounded-lg border border-slate-700">
+                  {countdown}s remaining
+                </span>
+              </div>
+              <p className="text-[11px] text-slate-400 text-left">
+                Your bracket slot is guaranteed immediately once confirmed on the backend. Do not close this page.
+              </p>
+            </div>
+
+            {/* Manual Verification Toggle */}
+            <div className="pt-2 max-w-md mx-auto space-y-3">
+              {!showManualInput ? (
+                <button
+                  type="button"
+                  onClick={() => setShowManualInput(true)}
+                  className="text-xs text-amber-400/90 hover:text-amber-300 underline font-medium cursor-pointer transition-colors"
+                >
+                  Already received M-Pesa SMS? Enter receipt code manually
+                </button>
+              ) : (
+                <form
+                  onSubmit={handleVerifyManualReceipt}
+                  className="p-4 rounded-2xl bg-slate-900 border border-slate-800 space-y-3 text-left"
+                >
+                  <div className="flex items-center justify-between">
+                    <label className="text-xs font-bold text-white flex items-center gap-1.5">
+                      <KeyRound className="w-3.5 h-3.5 text-amber-400" />
+                      <span>Instant M-Pesa Receipt Verification</span>
+                    </label>
+                    <button
+                      type="button"
+                      onClick={() => setShowManualInput(false)}
+                      className="text-slate-400 hover:text-white"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
                   </div>
-                )}
+
+                  <p className="text-[11px] text-slate-400">
+                    If Safaricom SMS already arrived on your phone (e.g. <strong>TK82HD7...</strong>), enter it below to confirm instantly without waiting.
+                  </p>
+
+                  {manualError && (
+                    <div className="p-2 rounded-lg bg-rose-950/60 border border-rose-800 text-rose-300 text-xs">
+                      {manualError}
+                    </div>
+                  )}
+
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="e.g. TK83HD92LS"
+                      value={manualReceipt}
+                      onChange={(e) => setManualReceipt(e.target.value.toUpperCase())}
+                      className="flex-1 px-3 py-2 rounded-xl bg-pitch-card border border-pitch-border text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500"
+                      required
+                    />
+                    <Button
+                      type="submit"
+                      variant="gold"
+                      size="sm"
+                      isLoading={verifyingManual}
+                      className="cursor-pointer font-bold text-xs shrink-0"
+                    >
+                      Verify
+                    </Button>
+                  </div>
+                </form>
+              )}
+
+              {/* Cancel STK button */}
+              <div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setIsStkWaiting(false);
+                    setError("STK push waiting cancelled. You can change your details and try again.");
+                  }}
+                  className="text-xs text-slate-500 hover:text-slate-300 transition-colors"
+                >
+                  Cancel and modify details
+                </button>
               </div>
-            ) : selectedTourney.entry_fee_kes > 0 ? (
-              <div className="p-4 rounded-2xl bg-amber-950/60 border border-amber-500/40 text-xs text-slate-200 space-y-1.5 max-w-md mx-auto text-left shadow-inner">
-                <div className="flex items-center gap-2 text-amber-300 font-bold">
-                  <Smartphone className="w-4 h-4" />
-                  <span>Safaricom Till Payment Instructions</span>
+            </div>
+          </div>
+        ) : regSuccess && selectedTourney ? (
+          /* VIEW 2: CONFIRMED REGISTRATION SUCCESS VIEW */
+          <div className="p-8 sm:p-10 rounded-3xl bg-pitch-surface border border-emerald-500/50 shadow-2xl space-y-6 text-center animate-in fade-in">
+            <div className="w-16 h-16 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 flex items-center justify-center mx-auto shadow-lg shadow-emerald-500/20">
+              <CheckCircle2 className="w-10 h-10 text-emerald-400" />
+            </div>
+
+            <div className="space-y-2 max-w-lg mx-auto">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold uppercase tracking-wider">
+                <Check className="w-3.5 h-3.5" />
+                <span>Payment Confirmed & Verified</span>
+              </div>
+              <h2 className="text-2xl sm:text-3xl font-black text-white font-display">
+                Tournament Slot Locked In!
+              </h2>
+              <p className="text-xs text-slate-300">
+                You are registered for <strong>{selectedTourney.title}</strong>. Your slot has been officially confirmed on the backend.
+              </p>
+            </div>
+
+            {/* Receipt Summary Card */}
+            <div className="p-5 rounded-2xl bg-pitch-card border border-emerald-500/30 text-xs text-slate-200 space-y-2 max-w-md mx-auto text-left shadow-inner">
+              <div className="flex items-center justify-between border-b border-pitch-border/80 pb-2">
+                <span className="text-slate-400">Gamer Tag:</span>
+                <strong className="text-white font-mono">{gamerTag}</strong>
+              </div>
+              <div className="flex items-center justify-between border-b border-pitch-border/80 pb-2">
+                <span className="text-slate-400">eFootball Friend ID:</span>
+                <strong className="text-white font-mono">{friendId}</strong>
+              </div>
+              <div className="flex items-center justify-between border-b border-pitch-border/80 pb-2">
+                <span className="text-slate-400">Entry Fee:</span>
+                <strong className="text-emerald-400 font-mono">
+                  {selectedTourney.entry_fee_kes === 0 ? "FREE" : `KES ${selectedTourney.entry_fee_kes.toLocaleString()}`}
+                </strong>
+              </div>
+
+              {regResult?.paid_via_mpesa && regResult.receipt_number && (
+                <div className="flex items-center justify-between border-b border-pitch-border/80 pb-2">
+                  <span className="text-slate-400">M-Pesa Receipt:</span>
+                  <strong className="text-amber-300 font-mono">{regResult.receipt_number}</strong>
                 </div>
-                <p className="text-[11px] text-slate-300">
-                  Please pay <strong>KES {selectedTourney.entry_fee_kes.toLocaleString()}</strong> to Safaricom Buy Goods Till{" "}
-                  <strong className="text-amber-300 font-mono font-bold">1572931</strong> (EFootballMarket). Tournament Moderator Brian Okibo will verify and approve your slot.
-                </p>
-              </div>
-            ) : (
-              <div className="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/30 text-xs text-emerald-300 max-w-md mx-auto">
-                Free Community Cup slot secured! Zero fees required.
-              </div>
-            )}
+              )}
+
+              {regResult?.paid_via_wallet && (
+                <div className="flex items-center justify-between border-b border-pitch-border/80 pb-2">
+                  <span className="text-slate-400">Paid Via:</span>
+                  <strong className="text-emerald-300 font-semibold">Account Wallet Balance</strong>
+                </div>
+              )}
+
+              {regResult?.remaining_balance !== undefined && (
+                <div className="flex items-center justify-between pt-1">
+                  <span className="text-slate-400">Wallet Balance:</span>
+                  <strong className="text-slate-200 font-mono">
+                    KES {regResult.remaining_balance.toLocaleString()}
+                  </strong>
+                </div>
+              )}
+            </div>
 
             {/* Actions */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 pt-2 max-w-md mx-auto">
               <a
                 href={`https://wa.me/254794400365?text=${encodeURIComponent(
-                  `Hello Brian Okibo, I registered for "${selectedTourney.title}"! Gamer Tag: ${gamerTag}, Friend ID: ${friendId}. Phone: ${phone}. Payment: ${
-                    regResult?.paid_via_wallet
+                  `Hello Brian Okibo, I registered and confirmed payment for "${selectedTourney.title}"!\nGamer Tag: ${gamerTag}\nFriend ID: ${friendId}\nPhone: ${phone}\nPayment: ${
+                    regResult?.receipt_number
+                      ? `M-Pesa Receipt: ${regResult.receipt_number}`
+                      : regResult?.paid_via_wallet
                       ? `Paid via Account Balance (KES ${selectedTourney.entry_fee_kes})`
-                      : selectedTourney.entry_fee_kes > 0
-                      ? `Paying KES ${selectedTourney.entry_fee_kes} via Till 1572931`
                       : "Free Entry"
-                  }. Ready for match room!`
+                  }\nReady for match bracket room!`
                 )}`}
                 target="_blank"
                 rel="noopener noreferrer"
@@ -335,7 +648,7 @@ export default function RegisterTournamentPage() {
             </div>
           </div>
         ) : (
-          /* Form Screen */
+          /* VIEW 3: REGISTRATION FORM SCREEN */
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             {/* Left: Tournament Details Overview Card */}
             <div className="md:col-span-1 space-y-4">
@@ -420,13 +733,14 @@ export default function RegisterTournamentPage() {
                     Player Registration Details
                   </h3>
                   <p className="text-xs text-slate-400 mt-0.5">
-                    Fill in your in-game details to be seeded into the bracket room.
+                    Fill in your in-game details. Upfront payment confirmation is required for paid entry.
                   </p>
                 </div>
 
                 {error && (
-                  <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs">
-                    {error}
+                  <div className="p-3.5 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs flex items-start gap-2.5">
+                    <AlertCircle className="w-4 h-4 text-rose-400 shrink-0 mt-0.5" />
+                    <span>{error}</span>
                   </div>
                 )}
 
@@ -447,8 +761,8 @@ export default function RegisterTournamentPage() {
                 />
 
                 <Input
-                  label="Safaricom Phone Number (For M-Pesa Payout)"
-                  placeholder="e.g. +254 712 345 678"
+                  label="Safaricom Phone Number (For M-Pesa STK Push & Payouts)"
+                  placeholder="e.g. 0712345678 or 254712345678"
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   required
@@ -459,14 +773,52 @@ export default function RegisterTournamentPage() {
                   <div className="space-y-3 pt-2">
                     <div className="flex items-center justify-between">
                       <label className="block text-xs font-semibold text-slate-300">
-                        Select Payment Method
+                        Choose Upfront Payment Method
                       </label>
                       <span className="text-xs font-mono font-bold text-amber-400">
                         Entry Fee: KES {selectedTourney.entry_fee_kes.toLocaleString()}
                       </span>
                     </div>
 
-                    {/* Option 1: Account Wallet Balance */}
+                    {/* Option 1: Safaricom M-Pesa STK Push (Recommended) */}
+                    <div
+                      onClick={() => setPaymentMethod("mpesa_stk")}
+                      className={`p-4 rounded-2xl border transition-all cursor-pointer ${
+                        paymentMethod === "mpesa_stk"
+                          ? "bg-amber-950/40 border-amber-500 ring-1 ring-amber-500/40 shadow-md"
+                          : "bg-pitch-card border-pitch-border hover:border-slate-700"
+                      }`}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div
+                          className={`w-4 h-4 mt-0.5 rounded-full border flex items-center justify-center shrink-0 ${
+                            paymentMethod === "mpesa_stk"
+                              ? "border-amber-400 bg-amber-500"
+                              : "border-slate-600"
+                          }`}
+                        >
+                          {paymentMethod === "mpesa_stk" && (
+                            <div className="w-1.5 h-1.5 rounded-full bg-black" />
+                          )}
+                        </div>
+                        <div className="flex-1">
+                          <div className="flex items-center justify-between gap-2 flex-wrap">
+                            <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                              <Smartphone className="w-4 h-4 text-amber-400" />
+                              <span>M-Pesa STK Push Prompt (Till 1572931)</span>
+                            </span>
+                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30">
+                              Automated & Instant
+                            </span>
+                          </div>
+                          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                            A prompt will pop up on your phone ({phone || "Safaricom handset"}). Enter your PIN to pay KES {selectedTourney.entry_fee_kes.toLocaleString()}. Your slot locks in automatically upon backend confirmation.
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Option 2: Account Wallet Balance */}
                     {(() => {
                       const balance = profile?.available_balance || 0;
                       const hasEnough = balance >= selectedTourney.entry_fee_kes;
@@ -514,53 +866,14 @@ export default function RegisterTournamentPage() {
                               </div>
                               <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
                                 {hasEnough
-                                  ? `Instant deduction of KES ${selectedTourney.entry_fee_kes.toLocaleString()} from your wallet. Zero SMS waiting.`
-                                  : `Insufficient wallet balance (KES ${balance.toLocaleString()} available / KES ${selectedTourney.entry_fee_kes.toLocaleString()} required). Top up or choose Till payment below.`}
+                                  ? `Instant deduction of KES ${selectedTourney.entry_fee_kes.toLocaleString()} from your earnings balance. Zero SMS waiting.`
+                                  : `Insufficient wallet balance (KES ${balance.toLocaleString()} available / KES ${selectedTourney.entry_fee_kes.toLocaleString()} required). Please choose M-Pesa STK Push above.`}
                               </p>
                             </div>
                           </div>
                         </div>
                       );
                     })()}
-
-                    {/* Option 2: Safaricom Till 1572931 */}
-                    <div
-                      onClick={() => setPaymentMethod("mpesa_till")}
-                      className={`p-4 rounded-2xl border transition-all cursor-pointer ${
-                        paymentMethod === "mpesa_till"
-                          ? "bg-amber-950/40 border-amber-500 ring-1 ring-amber-500/40 shadow-md"
-                          : "bg-pitch-card border-pitch-border hover:border-slate-700"
-                      }`}
-                    >
-                      <div className="flex items-start gap-3">
-                        <div
-                          className={`w-4 h-4 mt-0.5 rounded-full border flex items-center justify-center shrink-0 ${
-                            paymentMethod === "mpesa_till"
-                              ? "border-amber-400 bg-amber-500"
-                              : "border-slate-600"
-                          }`}
-                        >
-                          {paymentMethod === "mpesa_till" && (
-                            <div className="w-1.5 h-1.5 rounded-full bg-black" />
-                          )}
-                        </div>
-                        <div className="flex-1">
-                          <div className="flex items-center justify-between gap-2 flex-wrap">
-                            <span className="text-xs font-bold text-white flex items-center gap-1.5">
-                              <Smartphone className="w-3.5 h-3.5 text-amber-400" />
-                              <span>Pay via Safaricom Till</span>
-                            </span>
-                            <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
-                              Till 1572931
-                            </span>
-                          </div>
-                          <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
-                            Send KES {selectedTourney.entry_fee_kes.toLocaleString()} to Buy Goods Till{" "}
-                            <strong className="text-amber-300 font-mono">1572931</strong> (EFootballMarket). Moderator verifies M-Pesa ref.
-                          </p>
-                        </div>
-                      </div>
-                    </div>
                   </div>
                 ) : (
                   <div className="p-4 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 text-xs text-emerald-300 flex items-center justify-between">
@@ -574,10 +887,16 @@ export default function RegisterTournamentPage() {
                     type="submit"
                     variant="gold"
                     size="lg"
-                    className="w-full font-bold cursor-pointer shadow-xl shadow-amber-500/10"
+                    className="w-full font-bold cursor-pointer shadow-xl shadow-amber-500/10 flex items-center justify-center gap-2"
                     isLoading={submitting}
                   >
-                    Confirm Registration Slot
+                    {selectedTourney?.entry_fee_kes === 0 ? (
+                      <span>Confirm Free Registration</span>
+                    ) : paymentMethod === "wallet" ? (
+                      <span>Pay KES {selectedTourney?.entry_fee_kes} from Balance & Join</span>
+                    ) : (
+                      <span>Pay KES {selectedTourney?.entry_fee_kes} via M-Pesa & Join</span>
+                    )}
                   </Button>
                 </div>
               </form>

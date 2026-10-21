@@ -1,6 +1,6 @@
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
-import { Tournament, TournamentMatch, TournamentParticipant } from "@/types/database";
+import { Tournament, TournamentMatch, TournamentParticipant, TournamentPayment } from "@/types/database";
 
 /**
  * In-memory fallback cache to guarantee immediate persistence and zero loss
@@ -8,6 +8,7 @@ import { Tournament, TournamentMatch, TournamentParticipant } from "@/types/data
  * ZERO MOCK DATA - Initialized completely empty!
  */
 let MEMORY_TOURNAMENTS: Tournament[] = [];
+let MEMORY_TOURNAMENT_PAYMENTS: TournamentPayment[] = [];
 
 function getSupabase() {
   const adminSupabase = createAdminClient();
@@ -226,39 +227,47 @@ export class TournamentService {
     let chosenPaymentMethod: "wallet" | "mpesa_till" | "free" = isFree ? "free" : payment_method;
     let updatedAvailBalance: number | undefined;
 
-    // Handle Wallet Balance deduction if chosen
-    if (!isFree && chosenPaymentMethod === "wallet") {
-      const supabase = getSupabase();
-      const { data: userProf, error: profErr } = await supabase
-        .from("profiles")
-        .select("available_balance")
-        .eq("id", user_id)
-        .single();
+    // Handle paid tournament entry: Enforce upfront payment
+    if (!isFree) {
+      if (chosenPaymentMethod === "wallet") {
+        const supabase = getSupabase();
+        const { data: userProf, error: profErr } = await supabase
+          .from("profiles")
+          .select("available_balance")
+          .eq("id", user_id)
+          .single();
 
-      if (profErr || !userProf) {
-        return { success: false, error: "Unable to verify account balance." };
-      }
+        if (profErr || !userProf) {
+          return { success: false, error: "Unable to verify account balance." };
+        }
 
-      const currentBal = Number(userProf.available_balance || 0);
-      if (currentBal < tourney.entry_fee_kes) {
+        const currentBal = Number(userProf.available_balance || 0);
+        if (currentBal < tourney.entry_fee_kes) {
+          return {
+            success: false,
+            error: `Insufficient account balance. You have KES ${currentBal.toLocaleString()}, but entry fee is KES ${tourney.entry_fee_kes.toLocaleString()}. Please pay via M-Pesa STK Push.`,
+          };
+        }
+
+        // Deduct entry fee
+        updatedAvailBalance = currentBal - tourney.entry_fee_kes;
+        const { error: deductErr } = await supabase
+          .from("profiles")
+          .update({ available_balance: updatedAvailBalance })
+          .eq("id", user_id);
+
+        if (deductErr) {
+          return { success: false, error: "Failed to process wallet payment. Please try again." };
+        }
+
+        initialPaymentStatus = "paid";
+      } else {
+        // Unconfirmed M-Pesa registration is strictly rejected
         return {
           success: false,
-          error: `Insufficient account balance. You have KES ${currentBal.toLocaleString()}, but entry fee is KES ${tourney.entry_fee_kes.toLocaleString()}. Please pay via Till 1572931.`,
+          error: "Payment required: For M-Pesa entry, please initiate an STK Push to pay the entry fee. Slots are reserved only after backend confirmation.",
         };
       }
-
-      // Deduct entry fee
-      updatedAvailBalance = currentBal - tourney.entry_fee_kes;
-      const { error: deductErr } = await supabase
-        .from("profiles")
-        .update({ available_balance: updatedAvailBalance })
-        .eq("id", user_id);
-
-      if (deductErr) {
-        return { success: false, error: "Failed to process wallet payment. Please try again." };
-      }
-
-      initialPaymentStatus = "paid";
     }
 
     const participantId = `part-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
@@ -316,6 +325,244 @@ export class TournamentService {
     }
 
     return { success: true, participant: newParticipant, remainingBalance: updatedAvailBalance };
+  }
+
+  /**
+   * Create a pending tournament payment entry before STK Push is sent.
+   */
+  static async createTournamentPayment(params: {
+    tournament_id: string;
+    user_id?: string;
+    gamer_tag: string;
+    friend_id: string;
+    phone_number: string;
+    amount: number;
+    checkout_request_id: string;
+    merchant_request_id?: string;
+  }): Promise<TournamentPayment> {
+    const newPayment: TournamentPayment = {
+      id: `trn-pay-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`,
+      tournament_id: params.tournament_id,
+      user_id: params.user_id,
+      gamer_tag: params.gamer_tag.trim(),
+      friend_id: params.friend_id.trim(),
+      phone_number: params.phone_number.trim(),
+      amount: params.amount,
+      checkout_request_id: params.checkout_request_id,
+      merchant_request_id: params.merchant_request_id,
+      status: "pending",
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString(),
+    };
+
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from("tournament_payments")
+        .insert({
+          tournament_id: newPayment.tournament_id,
+          user_id: newPayment.user_id,
+          gamer_tag: newPayment.gamer_tag,
+          friend_id: newPayment.friend_id,
+          phone_number: newPayment.phone_number,
+          amount: newPayment.amount,
+          checkout_request_id: newPayment.checkout_request_id,
+          merchant_request_id: newPayment.merchant_request_id,
+          status: "pending",
+        })
+        .select()
+        .single();
+
+      if (!error && data) {
+        newPayment.id = data.id;
+      }
+    } catch (err) {
+      console.warn("Supabase insert tournament_payments notice:", err);
+    }
+
+    MEMORY_TOURNAMENT_PAYMENTS.unshift(newPayment);
+    return newPayment;
+  }
+
+  /**
+   * Retrieve a tournament payment by checkoutRequestId or merchantRequestId
+   */
+  static async getTournamentPayment(checkoutRequestId: string): Promise<TournamentPayment | null> {
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from("tournament_payments")
+        .select("*")
+        .or(`checkout_request_id.eq.${checkoutRequestId},merchant_request_id.eq.${checkoutRequestId},id.eq.${checkoutRequestId}`)
+        .order("created_at", { ascending: false })
+        .maybeSingle();
+
+      if (!error && data) {
+        return data as TournamentPayment;
+      }
+    } catch (err) {
+      console.warn("Supabase getTournamentPayment notice:", err);
+    }
+
+    const found = MEMORY_TOURNAMENT_PAYMENTS.find(
+      (p) =>
+        p.checkout_request_id === checkoutRequestId ||
+        p.merchant_request_id === checkoutRequestId ||
+        p.id === checkoutRequestId
+    );
+    return found || null;
+  }
+
+  /**
+   * Confirm tournament payment upon live M-Pesa verification and atomically register participant.
+   */
+  static async confirmTournamentPayment(
+    checkoutRequestId: string,
+    receiptNumber: string,
+    amount?: number
+  ): Promise<{ success: boolean; participant?: TournamentParticipant; payment?: TournamentPayment; error?: string }> {
+    const payment = await this.getTournamentPayment(checkoutRequestId);
+    if (!payment) {
+      return { success: false, error: "Payment record not found." };
+    }
+
+    const tourney = await this.getTournamentById(payment.tournament_id);
+    if (!tourney) {
+      return { success: false, error: "Tournament not found." };
+    }
+
+    // Idempotency: if already completed, return existing registered participant
+    if (payment.status === "completed") {
+      const existingPart = (tourney.participants || []).find(
+        (p) => p.friend_id.toLowerCase() === payment.friend_id.toLowerCase()
+      );
+      return { success: true, participant: existingPart, payment };
+    }
+
+    const now = new Date().toISOString();
+    payment.status = "completed";
+    payment.mpesa_receipt_number = receiptNumber;
+    payment.updated_at = now;
+
+    try {
+      const supabase = getSupabase();
+      await supabase
+        .from("tournament_payments")
+        .update({
+          status: "completed",
+          mpesa_receipt_number: receiptNumber,
+          result_code: 0,
+          result_desc: "Payment completed successfully",
+          updated_at: now,
+        })
+        .eq("id", payment.id);
+    } catch (err) {
+      console.warn("Supabase update tournament_payments notice:", err);
+    }
+
+    // Check if participant already recorded
+    const participants = tourney.participants || [];
+    const existingPart = participants.find(
+      (p) => p.friend_id.toLowerCase() === payment.friend_id.toLowerCase()
+    );
+
+    if (existingPart) {
+      return { success: true, participant: existingPart, payment };
+    }
+
+    const participantId = `part-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
+    const newParticipant: TournamentParticipant = {
+      id: participantId,
+      tournament_id: payment.tournament_id,
+      user_id: payment.user_id,
+      gamer_tag: payment.gamer_tag,
+      friend_id: payment.friend_id,
+      phone_number: payment.phone_number,
+      payment_status: "paid",
+      payment_method: "mpesa_stk",
+      amount_paid: amount || payment.amount,
+      seed: participants.length + 1,
+      created_at: now,
+    };
+
+    try {
+      const supabase = getSupabase();
+      const { data, error } = await supabase
+        .from("tournament_participants")
+        .insert({
+          tournament_id: newParticipant.tournament_id,
+          user_id: newParticipant.user_id,
+          gamer_tag: newParticipant.gamer_tag,
+          friend_id: newParticipant.friend_id,
+          phone_number: newParticipant.phone_number,
+          payment_status: "paid",
+          payment_method: "mpesa_stk",
+          amount_paid: newParticipant.amount_paid,
+          seed: newParticipant.seed,
+        })
+        .select()
+        .single();
+
+      if (!error && data) {
+        newParticipant.id = data.id;
+        // Increment registered count in DB
+        await supabase
+          .from("tournaments")
+          .update({ registered_count: participants.length + 1 })
+          .eq("id", payment.tournament_id);
+      }
+    } catch (err) {
+      console.warn("Supabase insert participant on payment notice:", err);
+    }
+
+    // Update memory cache
+    const memIndex = MEMORY_TOURNAMENTS.findIndex((t) => t.id === payment.tournament_id);
+    if (memIndex !== -1) {
+      MEMORY_TOURNAMENTS[memIndex].participants = [
+        ...(MEMORY_TOURNAMENTS[memIndex].participants || []),
+        newParticipant,
+      ];
+      MEMORY_TOURNAMENTS[memIndex].registered_count =
+        (MEMORY_TOURNAMENTS[memIndex].participants || []).length;
+    }
+
+    const payIndex = MEMORY_TOURNAMENT_PAYMENTS.findIndex((p) => p.id === payment.id);
+    if (payIndex !== -1) {
+      MEMORY_TOURNAMENT_PAYMENTS[payIndex] = { ...payment };
+    }
+
+    return { success: true, participant: newParticipant, payment };
+  }
+
+  /**
+   * Mark a tournament payment as failed/cancelled without adding participant.
+   */
+  static async failTournamentPayment(
+    checkoutRequestId: string,
+    reason?: string
+  ): Promise<{ success: boolean }> {
+    const payment = await this.getTournamentPayment(checkoutRequestId);
+    if (!payment) return { success: false };
+
+    payment.status = "failed";
+    payment.result_desc = reason || "Payment cancelled or timed out";
+    payment.updated_at = new Date().toISOString();
+
+    try {
+      const supabase = getSupabase();
+      await supabase
+        .from("tournament_payments")
+        .update({
+          status: "failed",
+          result_desc: payment.result_desc,
+          updated_at: payment.updated_at,
+        })
+        .eq("id", payment.id);
+    } catch (err) {
+      console.warn("Supabase fail tournament_payments notice:", err);
+    }
+
+    return { success: true };
   }
 
   /**

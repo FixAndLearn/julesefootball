@@ -1,5 +1,8 @@
 import { createAdminClient } from "@/lib/supabase/admin";
+import { mpesaClient } from "@/lib/mpesa/client";
 import { PaymentService } from "@/services/paymentService";
+import { TournamentService } from "@/services/tournamentService";
+import { dispatchAdminWhatsAppAlert } from "@/lib/notifications/adminAlert";
 import { NextRequest, NextResponse } from "next/server";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +11,41 @@ export async function POST(req: NextRequest) {
   try {
     const body = await req.json();
 
-    // Use admin client for webhook processing
+    // 1. Check if callback belongs to a tournament entry fee
+    const parsed = mpesaClient.parseCallback(body);
+    const checkoutId = parsed.checkoutRequestId || parsed.merchantRequestId;
+
+    if (checkoutId) {
+      const tourneyPayment = await TournamentService.getTournamentPayment(checkoutId);
+      if (tourneyPayment) {
+        if (parsed.isSuccess) {
+          const receipt = parsed.receiptNumber || `CONFIRMED_${Date.now()}`;
+          await TournamentService.confirmTournamentPayment(
+            checkoutId,
+            receipt,
+            parsed.amount || tourneyPayment.amount
+          );
+          const tourney = await TournamentService.getTournamentById(tourneyPayment.tournament_id);
+          await dispatchAdminWhatsAppAlert({
+            eventType: "TOURNAMENT_REGISTRATION",
+            listingTitle: tourney?.title || "eFootball Tournament",
+            username: `${tourneyPayment.gamer_tag} (CONFIRMED WEBHOOK)`,
+            buyerPhone: tourneyPayment.phone_number,
+            amount: parsed.amount || tourneyPayment.amount,
+            details: `Gamer Tag: ${tourneyPayment.gamer_tag} | Friend ID: ${tourneyPayment.friend_id} | Receipt: ${receipt} | Phone: ${tourneyPayment.phone_number}`,
+          }).catch((e) => console.warn("WhatsApp alert error:", e));
+        } else {
+          await TournamentService.failTournamentPayment(checkoutId, parsed.resultDesc);
+        }
+
+        return NextResponse.json({
+          ResultCode: 0,
+          ResultDesc: "Tournament callback processed successfully",
+        });
+      }
+    }
+
+    // 2. Default: Process Marketplace Order payment
     const adminSupabase = createAdminClient();
     const paymentService = new PaymentService(adminSupabase);
 
