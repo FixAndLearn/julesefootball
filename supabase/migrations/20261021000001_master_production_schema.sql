@@ -392,28 +392,38 @@ CREATE POLICY "Public can view published news" ON public.news_articles FOR SELEC
 -- ==============================================================================
 DO $$
 BEGIN
-  BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'tournaments'
+  ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.tournaments;
-  EXCEPTION WHEN duplicate_object THEN
-  END;
+  END IF;
 
-  BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'tournament_matches'
+  ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.tournament_matches;
-  EXCEPTION WHEN duplicate_object THEN
-  END;
+  END IF;
 
-  BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'tournament_participants'
+  ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.tournament_participants;
-  EXCEPTION WHEN duplicate_object THEN
-  END;
+  END IF;
 
-  BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'listings'
+  ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.listings;
-  EXCEPTION WHEN duplicate_object THEN
-  END;
+  END IF;
 
-  BEGIN
+  IF NOT EXISTS (
+    SELECT 1 FROM pg_publication_tables 
+    WHERE pubname = 'supabase_realtime' AND schemaname = 'public' AND tablename = 'seller_withdrawals'
+  ) THEN
     ALTER PUBLICATION supabase_realtime ADD TABLE public.seller_withdrawals;
-  EXCEPTION WHEN duplicate_object THEN
-  END;
+  END IF;
 END $$;
