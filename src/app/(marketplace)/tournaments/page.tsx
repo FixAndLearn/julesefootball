@@ -40,7 +40,10 @@ import {
   LogIn,
   Share2,
   Copy,
+  Wallet,
+  ArrowRight,
 } from "lucide-react";
+import { calculateTournamentFee } from "@/lib/utils/tournamentFee";
 
 export default function TournamentsPage() {
   const { user, profile, displayName } = useAuth();
@@ -53,7 +56,6 @@ export default function TournamentsPage() {
   // Modals state
   const [isRegisterOpen, setIsRegisterOpen] = useState(false);
   const [isAuthRequiredOpen, setIsAuthRequiredOpen] = useState(false);
-  const [isHostOpen, setIsHostOpen] = useState(false);
   const [isScoreOpen, setIsScoreOpen] = useState(false);
   const [selectedMatch, setSelectedMatch] = useState<TournamentMatch | null>(null);
 
@@ -61,34 +63,11 @@ export default function TournamentsPage() {
   const [gamerTag, setGamerTag] = useState("");
   const [friendId, setFriendId] = useState("");
   const [phone, setPhone] = useState("");
+  const [paymentMethod, setPaymentMethod] = useState<"wallet" | "mpesa_till">("wallet");
+  const [regResult, setRegResult] = useState<{ remaining_balance?: number; paid_via_wallet?: boolean } | null>(null);
   const [submittingReg, setSubmittingReg] = useState(false);
   const [regSuccess, setRegSuccess] = useState(false);
   const [regError, setRegError] = useState("");
-
-  // Auto-prefill registration fields for logged-in community members
-  useEffect(() => {
-    if (profile) {
-      if (!gamerTag && profile.username) {
-        setGamerTag(profile.username);
-      }
-      if (!phone && profile.phone_number) {
-        setPhone(profile.phone_number);
-      }
-    }
-  }, [profile, gamerTag, phone]);
-
-  // Host Tournament Form State (Users can host tournaments as Moderators)
-  const [hostType, setHostType] = useState<"paid" | "free">("paid");
-  const [hostTitle, setHostTitle] = useState("");
-  const [hostSubtitle, setHostSubtitle] = useState("");
-  const [hostPlatform, setHostPlatform] = useState<"all" | "android" | "ios" | "crossplay" | "console_pc">("crossplay");
-  const [hostEntryFee, setHostEntryFee] = useState("100");
-  const [hostFormat, setHostFormat] = useState("Single Knockout 1v1 (12-Minute Game + Extra Time & PKs)");
-  const [hostPayoutSplit, setHostPayoutSplit] = useState<"winner_takes_all" | "80_20" | "70_30">("winner_takes_all");
-  const [hostMaxPlayers, setHostMaxPlayers] = useState("8");
-  const [hostStartDate, setHostStartDate] = useState("");
-  const [submittingHost, setSubmittingHost] = useState(false);
-  const [hostError, setHostError] = useState("");
   const [copiedTourneyId, setCopiedTourneyId] = useState<string | null>(null);
 
   // Handle URL join parameter (e.g. ?join=tourney-id)
@@ -193,6 +172,7 @@ export default function TournamentsPage() {
     setRegError("");
     setSubmittingReg(true);
     try {
+      const isPaid = (selectedTourney.entry_fee_kes || 0) > 0;
       const res = await fetch("/api/tournaments", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -203,6 +183,7 @@ export default function TournamentsPage() {
           friend_id: friendId,
           phone_number: normalizePhoneNumber(phone).international,
           user_id: user?.id,
+          payment_method: isPaid ? paymentMethod : "free",
         }),
       });
 
@@ -211,78 +192,13 @@ export default function TournamentsPage() {
         throw new Error(data.error || "Failed to register");
       }
 
+      setRegResult(data);
       setRegSuccess(true);
       await fetchTourneys();
     } catch (err: any) {
       setRegError(err.message || "Failed to register.");
     } finally {
       setSubmittingReg(false);
-    }
-  };
-
-  // Handle Tournament Creation (Users host as Moderators)
-  const handleHostTournament = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setHostError("");
-    setSubmittingHost(true);
-
-    try {
-      if (!hostTitle.trim()) {
-        throw new Error("Tournament title is required.");
-      }
-
-      if (!hostStartDate.trim()) {
-        throw new Error("Start date / time is required (e.g. This Saturday, 8:00 PM EAT).");
-      }
-
-      const numPlayers = Number(hostMaxPlayers || 8);
-      const isPaid = hostType === "paid";
-      const entryFee = isPaid ? Math.max(0, Number(hostEntryFee || 0)) : 0;
-      const totalPot = entryFee * numPlayers;
-      const adminFee = isPaid && entryFee > 0 ? 50 : 0; // Flat KES 50 admin deal per tournament
-      const netPrizePool = Math.max(0, totalPot - adminFee);
-      const firstPlace = isPaid ? Math.round(netPrizePool * 0.8) : 0;
-      const secondPlace = isPaid ? Math.max(0, netPrizePool - firstPlace) : 0;
-
-      const res = await fetch("/api/tournaments", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          action: "create",
-          title: hostTitle.trim(),
-          subtitle:
-            hostSubtitle.trim() ||
-            (isPaid
-              ? `${numPlayers}-Player Knockout | KES ${netPrizePool.toLocaleString()} Prize Pool (Till 1572931 Escrow)`
-              : `${numPlayers}-Player Knockout | Free Community Cup`),
-          platform: hostPlatform,
-          prize_pool_kes: netPrizePool,
-          first_place_kes: firstPlace,
-          second_place_kes: secondPlace,
-          entry_fee_kes: entryFee,
-          format: hostFormat,
-          max_players: numPlayers,
-          start_date: hostStartDate.trim(),
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to host tournament.");
-      }
-
-      setIsHostOpen(false);
-      setHostTitle("");
-      setHostSubtitle("");
-      setHostStartDate("");
-      await fetchTourneys();
-      if (data.tournament) {
-        setSelectedTourney(data.tournament);
-      }
-    } catch (err: any) {
-      setHostError(err.message || "Failed to host tournament.");
-    } finally {
-      setSubmittingHost(false);
     }
   };
 
@@ -418,25 +334,26 @@ export default function TournamentsPage() {
             </div>
           </div>
 
-          {/* Host Tournament Button (Available to all users as Moderators) */}
-          <div className="flex flex-col gap-2 shrink-0">
-            <Button
-              variant="gold"
-              size="lg"
-              onClick={() => {
-                if (!user) {
-                  setIsAuthRequiredOpen(true);
-                } else {
-                  setIsHostOpen(true);
-                }
-              }}
-              className="font-bold flex items-center justify-center gap-2 shadow-xl shadow-amber-500/10 cursor-pointer"
+          {/* Host Actions: 1v1 Wager Duel & Multi-Player Tournament */}
+          <div className="flex flex-col gap-2.5 shrink-0 w-full sm:w-auto">
+            <Link
+              href="/tournaments/host?type=1v1"
+              className="inline-flex items-center justify-center gap-2 px-5 py-3 rounded-2xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-xl shadow-amber-500/20 transition-all cursor-pointer"
             >
-              <PlusCircle className="w-5 h-5" />
-              <span>Host a Tournament</span>
-            </Button>
+              <Swords className="w-4 h-4" />
+              <span>Create 1v1 Wager Duel</span>
+            </Link>
+
+            <Link
+              href="/tournaments/host?type=tournament"
+              className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-2xl bg-pitch-card hover:bg-slate-800 border border-pitch-border text-white font-bold text-xs shadow-lg transition-all cursor-pointer"
+            >
+              <Trophy className="w-4 h-4 text-amber-400" />
+              <span>Host 4-16 Player Cup</span>
+            </Link>
+
             <span className="text-[11px] text-slate-400 font-medium text-center">
-              Free or Paid Prize Pool • Flat KES 50 Platform Deal
+              Fair Fee (KES 10-20 to ~5%) • 12-Min Matches
             </span>
           </div>
         </div>
@@ -511,22 +428,21 @@ export default function TournamentsPage() {
             <p className="text-xs text-slate-400 max-w-md mx-auto">
               There are currently no scheduled tournaments. When Brian Okibo or tournament organizers host a new cup, it will appear here with live brackets and player registration.
             </p>
-            <div className="pt-2">
-              <Button
-                variant="gold"
-                size="md"
-                onClick={() => {
-                  if (!user) {
-                    setIsAuthRequiredOpen(true);
-                  } else {
-                    setIsHostOpen(true);
-                  }
-                }}
-                className="font-bold inline-flex items-center gap-2 cursor-pointer shadow-lg shadow-amber-500/10"
+            <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
+              <Link
+                href="/tournaments/host?type=1v1"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black font-extrabold text-xs shadow-lg transition-all"
               >
-                <PlusCircle className="w-4 h-4" />
-                <span>Host the First Tournament</span>
-              </Button>
+                <Swords className="w-4 h-4" />
+                <span>Create 1v1 Wager Duel</span>
+              </Link>
+              <Link
+                href="/tournaments/host?type=tournament"
+                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-pitch-card hover:bg-slate-800 border border-pitch-border text-white font-bold text-xs transition-all"
+              >
+                <Trophy className="w-4 h-4 text-amber-400" />
+                <span>Host Knockout Tournament</span>
+              </Link>
             </div>
           </div>
         ) : (
@@ -550,6 +466,17 @@ export default function TournamentsPage() {
                   <div className="space-y-4">
                     <div className="flex items-center justify-between gap-2 flex-wrap">
                       <div className="flex items-center gap-1.5 flex-wrap">
+                        {t.tournament_type === "1v1" || t.max_players <= 2 ? (
+                          <span className="text-[10px] font-extrabold text-amber-300 bg-amber-500/15 px-2 py-0.5 rounded-full border border-amber-500/30 flex items-center gap-1">
+                            <Swords className="w-3 h-3 text-amber-400" />
+                            <span>1v1 WAGER DUEL</span>
+                          </span>
+                        ) : (
+                          <span className="text-[10px] font-bold text-indigo-300 bg-indigo-500/15 px-2 py-0.5 rounded-full border border-indigo-500/30 flex items-center gap-1">
+                            <Trophy className="w-3 h-3 text-indigo-400" />
+                            <span>{t.max_players}-PLAYER CUP</span>
+                          </span>
+                        )}
                         <Badge
                           variant={
                             t.status === "completed"
@@ -594,19 +521,34 @@ export default function TournamentsPage() {
                     {/* Prize Pool Breakdown */}
                     <div className="p-4 rounded-2xl bg-pitch-card border border-pitch-border space-y-2">
                       <div className="flex items-center justify-between">
-                        <span className="text-xs text-slate-400 font-semibold">Total Prize Pool</span>
+                        <span className="text-xs text-slate-400 font-semibold">
+                          {t.tournament_type === "1v1" || t.max_players <= 2 ? "Winner Takes All (Net Pool)" : "Total Prize Pool"}
+                        </span>
                         <span className="text-lg font-extrabold text-amber-300 font-display">
                           {formatCurrency(t.prize_pool_kes, "KES")}
                         </span>
                       </div>
                       <div className="grid grid-cols-2 gap-2 pt-1 border-t border-pitch-border/60 text-[11px] text-slate-300">
-                        <div>🥇 1st: <strong>{formatCurrency(t.first_place_kes, "KES")}</strong></div>
-                        <div>🥈 2nd: <strong>{formatCurrency(t.second_place_kes, "KES")}</strong></div>
+                        {t.tournament_type === "1v1" || t.max_players <= 2 || t.payout_split === "winner_takes_all" ? (
+                          <div className="col-span-2 text-emerald-400 font-bold">
+                            👑 Champion Takes 100%: <strong>{formatCurrency(t.prize_pool_kes, "KES")}</strong>
+                          </div>
+                        ) : (
+                          <>
+                            <div>🥇 1st: <strong>{formatCurrency(t.first_place_kes, "KES")}</strong></div>
+                            <div>🥈 2nd: <strong>{formatCurrency(t.second_place_kes, "KES")}</strong></div>
+                          </>
+                        )}
                       </div>
                       {t.entry_fee_kes > 0 && (
-                        <div className="pt-1 text-[10px] text-emerald-400 flex items-center gap-1 font-semibold">
-                          <ShieldCheck className="w-3.5 h-3.5" />
-                          <span>Till 1572931 Escrow Custody Active</span>
+                        <div className="pt-1 text-[10px] text-slate-400 flex items-center justify-between border-t border-pitch-border/40">
+                          <span className="flex items-center gap-1 text-emerald-400 font-medium">
+                            <ShieldCheck className="w-3.5 h-3.5" />
+                            <span>Escrow Protected</span>
+                          </span>
+                          <span className="text-amber-400/90 font-mono">
+                            Platform Deal: KES {t.admin_fee_kes ?? calculateTournamentFee(t.entry_fee_kes * t.max_players)}
+                          </span>
                         </div>
                       )}
                     </div>
@@ -659,9 +601,17 @@ export default function TournamentsPage() {
                               setIsAuthRequiredOpen(true);
                               return;
                             }
-                            setIsRegisterOpen(true);
+                            const userBal = profile?.available_balance || 0;
+                            const fee = t.entry_fee_kes || 0;
+                            if (fee > 0 && userBal >= fee) {
+                              setPaymentMethod("wallet");
+                            } else {
+                              setPaymentMethod("mpesa_till");
+                            }
+                            setRegResult(null);
                             setRegSuccess(false);
                             setRegError("");
+                            setIsRegisterOpen(true);
                           }}
                         >
                           {isFull ? "Tournament Full" : "Register Slot"}
@@ -1123,14 +1073,16 @@ export default function TournamentsPage() {
                   <Trophy className="w-5 h-5" />
                 </div>
                 <div>
-                  <h3 className="text-base font-bold text-white">Join Tournament</h3>
+                  <h3 className="text-base font-bold text-white">
+                    {selectedTourney.tournament_type === "1v1" ? "Join 1v1 Wager Duel" : "Join Tournament"}
+                  </h3>
                   <p className="text-xs text-slate-400">{selectedTourney.title}</p>
                 </div>
               </div>
               <button
                 type="button"
                 onClick={() => setIsRegisterOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800"
+                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -1141,18 +1093,53 @@ export default function TournamentsPage() {
                 <div className="p-4 rounded-2xl bg-emerald-950/60 border border-emerald-500 text-emerald-300 text-center space-y-3">
                   <CheckCircle2 className="w-10 h-10 mx-auto text-emerald-400" />
                   <h4 className="text-base font-bold text-white">Registration Confirmed!</h4>
-                  <p className="text-xs text-slate-200">
-                    Your slot is locked in. If an entry fee of{" "}
-                    <strong>KES {selectedTourney.entry_fee_kes}</strong> applies, verify via Till{" "}
-                    <strong>1572931</strong>.
-                  </p>
+                  {regResult?.paid_via_wallet ? (
+                    <div className="p-3.5 rounded-2xl bg-emerald-900/40 border border-emerald-500/40 text-xs text-slate-200 space-y-1.5 text-left">
+                      <div className="flex items-center gap-2 text-emerald-300 font-bold">
+                        <Wallet className="w-4 h-4" />
+                        <span>Paid with Account Balance!</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300">
+                        Entry fee of <strong>KES {selectedTourney.entry_fee_kes.toLocaleString()}</strong> has been deducted directly from your account balance. Your slot is guaranteed immediately!
+                      </p>
+                      {regResult.remaining_balance !== undefined && (
+                        <div className="pt-1 border-t border-emerald-500/30 flex items-center justify-between text-[11px]">
+                          <span className="text-slate-400">Remaining Balance:</span>
+                          <strong className="text-emerald-300 font-mono">
+                            KES {regResult.remaining_balance.toLocaleString()}
+                          </strong>
+                        </div>
+                      )}
+                    </div>
+                  ) : selectedTourney.entry_fee_kes > 0 ? (
+                    <div className="p-3.5 rounded-2xl bg-amber-950/40 border border-amber-500/40 text-xs text-slate-200 space-y-1.5 text-left">
+                      <div className="flex items-center gap-2 text-amber-300 font-bold">
+                        <Smartphone className="w-4 h-4" />
+                        <span>Slot Reserved — Pay via Till 1572931</span>
+                      </div>
+                      <p className="text-[11px] text-slate-300">
+                        Please send <strong>KES {selectedTourney.entry_fee_kes.toLocaleString()}</strong> to Safaricom Buy Goods Till <strong className="text-amber-300 font-mono">1572931</strong> (EFootballMarket). Moderator Brian Okibo will verify and approve your slot.
+                      </p>
+                    </div>
+                  ) : (
+                    <p className="text-xs text-slate-200">
+                      Free slot locked in! Get your eFootball squad ready.
+                    </p>
+                  )}
+
                   <a
                     href={`https://wa.me/254794400365?text=${encodeURIComponent(
-                      `Hello Brian Okibo, I registered for "${selectedTourney.title}"! Gamer Tag: ${gamerTag}, Friend ID: ${friendId}. Phone: ${phone}. Ready for the match room!`
+                      `Hello Brian Okibo, I registered for "${selectedTourney.title}"! Gamer Tag: ${gamerTag}, Friend ID: ${friendId}. Phone: ${phone}. Payment: ${
+                        regResult?.paid_via_wallet
+                          ? `Paid via Account Balance (KES ${selectedTourney.entry_fee_kes})`
+                          : selectedTourney.entry_fee_kes > 0
+                          ? `Paying KES ${selectedTourney.entry_fee_kes} via Till 1572931`
+                          : "Free Entry"
+                      }. Ready for match room!`
                     )}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all"
+                    className="w-full inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs transition-all shadow-lg"
                   >
                     <MessageCircle className="w-4 h-4 fill-white" />
                     <span>Join Tournament WhatsApp Room</span>
@@ -1210,25 +1197,127 @@ export default function TournamentsPage() {
                     required
                   />
 
-                  <div className="p-3.5 rounded-xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-1">
-                    <div className="flex items-center justify-between">
+                  {/* Payment Method Selector if Entry Fee > 0 */}
+                  {selectedTourney.entry_fee_kes > 0 ? (
+                    <div className="space-y-2.5 pt-1">
+                      <div className="flex items-center justify-between">
+                        <label className="block text-xs font-semibold text-slate-300">
+                          Payment Method
+                        </label>
+                        <span className="text-xs font-mono font-bold text-amber-400">
+                          Entry: KES {selectedTourney.entry_fee_kes.toLocaleString()}
+                        </span>
+                      </div>
+
+                      {/* Option 1: Account Wallet Balance */}
+                      {(() => {
+                        const balance = profile?.available_balance || 0;
+                        const hasEnough = balance >= selectedTourney.entry_fee_kes;
+
+                        return (
+                          <div
+                            onClick={() => {
+                              if (hasEnough) setPaymentMethod("wallet");
+                            }}
+                            className={`p-3.5 rounded-2xl border transition-all ${
+                              !hasEnough
+                                ? "bg-slate-900/50 border-slate-800/80 opacity-60 cursor-not-allowed"
+                                : paymentMethod === "wallet"
+                                ? "bg-emerald-950/40 border-emerald-500 ring-1 ring-emerald-500/40 cursor-pointer shadow-md"
+                                : "bg-pitch-card border-pitch-border hover:border-slate-700 cursor-pointer"
+                            }`}
+                          >
+                            <div className="flex items-start gap-3">
+                              <div
+                                className={`w-4 h-4 mt-0.5 rounded-full border flex items-center justify-center shrink-0 ${
+                                  paymentMethod === "wallet" && hasEnough
+                                    ? "border-emerald-400 bg-emerald-500"
+                                    : "border-slate-600"
+                                }`}
+                              >
+                                {paymentMethod === "wallet" && hasEnough && (
+                                  <div className="w-1.5 h-1.5 rounded-full bg-black" />
+                                )}
+                              </div>
+                              <div className="flex-1">
+                                <div className="flex items-center justify-between gap-2 flex-wrap">
+                                  <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                                    <Wallet className="w-3.5 h-3.5 text-emerald-400" />
+                                    <span>Pay with Account Balance</span>
+                                  </span>
+                                  <span
+                                    className={`text-[10px] font-extrabold px-2 py-0.5 rounded-full ${
+                                      hasEnough
+                                        ? "bg-emerald-500/20 text-emerald-300 border border-emerald-500/30"
+                                        : "bg-rose-500/20 text-rose-300 border border-rose-500/30"
+                                    }`}
+                                  >
+                                    KES {balance.toLocaleString()} Available
+                                  </span>
+                                </div>
+                                <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                                  {hasEnough
+                                    ? `Instant deduction of KES ${selectedTourney.entry_fee_kes.toLocaleString()} from your wallet. Zero SMS waiting.`
+                                    : `Insufficient wallet balance (KES ${balance.toLocaleString()} available / KES ${selectedTourney.entry_fee_kes.toLocaleString()} required). Top up or choose Till payment below.`}
+                                </p>
+                              </div>
+                            </div>
+                          </div>
+                        );
+                      })()}
+
+                      {/* Option 2: Safaricom Till 1572931 */}
+                      <div
+                        onClick={() => setPaymentMethod("mpesa_till")}
+                        className={`p-3.5 rounded-2xl border transition-all cursor-pointer ${
+                          paymentMethod === "mpesa_till"
+                            ? "bg-amber-950/40 border-amber-500 ring-1 ring-amber-500/40 shadow-md"
+                            : "bg-pitch-card border-pitch-border hover:border-slate-700"
+                        }`}
+                      >
+                        <div className="flex items-start gap-3">
+                          <div
+                            className={`w-4 h-4 mt-0.5 rounded-full border flex items-center justify-center shrink-0 ${
+                              paymentMethod === "mpesa_till"
+                                ? "border-amber-400 bg-amber-500"
+                                : "border-slate-600"
+                            }`}
+                          >
+                            {paymentMethod === "mpesa_till" && (
+                              <div className="w-1.5 h-1.5 rounded-full bg-black" />
+                            )}
+                          </div>
+                          <div className="flex-1">
+                            <div className="flex items-center justify-between gap-2 flex-wrap">
+                              <span className="text-xs font-bold text-white flex items-center gap-1.5">
+                                <Smartphone className="w-3.5 h-3.5 text-amber-400" />
+                                <span>Pay via Safaricom Till</span>
+                              </span>
+                              <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-mono">
+                                Till 1572931
+                              </span>
+                            </div>
+                            <p className="text-[11px] text-slate-400 mt-1 leading-relaxed">
+                              Send KES {selectedTourney.entry_fee_kes.toLocaleString()} to Buy Goods Till{" "}
+                              <strong className="text-amber-300 font-mono">1572931</strong> (EFootballMarket). Moderator verifies M-Pesa ref.
+                            </p>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="p-3.5 rounded-2xl bg-emerald-950/30 border border-emerald-500/30 text-xs text-emerald-300 flex items-center justify-between">
                       <span>Entry Fee:</span>
-                      <strong className="text-emerald-400">
-                        {selectedTourney.entry_fee_kes === 0 ? "FREE" : `KES ${selectedTourney.entry_fee_kes}`}
-                      </strong>
+                      <strong className="font-bold">FREE ENTRY</strong>
                     </div>
-                    <div className="flex items-center justify-between">
-                      <span>Safaricom Till Number:</span>
-                      <strong className="text-amber-400">1572931 (EFootballMarket)</strong>
-                    </div>
-                  </div>
+                  )}
 
                   <div className="pt-2">
                     <Button
                       type="submit"
                       variant="gold"
                       size="lg"
-                      className="w-full font-bold"
+                      className="w-full font-bold cursor-pointer"
                       isLoading={submittingReg}
                     >
                       Confirm Registration
@@ -1236,329 +1325,6 @@ export default function TournamentsPage() {
                   </div>
                 </>
               )}
-            </form>
-          </div>
-        </div>
-      )}
-
-      {/* MODAL 2: User / Moderator Host Tournament Modal */}
-      {isHostOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-in fade-in">
-          <div className="w-full max-w-lg bg-pitch-surface border border-pitch-border rounded-3xl shadow-2xl overflow-hidden flex flex-col max-h-[90vh]">
-            <div className="p-6 border-b border-pitch-border bg-pitch-card/60 flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <div className="w-9 h-9 rounded-xl bg-amber-500/20 text-amber-400 flex items-center justify-center">
-                  <Trophy className="w-5 h-5" />
-                </div>
-                <div>
-                  <h3 className="text-base font-bold text-white">Host a Tournament</h3>
-                  <p className="text-xs text-slate-400">You become the Tournament Moderator</p>
-                </div>
-              </div>
-              <button
-                type="button"
-                onClick={() => setIsHostOpen(false)}
-                className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 transition-colors cursor-pointer"
-              >
-                <X className="w-4 h-4" />
-              </button>
-            </div>
-
-            <form onSubmit={handleHostTournament} className="p-6 overflow-y-auto space-y-4">
-              {hostError && (
-                <div className="p-3 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs">
-                  {hostError}
-                </div>
-              )}
-
-              {/* Tournament Type: Paid vs Free */}
-              <div className="space-y-1.5">
-                <label className="block text-xs font-semibold text-slate-300">
-                  Tournament Entry Type
-                </label>
-                <div className="grid grid-cols-2 gap-2.5">
-                  <button
-                    type="button"
-                    onClick={() => setHostType("paid")}
-                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-                      hostType === "paid"
-                        ? "bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500/30"
-                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
-                    }`}
-                  >
-                    <span className="text-xs font-bold block text-white">🏆 Paid Prize Pool</span>
-                    <span className="text-[10px] text-slate-400 mt-0.5 block leading-tight">
-                      Pay via Till 1572931 • Flat KES 50 deal
-                    </span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => setHostType("free")}
-                    className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-                      hostType === "free"
-                        ? "bg-emerald-500/15 border-emerald-500 text-emerald-300 ring-1 ring-emerald-500/30"
-                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
-                    }`}
-                  >
-                    <span className="text-xs font-bold block text-white">🎮 Free Community Cup</span>
-                    <span className="text-[10px] text-slate-400 mt-0.5 block leading-tight">
-                      Free to enter • Community ranking
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              <Input
-                label="Tournament Title"
-                placeholder="e.g. Weekend Knockout Cup #1"
-                value={hostTitle}
-                onChange={(e) => setHostTitle(e.target.value)}
-                required
-              />
-
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Platform
-                  </label>
-                  <select
-                    className="w-full px-3.5 py-2 rounded-xl bg-pitch-card border border-pitch-border text-white text-xs focus:outline-none focus:border-amber-500"
-                    value={hostPlatform}
-                    onChange={(e: any) => setHostPlatform(e.target.value)}
-                  >
-                    <option value="crossplay">Crossplay (Mobile / All)</option>
-                    <option value="android">Android Mobile</option>
-                    <option value="ios">iOS Mobile</option>
-                    <option value="console_pc">Console / PC</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                    Player Slots
-                  </label>
-                  <select
-                    className="w-full px-3.5 py-2 rounded-xl bg-pitch-card border border-pitch-border text-white text-xs focus:outline-none focus:border-amber-500"
-                    value={hostMaxPlayers}
-                    onChange={(e) => setHostMaxPlayers(e.target.value)}
-                  >
-                    <option value="4">4 Players (Semi-Finals & Final)</option>
-                    <option value="8">8 Players (Quarter-Finals & Final)</option>
-                    <option value="16">16 Players (Full Knockout)</option>
-                  </select>
-                </div>
-              </div>
-
-              {/* Paid Prize Pool & Flat Rate KES 50 Admin Calculation */}
-              {hostType === "paid" ? (
-                <div className="space-y-3">
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                      Entry Fee per Player (KES)
-                    </label>
-                    <div className="flex items-center gap-2 mb-2">
-                      {["50", "100", "200", "500"].map((preset) => (
-                        <button
-                          key={preset}
-                          type="button"
-                          onClick={() => setHostEntryFee(preset)}
-                          className={`flex-1 py-1 px-2 rounded-lg text-xs font-semibold border transition-all cursor-pointer ${
-                            hostEntryFee === preset
-                              ? "bg-amber-500 text-black border-amber-400 font-bold"
-                              : "bg-pitch-card border-pitch-border text-slate-300 hover:text-white"
-                          }`}
-                        >
-                          KES {preset}
-                        </button>
-                      ))}
-                    </div>
-                    <Input
-                      type="number"
-                      placeholder="e.g. 100"
-                      value={hostEntryFee}
-                      onChange={(e) => setHostEntryFee(e.target.value)}
-                      required
-                    />
-                  </div>
-
-                  {/* Agreed Payout Split Selector */}
-                  <div>
-                    <label className="block text-xs font-semibold text-slate-300 mb-1.5">
-                      Agreed Winner Payout Agreement
-                    </label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <button
-                        type="button"
-                        onClick={() => setHostPayoutSplit("winner_takes_all")}
-                        className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer ${
-                          hostPayoutSplit === "winner_takes_all"
-                            ? "bg-amber-500 text-black border-amber-400 font-bold shadow-md shadow-amber-500/20"
-                            : "bg-pitch-card border-pitch-border text-slate-300 hover:text-white"
-                        }`}
-                      >
-                        <span className="block text-[11px] font-bold">Winner 100%</span>
-                        <span className="block text-[9px] opacity-80">Winner takes all</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setHostPayoutSplit("80_20")}
-                        className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer ${
-                          hostPayoutSplit === "80_20"
-                            ? "bg-amber-500 text-black border-amber-400 font-bold shadow-md shadow-amber-500/20"
-                            : "bg-pitch-card border-pitch-border text-slate-300 hover:text-white"
-                        }`}
-                      >
-                        <span className="block text-[11px] font-bold">80% / 20%</span>
-                        <span className="block text-[9px] opacity-80">1st &amp; 2nd Split</span>
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => setHostPayoutSplit("70_30")}
-                        className={`p-2.5 rounded-xl border text-center text-xs font-semibold transition-all cursor-pointer ${
-                          hostPayoutSplit === "70_30"
-                            ? "bg-amber-500 text-black border-amber-400 font-bold shadow-md shadow-amber-500/20"
-                            : "bg-pitch-card border-pitch-border text-slate-300 hover:text-white"
-                        }`}
-                      >
-                        <span className="block text-[11px] font-bold">70% / 30%</span>
-                        <span className="block text-[9px] opacity-80">1st &amp; 2nd Split</span>
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* Real-time Flat 50 Deal Calculation Card */}
-                  {(() => {
-                    const num = Number(hostMaxPlayers || 8);
-                    const fee = Math.max(0, Number(hostEntryFee || 0));
-                    const pot = num * fee;
-                    const adminFee = fee > 0 ? 50 : 0;
-                    const prizePool = Math.max(0, pot - adminFee);
-                    let p1 = prizePool;
-                    let p2 = 0;
-                    if (hostPayoutSplit === "70_30") {
-                      p1 = Math.round(prizePool * 0.7);
-                      p2 = Math.max(0, prizePool - p1);
-                    } else if (hostPayoutSplit === "80_20") {
-                      p1 = Math.round(prizePool * 0.8);
-                      p2 = Math.max(0, prizePool - p1);
-                    }
-
-                    return (
-                      <div className="p-4 rounded-2xl bg-pitch-card border border-amber-500/30 space-y-2 text-xs shadow-inner">
-                        <div className="flex items-center justify-between text-slate-300">
-                          <span>Total Collected Pot ({num} players × KES {fee}):</span>
-                          <strong className="text-white font-mono">KES {pot.toLocaleString()}</strong>
-                        </div>
-                        <div className="flex items-center justify-between text-slate-300">
-                          <span className="flex items-center gap-1">
-                            <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                            <span>Platform Admin Deal (Flat Rate):</span>
-                          </span>
-                          <strong className="text-amber-400 font-mono font-bold">KES 50 flat</strong>
-                        </div>
-                        <div className="pt-2 border-t border-pitch-border flex items-center justify-between text-sm">
-                          <span className="font-bold text-white">Net Winner Prize Pool:</span>
-                          <span className="text-base font-black text-emerald-400 font-mono font-display">
-                            KES {prizePool.toLocaleString()}
-                          </span>
-                        </div>
-                        <div className="grid grid-cols-2 gap-2 pt-1 text-[11px] text-slate-400">
-                          <div>🥇 1st Place: <strong className="text-amber-300 font-mono">KES {p1.toLocaleString()}</strong></div>
-                          <div>🥈 2nd Place: <strong className="text-slate-200 font-mono">{p2 > 0 ? `KES ${p2.toLocaleString()}` : "Prestige / Trophy"}</strong></div>
-                        </div>
-                        <p className="text-[10px] text-slate-400 pt-1 leading-relaxed border-t border-pitch-border/60">
-                          Players pay their entry into Safaricom Till 1572931. Prize pool is held safely in escrow until you (the tournament moderator) conclude the final and crown the champion!
-                        </p>
-                      </div>
-                    );
-                  })()}
-                </div>
-              ) : (
-                <div className="p-3.5 rounded-2xl bg-pitch-card border border-pitch-border text-xs text-slate-300 space-y-1">
-                  <span className="font-bold text-emerald-400 block">Free Community Entry:</span>
-                  <p className="text-slate-400 text-[11px] leading-relaxed">
-                    Zero entry fees and zero platform fees. Players register for free, knockout brackets generate automatically, and you moderate the match results.
-                  </p>
-                </div>
-              )}
-
-              {/* Match Duration & Format (12-Minute Game Standard) */}
-              <div className="space-y-2">
-                <div className="flex items-center justify-between">
-                  <label className="block text-xs font-semibold text-slate-300">
-                    Match Duration &amp; Rules
-                  </label>
-                  <span className="text-[10px] text-amber-400 font-bold font-mono">
-                    ⏱️ 12-Minute Game Standard
-                  </span>
-                </div>
-                <div className="grid grid-cols-3 gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setHostFormat("Single Knockout 1v1 (12-Minute Game + Extra Time & PKs)")}
-                    className={`p-2.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${
-                      hostFormat.includes("Single Knockout")
-                        ? "bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500/30"
-                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
-                    }`}
-                  >
-                    <span className="font-bold text-white block text-[11px]">12-Min Knockout</span>
-                    <span className="text-[9px] text-slate-400 block mt-0.5">ET &amp; PKs enabled</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setHostFormat("Home & Away 1v1 (12-Minute Two-Leg Aggregate)")}
-                    className={`p-2.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${
-                      hostFormat.includes("Two-Leg")
-                        ? "bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500/30"
-                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
-                    }`}
-                  >
-                    <span className="font-bold text-white block text-[11px]">12-Min Two-Leg</span>
-                    <span className="text-[9px] text-slate-400 block mt-0.5">Home &amp; Away agg</span>
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setHostFormat("Best of 3 Series (12-Minute Matches)")}
-                    className={`p-2.5 rounded-xl border text-left text-xs transition-all cursor-pointer ${
-                      hostFormat.includes("Best of 3")
-                        ? "bg-amber-500/15 border-amber-500 text-amber-300 ring-1 ring-amber-500/30"
-                        : "bg-pitch-card border-pitch-border text-slate-400 hover:border-slate-700"
-                    }`}
-                  >
-                    <span className="font-bold text-white block text-[11px]">12-Min Best of 3</span>
-                    <span className="text-[9px] text-slate-400 block mt-0.5">First to 2 wins</span>
-                  </button>
-                </div>
-                <Input
-                  label="Match Format Details"
-                  value={hostFormat}
-                  onChange={(e) => setHostFormat(e.target.value)}
-                  helperText="All participants must set their match duration to 12 minutes in the eFootball Friend Match room."
-                  required
-                />
-              </div>
-
-              <Input
-                label="Start Date / Time"
-                placeholder="e.g. This Saturday, 8:00 PM EAT"
-                value={hostStartDate}
-                onChange={(e) => setHostStartDate(e.target.value)}
-                required
-              />
-
-              <div className="pt-2">
-                <Button
-                  type="submit"
-                  variant="gold"
-                  size="lg"
-                  className="w-full font-bold cursor-pointer"
-                  isLoading={submittingHost}
-                >
-                  Create Tournament &amp; Become Moderator
-                </Button>
-              </div>
             </form>
           </div>
         </div>

@@ -41,6 +41,9 @@ export async function POST(req: NextRequest) {
         subtitle,
         description,
         platform = "all",
+        tournament_type = "tournament",
+        admin_fee_kes = 0,
+        payout_split = "winner_takes_all",
         prize_pool_kes = 0,
         first_place_kes = 0,
         second_place_kes = 0,
@@ -62,6 +65,9 @@ export async function POST(req: NextRequest) {
         subtitle,
         description,
         platform,
+        tournament_type,
+        admin_fee_kes: Number(admin_fee_kes),
+        payout_split,
         prize_pool_kes: Number(prize_pool_kes),
         first_place_kes: Number(first_place_kes),
         second_place_kes: Number(second_place_kes),
@@ -86,7 +92,7 @@ export async function POST(req: NextRequest) {
     }
 
     // 2. ACTION: Register Participant for a Tournament
-    const { tournament_id, gamer_tag, friend_id, phone_number, user_id } = body;
+    const { tournament_id, gamer_tag, friend_id, phone_number, user_id, payment_method } = body;
 
     if (!tournament_id || !gamer_tag || !friend_id || !phone_number) {
       return NextResponse.json(
@@ -116,7 +122,7 @@ export async function POST(req: NextRequest) {
     // Verify account exists in public.profiles table
     const { data: memberProfile } = await supabase
       .from("profiles")
-      .select("id, username")
+      .select("id, username, available_balance")
       .eq("id", verifiedUserId)
       .maybeSingle();
 
@@ -138,6 +144,7 @@ export async function POST(req: NextRequest) {
       friend_id,
       phone_number: normalizedPhone,
       user_id: verifiedUserId,
+      payment_method: payment_method || "mpesa_till",
     });
 
     if (!result.success) {
@@ -153,13 +160,16 @@ export async function POST(req: NextRequest) {
       username: gamer_tag,
       buyerPhone: normalizedPhone,
       amount: tourney?.entry_fee_kes || 0,
-      details: `Gamer Tag: ${gamer_tag} | Friend ID: ${friend_id}`,
+      details: `Gamer Tag: ${gamer_tag} | Friend ID: ${friend_id} | Payment: ${result.participant?.payment_method || "till"}`,
     }).catch((e) => console.warn("WhatsApp alert error:", e));
 
     return NextResponse.json({
       success: true,
       participant: result.participant,
-      message: "Successfully registered for tournament!",
+      remainingBalance: result.remainingBalance,
+      message: result.participant?.payment_method === "wallet"
+        ? `Successfully registered! KES ${tourney?.entry_fee_kes || 0} deducted from your account balance.`
+        : "Successfully registered for tournament!",
     });
   } catch (err: any) {
     console.error("POST /api/tournaments error:", err);

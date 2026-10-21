@@ -96,6 +96,9 @@ export class TournamentService {
     subtitle?: string;
     description?: string;
     platform: "all" | "android" | "ios" | "crossplay" | "console_pc";
+    tournament_type?: "1v1" | "tournament";
+    admin_fee_kes?: number;
+    payout_split?: "winner_takes_all" | "80_20" | "70_30";
     prize_pool_kes: number;
     first_place_kes: number;
     second_place_kes: number;
@@ -114,6 +117,9 @@ export class TournamentService {
       subtitle: params.subtitle?.trim() || `${params.max_players}-Player 1v1 Single Knockout | M-Pesa Escrow Payout`,
       description: params.description?.trim() || "",
       platform: params.platform,
+      tournament_type: params.tournament_type || (params.max_players === 2 ? "1v1" : "tournament"),
+      admin_fee_kes: params.admin_fee_kes || 0,
+      payout_split: params.payout_split || "winner_takes_all",
       prize_pool_kes: params.prize_pool_kes,
       first_place_kes: params.first_place_kes,
       second_place_kes: params.second_place_kes,
@@ -139,6 +145,9 @@ export class TournamentService {
           subtitle: tourneyPayload.subtitle,
           description: tourneyPayload.description,
           platform: tourneyPayload.platform,
+          tournament_type: tourneyPayload.tournament_type,
+          admin_fee_kes: tourneyPayload.admin_fee_kes,
+          payout_split: tourneyPayload.payout_split,
           prize_pool_kes: tourneyPayload.prize_pool_kes,
           first_place_kes: tourneyPayload.first_place_kes,
           second_place_kes: tourneyPayload.second_place_kes,
@@ -174,8 +183,9 @@ export class TournamentService {
     friend_id: string;
     phone_number: string;
     user_id?: string;
-  }): Promise<{ success: boolean; participant?: TournamentParticipant; error?: string }> {
-    const { tournament_id, gamer_tag, friend_id, phone_number, user_id } = params;
+    payment_method?: "wallet" | "mpesa_till" | "free";
+  }): Promise<{ success: boolean; participant?: TournamentParticipant; error?: string; remainingBalance?: number }> {
+    const { tournament_id, gamer_tag, friend_id, phone_number, user_id, payment_method = "mpesa_till" } = params;
 
     const tourney = await this.getTournamentById(tournament_id);
     if (!tourney) {
@@ -211,6 +221,46 @@ export class TournamentService {
       };
     }
 
+    const isFree = tourney.entry_fee_kes === 0;
+    let initialPaymentStatus: "pending" | "paid" | "exempt" = isFree ? "exempt" : "pending";
+    let chosenPaymentMethod: "wallet" | "mpesa_till" | "free" = isFree ? "free" : payment_method;
+    let updatedAvailBalance: number | undefined;
+
+    // Handle Wallet Balance deduction if chosen
+    if (!isFree && chosenPaymentMethod === "wallet") {
+      const supabase = getSupabase();
+      const { data: userProf, error: profErr } = await supabase
+        .from("profiles")
+        .select("available_balance")
+        .eq("id", user_id)
+        .single();
+
+      if (profErr || !userProf) {
+        return { success: false, error: "Unable to verify account balance." };
+      }
+
+      const currentBal = Number(userProf.available_balance || 0);
+      if (currentBal < tourney.entry_fee_kes) {
+        return {
+          success: false,
+          error: `Insufficient account balance. You have KES ${currentBal.toLocaleString()}, but entry fee is KES ${tourney.entry_fee_kes.toLocaleString()}. Please pay via Till 1572931.`,
+        };
+      }
+
+      // Deduct entry fee
+      updatedAvailBalance = currentBal - tourney.entry_fee_kes;
+      const { error: deductErr } = await supabase
+        .from("profiles")
+        .update({ available_balance: updatedAvailBalance })
+        .eq("id", user_id);
+
+      if (deductErr) {
+        return { success: false, error: "Failed to process wallet payment. Please try again." };
+      }
+
+      initialPaymentStatus = "paid";
+    }
+
     const participantId = `part-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`;
     const newParticipant: TournamentParticipant = {
       id: participantId,
@@ -219,7 +269,9 @@ export class TournamentService {
       gamer_tag: gamer_tag.trim(),
       friend_id: cleanFriendId,
       phone_number: phone_number.trim(),
-      payment_status: tourney.entry_fee_kes === 0 ? "exempt" : "pending",
+      payment_status: initialPaymentStatus,
+      payment_method: chosenPaymentMethod,
+      amount_paid: initialPaymentStatus === "paid" ? tourney.entry_fee_kes : 0,
       seed: participants.length + 1,
       created_at: new Date().toISOString(),
     };
@@ -263,12 +315,12 @@ export class TournamentService {
         (MEMORY_TOURNAMENTS[memIndex].participants || []).length;
     }
 
-    return { success: true, participant: newParticipant };
+    return { success: true, participant: newParticipant, remainingBalance: updatedAvailBalance };
   }
 
   /**
    * Form / Generate Tournament Knockout Brackets
-   * Builds single elimination brackets (Quarter-Finals -> Semi-Finals -> Grand Final)
+   * Builds single elimination brackets (1v1 Final -> Semi-Finals -> Grand Final)
    * Connects winners automatically to the next match.
    */
   static async generateBrackets(
@@ -296,7 +348,24 @@ export class TournamentService {
     const matchesToCreate: TournamentMatch[] = [];
     const maxPlayers = tourney.max_players;
 
-    if (maxPlayers <= 4) {
+    if (maxPlayers <= 2) {
+      // 1v1 Head-to-Head Duel Championship
+      const duelMatchId = `match-1v1-${Date.now()}`;
+      matchesToCreate.push({
+        id: duelMatchId,
+        tournament_id,
+        round: "1v1 Duel Championship",
+        match_number: 1,
+        player1_name: players[0]?.gamer_tag || "TBD",
+        player2_name: players[1]?.gamer_tag || "TBD",
+        player1_friend_id: players[0]?.friend_id,
+        player2_friend_id: players[1]?.friend_id,
+        player1_user_id: players[0]?.user_id,
+        player2_user_id: players[1]?.user_id,
+        is_completed: false,
+        created_at: new Date().toISOString(),
+      });
+    } else if (maxPlayers <= 4) {
       // 4-Player Format: Semi-Finals (2 matches) -> Grand Final (1 match)
       const finalMatchId = `match-f-${Date.now()}`;
       const semi1Id = `match-s1-${Date.now()}`;

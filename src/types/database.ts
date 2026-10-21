@@ -411,6 +411,8 @@ export interface TournamentParticipant {
   friend_id: string;
   phone_number: string;
   payment_status: 'pending' | 'paid' | 'exempt';
+  payment_method?: 'wallet' | 'mpesa_till' | 'free';
+  amount_paid?: number;
   seed?: number | null;
   created_at: string;
 }
@@ -421,6 +423,9 @@ export interface Tournament {
   subtitle?: string | null;
   description?: string | null;
   platform: TournamentPlatform;
+  tournament_type?: '1v1' | 'tournament';
+  admin_fee_kes?: number;
+  payout_split?: 'winner_takes_all' | '80_20' | '70_30';
   prize_pool_kes: number;
   first_place_kes: number;
   second_place_kes: number;
