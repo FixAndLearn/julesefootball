@@ -22,6 +22,8 @@ export function MobileBottomNav() {
     pathname.startsWith("/pay/") ||
     pathname.startsWith("/orders/") ||
     pathname.startsWith("/listings/") ||
+    pathname.startsWith("/tournaments/host") ||
+    pathname.startsWith("/tournaments/register") ||
     pathname === "/seller/create-listing" ||
     pathname === "/seller/verification" ||
     pathname === "/profile";

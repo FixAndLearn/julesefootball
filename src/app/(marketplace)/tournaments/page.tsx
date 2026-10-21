@@ -590,32 +590,17 @@ export default function TournamentsPage() {
                   <div className="mt-6 pt-4 border-t border-pitch-border/60 space-y-2">
                     <div className="flex items-center gap-2">
                       {t.status === "registration_open" && (
-                        <Button
-                          variant="gold"
-                          size="md"
-                          className="flex-1 font-bold text-xs cursor-pointer"
-                          disabled={isFull}
-                          onClick={() => {
-                            setSelectedTourney(t);
-                            if (!user) {
-                              setIsAuthRequiredOpen(true);
-                              return;
-                            }
-                            const userBal = profile?.available_balance || 0;
-                            const fee = t.entry_fee_kes || 0;
-                            if (fee > 0 && userBal >= fee) {
-                              setPaymentMethod("wallet");
-                            } else {
-                              setPaymentMethod("mpesa_till");
-                            }
-                            setRegResult(null);
-                            setRegSuccess(false);
-                            setRegError("");
-                            setIsRegisterOpen(true);
-                          }}
+                        <Link
+                          href={isFull ? "#" : `/tournaments/register?id=${t.id}`}
+                          className={`flex-1 inline-flex items-center justify-center gap-1.5 py-2 px-3 rounded-xl font-bold text-xs transition-all ${
+                            isFull
+                              ? "bg-slate-800 text-slate-500 cursor-not-allowed pointer-events-none"
+                              : "bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-400 hover:to-amber-500 text-black shadow-md shadow-amber-500/10 cursor-pointer"
+                          }`}
                         >
-                          {isFull ? "Tournament Full" : "Register Slot"}
-                        </Button>
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>{isFull ? "Tournament Full" : "Register Slot"}</span>
+                        </Link>
                       )}
 
                       <Button
