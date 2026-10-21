@@ -25,7 +25,6 @@ import {
   RotateCw,
   Home,
   AlertCircle,
-  KeyRound,
   Check,
   X,
   Zap,
@@ -54,11 +53,6 @@ export default function RegisterTournamentPage() {
   const [stkCheckoutId, setStkCheckoutId] = useState<string | null>(null);
   const [stkMessage, setStkMessage] = useState("Waiting for M-Pesa PIN confirmation...");
   const [checkingNow, setCheckingNow] = useState(false);
-
-  // Manual Receipt Verification State
-  const [manualReceipt, setManualReceipt] = useState("");
-  const [verifyingManual, setVerifyingManual] = useState(false);
-  const [manualError, setManualError] = useState("");
 
   // Final Success State
   const [regSuccess, setRegSuccess] = useState(false);
@@ -223,7 +217,6 @@ export default function RegisterTournamentPage() {
   const handleCheckPaymentNow = async () => {
     if (!stkCheckoutId) return;
     setCheckingNow(true);
-    setManualError("");
 
     try {
       const res = await fetch(
@@ -239,7 +232,7 @@ export default function RegisterTournamentPage() {
         });
         setRegSuccess(true);
       } else if (data.status === "pending") {
-        setStkMessage("Payment is processing on Safaricom Till 1572931. If you already received your SMS, enter the receipt code below.");
+        setStkMessage("Payment is processing on Safaricom Till 1572931. Waiting for Safaricom confirmation...");
       } else if (data.status === "failed") {
         setIsStkWaiting(false);
         setError(data.resultDesc || "Transaction was not completed. Please try again.");
@@ -377,47 +370,6 @@ export default function RegisterTournamentPage() {
       } finally {
         setSubmitting(false);
       }
-    }
-  };
-
-  // Manual Receipt Verification Handler
-  const handleVerifyManualReceipt = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!manualReceipt.trim()) return;
-
-    setVerifyingManual(true);
-    setManualError("");
-
-    try {
-      const res = await fetch("/api/tournaments/payment-status", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          checkoutRequestId: stkCheckoutId,
-          receiptNumber: manualReceipt.trim().toUpperCase(),
-          tournamentId: selectedTourney?.id,
-          gamerTag: gamerTag.trim(),
-          friendId: friendId.trim(),
-          phoneNumber: phone.trim(),
-          userId: user?.id,
-        }),
-      });
-
-      const data = await res.json();
-      if (!res.ok) {
-        throw new Error(data.error || "Failed to verify M-Pesa receipt.");
-      }
-
-      setIsStkWaiting(false);
-      setRegResult({
-        paid_via_mpesa: true,
-        receipt_number: data.receiptNumber || manualReceipt.trim().toUpperCase(),
-      });
-      setRegSuccess(true);
-    } catch (err: any) {
-      setManualError(err.message || "Invalid receipt code. Please check your SMS and re-enter.");
-    } finally {
-      setVerifyingManual(false);
     }
   };
 
@@ -568,43 +520,6 @@ export default function RegisterTournamentPage() {
                 <Zap className="w-4 h-4 fill-black" />
                 <span>I Have Entered PIN — Confirm Payment Now</span>
               </Button>
-            </div>
-
-            {/* Direct Instant Receipt Verification Form */}
-            <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/90 border border-slate-800 space-y-3 text-left max-w-md mx-auto">
-              <div className="flex items-center gap-2 text-xs font-bold text-white">
-                <KeyRound className="w-4 h-4 text-emerald-400" />
-                <span>Already Got Safaricom SMS? Verify Receipt Directly</span>
-              </div>
-              <p className="text-[11px] text-slate-400">
-                Paste the 10-character M-Pesa code from your Safaricom SMS (e.g. <strong>UJL9JAS7T5</strong>) to lock in your slot immediately:
-              </p>
-
-              {manualError && (
-                <div className="p-2.5 rounded-xl bg-rose-950/60 border border-rose-800 text-rose-300 text-xs">
-                  {manualError}
-                </div>
-              )}
-
-              <form onSubmit={handleVerifyManualReceipt} className="flex gap-2">
-                <input
-                  type="text"
-                  placeholder="e.g. UJL9JAS7T5"
-                  value={manualReceipt}
-                  onChange={(e) => setManualReceipt(e.target.value.toUpperCase())}
-                  className="flex-1 px-3 py-2 rounded-xl bg-pitch-card border border-pitch-border text-white text-xs font-mono uppercase focus:outline-none focus:border-emerald-500"
-                  required
-                />
-                <Button
-                  type="submit"
-                  variant="gold"
-                  size="sm"
-                  isLoading={verifyingManual}
-                  className="cursor-pointer font-bold text-xs shrink-0"
-                >
-                  Verify Receipt
-                </Button>
-              </form>
             </div>
 
             {/* Cancel and return button */}
@@ -830,38 +745,6 @@ export default function RegisterTournamentPage() {
                   onChange={(e) => setPhone(e.target.value)}
                   required
                 />
-
-                {/* Direct Receipt Recovery Accordion if user already paid */}
-                <div className="p-3 rounded-2xl bg-slate-900 border border-slate-800 space-y-2">
-                  <div className="flex items-center justify-between text-xs">
-                    <span className="text-slate-300 font-medium flex items-center gap-1.5">
-                      <KeyRound className="w-3.5 h-3.5 text-amber-400" />
-                      <span>Already Sent Payment to Till 1572931?</span>
-                    </span>
-                  </div>
-                  <div className="flex gap-2">
-                    <input
-                      type="text"
-                      placeholder="Paste M-Pesa Receipt (e.g. UJL9JAS7T5)"
-                      value={manualReceipt}
-                      onChange={(e) => setManualReceipt(e.target.value.toUpperCase())}
-                      className="flex-1 px-3 py-1.5 rounded-xl bg-pitch-card border border-pitch-border text-white text-xs font-mono uppercase focus:outline-none focus:border-amber-500"
-                    />
-                    <Button
-                      type="button"
-                      variant="secondary"
-                      size="sm"
-                      isLoading={verifyingManual}
-                      onClick={handleVerifyManualReceipt}
-                      className="cursor-pointer font-bold text-xs shrink-0"
-                    >
-                      Verify
-                    </Button>
-                  </div>
-                  {manualError && (
-                    <p className="text-[11px] text-rose-400">{manualError}</p>
-                  )}
-                </div>
 
                 {/* Payment Method Selector if Entry Fee > 0 */}
                 {selectedTourney && selectedTourney.entry_fee_kes > 0 ? (
