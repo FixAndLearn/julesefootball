@@ -4,6 +4,7 @@ import { mpesaClient } from "@/lib/mpesa/client";
 import { dispatchAdminOrderAlert } from "@/lib/notifications/adminAlert";
 import { sendBuyerPaymentConfirmedSms, sendSellerOrderReceivedSms } from "@/lib/notifications/smsAlert";
 import { sendBuyerPaymentSecuredWhatsApp, sendSellerDeliverCredentialsWhatsApp } from "@/lib/whatsapp/notifications";
+import { notifySellerOrderSecuredViaTelegram } from "@/lib/notifications/telegramAlert";
 import { PaymentService } from "@/services/paymentService";
 import { NextRequest, NextResponse } from "next/server";
 
@@ -389,6 +390,15 @@ export async function POST(req: NextRequest) {
           orderId
         ).catch((err) => console.warn("Seller WhatsApp error:", err));
       }
+
+      notifySellerOrderSecuredViaTelegram({
+        sellerId: order.seller_id,
+        orderId,
+        orderNumber: order.order_number,
+        listingTitle: order.listing?.title || "eFootball Squad",
+        amount,
+        buyerPhone: user.phone || undefined,
+      }).catch((err) => console.warn("Seller Telegram order alert error:", err));
     }
 
     // 6. Admin alert to Brian Okibo (0794400365)

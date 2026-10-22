@@ -235,8 +235,39 @@ export async function editTelegramMessageText(
   }
 }
 
+function escapeHtml(str: string): string {
+  if (!str) return "";
+  return String(str)
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;");
+}
+
 /**
- * Broadcasts a verified listing deal to a public Telegram Channel (e.g. @efootballmarket_deals).
+ * Extracts a valid public image URL for a squad listing.
+ */
+export function extractListingImageUrl(listing: any): string | null {
+  if (!listing) return null;
+  // Check array of images (can be strings or objects)
+  if (Array.isArray(listing.images) && listing.images.length > 0) {
+    for (const img of listing.images) {
+      if (typeof img === "string" && img.startsWith("http")) return img;
+      if (img && typeof img === "object" && typeof img.image_url === "string" && img.image_url.startsWith("http")) {
+        return img.image_url;
+      }
+    }
+  }
+  // Check common single-image fields
+  for (const field of ["primary_image_url", "image_url", "cover_image_url", "thumbnail_url"]) {
+    if (listing[field] && typeof listing[field] === "string" && listing[field].startsWith("http")) {
+      return listing[field];
+    }
+  }
+  return null;
+}
+
+/**
+ * Broadcasts a verified listing deal to the official Telegram Group/Channel (@efootballmarket254).
  */
 export async function broadcastListingToTelegramChannel(
   listing: any,
@@ -246,7 +277,7 @@ export async function broadcastListingToTelegramChannel(
     customChannel ||
     process.env.TELEGRAM_CHANNEL_ID ||
     process.env.TELEGRAM_DEALS_CHANNEL ||
-    process.env.TELEGRAM_CHAT_ID;
+    "@efootballmarket254";
 
   const token = process.env.TELEGRAM_BOT_TOKEN || process.env.TELEGRAM_API_TOKEN;
   if (!token || !channel) {
@@ -254,36 +285,48 @@ export async function broadcastListingToTelegramChannel(
   }
 
   const priceKes = listing.price ? `KES ${Number(listing.price).toLocaleString()}` : "Price on Inquiry";
-  const ovr = listing.collective_strength || listing.squad_rating || "Top Tier";
-  const platform = listing.platform ? String(listing.platform).toUpperCase() : "MOBILE";
+  const ovr = listing.overall_team_strength || listing.collective_strength || listing.squad_rating || "Top Tier";
+  const platform = listing.platform ? String(listing.platform).toUpperCase().replace("_", " ") : "MOBILE";
   const title = listing.title || "eFootball Squad";
   const listingUrl = `${APP_URL}/listings/${listing.id}`;
 
+  const coinLine = listing.coin_balance ? `🪙 <b>Coins:</b> <code>${Number(listing.coin_balance).toLocaleString()}</code>\n` : "";
+  const gpLine = listing.gp_balance ? `💵 <b>GP:</b> <code>${Number(listing.gp_balance).toLocaleString()}</code>\n` : "";
+  const epicsCount = (listing.epic_players_count || 0) + (listing.big_time_players_count || 0) + (listing.legend_players_count || 0);
+  const epicsLine = epicsCount > 0 ? `🌟 <b>Epic / Big Time / Legends:</b> <code>${epicsCount} Players</code>\n` : "";
+  const divisionLine = listing.highest_division ? `🏆 <b>Peak Division:</b> <code>Division ${listing.highest_division}</code>\n` : "";
+
   const captionHtml =
-    `🔥 <b>NEW VERIFIED LISTING ON EFOOTBALLMARKET</b> ⚽\n\n` +
-    `🎮 <b>Account:</b> <b>${title}</b>\n` +
+    `🔥 <b>NEW VERIFIED SQUAD ON EFOOTBALLMARKET</b> ⚽\n\n` +
+    `🎮 <b>Account:</b> <b>${escapeHtml(title)}</b>\n` +
     `⭐ <b>Squad Strength:</b> <code>${ovr} OVR</code>\n` +
     `💰 <b>Price:</b> <b>${priceKes}</b>\n` +
-    `📱 <b>Platform:</b> ${platform}\n` +
-    `🛡️ <b>Escrow Protection:</b> Safaricom Till 1572931\n` +
+    `📱 <b>Platform:</b> <code>${platform}</code>\n` +
+    coinLine +
+    gpLine +
+    epicsLine +
+    divisionLine +
+    `🛡️ <b>Escrow Protected:</b> Safaricom Till <code>1572931</code>\n` +
     `🔐 <b>Konami ID:</b> Transferable &amp; Email Bindable\n\n` +
-    `⚡ <i>Funds held in escrow until buyer verifies squad players &amp; coin balances!</i>\n\n` +
+    `⚡ <i>Funds held in secure escrow until buyer confirms squad access &amp; players!</i>\n\n` +
     `#eFootball #eFootballKenya #eFootballMarket #GamingKE`;
 
+  const waInquiryUrl = `https://wa.me/254794400365?text=${encodeURIComponent(
+    `Hello Brian, I want to purchase squad "${title}" (${priceKes}) on eFootballMarket: ${listingUrl}`
+  )}`;
+
   const buttons = [
-    [{ text: "🛒 Buy Safely via Escrow", url: listingUrl }],
-    [{ text: "⚽ Browse All Squads", url: `${APP_URL}/marketplace` }],
+    [{ text: `🛒 Buy Safely (${priceKes})`, url: listingUrl }],
+    [
+      { text: "💬 Deal Inquiry / WhatsApp", url: waInquiryUrl },
+      { text: "⚽ Browse All Squads", url: `${APP_URL}/marketplace` },
+    ],
   ];
 
   // Try sending high-impact squad screenshot first if available
-  const photoUrl =
-    (Array.isArray(listing.images) && listing.images[0]) ||
-    listing.images?.[0] ||
-    listing.primary_image_url ||
-    listing.image_url ||
-    listing.cover_image_url;
+  const photoUrl = extractListingImageUrl(listing);
 
-  if (photoUrl && typeof photoUrl === "string" && photoUrl.startsWith("http")) {
+  if (photoUrl) {
     try {
       const photoEndpoint = `https://api.telegram.org/bot${token.trim()}/sendPhoto`;
       const photoRes = await fetch(photoEndpoint, {
@@ -302,17 +345,20 @@ export async function broadcastListingToTelegramChannel(
 
       const photoData = await photoRes.json();
       if (photoRes.ok && photoData?.ok) {
+        console.log(`[Telegram:Broadcast] Squad photo sent to ${channel}: msg_id=${photoData.result?.message_id}`);
         return {
           success: true,
           messageId: photoData.result?.message_id,
           channelUsed: channel,
         };
       }
-    } catch {
-      // Graceful fallback to text message
+      console.warn("[Telegram:Broadcast] sendPhoto error, falling back to text:", photoData);
+    } catch (err: any) {
+      console.warn("[Telegram:Broadcast] sendPhoto failed, falling back to text:", err.message);
     }
   }
 
+  // Graceful fallback to text message with buttons
   const textRes = await sendTelegramMessage(captionHtml, {
     chatId: channel,
     token,
@@ -324,6 +370,133 @@ export async function broadcastListingToTelegramChannel(
     ...textRes,
     channelUsed: channel,
   };
+}
+
+/**
+ * Dispatches an instant Telegram message to a user or creator if they have linked their Telegram account.
+ */
+export async function sendTelegramToUser(
+  userId: string,
+  messageHtml: string,
+  inlineButtons?: Array<Array<{ text: string; url?: string; callback_data?: string }>>
+): Promise<TelegramSendResult> {
+  if (!userId) return { success: false, error: "No user ID provided" };
+
+  try {
+    const { createAdminClient } = await import("@/lib/supabase/admin");
+    const supabase = createAdminClient();
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("telegram_chat_id, username")
+      .eq("id", userId)
+      .maybeSingle();
+
+    if (!profile?.telegram_chat_id) {
+      return { success: false, error: "User has not connected Telegram." };
+    }
+
+    return await sendTelegramMessage(messageHtml, {
+      chatId: profile.telegram_chat_id,
+      inlineButtons,
+      parseMode: "HTML",
+    });
+  } catch (err: any) {
+    console.warn(`[Telegram:UserAlert] Failed to dispatch alert to user ${userId}:`, err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Notifies a seller instantly on Telegram when a buyer submits a price offer on their listing.
+ */
+export async function notifySellerNewOfferViaTelegram(params: {
+  sellerId: string;
+  offerId: string;
+  listingId: string;
+  listingTitle: string;
+  offerAmount: number;
+  originalPrice: number;
+  buyerName: string;
+  note?: string | null;
+}): Promise<TelegramSendResult> {
+  const discount =
+    params.originalPrice > 0
+      ? Math.round(((params.originalPrice - params.offerAmount) / params.originalPrice) * 100)
+      : 0;
+
+  const msg =
+    `🤝 <b>NEW CASH OFFER ON YOUR SQUAD!</b> ⚽\n\n` +
+    `🎮 <b>Squad:</b> <b>${escapeHtml(params.listingTitle)}</b>\n` +
+    `💰 <b>Offered:</b> <b>KES ${Number(params.offerAmount).toLocaleString()}</b> ` +
+    (discount > 0
+      ? `<i>(${discount}% off original KES ${Number(params.originalPrice).toLocaleString()})</i>\n`
+      : `\n`) +
+    `👤 <b>Buyer:</b> ${escapeHtml(params.buyerName)}\n` +
+    (params.note ? `💬 <b>Buyer Note:</b> <i>"${escapeHtml(params.note)}"</i>\n\n` : `\n`) +
+    `⚡ <i>Review quickly to accept or negotiate before the buyer finds another squad!</i>`;
+
+  return sendTelegramToUser(params.sellerId, msg, [
+    [{ text: "🤝 Review & Accept Offer", url: `${APP_URL}/dashboard/seller` }],
+    [{ text: "⚽ View Squad Listing", url: `${APP_URL}/listings/${params.listingId}` }],
+  ]);
+}
+
+/**
+ * Notifies a seller instantly on Telegram when payment is confirmed and locked in escrow.
+ */
+export async function notifySellerOrderSecuredViaTelegram(params: {
+  sellerId: string;
+  orderId: string;
+  orderNumber: string;
+  listingTitle: string;
+  amount: number;
+  buyerPhone?: string;
+}): Promise<TelegramSendResult> {
+  const msg =
+    `🎉 <b>SQUAD SOLD! PAYMENT SECURED IN ESCROW</b> 🛡️\n\n` +
+    `📦 <b>Order:</b> <code>${escapeHtml(params.orderNumber)}</code>\n` +
+    `🎮 <b>Squad:</b> <b>${escapeHtml(params.listingTitle)}</b>\n` +
+    `💵 <b>Amount Locked:</b> <b>KES ${Number(params.amount).toLocaleString()}</b>\n` +
+    `🛡️ <b>M-Pesa Escrow:</b> Verified safely at Till <code>1572931</code>\n\n` +
+    `⚡ <b>ACTION REQUIRED:</b>\n` +
+    `Please log into the Escrow Vault now to deliver the Konami ID and login details so the buyer can inspect and release your payout!`;
+
+  return sendTelegramToUser(params.sellerId, msg, [
+    [{ text: "🔑 Deliver Credentials to Buyer", url: `${APP_URL}/orders/${params.orderId}` }],
+    [{ text: "📊 Open Seller Dashboard", url: `${APP_URL}/dashboard/seller` }],
+  ]);
+}
+
+/**
+ * Notifies a participant on Telegram when a new message is received in the escrow chat room.
+ */
+export async function notifyEscrowMessageViaTelegram(params: {
+  recipientId: string;
+  orderId?: string;
+  orderNumber?: string;
+  senderName: string;
+  messagePreview: string;
+}): Promise<TelegramSendResult> {
+  const title = params.orderNumber ? `Order #${params.orderNumber}` : "Escrow Room";
+  const preview = params.messagePreview.length > 120
+    ? params.messagePreview.slice(0, 117) + "..."
+    : params.messagePreview;
+
+  const msg =
+    `💬 <b>NEW MESSAGE IN ESCROW ROOM</b> 📨\n\n` +
+    `📦 <b>Room:</b> <code>${escapeHtml(title)}</code>\n` +
+    `👤 <b>From:</b> <b>${escapeHtml(params.senderName)}</b>\n` +
+    `📝 <b>Message:</b> <i>"${escapeHtml(preview)}"</i>\n\n` +
+    `🛡️ <i>Funds remain safely protected in Escrow Till 1572931.</i>`;
+
+  const buttons: Array<Array<{ text: string; url?: string }>> = [];
+  if (params.orderId) {
+    buttons.push([{ text: "💬 Reply in Escrow Room", url: `${APP_URL}/orders/${params.orderId}` }]);
+  } else {
+    buttons.push([{ text: "💬 Open Portal", url: `${APP_URL}/dashboard/buyer` }]);
+  }
+
+  return sendTelegramToUser(params.recipientId, msg, buttons);
 }
 
 /**

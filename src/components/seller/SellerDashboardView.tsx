@@ -9,6 +9,7 @@ import { EmptyState } from "@/components/ui/EmptyState";
 import { formatCurrency, getPlatformLabel } from "@/lib/utils";
 import { Listing, ListingOffer, Order } from "@/types/database";
 import { SellerListingOffersPanel } from "@/components/marketplace/SellerListingOffersPanel";
+import { SellerTelegramCard } from "@/components/seller/SellerTelegramCard";
 import { ArrowRight, ArrowUpRight, Edit3, PlusCircle, ShieldCheck, Star, Trophy, Wallet, Sparkles, Crown, Lock } from "lucide-react";
 import { getSellerTier } from "@/lib/utils/sellerTier";
 import Link from "next/link";
@@ -22,10 +23,13 @@ export interface SellerDashboardViewProps {
     completed_sales_count: number;
     seller_rating: number;
     is_verified_seller: boolean;
+    telegram_username?: string | null;
+    telegram_chat_id?: string | null;
   };
   listings: Listing[];
   pendingOrders: Order[];
   incomingOffers?: ListingOffer[];
+  userId?: string;
 }
 
 export function SellerDashboardView({
@@ -33,6 +37,7 @@ export function SellerDashboardView({
   listings,
   pendingOrders,
   incomingOffers,
+  userId,
 }: SellerDashboardViewProps) {
   const router = useRouter();
   const [isWithdrawModalOpen, setIsWithdrawModalOpen] = useState(false);
@@ -209,6 +214,15 @@ export function SellerDashboardView({
           </div>
         );
       })()}
+
+      {/* Telegram Push Alerts & Official Community Group */}
+      {userId && (
+        <SellerTelegramCard
+          userId={userId}
+          initialTelegramUsername={sellerProfile.telegram_username}
+          initialTelegramChatId={sellerProfile.telegram_chat_id}
+        />
+      )}
 
       {/* Action Required: Orders Awaiting Credential Delivery */}
       {pendingOrders.length > 0 && (

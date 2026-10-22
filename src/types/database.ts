@@ -100,6 +100,9 @@ export interface Profile {
   available_balance: number;
   escrow_balance: number;
   is_suspended: boolean;
+  telegram_chat_id?: string | null;
+  telegram_username?: string | null;
+  telegram_phone?: string | null;
   created_at: string;
   updated_at: string;
   deleted_at: string | null;

@@ -348,6 +348,66 @@ export async function POST(req: NextRequest) {
 
     const lower = text.toLowerCase();
 
+    // 0. Handle Deep-Link Creator Account Binding: /start link_<userId> or /link <userId>
+    const linkMatch = text.match(/^\/(?:start\s+link_|link\s+)([a-zA-Z0-9_-]+)/i);
+    if (linkMatch) {
+      const targetUserId = linkMatch[1].trim();
+      const adminSupabase = createAdminClient();
+
+      const { data: profile, error: profErr } = await adminSupabase
+        .from("profiles")
+        .select("id, username, first_name, telegram_chat_id")
+        .eq("id", targetUserId)
+        .maybeSingle();
+
+      if (profErr || !profile) {
+        const errorReply =
+          `⚠️ <b>Account Link Notice</b>\n\n` +
+          `Could not locate user account with ID <code>${escapeHtml(targetUserId)}</code>.\n\n` +
+          `Please log into <a href="${APP_URL}">eFootballMarket.co.ke</a>, go to your <b>Seller Dashboard</b>, and tap <b>"Connect Telegram Alerts"</b> to connect with 1-click.`;
+
+        await sendTelegramMessage(errorReply, {
+          chatId,
+          inlineButtons: [
+            [{ text: "⚽ Log in to eFootballMarket", url: `${APP_URL}/login` }],
+            [{ text: "👥 Join Official Group (@efootballmarket254)", url: "https://t.me/efootballmarket254" }],
+          ],
+        });
+        return NextResponse.json({ ok: true });
+      }
+
+      // Save telegram_chat_id and telegram_username to profiles table
+      const tgUsername = message.from?.username ? `@${message.from.username}` : (message.from?.first_name || null);
+      await adminSupabase
+        .from("profiles")
+        .update({
+          telegram_chat_id: chatId,
+          telegram_username: tgUsername,
+          updated_at: new Date().toISOString(),
+        })
+        .eq("id", targetUserId);
+
+      const successReply =
+        `🎉 <b>TELEGRAM ALERTS ACTIVATED!</b> ⚽\n\n` +
+        `Welcome <b>${escapeHtml(profile.username || profile.first_name || "Creator")}</b>! Your Telegram account has been linked to your eFootballMarket profile.\n\n` +
+        `🔔 <b>Instant Alerts Enabled:</b>\n` +
+        `✅ <b>Squad Purchases:</b> Instant pings when escrow payment is confirmed at Till 1572931.\n` +
+        `✅ <b>Price Offers:</b> Instant alerts when buyers propose cash offers.\n` +
+        `✅ <b>Escrow Messages:</b> Direct pings when buyers send messages in the order room.\n\n` +
+        `📢 <b>Official Community Group:</b> Connect with Kenyan eFootball traders and creators in @efootballmarket254!`;
+
+      await sendTelegramMessage(successReply, {
+        chatId,
+        inlineButtons: [
+          [{ text: "📊 Open Seller Dashboard", url: `${APP_URL}/dashboard/seller` }],
+          [{ text: "👥 Join Official Group (@efootballmarket254)", url: "https://t.me/efootballmarket254" }],
+          [{ text: "⚽ Browse Marketplace", url: `${APP_URL}/marketplace` }],
+        ],
+      });
+
+      return NextResponse.json({ ok: true });
+    }
+
     // 1. /start or /help or greetings
     if (lower === "/start" || lower === "/help" || lower === "hi" || lower === "hello") {
       const reply =
@@ -355,9 +415,10 @@ export async function POST(req: NextRequest) {
         `Welcome to the official <b>eFootballMarket Executive &amp; Alerts Bot</b>.\n\n` +
         `🆔 <b>Your Chat ID:</b> <code>${chatId}</code>\n` +
         `🛡️ <b>M-Pesa Escrow Till:</b> <code>1572931</code> (EFootballMarket)\n` +
+        `👥 <b>Community Group:</b> @efootballmarket254\n` +
         `📱 <b>Admin Hotline:</b> +254 794 400 365\n\n` +
         `✅ <b>Bot Status:</b> Active &amp; Ready!\n` +
-        `All platform transactions, payments, credentials, and disputes are pushed to this chat automatically.\n\n` +
+        `Platform transactions, payments, credentials, and deal notifications are processed automatically.\n\n` +
         `<b>Available Commands:</b>\n` +
         `⚡ /status — Check platform &amp; escrow health\n` +
         `💳 /till — Safaricom Till 1572931 instructions\n` +
@@ -367,9 +428,9 @@ export async function POST(req: NextRequest) {
       await sendTelegramMessage(reply, {
         chatId,
         inlineButtons: [
-          [{ text: "🛡️ Open Admin Panel", url: `${APP_URL}/admin` }],
+          [{ text: "👥 Join Official Group (@efootballmarket254)", url: "https://t.me/efootballmarket254" }],
           [{ text: "⚽ Browse Marketplace", url: `${APP_URL}/marketplace` }],
-          [{ text: "💬 WhatsApp CEO Line", url: `https://wa.me/254794400365` }],
+          [{ text: "🛡️ Admin Panel", url: `${APP_URL}/admin` }],
         ],
       });
 

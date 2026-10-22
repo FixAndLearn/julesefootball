@@ -18,7 +18,7 @@ export default async function SellerDashboardPage() {
   // Fetch seller profile
   const { data: profile } = await supabase
     .from("profiles")
-    .select("available_balance, escrow_balance, completed_sales_count, seller_rating, is_verified_seller")
+    .select("available_balance, escrow_balance, completed_sales_count, seller_rating, is_verified_seller, telegram_username, telegram_chat_id")
     .eq("id", user.id)
     .single();
 
@@ -50,6 +50,8 @@ export default async function SellerDashboardPage() {
     completed_sales_count: profile?.completed_sales_count || 0,
     seller_rating: Number(profile?.seller_rating || 0),
     is_verified_seller: profile?.is_verified_seller || false,
+    telegram_username: profile?.telegram_username || null,
+    telegram_chat_id: profile?.telegram_chat_id || null,
   };
 
   return (
@@ -64,6 +66,7 @@ export default async function SellerDashboardPage() {
       </div>
 
       <SellerDashboardView
+        userId={user.id}
         sellerProfile={sellerProfile}
         listings={(listings as Listing[]) || []}
         pendingOrders={(pendingOrders as Order[]) || []}

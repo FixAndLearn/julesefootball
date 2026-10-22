@@ -3,6 +3,7 @@ import { AnyCallbackBody, StkCallbackBody } from "@/lib/mpesa/types";
 import { dispatchAdminOrderAlert } from "@/lib/notifications/adminAlert";
 import { sendBuyerPaymentConfirmedSms, sendSellerOrderReceivedSms } from "@/lib/notifications/smsAlert";
 import { sendBuyerPaymentSecuredWhatsApp, sendSellerDeliverCredentialsWhatsApp } from "@/lib/whatsapp/notifications";
+import { notifySellerOrderSecuredViaTelegram } from "@/lib/notifications/telegramAlert";
 import { Payment } from "@/types/database";
 import { SupabaseClient } from "@supabase/supabase-js";
 
@@ -241,6 +242,15 @@ export class PaymentService {
               payment.order_id || paymentId
             ).catch((err) => console.warn("Seller order WhatsApp notice:", err));
           }
+
+          notifySellerOrderSecuredViaTelegram({
+            sellerId: payment.order.seller_id,
+            orderId: payment.order_id || paymentId,
+            orderNumber: payment.order?.order_number || `ORD-${paymentId.slice(0, 8)}`,
+            listingTitle: payment.order?.listing?.title || "eFootball Verified Squad",
+            amount: amount || Number(payment.order?.total_amount) || 0,
+            buyerPhone: payment.phone_number,
+          }).catch((err) => console.warn("Seller Telegram order alert notice:", err));
         } catch (err) {
           console.warn("Seller order notification notice:", err);
         }

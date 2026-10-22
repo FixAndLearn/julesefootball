@@ -2,6 +2,7 @@ import { detectProhibitedOffPlatformContent } from "@/lib/security/chatFilter";
 import { createAdminClient, hasServiceRoleKey } from "@/lib/supabase/admin";
 import { createServerSupabaseClient } from "@/lib/supabase/server";
 import { MessageService } from "@/services/messageService";
+import { notifyEscrowMessageViaTelegram } from "@/lib/notifications/telegramAlert";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 
@@ -208,6 +209,15 @@ export async function POST(req: NextRequest) {
           action_url: actionUrl,
           is_read: false,
         });
+
+        // Instant direct Telegram ping to recipient if connected
+        notifyEscrowMessageViaTelegram({
+          recipientId,
+          orderId: order?.id,
+          orderNumber: order?.order_number,
+          senderName,
+          messagePreview: content,
+        }).catch((tgErr) => console.warn("Recipient Telegram message alert notice:", tgErr));
       } catch (notifErr) {
         console.warn("Could not dispatch notification for new message:", notifErr);
       }
